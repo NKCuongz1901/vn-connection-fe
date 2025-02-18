@@ -1,0 +1,5 @@
+# File .eslintignore
+node_modules/
+dist/
+build/
+.next/
