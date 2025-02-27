@@ -1,95 +1,57 @@
 'use client'
-import Image from '@/Components/Image'
-import styles from './page.module.scss'
+import { Layout, Menu, Carousel, Card, Button } from 'antd'
+import { Header, Content, Footer } from 'antd/es/layout/layout'
+import { HomeOutlined, BookOutlined, InfoCircleOutlined, EnvironmentOutlined, HeartOutlined, KubernetesOutlined } from '@ant-design/icons';
 
 export default function Home() {
 	return (
-		<div className={styles.page}>
-			<div style={{ width: '100%', height: '20%' }}>
-				<Image
-					src="https://firebasestorage.googleapis.com/v0/b/fir-5f468.appspot.com/o/hutao%20shortgun.jpg?alt=media&token=46af4937-9fbd-4e25-99d5-8cb0f086fb4f"
-					width={200}
-					height={200}
-					priority
-					sizes="100vw"
-				/>
-			</div>
-			<ol>
-				<li>
-					Get started by editing <code>src/app/page.tsx</code>.
-				</li>
-				<li>Save and see your changes instantly.</li>
-			</ol>
-
-			<div className={styles.ctas}>
-				<a
-					className={styles.primary}
-					href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image
-						className={styles.logo}
-						src="https://nextjs.org/icons/vercel.svg"
-						alt="Vercel logomark"
-						width={20}
-						height={20}
-					/>
-					Deploy now
-				</a>
-				<a
-					href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-					className={styles.secondary}
-				>
-					Read our docs
-				</a>
-			</div>
-			<footer className={styles.footer}>
-				<a
-					href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image
-						aria-hidden
-						src="https://nextjs.org/icons/file.svg"
-						alt="File icon"
-						width={16}
-						height={16}
-					/>
-					Learn
-				</a>
-				<a
-					href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image
-						aria-hidden
-						src="https://nextjs.org/icons/window.svg"
-						alt="Window icon"
-						width={16}
-						height={16}
-					/>
-					Examples
-				</a>
-				<a
-					href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image
-						aria-hidden
-						src="https://nextjs.org/icons/globe.svg"
-						alt="Globe icon"
-						width={16}
-						height={16}
-					/>
-					Go to nextjs.org →
-				</a>
-			</footer>
-		</div>
+		<Layout>
+		{/* Header */}
+		<Header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+		  <div style={{ color: 'white', fontSize: '20px', fontWeight: 'bold' }}>UniVini</div>
+		  <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
+			<Menu.Item key="1" icon={<HomeOutlined />}>Home</Menu.Item>
+			<Menu.Item key="2" icon={<HeartOutlined />}>Dating</Menu.Item>
+			<Menu.Item key="2" icon={<EnvironmentOutlined />}>Event</Menu.Item>
+			<Menu.Item key="2" icon={<KubernetesOutlined />}>Network</Menu.Item>
+			<Menu.Item key="2" icon={<BookOutlined />}>Library</Menu.Item>
+			<Menu.Item key="3" icon={<InfoCircleOutlined />}>About</Menu.Item>
+		  </Menu>
+		</Header>
+  
+		{/* Carousel */}
+		<Content style={{ padding: '20px' }}>
+		  <Carousel autoplay>
+			<div><h3 style={carouselStyle}>Welcome to UniVini</h3></div>
+			<div><h3 style={carouselStyle}>Discover Amazing Events</h3></div>
+			<div><h3 style={carouselStyle}>Read, Learn, and Grow</h3></div>
+		  </Carousel>
+  
+		  {/* Featured Books Section */}
+		  <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '30px' }}>
+			<Card title="Book 1" style={{ width: 300 }}>
+			  <p>Author: Zani</p>
+			  <Button type="primary">Read More</Button>
+			</Card>
+			<Card title="Book 2" style={{ width: 300 }}>
+			  <p>Author: Forest</p>
+			  <Button type="primary">Read More</Button>
+			</Card>
+		  </div>
+		</Content>
+  
+		{/* Footer */}
+		<Footer style={{ textAlign: 'center' }}>
+		  UniVini ©{new Date().getFullYear()} Created by Vietnamhikers.com
+		</Footer>
+	  </Layout>
 	)
 }
+
+const carouselStyle: React.CSSProperties = {
+	height: '100px',
+	color: '#fff',
+	lineHeight: '100px',
+	textAlign: 'center',
+	background: '#364d79',
+  };
