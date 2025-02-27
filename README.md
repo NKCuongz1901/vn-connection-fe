@@ -25,5 +25,4 @@ bun dev
   - Refactor
   - Other
 - Example :
-  - Feature: HomePage - https://fb.com/
   - Fix: Wrong text
