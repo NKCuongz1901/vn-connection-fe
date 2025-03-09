@@ -40,12 +40,7 @@ export default function RootLayout({
 	const headersList = headers()
 
 	const pathname = headersList.get('x-x-pathname') || ''
-	let content = (
-		<>
-			<b>{JSON.stringify(pathname)}</b>
-			<div style={{ color: 'bisque' }}>{children}</div>
-		</>
-	)
+	let content = <>{children}</>
 	if (appLayoutExclusive.some((i) => i.startsWith(pathname))) {
 		content = (
 			<html lang="en">

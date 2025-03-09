@@ -1,3 +1,5 @@
-.test {
-	background: red;
+.wrapper {
+	@media (min-width: 1440px) {
+		align-items: center !important;
+	}
 }

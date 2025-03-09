@@ -1,8 +1,11 @@
+import { Flex } from 'antd'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+
 import { routing } from '@/i18n/routing'
 
+import classes from './classes.module.scss'
 export default async function LocaleLayout({
 	children,
 	params: { locale },
@@ -21,7 +24,19 @@ export default async function LocaleLayout({
 
 	return (
 		<NextIntlClientProvider messages={messages}>
-			{children}
+			<Flex
+				vertical
+				className={classes.wrapper}
+				style={{
+					background: 'white',
+					color: 'black',
+					height: '100vh',
+					fontSize: 14,
+					overflow: 'auto',
+				}}
+			>
+				{children}
+			</Flex>
 		</NextIntlClientProvider>
 	)
 }
