@@ -89,6 +89,32 @@
 		color: #006b35;
 	}
 	.cButton {
-		color: #94a3b8;
+		color: white;
+		background: #e55a0f;
+	}
+}
+@media (max-width: 688px) {
+	.wrapper {
+		max-width: 100%;
+		min-width: 100%;
+		.left {
+			display: none;
+		}
+		.rightContainer {
+			width: 100%;
+			.right {
+				width: 100%;
+			}
+		}
+	}
+}
+@media (max-width: 375px) {
+	.wrapper {
+		.left {
+			display: none;
+		}
+		.rightContainer {
+			padding: 8px 16px;
+		}
 	}
 }

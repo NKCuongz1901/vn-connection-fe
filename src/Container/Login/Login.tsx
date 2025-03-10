@@ -1,7 +1,7 @@
 'use client'
 import { Checkbox, Flex, Select } from 'antd'
 import clsx from 'clsx'
-import { memo } from 'react'
+import { memo, useCallback } from 'react'
 
 import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
@@ -12,21 +12,28 @@ import Gradiant from './Gradiant'
 import MainLogo from './MainLogo'
 
 import classes from './Login.module.scss'
+import useLogin from '@/app/hooks/Login/useLogin'
+import { countryCodes } from '@/Variable/common.variable'
 
 const { Option } = Select
-const prefix = ['+84', '+85']
 
 const Login = () => {
+	const { account, onChange, isValidate } = useLogin()
+	console.log('🌸🌸🌸 TrieuNinhHan ~ Login ~ account:', { isValidate, account })
 	const selectBefore = (
-		<Select defaultValue="+84">
-			{prefix.map((i) => (
-				<Option key={i} value={i}>
-					{i}
+		<Select
+			value={account.prefix}
+			onChange={onChange('prefix')}
+			style={{ width: 90 }}
+		>
+			{countryCodes.map((i) => (
+				<Option key={i.dial_code} value={i.dial_code}>
+					{i.dial_code}
 				</Option>
 			))}
 		</Select>
 	)
-	const _renderLeft = () => {
+	const _renderLeft = useCallback(() => {
 		return (
 			<Flex vertical align="center" className={classes.left}>
 				<Background />
@@ -49,8 +56,9 @@ const Login = () => {
 				</Flex>
 			</Flex>
 		)
-	}
+	}, [])
 	const _renderRight = () => {
+		const { phone, password, isRemember } = account
 		return (
 			<Flex className={classes.right} vertical justify="space-between">
 				<div className={classes.rightTop}>
@@ -70,22 +78,39 @@ const Login = () => {
 						</Flex>
 						<Flex vertical gap={4}>
 							<span>Phone number</span>
-							<CInput addonBefore={selectBefore} placeholder="Phone number" />
+							<CInput
+								value={phone}
+								onChange={(e) => onChange('phone')(e.target.value)}
+								addonBefore={selectBefore}
+								placeholder="Phone number"
+							/>
 						</Flex>
 						<Flex vertical gap={4}>
 							<span>Password</span>
 							<CInputPassword
+								value={password}
+								onChange={(e) => onChange('password')(e.target.value)}
 								placeholder="Password"
 								style={{ padding: '12px 16px', height: 44 }}
 							/>
 						</Flex>
 						<Flex justify="space-between" align="center">
 							<Flex>
-								<Checkbox>Remember me</Checkbox>
+								<Checkbox
+									value={isRemember}
+									onChange={(e) => onChange('isRemember')(e.target.checked)}
+								>
+									Remember me
+								</Checkbox>
 							</Flex>
 							<span className={classes.color}>Forger password</span>
 						</Flex>
-						<CButton className={classes.cButton}>Sign in</CButton>
+						<CButton
+							className={isValidate ? classes.cButton : ''}
+							disabled={!isValidate}
+						>
+							Sign in
+						</CButton>
 					</Flex>
 				</div>
 				<Flex

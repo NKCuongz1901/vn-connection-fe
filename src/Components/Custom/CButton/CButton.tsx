@@ -7,7 +7,6 @@ const CButton = (_props: ButtonProps) => {
 			style={{
 				borderRadius: 100,
 				height: 48,
-				background: '#f4f8fc',
 				fontWeight: 600,
 				padding: '12px 16px',
 				border: 'none',
