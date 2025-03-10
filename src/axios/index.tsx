@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-axios.defaults.baseURL = process.env.REACT_APP_API_URL
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL
 let isRefreshing = false
 let refreshSubscribers = [] as any
 let refreshTokenPromise = null as any

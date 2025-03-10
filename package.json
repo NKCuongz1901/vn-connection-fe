@@ -14,6 +14,7 @@
 		"antd": "^5.24.1",
 		"axios": "^1.8.2",
 		"clsx": "^2.1.1",
+		"md5": "^2.3.0",
 		"next": "14.2.18",
 		"next-intl": "^3.26.3",
 		"react": "^18",
@@ -21,6 +22,7 @@
 		"sass": "^1.81.0"
 	},
 	"devDependencies": {
+		"@types/md5": "^2.3.5",
 		"@types/node": "^20",
 		"@types/react": "^18",
 		"@types/react-dom": "^18",

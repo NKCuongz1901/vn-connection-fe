@@ -18,8 +18,7 @@ import { countryCodes } from '@/Variable/common.variable'
 const { Option } = Select
 
 const Login = () => {
-	const { account, onChange, isValidate } = useLogin()
-	console.log('🌸🌸🌸 TrieuNinhHan ~ Login ~ account:', { isValidate, account })
+	const { account, onChange, isValidate, onLogin } = useLogin()
 	const selectBefore = (
 		<Select
 			value={account.prefix}
@@ -97,7 +96,7 @@ const Login = () => {
 						<Flex justify="space-between" align="center">
 							<Flex>
 								<Checkbox
-									value={isRemember}
+									checked={isRemember}
 									onChange={(e) => onChange('isRemember')(e.target.checked)}
 								>
 									Remember me
@@ -106,8 +105,9 @@ const Login = () => {
 							<span className={classes.color}>Forger password</span>
 						</Flex>
 						<CButton
-							className={isValidate ? classes.cButton : ''}
 							disabled={!isValidate}
+							className={isValidate ? classes.cButton : ''}
+							onClick={onLogin}
 						>
 							Sign in
 						</CButton>
