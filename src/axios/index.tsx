@@ -63,7 +63,7 @@ const refreshToken = async () => {
 
 axios.interceptors.response.use(
 	(response) => {
-		return response
+		return response.data
 	},
 	async (error) => {
 		const originalConfig = error.config
@@ -86,7 +86,7 @@ axios.interceptors.response.use(
 			localStorage.clear()
 		}
 
-		return Promise.reject(error)
+		return Promise.reject(error?.response?.data)
 	},
 )
 

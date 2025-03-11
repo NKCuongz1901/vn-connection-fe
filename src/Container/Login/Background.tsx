@@ -3,7 +3,7 @@ import React, { memo } from 'react'
 const Background = () => {
 	return (
 		<svg
-			width="984"
+			width="100%"
 			height="500"
 			viewBox="0 0 984 500"
 			fill="none"

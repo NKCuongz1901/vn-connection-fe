@@ -3,6 +3,9 @@ import { Checkbox, Flex, Select } from 'antd'
 import clsx from 'clsx'
 import { memo, useCallback } from 'react'
 
+import useLogin from '@/app/hooks/Login/useLogin'
+import { useLoading } from '@/app/context/LoadingContext'
+
 import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
 import CInputPassword from '@/Components/Custom/CInputPassword'
@@ -12,13 +15,15 @@ import Gradiant from './Gradiant'
 import MainLogo from './MainLogo'
 
 import classes from './Login.module.scss'
-import useLogin from '@/app/hooks/Login/useLogin'
+
 import { countryCodes } from '@/Variable/common.variable'
+import DownloadApp from '@/Components/DownloadApp'
 
 const { Option } = Select
 
 const Login = () => {
-	const { account, onChange, isValidate, onLogin } = useLogin()
+	const { loadingContext } = useLoading()
+	const { error, account, onChange, isValidate, onLogin } = useLogin()
 	const selectBefore = (
 		<Select
 			value={account.prefix}
@@ -32,10 +37,13 @@ const Login = () => {
 			))}
 		</Select>
 	)
+
 	const _renderLeft = useCallback(() => {
 		return (
 			<Flex vertical align="center" className={classes.left}>
-				<Background />
+				<div>
+					<Background />
+				</div>
 				<Flex align="center" justify="center">
 					<div className={classes.mainLogo}>
 						<MainLogo />
@@ -56,8 +64,10 @@ const Login = () => {
 			</Flex>
 		)
 	}, [])
+
 	const _renderRight = () => {
 		const { phone, password, isRemember } = account
+		const disable = !isValidate || loadingContext
 		return (
 			<Flex className={classes.right} vertical justify="space-between">
 				<div className={classes.rightTop}>
@@ -82,6 +92,7 @@ const Login = () => {
 								onChange={(e) => onChange('phone')(e.target.value)}
 								addonBefore={selectBefore}
 								placeholder="Phone number"
+								maxLength={255}
 							/>
 						</Flex>
 						<Flex vertical gap={4}>
@@ -90,7 +101,6 @@ const Login = () => {
 								value={password}
 								onChange={(e) => onChange('password')(e.target.value)}
 								placeholder="Password"
-								style={{ padding: '12px 16px', height: 44 }}
 							/>
 						</Flex>
 						<Flex justify="space-between" align="center">
@@ -104,9 +114,10 @@ const Login = () => {
 							</Flex>
 							<span className={classes.color}>Forger password</span>
 						</Flex>
+						{error && <span className="error">{error}</span>}
 						<CButton
-							disabled={!isValidate}
-							className={isValidate ? classes.cButton : ''}
+							disabled={disable}
+							className={!disable ? classes.cButton : ''}
 							onClick={onLogin}
 						>
 							Sign in
@@ -132,6 +143,7 @@ const Login = () => {
 	return (
 		<div className={classes.wrapper}>
 			{_renderLeft()}
+			{<DownloadApp />}
 			<div className={classes.rightContainer}>{_renderRight()}</div>
 		</div>
 	)

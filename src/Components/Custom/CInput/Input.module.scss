@@ -9,6 +9,10 @@
 	background: #f4f8fc;
 	border-radius: 16px 0 0 16px !important;
 }
+.wrapper :global(.ant-input-affix-wrapper) {
+	border-radius: 16px;
+	padding: 0px 16px;
+}
 .wrapper {
 	input {
 		padding: 12px 16px;

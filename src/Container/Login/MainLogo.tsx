@@ -3,8 +3,8 @@ import React, { memo } from 'react'
 const MainLogo = () => {
 	return (
 		<svg
-			width="271"
-			height="342"
+			width="100%"
+			height="auto"
 			viewBox="0 0 271 342"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
