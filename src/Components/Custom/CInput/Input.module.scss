@@ -16,5 +16,12 @@
 .wrapper {
 	input {
 		padding: 12px 16px;
+		&:-webkit-autofill {
+			-webkit-text-fill-color: black;
+			-moz-transition: background-color 2147483647s;
+			-webkit-transition: background-color 2147483647s;
+			-o-transition: background-color 2147483647s;
+			transition: background-color 2147483647s;
+		}
 	}
 }

@@ -1,14 +1,17 @@
 'use client'
 import { Checkbox, Flex, Select } from 'antd'
 import clsx from 'clsx'
+import Link from 'next/link'
 import { memo, useCallback } from 'react'
 
-import useLogin from '@/app/hooks/Login/useLogin'
 import { useLoading } from '@/app/context/LoadingContext'
+import useLogin from '@/app/hooks/Login/useLogin'
+import { useLocalePath } from '@/ultis/route.ults'
 
 import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
 import CInputPassword from '@/Components/Custom/CInputPassword'
+import DownloadApp from '@/Components/DownloadApp'
 import Logo from '@/Container/Login/Logo'
 import Background from './Background'
 import Gradiant from './Gradiant'
@@ -17,11 +20,13 @@ import MainLogo from './MainLogo'
 import classes from './Login.module.scss'
 
 import { countryCodes } from '@/Variable/common.variable'
-import DownloadApp from '@/Components/DownloadApp'
+import { mainRoutes } from '@/routes/MainRoutes'
 
 const { Option } = Select
+const { forgetPassword } = mainRoutes
 
 const Login = () => {
+	const { onGetPath } = useLocalePath()
 	const { loadingContext } = useLoading()
 	const { error, account, onChange, isValidate, onLogin } = useLogin()
 	const selectBefore = (
@@ -112,7 +117,9 @@ const Login = () => {
 									Remember me
 								</Checkbox>
 							</Flex>
-							<span className={classes.color}>Forger password</span>
+							<Link href={onGetPath(forgetPassword)}>
+								<span className={classes.color}>Forger password</span>
+							</Link>
 						</Flex>
 						{error && <span className="error">{error}</span>}
 						<CButton
