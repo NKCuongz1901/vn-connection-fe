@@ -14,6 +14,22 @@ pnpm dev
 bun dev
 ```
 
+![](https://img.shields.io/badge/Important-FF0000?style=for-the-badge)
+
+## Run next lint before commit code
+
+## Rule import
+
+1. Lib
+2. Custom hook
+3. Api
+4. Ulti
+5. Component
+6. Style
+7. Variable
+8. Define variable
+9. Define type/interface
+
 ## Rule commit code
 
 - [Intention]: [Mission] - (Url task)

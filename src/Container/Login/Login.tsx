@@ -1,5 +1,5 @@
 'use client'
-import { Checkbox, Flex, Select } from 'antd'
+import { Checkbox, Flex } from 'antd'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { memo, useCallback } from 'react'
@@ -9,9 +9,10 @@ import useLogin from '@/app/hooks/Login/useLogin'
 import { useLocalePath } from '@/ultis/route.ults'
 
 import CButton from '@/Components/Custom/CButton'
-import CInput from '@/Components/Custom/CInput'
 import CInputPassword from '@/Components/Custom/CInputPassword'
+import CInputPhone from '@/Components/Custom/CInputPhone'
 import DownloadApp from '@/Components/DownloadApp'
+import TermPolicy from '@/Components/TermPolicy'
 import Logo from '@/Container/Login/Logo'
 import Background from './Background'
 import Gradiant from './Gradiant'
@@ -19,29 +20,14 @@ import MainLogo from './MainLogo'
 
 import classes from './Login.module.scss'
 
-import { countryCodes } from '@/Variable/common.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
-const { Option } = Select
 const { forgetPassword } = mainRoutes
 
 const Login = () => {
 	const { onGetPath } = useLocalePath()
 	const { loadingContext } = useLoading()
 	const { error, account, onChange, isValidate, onLogin } = useLogin()
-	const selectBefore = (
-		<Select
-			value={account.prefix}
-			onChange={onChange('prefix')}
-			style={{ width: 90 }}
-		>
-			{countryCodes.map((i) => (
-				<Option key={i.dial_code} value={i.dial_code}>
-					{i.dial_code}
-				</Option>
-			))}
-		</Select>
-	)
 
 	const _renderLeft = useCallback(() => {
 		return (
@@ -71,7 +57,7 @@ const Login = () => {
 	}, [])
 
 	const _renderRight = () => {
-		const { phone, password, isRemember } = account
+		const { phone, password, isRemember, prefix } = account
 		const disable = !isValidate || loadingContext
 		return (
 			<Flex className={classes.right} vertical justify="space-between">
@@ -92,10 +78,11 @@ const Login = () => {
 						</Flex>
 						<Flex vertical gap={4}>
 							<span>Phone number</span>
-							<CInput
+							<CInputPhone
+								prefix={prefix}
 								value={phone}
+								onChangePrefix={onChange('prefix')}
 								onChange={(e) => onChange('phone')(e.target.value)}
-								addonBefore={selectBefore}
 								placeholder="Phone number"
 								maxLength={255}
 							/>
@@ -124,26 +111,15 @@ const Login = () => {
 						{error && <span className="error">{error}</span>}
 						<CButton
 							disabled={disable}
-							className={!disable ? classes.cButton : ''}
+							ctype={!disable ? 'oranger' : null}
 							onClick={onLogin}
 						>
 							Sign in
 						</CButton>
 					</Flex>
 				</div>
-				<Flex
-					vertical
-					justify="center"
-					align="center"
-					gap={4}
-					className={classes.rightBottom}
-				>
-					<Flex gap={12}>
-						<span>Terms of Use</span>
-						<span>Privacy Policy</span>
-					</Flex>
-					<span>Copyrightⓒ(Inc)UniVini. All rights reserved.</span>
-				</Flex>
+				<br />
+				<TermPolicy />
 			</Flex>
 		)
 	}

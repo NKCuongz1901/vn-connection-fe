@@ -1,3 +1,3 @@
 export const mainRoutes = {
-	forgetPassword: 'forger-password',
+	forgetPassword: 'forget-password',
 }

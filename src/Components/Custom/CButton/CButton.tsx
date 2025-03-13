@@ -1,7 +1,20 @@
 import { Button, ButtonProps } from 'antd'
 
-const CButton = (_props: ButtonProps) => {
-	const { children, style, ...props } = _props
+const variant = {
+	oranger: {
+		color: 'white',
+		background: ' #e55a0f ',
+	},
+	disabled: {
+		color: 'black',
+		background: ' #EEF3F6 ',
+	},
+}
+
+type VariantType = keyof typeof variant | null | undefined
+
+const CButton = (_props: ButtonProps & { ctype?: VariantType }) => {
+	const { children, ctype, style, ...props } = _props
 	return (
 		<Button
 			style={{
@@ -10,6 +23,7 @@ const CButton = (_props: ButtonProps) => {
 				fontWeight: 600,
 				padding: '12px 16px',
 				border: 'none',
+				...(ctype ? variant[ctype] || {} : {}),
 				...style,
 			}}
 			{...props}
