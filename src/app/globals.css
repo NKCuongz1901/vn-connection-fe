@@ -40,10 +40,17 @@ a {
 		color-scheme: dark;
 	}
 }
-
+/* color */
 .error{
 	color:#E53835
 }
 .gray {
 	color:#48546B
+}
+.orange{
+	color:#E55A0F
+}
+.orange-600{
+	color:#E55A0F;
+	font-weight: 600;
 }

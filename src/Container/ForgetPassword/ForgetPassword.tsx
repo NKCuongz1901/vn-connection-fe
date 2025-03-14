@@ -1,8 +1,9 @@
 'use client'
-import { VerifyPhone } from '@/Components/Auth'
 import { Flex } from 'antd'
 import { memo } from 'react'
 
+import VerifyOTP from '@/Components/Auth/VerifyOTP'
+import VerifyPhone from '@/Components/Auth/VerifyPhone'
 import TermPolicy from '@/Components/TermPolicy'
 
 import classes from './ForgetPassword.module.scss'
@@ -13,6 +14,7 @@ const ForgetPassword = () => {
 				Verify Phone Number
 			</Flex>
 			<VerifyPhone title="Reset your password" />
+			<VerifyOTP title="OTP verification" phone="0828684370" />
 			<TermPolicy />
 		</Flex>
 	)

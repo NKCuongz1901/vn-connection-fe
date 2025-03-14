@@ -9,6 +9,7 @@ import classes from './VerifyPhone.module.scss'
 
 interface VerifyPhoneProps {
 	title: string
+	[key: string]: any
 }
 
 const VerifyPhone = ({ title }: VerifyPhoneProps) => {
