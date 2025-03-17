@@ -1,8 +1,9 @@
-import { InputProps, Select } from 'antd'
+import { Select } from 'antd'
 import { memo } from 'react'
 
 import CInput from '../CInput/CInput'
 
+import { CInputProps } from '@/interface/CComponent/Input.interface'
 import { countryCodes } from '@/Variable/common.variable'
 
 const { Option } = Select
@@ -16,7 +17,7 @@ const CInputPhone = ({
 	prefix,
 	onChangePrefix,
 	...props
-}: CInputPhoneProps & InputProps) => {
+}: CInputPhoneProps & CInputProps) => {
 	const selectBefore = (
 		<Select value={prefix} onChange={onChangePrefix} style={{ width: 90 }}>
 			{countryCodes.map((i) => (

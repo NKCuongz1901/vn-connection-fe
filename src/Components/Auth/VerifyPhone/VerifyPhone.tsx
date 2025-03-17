@@ -8,11 +8,23 @@ import ImageVerifyPhone from './ImageVerifyPhone'
 import classes from './VerifyPhone.module.scss'
 
 interface VerifyPhoneProps {
+	prefix: string
 	title: string
+	value: string
+	onChangePrefix: any
+	onChange: any
+	onAccept: any
 	[key: string]: any
 }
 
-const VerifyPhone = ({ title }: VerifyPhoneProps) => {
+const VerifyPhone = ({
+	title,
+	prefix,
+	value,
+	onChangePrefix,
+	onChange,
+	onAccept,
+}: VerifyPhoneProps) => {
 	return (
 		<div className={classes.wrapper}>
 			<Flex
@@ -30,10 +42,10 @@ const VerifyPhone = ({ title }: VerifyPhoneProps) => {
 					</span>
 				</Flex>
 				<CInputPhone
-					// prefix={''}
-					// value={''}
-					// onChangePrefix={() => null}
-					// onChange={() => null}
+					prefix={prefix}
+					value={value}
+					onChangePrefix={onChangePrefix}
+					onChange={onChange}
 					placeholder="Phone number"
 					maxLength={255}
 				/>
@@ -41,7 +53,7 @@ const VerifyPhone = ({ title }: VerifyPhoneProps) => {
 					<CButton ctype="disabled" style={{ flex: 1 }}>
 						Cancel
 					</CButton>
-					<CButton ctype="oranger" style={{ flex: 1 }}>
+					<CButton ctype="oranger" style={{ flex: 1 }} onClick={onAccept}>
 						Continue
 					</CButton>
 				</Flex>

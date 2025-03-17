@@ -6,13 +6,27 @@ import ImageVerifyOTP from './ImageVerifyOTP'
 
 import classes from './VerifyOTP.module.scss'
 
-interface VerifyPhoneProps {
+interface VerifyOTPProps {
 	title: string
 	phone: string
+	value: string
+	length?: number
+	onChage?: (value: string) => void
+	onInput?: (value: string[]) => void
+	onAccept?: any
 	[key: string]: any
 }
 
-const VerifyPhone = ({ title, phone }: VerifyPhoneProps) => {
+const VerifyOTP = ({
+	title,
+	phone,
+	value,
+	length = 6,
+	onChange,
+	onInput,
+	onAccept,
+}: VerifyOTPProps) => {
+	const disabled = value.length < length
 	return (
 		<div className={classes.wrapper}>
 			<Flex
@@ -34,8 +48,11 @@ const VerifyPhone = ({ title, phone }: VerifyPhoneProps) => {
 					<Input.OTP
 						mask="*"
 						formatter={(str) => str.replace(/\D/g, '')}
-						length={6}
+						value={value}
+						length={length}
 						variant="filled"
+						onChange={onChange}
+						onInput={onInput}
 					/>
 				</Flex>
 				<Flex gap={4}>
@@ -43,7 +60,12 @@ const VerifyPhone = ({ title, phone }: VerifyPhoneProps) => {
 					<span className={classes.send}>Send again </span>
 				</Flex>
 				<Flex className={classes.buttonWrapper}>
-					<CButton disabled style={{ flex: 1 }}>
+					<CButton
+						disabled={disabled}
+						style={{ flex: 1 }}
+						ctype={!disabled && 'oranger'}
+						onClick={onAccept}
+					>
 						Confirm
 					</CButton>
 				</Flex>
@@ -52,4 +74,4 @@ const VerifyPhone = ({ title, phone }: VerifyPhoneProps) => {
 	)
 }
 
-export default memo(VerifyPhone)
+export default memo(VerifyOTP)

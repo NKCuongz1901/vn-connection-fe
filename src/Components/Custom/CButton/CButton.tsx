@@ -11,10 +11,11 @@ const variant = {
 	},
 }
 
-type VariantType = keyof typeof variant | null | undefined
+type VariantType = keyof typeof variant | null | undefined | '' | false
 
 const CButton = (_props: ButtonProps & { ctype?: VariantType }) => {
 	const { children, ctype, style, ...props } = _props
+	const { disabled } = _props
 	return (
 		<Button
 			style={{
@@ -23,7 +24,7 @@ const CButton = (_props: ButtonProps & { ctype?: VariantType }) => {
 				fontWeight: 600,
 				padding: '12px 16px',
 				border: 'none',
-				...(ctype ? variant[ctype] || {} : {}),
+				...(!disabled && ctype ? variant[ctype] || {} : {}),
 				...style,
 			}}
 			{...props}

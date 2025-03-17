@@ -54,3 +54,11 @@ a {
 	color:#E55A0F;
 	font-weight: 600;
 }
+
+/* width */
+.fullW{
+	width: 100%;
+}
+.fullvW{
+	width: 100vw;
+}

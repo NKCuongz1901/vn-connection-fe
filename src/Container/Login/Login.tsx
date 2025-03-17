@@ -76,25 +76,22 @@ const Login = () => {
 						<Flex align="center" justify="center" className={classes.rightTop3}>
 							Sign In
 						</Flex>
-						<Flex vertical gap={4}>
-							<span>Phone number</span>
-							<CInputPhone
-								prefix={prefix}
-								value={phone}
-								onChangePrefix={onChange('prefix')}
-								onChange={(e) => onChange('phone')(e.target.value)}
-								placeholder="Phone number"
-								maxLength={255}
-							/>
-						</Flex>
-						<Flex vertical gap={4}>
-							<span>Password</span>
-							<CInputPassword
-								value={password}
-								onChange={(e) => onChange('password')(e.target.value)}
-								placeholder="Password"
-							/>
-						</Flex>
+						<CInputPhone
+							label="Phone number"
+							prefix={prefix}
+							value={phone}
+							onChangePrefix={onChange('prefix')}
+							onChange={(e) => onChange('phone')(e.target.value)}
+							placeholder="Phone number"
+							maxLength={255}
+						/>
+						<CInputPassword
+							isRequired
+							label="Password"
+							value={password}
+							onChange={(e) => onChange('password')(e.target.value)}
+							placeholder="Password"
+						/>
 						<Flex justify="space-between" align="center">
 							<Flex>
 								<Checkbox
