@@ -95,6 +95,7 @@ export default function useRegisterAndReset({ type }: { type: string }) {
 		}
 		setErrors((pre) => ({ ...pre, ...error }))
 		return value
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toJson(accountInfo), step])
 
 	useEffect(() => {
