@@ -1,21 +1,22 @@
 import md5 from 'md5'
 import { useCallback, useMemo, useState } from 'react'
 
-import { useLoading } from '@/app/context/LoadingContext'
+import { useLoading } from '@/context/LoadingContext'
+import { useModal } from '@/context/ModalContext'
 
 import { loginByPhone } from '@/apis/authApis'
 
-import { toJson } from '@/ultis/common.ults'
+import { formatPhone, toJson } from '@/ultis/common.ults'
 
 export default function useLogin() {
 	const { toggleLoadingContext } = useLoading()
+	const { openError } = useModal()
 	const [account, setAccount] = useState({
 		phone: '',
 		password: '',
 		isRemember: false,
 		prefix: '+84',
 	})
-	const [error, setError] = useState('')
 	const isValidate = useMemo(() => {
 		const { phone, password } = account
 		return phone.length >= 9 && password.length >= 8
@@ -31,19 +32,11 @@ export default function useLogin() {
 				default:
 					break
 			}
-			if (error) {
-				setError('')
-			}
 			setAccount((pre) => ({
 				...pre,
 				[key]: value,
 			}))
 		},
-		[error],
-	)
-	const formatPhone = useCallback(
-		(prefix: string, phone: string) =>
-			phone.startsWith('0') ? prefix + phone.slice(1) : prefix + phone,
 		[],
 	)
 
@@ -71,7 +64,7 @@ export default function useLogin() {
 			}
 		} catch (error: any) {
 			console.log('error', error)
-			setError(error.message || 'unknow error')
+			openError(error)
 		} finally {
 			toggleLoadingContext(false)
 		}
@@ -79,7 +72,6 @@ export default function useLogin() {
 	return {
 		isValidate,
 		account,
-		error,
 		onChange: handleChange,
 		onLogin: handleLogin,
 	}

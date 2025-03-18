@@ -3,7 +3,8 @@ import { memo } from 'react'
 
 import CInput from '../CInput/CInput'
 
-import { CInputProps } from '@/interface/CComponent/Input.interface'
+import { CInputProps } from '@/interface/CComponent/CComponent.interface'
+
 import { countryCodes } from '@/Variable/common.variable'
 
 const { Option } = Select

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { useLoading } from '@/app/context/LoadingContext'
-
+import { useLoading } from '@/context/LoadingContext'
 import { isArray } from '@/ultis/array.ults'
 import { toJson } from '@/ultis/common.ults'
 
+import { passwordRegex } from '@/Variable/regex.variable'
 import { forgetPasswordStep } from '@/Variable/step.variable'
 
 export default function useRegisterAndReset({ type }: { type: string }) {
@@ -19,6 +19,8 @@ export default function useRegisterAndReset({ type }: { type: string }) {
 		prefix: '+84',
 		type,
 	})
+	const [errors, setErrors] = useState({})
+	const [isValidate, setIsValidate] = useState(false)
 	const handleChangeStep = useCallback((value: number) => {
 		setStep(value)
 	}, [])
@@ -65,6 +67,36 @@ export default function useRegisterAndReset({ type }: { type: string }) {
 		}
 	}, [])
 
+	const handleValidate = useCallback(() => {
+		const { phone, password, confirmPassword } = accountInfo
+		const error: { [key: string]: any } = {}
+		let value = false
+
+		console.log('🌸🌸🌸 TrieuNinhHan ~ handleValidate ~ step:', { step })
+		switch (step) {
+			case 0:
+				if (phone.length >= 9) {
+					value = true
+				}
+				break
+			case 2:
+				error.confirmPassword = null
+				if (passwordRegex.test(password) && password === confirmPassword) {
+					value = true
+					break
+				}
+				if (password !== confirmPassword && confirmPassword) {
+					error.confirmPassword = 'Confirm password do not match'
+				}
+				break
+
+			default:
+				break
+		}
+		setErrors((pre) => ({ ...pre, ...error }))
+		return value
+	}, [toJson(accountInfo), step])
+
 	useEffect(() => {
 		switch (step) {
 			case 2:
@@ -85,9 +117,15 @@ export default function useRegisterAndReset({ type }: { type: string }) {
 		}
 	}, [step])
 
+	useEffect(() => {
+		setIsValidate(handleValidate())
+	}, [handleValidate])
+
 	return {
+		isValidate: isValidate,
 		step: step,
 		accountInfo: accountInfo,
+		errors: errors,
 		onChangeStep: handleChangeStep,
 		onChangeData: handleChangeAccountInfo,
 		onSubmitPhone: handleSubmitPhone,

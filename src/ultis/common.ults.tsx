@@ -5,3 +5,6 @@ export const toJson = (data: any) => {
 
 export const isIOS = (): boolean =>
 	/iPhone|iPad|iPod/i.test(navigator.userAgent)
+
+export const formatPhone = (prefix: string, phone: string) =>
+	phone.startsWith('0') ? prefix + phone.slice(1) : prefix + phone

@@ -4,8 +4,8 @@ import clsx from 'clsx'
 import Link from 'next/link'
 import { memo, useCallback } from 'react'
 
-import { useLoading } from '@/app/context/LoadingContext'
 import useLogin from '@/app/hooks/Login/useLogin'
+import { useLoading } from '@/context/LoadingContext'
 import { useLocalePath } from '@/ultis/route.ults'
 
 import CButton from '@/Components/Custom/CButton'
@@ -27,7 +27,7 @@ const { forgetPassword } = mainRoutes
 const Login = () => {
 	const { onGetPath } = useLocalePath()
 	const { loadingContext } = useLoading()
-	const { error, account, onChange, isValidate, onLogin } = useLogin()
+	const { account, onChange, isValidate, onLogin } = useLogin()
 
 	const _renderLeft = useCallback(() => {
 		return (
@@ -105,7 +105,6 @@ const Login = () => {
 								<span className={classes.color}>Forger password</span>
 							</Link>
 						</Flex>
-						{error && <span className="error">{error}</span>}
 						<CButton
 							disabled={disable}
 							ctype={!disable ? 'oranger' : null}

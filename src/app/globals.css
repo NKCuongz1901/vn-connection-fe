@@ -62,3 +62,9 @@ a {
 .fullvW{
 	width: 100vw;
 }
+
+
+/* flex */
+.flex-1{
+	flex:1
+}

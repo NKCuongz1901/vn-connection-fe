@@ -1,11 +1,11 @@
 import { Flex, Input } from 'antd'
 
-import { CInputProps } from '@/interface/CComponent/Input.interface'
+import { CInputProps } from '@/interface/CComponent/CComponent.interface'
 
 import classes from './CInputPassword.module.scss'
 
 const CInputPassword = (_props: CInputProps) => {
-	const { style, label, isRequired, ...props } = _props
+	const { error, style, label, isRequired, ...props } = _props
 	return (
 		<Flex vertical gap={4}>
 			{label && (
@@ -27,6 +27,7 @@ const CInputPassword = (_props: CInputProps) => {
 				}}
 				{...props}
 			/>
+			{error && <span className="error">{error}</span>}
 		</Flex>
 	)
 }

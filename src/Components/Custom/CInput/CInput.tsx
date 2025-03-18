@@ -1,11 +1,11 @@
 import { Flex, Input } from 'antd'
 
-import { CInputProps } from '@/interface/CComponent/Input.interface'
+import { CInputProps } from '@/interface/CComponent/CComponent.interface'
 
 import classes from './Input.module.scss'
 
 const CInput = (_props: CInputProps) => {
-	const { label, isRequired, style, ...props } = _props
+	const { error, label, isRequired, style, ...props } = _props
 	return (
 		<Flex vertical gap={4}>
 			{label && (
@@ -24,6 +24,7 @@ const CInput = (_props: CInputProps) => {
 				}}
 				{...props}
 			/>
+			{error && <span className="error">{error}</span>}
 		</Flex>
 	)
 }

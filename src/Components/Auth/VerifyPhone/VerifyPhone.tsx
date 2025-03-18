@@ -8,21 +8,25 @@ import ImageVerifyPhone from './ImageVerifyPhone'
 import classes from './VerifyPhone.module.scss'
 
 interface VerifyPhoneProps {
+	disabled?: boolean
 	prefix: string
 	title: string
 	value: string
 	onChangePrefix: any
 	onChange: any
+	onCancel: any
 	onAccept: any
 	[key: string]: any
 }
 
 const VerifyPhone = ({
+	disabled,
 	title,
 	prefix,
 	value,
 	onChangePrefix,
 	onChange,
+	onCancel,
 	onAccept,
 }: VerifyPhoneProps) => {
 	return (
@@ -50,10 +54,15 @@ const VerifyPhone = ({
 					maxLength={255}
 				/>
 				<Flex className={classes.buttonWrapper}>
-					<CButton ctype="disabled" style={{ flex: 1 }}>
+					<CButton ctype="disabled" style={{ flex: 1 }} onClick={onCancel}>
 						Cancel
 					</CButton>
-					<CButton ctype="oranger" style={{ flex: 1 }} onClick={onAccept}>
+					<CButton
+						disabled={disabled}
+						ctype="oranger"
+						style={{ flex: 1 }}
+						onClick={onAccept}
+					>
 						Continue
 					</CButton>
 				</Flex>

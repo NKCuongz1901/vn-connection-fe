@@ -8,14 +8,28 @@ import ImageChangePassword from './ImageChangePassword'
 import classes from './ChangePassword.module.scss'
 
 interface ChangePasswordProps {
+	disabled?: boolean
+	password?: string
+	confirmPassword?: string
 	title: string
 	note: string
+	errors?: {
+		[key: string]: any
+	}
+	onChangePassword?: any
+	onChangeConfirmPassword?: any
 	[key: string]: any
 }
 
 const ChangePassword = ({
+	disabled,
+	password,
+	confirmPassword,
+	errors,
 	title = 'Change your password',
 	note,
+	onChangePassword,
+	onChangeConfirmPassword,
 }: ChangePasswordProps) => {
 	return (
 		<div className={classes.wrapper}>
@@ -32,15 +46,26 @@ const ChangePassword = ({
 					<div className={classes.note}>{note}</div>
 				</Flex>
 				<Flex vertical gap={12} className="fullW">
-					<CInputPassword isRequired label="New password" />
-					<CInputPassword isRequired label="Confirm password" />
+					<CInputPassword
+						isRequired
+						value={password}
+						label="New password"
+						onChange={(e) => onChangePassword(e.target.value)}
+					/>
+					<CInputPassword
+						isRequired
+						value={confirmPassword}
+						error={errors?.confirmPassword}
+						label="Confirm password"
+						onChange={(e) => onChangeConfirmPassword(e.target.value)}
+					/>
 				</Flex>
 
 				<Flex className={classes.buttonWrapper}>
 					<CButton ctype="disabled" style={{ flex: 1 }}>
 						Cancel
 					</CButton>
-					<CButton ctype="oranger" disabled style={{ flex: 1 }}>
+					<CButton ctype="oranger" disabled={disabled} style={{ flex: 1 }}>
 						Continue
 					</CButton>
 				</Flex>

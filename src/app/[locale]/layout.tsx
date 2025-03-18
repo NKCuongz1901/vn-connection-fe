@@ -3,7 +3,8 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
-import { LoadingProvider } from '../context/LoadingContext'
+import { LoadingProvider } from '@/context/LoadingContext'
+import { ModalProvider } from '@/context/ModalContext'
 
 import { routing } from '@/i18n/routing'
 
@@ -27,19 +28,21 @@ export default async function LocaleLayout({
 	return (
 		<NextIntlClientProvider messages={messages}>
 			<LoadingProvider>
-				<Flex
-					vertical
-					className={classes.wrapper}
-					style={{
-						background: 'white',
-						color: 'black',
-						height: '100vh',
-						fontSize: 14,
-						overflow: 'auto',
-					}}
-				>
-					{children}
-				</Flex>
+				<ModalProvider>
+					<Flex
+						vertical
+						className={classes.wrapper}
+						style={{
+							background: 'white',
+							color: 'black',
+							height: '100vh',
+							fontSize: 14,
+							overflow: 'auto',
+						}}
+					>
+						{children}
+					</Flex>
+				</ModalProvider>
 			</LoadingProvider>
 		</NextIntlClientProvider>
 	)

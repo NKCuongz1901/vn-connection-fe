@@ -1,0 +1,14 @@
+.wrapperCModalError {
+	.cModalErrorContent {
+		flex: 1;
+		.CModalErrorTitle {
+			font-size: 32px;
+			font-weight: 600;
+		}
+		.CModalErrorBody {
+			display: flex;
+			flex: 1;
+			justify-content: center;
+		}
+	}
+}
