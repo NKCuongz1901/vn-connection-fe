@@ -1145,3 +1145,11 @@ export const countryCodes = [
 		dial_code: '+263',
 	},
 ]
+
+export enum OTP_TYPE {
+	REGISTER = 'REGISTER',
+	FORGET_PASSWORD = 'FORGET_PASSWORD',
+	CHANGE_PHONE = 'CHANGE_PHONE',
+}
+
+export type OTPType = keyof typeof OTP_TYPE

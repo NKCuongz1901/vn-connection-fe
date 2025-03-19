@@ -19,6 +19,7 @@
 		"react/react-in-jsx-scope": "off",
 		"jsx-a11y/alt-text": "off",
 		"prefer-const": "warn",
+		"no-fallthrough": "warn",
 		"react/no-unescaped-entities": "off"
 	},
 	"settings": {

@@ -1,14 +1,26 @@
+import md5 from 'md5'
 import { useCallback, useEffect, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
-import { isArray } from '@/ultis/array.ults'
-import { toJson } from '@/ultis/common.ults'
+import { useModal } from '@/context/ModalContext'
 
+import {
+	checkPhoneExists,
+	forgetPasswordByPhone,
+	sendOTP,
+	verifyOTP,
+} from '@/apis/authApis'
+
+import { isArray } from '@/ultis/array.ults'
+import { formatPhone, toJson } from '@/ultis/common.ults'
+
+import { OTP_TYPE, OTPType } from '@/Variable/common.variable'
 import { passwordRegex } from '@/Variable/regex.variable'
 import { forgetPasswordStep } from '@/Variable/step.variable'
 
-export default function useRegisterAndReset({ type }: { type: string }) {
-	const { toggleLoadingContext: _ } = useLoading()
+export default function useRegisterAndReset({ type }: { type: OTPType }) {
+	const { toggleLoadingContext } = useLoading()
+	const { openError } = useModal()
 	const [step, setStep] = useState(0)
 	const [accountInfo, setAccountInfo] = useState({
 		title: 'Verify Phone Number',
@@ -17,6 +29,7 @@ export default function useRegisterAndReset({ type }: { type: string }) {
 		password: '',
 		confirmPassword: '',
 		prefix: '+84',
+		uid: '',
 		type,
 	})
 	const [errors, setErrors] = useState({})
@@ -35,10 +48,12 @@ export default function useRegisterAndReset({ type }: { type: string }) {
 			switch (key) {
 				case 'phone':
 					value = _value.replace(/[^0-9]/g, '')
+					break
 				case 'otp':
 					if (isArray(value)) {
 						value = _value.join('')
 					}
+					break
 				default:
 					break
 			}
@@ -50,23 +65,94 @@ export default function useRegisterAndReset({ type }: { type: string }) {
 		[],
 	)
 
-	const handleSubmitPhone = useCallback(() => {
+	const handleSubmitPhone = useCallback(async () => {
+		toggleLoadingContext(true)
+		const { prefix, phone } = accountInfo
 		try {
-			setStep(1)
+			const data: any = await checkPhoneExists({
+				phone: formatPhone(prefix, phone),
+			})
+			const { is_existed_phone } = data?.results?.object
+			switch (type) {
+				case OTP_TYPE.FORGET_PASSWORD:
+					if (!is_existed_phone) {
+						throw new Error('Phone does not exist')
+					}
+					break
+				case OTP_TYPE.REGISTER:
+					if (is_existed_phone) {
+						throw new Error('Phone already exists')
+					}
+					break
+				default:
+					break
+			}
+			const dataSendOtp: any = await sendOTP({
+				phone: formatPhone(prefix, phone),
+			})
+			if (dataSendOtp?.results?.object?.sid === 'success') {
+				setStep(1)
+			}
+			console.log(
+				'🌸🌸🌸 TrieuNinhHan ~ handleSubmitPhone ~ dataSendOtp:',
+				dataSendOtp,
+			)
+			// setStep(1)
 		} catch (error) {
 			console.log('🌸🌸🌸 TrieuNinhHan ~ handleSubmitPhone ~ error:', error)
+			openError(error)
+		} finally {
+			toggleLoadingContext(false)
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toJson(accountInfo)])
 
-	const handleSubmitOtp = useCallback(() => {
+	const handleSubmitOtp = useCallback(async () => {
+		toggleLoadingContext(true)
+
+		const { otp, prefix, phone } = accountInfo
 		try {
-			setStep(2)
+			const data: any = await verifyOTP({
+				otp_type: type,
+				phone: formatPhone(prefix, phone),
+				code: otp,
+			})
+			const { status, token } = data?.results?.object
+			if (status !== 'approved') {
+				throw new Error('Incorrect OTP code')
+			} else {
+				setAccountInfo((pre) => ({ ...pre, uid: token }))
+				setStep(2)
+			}
 		} catch (error) {
 			console.log('🌸🌸🌸 TrieuNinhHan ~ handleSubmitPhone ~ error:', error)
+			openError(error)
+		} finally {
+			toggleLoadingContext()
 		}
-	}, [])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [toJson(accountInfo), step])
 
+	const handleSubmitPass = useCallback(async () => {
+		const { uid, password } = accountInfo
+		toggleLoadingContext(true)
+
+		try {
+			const data: any = await forgetPasswordByPhone({
+				uid: uid,
+				password: md5(password),
+			})
+			if (data?.code === 200) {
+			}
+			console.log('🌸🌸🌸 TrieuNinhHan ~ handleSubmitPass ~ data:', data)
+		} catch (error) {
+			console.log('🌸🌸🌸 TrieuNinhHan ~ handleSubmitPass ~ error:', error)
+			openError(error)
+		} finally {
+			toggleLoadingContext()
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [toJson(accountInfo), step])
 	const handleValidate = useCallback(() => {
 		const { phone, password, confirmPassword } = accountInfo
 		const error: { [key: string]: any } = {}
@@ -131,5 +217,6 @@ export default function useRegisterAndReset({ type }: { type: string }) {
 		onChangeData: handleChangeAccountInfo,
 		onSubmitPhone: handleSubmitPhone,
 		onSubmitOtp: handleSubmitOtp,
+		onSubmitPass: handleSubmitPass,
 	}
 }

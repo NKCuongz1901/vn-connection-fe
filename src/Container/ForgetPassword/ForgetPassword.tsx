@@ -4,9 +4,7 @@ import { memo } from 'react'
 
 import useRegisterAndReset from '@/app/hooks/RegisterAndReset/useRegisterAndReset'
 import { useLoading } from '@/context/LoadingContext'
-import { useModal } from '@/context/ModalContext'
 import { useLocalePath } from '@/ultis/route.ults'
-
 import { formatPhone } from '@/ultis/common.ults'
 
 import ChangePassword from '@/Components/Auth/ChangePassword'
@@ -19,19 +17,20 @@ import classes from './ForgetPassword.module.scss'
 
 import { forgetPasswordStep } from '@/Variable/step.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
+import { OTP_TYPE } from '@/Variable/common.variable'
 
-const ForgetPassword = ({ type = 'reset' }) => {
+const ForgetPassword = ({ type = OTP_TYPE.FORGET_PASSWORD }) => {
 	const { onChangeRoute } = useLocalePath()
 	const { loadingContext } = useLoading()
-	const { openError } = useModal()
 	const {
 		isValidate,
 		step,
 		accountInfo,
+		errors,
 		onChangeData,
 		onSubmitPhone,
 		onSubmitOtp,
-		errors,
+		onSubmitPass,
 	} = useRegisterAndReset({
 		type,
 	})
@@ -75,6 +74,7 @@ const ForgetPassword = ({ type = 'reset' }) => {
 						note="Make sure it's at least 8 characters long and includes a mix of letters, numbers, and symbols"
 						onChangePassword={onChangeData('password')}
 						onChangeConfirmPassword={onChangeData('confirmPassword')}
+						onAccept={onSubmitPass}
 					/>
 				)
 			default:
@@ -84,7 +84,6 @@ const ForgetPassword = ({ type = 'reset' }) => {
 
 	return (
 		<Flex className={classes.wrapper} vertical align="center">
-			<div onClick={() => openError('asdasdhjads')}>a</div>
 			<Flex className={classes.title}>{title}</Flex>
 			<Flex className={classes.step} align="center">
 				<CSteps

@@ -30,6 +30,13 @@ bun dev
 8. Define variable
 9. Define type/interface
 
+## Rule passing props down
+
+1. Id, key
+2. Boolean
+3. Common type
+4. Function
+
 ## Rule commit code
 
 - [Intention]: [Mission] - (Url task)

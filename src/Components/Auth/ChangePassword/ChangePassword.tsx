@@ -18,6 +18,7 @@ interface ChangePasswordProps {
 	}
 	onChangePassword?: any
 	onChangeConfirmPassword?: any
+	onAccept?: any
 	[key: string]: any
 }
 
@@ -30,6 +31,7 @@ const ChangePassword = ({
 	note,
 	onChangePassword,
 	onChangeConfirmPassword,
+	onAccept,
 }: ChangePasswordProps) => {
 	return (
 		<div className={classes.wrapper}>
@@ -65,7 +67,12 @@ const ChangePassword = ({
 					<CButton ctype="disabled" style={{ flex: 1 }}>
 						Cancel
 					</CButton>
-					<CButton ctype="oranger" disabled={disabled} style={{ flex: 1 }}>
+					<CButton
+						ctype="oranger"
+						disabled={disabled}
+						style={{ flex: 1 }}
+						onClick={onAccept}
+					>
 						Continue
 					</CButton>
 				</Flex>
