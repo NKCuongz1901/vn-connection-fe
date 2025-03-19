@@ -29,6 +29,7 @@ export default function useLogin() {
 			switch (key) {
 				case 'phone':
 					value = _value.replace(/[^0-9]/g, '')
+					break
 				default:
 					break
 			}
