@@ -9,6 +9,7 @@ import classes from './ChangePassword.module.scss'
 
 interface ChangePasswordProps {
 	disabled?: boolean
+	isRegister?: boolean
 	password?: string
 	confirmPassword?: string
 	title: string
@@ -24,6 +25,7 @@ interface ChangePasswordProps {
 
 const ChangePassword = ({
 	disabled,
+	isRegister,
 	password,
 	confirmPassword,
 	errors,
@@ -37,7 +39,6 @@ const ChangePassword = ({
 		<div className={classes.wrapper}>
 			<Flex
 				vertical
-				gap={24}
 				align="center"
 				justify="center"
 				className={classes.container}
@@ -51,7 +52,7 @@ const ChangePassword = ({
 					<CInputPassword
 						isRequired
 						value={password}
-						label="New password"
+						label={isRegister ? 'Password' : 'New password'}
 						onChange={(e) => onChangePassword(e.target.value)}
 					/>
 					<CInputPassword
@@ -64,9 +65,6 @@ const ChangePassword = ({
 				</Flex>
 
 				<Flex className={classes.buttonWrapper}>
-					<CButton ctype="disabled" style={{ flex: 1 }}>
-						Cancel
-					</CButton>
 					<CButton
 						ctype="oranger"
 						disabled={disabled}

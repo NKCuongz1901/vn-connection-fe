@@ -8,11 +8,11 @@ import CModal from './CModal'
 import './CModal.scss'
 
 const CModalError = (_props: CModalProps) => {
-	const { onCancel, error, ...props } = _props
-	let message = error?.response?.data?.message || error?.message || error
+	const { onCancel, message: _message, titleLabel, ...props } = _props
+	let message = _message
 	// let code = error?.response?.data?.code || 0
 	if (typeof message !== 'string') {
-		message = 'Unknow error'
+		message = 'Success'
 	}
 	// if (code === 409) {
 	// 	message = 'Login expired, please login again 🍁'
@@ -37,7 +37,9 @@ const CModalError = (_props: CModalProps) => {
 			{...props}
 		>
 			<Flex vertical align="center" className="cModalContent flex-1" gap={12}>
-				<span className="error CModalTitle">ERROR</span>
+				<span className="success CModalTitle">
+					{titleLabel || 'Successfull'}
+				</span>
 				<Flex vertical className="CModalBody">
 					{message}
 				</Flex>

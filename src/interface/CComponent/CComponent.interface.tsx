@@ -10,6 +10,7 @@ interface CInputOthersProps {
 export interface CInputProps extends CInputOthersProps, InputProps {}
 
 interface CModalOthersProps {
+	titleLabel?: string
 	[key: string]: any
 }
 

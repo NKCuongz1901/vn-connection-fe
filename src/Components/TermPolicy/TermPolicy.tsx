@@ -11,6 +11,7 @@ const TermPolicy = () => {
 			style={{
 				color: '#48546b',
 				fontSize: 12,
+				width: '100%',
 			}}
 		>
 			<Flex gap={12}>

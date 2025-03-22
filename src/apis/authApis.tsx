@@ -41,3 +41,14 @@ export const forgetPasswordByPhone = async (payload: {
 }) => {
 	return await axios.post(AUTH_ROUTES.forgetPassword, payload)
 }
+
+export const registerByPhone = async (payload: {
+	uid: string
+	password: string
+	name: string
+	email: string
+	invite_code: string
+	[key: string]: any
+}) => {
+	return await axios.post(AUTH_ROUTES.registerByPhone, payload)
+}

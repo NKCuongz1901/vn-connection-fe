@@ -19,7 +19,11 @@
 	.ant-steps-icon {
 		color: #e55a0f !important;
 	}
-
+	.ant-steps-item-finish {
+		.ant-steps-item-tail::after {
+			background-color: #e55a0f !important;
+		}
+	}
 	.ant-steps-item-active {
 		.ant-steps-item-icon {
 			background-color: #e55a0f !important;
@@ -29,6 +33,10 @@
 
 		.ant-steps-icon {
 			color: white !important;
+		}
+		.ant-steps-item-title {
+			color: #e55a0f !important;
+			font-weight: 500 !important;
 		}
 		.ant-steps-item-title::after {
 			background-color: #cbd5e1 !important;

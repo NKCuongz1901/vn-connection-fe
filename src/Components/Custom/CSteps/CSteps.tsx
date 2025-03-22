@@ -7,12 +7,12 @@ const CSteps = (_props: StepsProps) => {
 	const { ...props } = _props
 	return (
 		<Steps
-			style={{
-				color: 'red',
-			}}
+			responsive={false}
 			size="small"
 			current={2}
 			className="StepsWrapper"
+			direction="horizontal"
+			labelPlacement="vertical"
 			{...props}
 		/>
 	)

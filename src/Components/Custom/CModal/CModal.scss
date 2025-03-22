@@ -1,11 +1,11 @@
-.wrapperCModalError {
-	.cModalErrorContent {
+.wrapperCModal {
+	.cModalContent {
 		flex: 1;
-		.CModalErrorTitle {
+		.CModalTitle {
 			font-size: 32px;
 			font-weight: 600;
 		}
-		.CModalErrorBody {
+		.CModalBody {
 			display: flex;
 			flex: 1;
 			justify-content: center;

@@ -1,7 +1,8 @@
 import { Flex, Input } from 'antd'
-import { memo } from 'react'
+import { memo, useState } from 'react'
 
 import CButton from '@/Components/Custom/CButton'
+import CCountDown from '@/Components/Custom/CCountDown/CCountDown'
 import ImageVerifyOTP from './ImageVerifyOTP'
 
 import classes from './VerifyOTP.module.scss'
@@ -14,6 +15,8 @@ interface VerifyOTPProps {
 	onChage?: (value: string) => void
 	onInput?: (value: string[]) => void
 	onAccept?: any
+	onSendAgain?: any
+	onChangeStep?: any
 	[key: string]: any
 }
 
@@ -25,8 +28,11 @@ const VerifyOTP = ({
 	onChange,
 	onInput,
 	onAccept,
+	onSendAgain,
+	onChangeStep,
 }: VerifyOTPProps) => {
 	const disabled = value.length < length
+	const [isSendAgain, setIsSendAgain] = useState(false)
 	return (
 		<div className={classes.wrapper}>
 			<Flex
@@ -55,9 +61,33 @@ const VerifyOTP = ({
 						onInput={onInput}
 					/>
 				</Flex>
-				<Flex gap={4}>
-					<span className="gray">Didn't receive the code?</span>
-					<span className={classes.send}>Send again </span>
+				<Flex gap={4} vertical align="center">
+					<Flex>
+						<span className="gray">Didn't receive the code?</span>
+						{isSendAgain ? (
+							<span
+								className={classes.send}
+								onClick={() => {
+									onSendAgain()
+									setIsSendAgain(false)
+								}}
+							>
+								&nbsp;Send again
+							</span>
+						) : (
+							<span className={classes.sendCountDown}>
+								&nbsp;Send again{' '}
+								<CCountDown
+									start={120}
+									onCountSuccess={() => setIsSendAgain(true)}
+								/>{' '}
+								second(s)
+							</span>
+						)}
+					</Flex>
+					<span className={classes.send} onClick={() => onChangeStep(0)}>
+						Change your phone number
+					</span>
 				</Flex>
 				<Flex className={classes.buttonWrapper}>
 					<CButton

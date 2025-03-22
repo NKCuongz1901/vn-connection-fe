@@ -4,4 +4,5 @@ export const AUTH_ROUTES = {
 	sendOTP: '/auth/otp/send',
 	verifyOTP: '/auth/otp/verify',
 	forgetPassword: '/auth/forget_password',
+	registerByPhone: '/auth/register_by_phone',
 }

@@ -7,20 +7,24 @@ import { useModal } from '@/context/ModalContext'
 import {
 	checkPhoneExists,
 	forgetPasswordByPhone,
+	registerByPhone,
 	sendOTP,
 	verifyOTP,
 } from '@/apis/authApis'
 
 import { isArray } from '@/ultis/array.ults'
 import { formatPhone, toJson } from '@/ultis/common.ults'
+import { useLocalePath } from '@/ultis/route.ults'
 
 import { OTP_TYPE, OTPType } from '@/Variable/common.variable'
 import { passwordRegex } from '@/Variable/regex.variable'
 import { forgetPasswordStep } from '@/Variable/step.variable'
+import { mainRoutes } from '@/routes/MainRoutes'
 
 export default function useRegisterAndReset({ type }: { type: OTPType }) {
 	const { toggleLoadingContext } = useLoading()
-	const { openError } = useModal()
+	const { openError, openSuccess } = useModal()
+	const { onChangeRoute } = useLocalePath()
 	const [step, setStep] = useState(0)
 	const [accountInfo, setAccountInfo] = useState({
 		title: 'Verify Phone Number',
@@ -93,13 +97,7 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 			if (dataSendOtp?.results?.object?.sid === 'success') {
 				setStep(1)
 			}
-			console.log(
-				'🌸🌸🌸 TrieuNinhHan ~ handleSubmitPhone ~ dataSendOtp:',
-				dataSendOtp,
-			)
-			// setStep(1)
 		} catch (error) {
-			console.log('🌸🌸🌸 TrieuNinhHan ~ handleSubmitPhone ~ error:', error)
 			openError(error)
 		} finally {
 			toggleLoadingContext(false)
@@ -125,7 +123,6 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 				setStep(2)
 			}
 		} catch (error) {
-			console.log('🌸🌸🌸 TrieuNinhHan ~ handleSubmitPhone ~ error:', error)
 			openError(error)
 		} finally {
 			toggleLoadingContext()
@@ -134,19 +131,35 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 	}, [toJson(accountInfo), step])
 
 	const handleSubmitPass = useCallback(async () => {
-		const { uid, password } = accountInfo
+		const isRegister = type === OTP_TYPE.REGISTER
+		const { uid, password, prefix, phone } = accountInfo
 		toggleLoadingContext(true)
 
 		try {
-			const data: any = await forgetPasswordByPhone({
+			let payload = {
 				uid: uid,
 				password: md5(password),
-			})
-			if (data?.code === 200) {
+			} as any
+			if (isRegister) {
+				payload = {
+					...payload,
+					name: formatPhone(prefix, phone),
+					email: '',
+					invite_code: '',
+				}
 			}
-			console.log('🌸🌸🌸 TrieuNinhHan ~ handleSubmitPass ~ data:', data)
+			const data: any = isRegister
+				? await registerByPhone(payload)
+				: await forgetPasswordByPhone(payload)
+			if (data?.code === 200) {
+				openSuccess({
+					message: isRegister
+						? 'Registration successful, move to login'
+						: 'Password changed successfully, move to login',
+					onAccept: () => onChangeRoute(mainRoutes.login),
+				})
+			}
 		} catch (error) {
-			console.log('🌸🌸🌸 TrieuNinhHan ~ handleSubmitPass ~ error:', error)
 			openError(error)
 		} finally {
 			toggleLoadingContext()
@@ -157,8 +170,6 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 		const { phone, password, confirmPassword } = accountInfo
 		const error: { [key: string]: any } = {}
 		let value = false
-
-		console.log('🌸🌸🌸 TrieuNinhHan ~ handleValidate ~ step:', { step })
 		switch (step) {
 			case 0:
 				if (phone.length >= 9) {

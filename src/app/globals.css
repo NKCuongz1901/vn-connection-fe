@@ -44,6 +44,9 @@ a {
 .error{
 	color:#E53835
 }
+.success{
+	color: #006B35
+}
 .gray {
 	color:#48546B
 }
@@ -67,4 +70,11 @@ a {
 /* flex */
 .flex-1{
 	flex:1
+}
+
+/* icon */
+.icon-1{
+	height: 20px;
+	width: 20px;
+	cursor: pointer;
 }

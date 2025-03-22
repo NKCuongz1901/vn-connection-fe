@@ -1,5 +1,6 @@
 'use client'
 import CModalError from '@/Components/Custom/CModal/CModalError'
+import CModalSuccess from '@/Components/Custom/CModal/CModalSuccess'
 import { usePathname } from 'next/navigation'
 import {
 	createContext,
@@ -9,19 +10,30 @@ import {
 	useState,
 } from 'react'
 
+interface openSuccessProps {
+	message: string
+	titleLabel?: string
+	onAccept?: any
+	[key: string]: any
+}
+
 const ModalContext = createContext({
 	openModal: ({}) => {},
 	openError: (_error: any) => {},
+	openSuccess: (_success: openSuccessProps) => {},
 	closeModal: () => {},
 })
 export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
-	const [open, setOpen] = useState() as any
+	const [open, setOpen] = useState({ type: '' }) as any
 
 	const openModal = useCallback(({ type = 'confirm', ...others }) => {
 		setOpen({ type, ...others })
 	}, [])
 	const openError = useCallback((error: any) => {
 		setOpen({ type: 'error', error: error })
+	}, [])
+	const openSuccess = useCallback((data: openSuccessProps) => {
+		setOpen({ type: 'success', ...data })
 	}, [])
 	const closeModal = useCallback(() => {
 		setOpen('')
@@ -31,18 +43,40 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 	useEffect(() => {
 		closeModal()
 	}, [pathname, closeModal])
+	const _renderContent = () => {
+		const { type, onAccept } = open || {}
+		let content = <></>
+		switch (type) {
+			case 'error':
+				content = <CModalError onCancel={closeModal} {...open} />
+				break
+			case 'success':
+				content = (
+					<CModalSuccess
+						onCancel={() => {
+							closeModal()
+							onAccept?.()
+						}}
+						{...open}
+					/>
+				)
+				break
+			default:
+				break
+		}
+		return content
+	}
 	return (
 		<ModalContext.Provider
 			value={{
 				openModal,
 				closeModal,
 				openError,
+				openSuccess,
 			}}
 		>
 			{children}
-			{open?.type === 'error' && (
-				<CModalError onCancel={closeModal} {...open} />
-			)}
+			{_renderContent()}
 		</ModalContext.Provider>
 	)
 }
