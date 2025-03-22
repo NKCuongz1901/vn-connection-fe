@@ -44,10 +44,6 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 
 	const handleChangeAccountInfo = useCallback(
 		(key: string) => (_value: any) => {
-			console.log('object', {
-				key,
-				_value,
-			})
 			let value = _value
 			switch (key) {
 				case 'phone':

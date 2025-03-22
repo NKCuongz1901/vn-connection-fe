@@ -64,7 +64,6 @@ export default function useLogin() {
 				}
 			}
 		} catch (error: any) {
-			console.log('error', error)
 			openError(error)
 		} finally {
 			toggleLoadingContext(false)

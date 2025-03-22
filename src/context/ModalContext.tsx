@@ -30,6 +30,7 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 		setOpen({ type, ...others })
 	}, [])
 	const openError = useCallback((error: any) => {
+		console.log('error', error)
 		setOpen({ type: 'error', error: error })
 	}, [])
 	const openSuccess = useCallback((data: openSuccessProps) => {

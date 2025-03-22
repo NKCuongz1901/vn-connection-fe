@@ -5,7 +5,6 @@ import { CModalProps } from '@/interface/CComponent/CComponent.interface'
 
 const CModal = (_props: CModalProps) => {
 	const { children, ...props } = _props
-	console.log('object')
 	return (
 		<Modal
 			centered
