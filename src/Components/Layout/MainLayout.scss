@@ -1,0 +1,122 @@
+.wrapperMainLayout {
+	.headerMainLayout {
+		height: 80px;
+		align-items: center;
+		padding: 0 32px;
+		background: white;
+		border-bottom: 1px solid #eef3f6;
+
+		/* elv-1 (bottom-bar) */
+		box-shadow: -2px 0px 12px 0px rgba(0, 13, 25, 0.1);
+	}
+	.bodyMainLayout {
+		background-color: #f4f7fc;
+		height: calc(100vh - 80px);
+		width: 100%;
+		.sideBarMainLayoutWrapper {
+			.sideBarMainLayout {
+				width: 240px;
+				background: white;
+				height: 100%;
+				.sideBarMenuToggle {
+					display: none;
+				}
+				.sideBarMainLayoutItem {
+					overflow: auto;
+
+					.menuItem {
+						padding: 8px 24px;
+						height: 64px;
+						cursor: pointer;
+						color: #94a3b8;
+						align-items: center;
+						.iconItemMenu {
+							width: 24px;
+						}
+						&:hover {
+							color: #006b35;
+							path {
+								fill: #006b35;
+							}
+						}
+					}
+
+					.menuItemActive {
+						color: #006b35;
+					}
+				}
+			}
+		}
+
+		.contentMainLayout {
+			height: 100%;
+			flex: 1;
+		}
+	}
+}
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapperMainLayout {
+		.headerMainLayout {
+			min-height: 56px;
+			max-height: 56px;
+		}
+		.bodyMainLayout {
+			height: calc(100vh - 56px);
+			.sideBarMainLayoutWrapper {
+				position: absolute;
+				height: 100%;
+				top: 0;
+				width: 100%;
+				background: rgba(0, 0, 0, 0.5);
+				.sideBarMainLayout {
+					.sideBarMenuToggle {
+						display: flex;
+						min-height: 56px;
+						padding: 0px 24px;
+						align-items: center;
+						gap: 12px;
+						color: black;
+						border-bottom: 1px solid #eef3f6;
+
+						/* elv-1 (bottom-bar) */
+						box-shadow: -2px 0px 12px 0px rgba(0, 13, 25, 0.1);
+						.sideBarMenuToggleICon {
+							width: 24px;
+							cursor: pointer;
+							color: #7987a4;
+						}
+						span {
+							font-weight: 600;
+						}
+					}
+				}
+			}
+
+			.contentMainLayout {
+				height: 100%;
+			}
+		}
+	}
+}
+@media (min-width: 0px) and (max-width: 376px) {
+	.wrapperMainLayout {
+		.headerMainLayout {
+		}
+		.bodyMainLayout {
+			.sideBarMainLayout {
+				.menuItem {
+					.iconItemMenu {
+					}
+					&:hover {
+					}
+				}
+
+				.menuItemActive {
+				}
+			}
+			.contentMainLayout {
+			}
+		}
+	}
+}

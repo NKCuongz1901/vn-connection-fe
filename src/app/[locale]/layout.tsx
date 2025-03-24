@@ -9,6 +9,7 @@ import { ModalProvider } from '@/context/ModalContext'
 import { routing } from '@/i18n/routing'
 
 import classes from './classes.module.scss'
+import MainLayout from '@/Components/Layout/MainLayout'
 export default async function LocaleLayout({
 	children,
 	params: { locale },
@@ -29,19 +30,21 @@ export default async function LocaleLayout({
 		<NextIntlClientProvider messages={messages}>
 			<LoadingProvider>
 				<ModalProvider>
-					<Flex
-						vertical
-						className={classes.wrapper}
-						style={{
-							background: 'white',
-							color: 'black',
-							height: '100vh',
-							fontSize: 14,
-							overflow: 'auto',
-						}}
-					>
-						{children}
-					</Flex>
+					<MainLayout>
+						<Flex
+							vertical
+							className={classes.wrapper}
+							style={{
+								// background: 'white',
+								color: 'black',
+								height: '100vh',
+								fontSize: 14,
+								overflow: 'auto',
+							}}
+						>
+							{children}
+						</Flex>
+					</MainLayout>
 				</ModalProvider>
 			</LoadingProvider>
 		</NextIntlClientProvider>

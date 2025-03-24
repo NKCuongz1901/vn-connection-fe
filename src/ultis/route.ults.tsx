@@ -1,8 +1,10 @@
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, usePathname, useRouter } from 'next/navigation'
 
 export function useLocalePath() {
 	const params = useParams()
 	const router = useRouter()
+	const pathname = usePathname() // Lấy path hiện tại
+
 	const locale = params?.locale || 'en'
 	const handleGetPath = (path?: string) => {
 		const cleanPath = path ? path.replace(/^\/+/, '') : '' // Xóa dấu `/` ở đầu nếu có
@@ -13,6 +15,7 @@ export function useLocalePath() {
 	}
 
 	return {
+		pathname: pathname,
 		onGetPath: handleGetPath,
 		onChangeRoute: handleChangeRoute,
 	}

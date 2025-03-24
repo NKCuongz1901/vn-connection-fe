@@ -78,3 +78,22 @@ a {
 	width: 20px;
 	cursor: pointer;
 }
+/* Ẩn thanh cuộn mặc định */
+
+::-webkit-scrollbar {
+	width: 4px; /* Điều chỉnh độ rộng nếu muốn */
+	background: transparent;
+  }
+  
+  /* Khi di chuột vào thì hiện */
+  ::-webkit-scrollbar-thumb {
+	background: #94a3b8; /* Màu của thanh cuộn */
+	border-radius: 4px;
+	visibility: hidden;
+  }
+  
+  /* Hiện thanh cuộn khi hover vào vùng cuộn */
+  :hover::-webkit-scrollbar-thumb {
+	visibility: visible;
+  }
+  
