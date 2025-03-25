@@ -1,3 +1,5 @@
+'use client'
+
 import { Flex, Input } from 'antd'
 
 import { CInputProps } from '@/interface/CComponent/CComponent.interface'

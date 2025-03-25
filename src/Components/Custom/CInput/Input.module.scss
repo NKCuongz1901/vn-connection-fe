@@ -1,3 +1,9 @@
+.layout {
+	width: 100%;
+	.wrapper {
+		align-items: center;
+	}
+}
 .wrapper :global(.ant-input) {
 	padding: 8px 16px;
 	border-radius: 16px;

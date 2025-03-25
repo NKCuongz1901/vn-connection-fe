@@ -1,14 +1,4 @@
 .wrapperMainLayout {
-	.headerMainLayout {
-		height: 80px;
-		align-items: center;
-		padding: 0 32px;
-		background: white;
-		border-bottom: 1px solid #eef3f6;
-
-		/* elv-1 (bottom-bar) */
-		box-shadow: -2px 0px 12px 0px rgba(0, 13, 25, 0.1);
-	}
 	.bodyMainLayout {
 		background-color: #f4f7fc;
 		height: calc(100vh - 80px);
@@ -64,10 +54,10 @@
 		.bodyMainLayout {
 			height: calc(100vh - 56px);
 			.sideBarMainLayoutWrapper {
+				z-index: 1;
 				position: absolute;
 				height: 100%;
 				top: 0;
-				width: 100%;
 				background: rgba(0, 0, 0, 0.5);
 				.sideBarMainLayout {
 					.sideBarMenuToggle {
@@ -91,31 +81,17 @@
 						}
 					}
 				}
+				transition: transform 0.3s ease-in-out;
+				transform: translateX(-100%);
+				width: 100%;
 			}
 
+			.openLayoutMenu {
+				width: 100%;
+				transform: translateX(0);
+			}
 			.contentMainLayout {
 				height: 100%;
-			}
-		}
-	}
-}
-@media (min-width: 0px) and (max-width: 376px) {
-	.wrapperMainLayout {
-		.headerMainLayout {
-		}
-		.bodyMainLayout {
-			.sideBarMainLayout {
-				.menuItem {
-					.iconItemMenu {
-					}
-					&:hover {
-					}
-				}
-
-				.menuItemActive {
-				}
-			}
-			.contentMainLayout {
 			}
 		}
 	}

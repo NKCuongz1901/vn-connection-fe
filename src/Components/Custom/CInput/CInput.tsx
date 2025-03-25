@@ -1,3 +1,5 @@
+'use client'
+
 import { Flex, Input } from 'antd'
 
 import { CInputProps } from '@/interface/CComponent/CComponent.interface'
@@ -7,7 +9,7 @@ import classes from './Input.module.scss'
 const CInput = (_props: CInputProps) => {
 	const { error, label, isRequired, style, ...props } = _props
 	return (
-		<Flex vertical gap={4}>
+		<Flex vertical gap={4} className={classes.layout}>
 			{label && (
 				<span>
 					{label} {isRequired && <span className="error">*</span>}

@@ -1,12 +1,16 @@
 'use client'
-import { Flex } from 'antd'
-import React, { memo } from 'react'
-import './MainLayout.scss'
-import { Menus } from '@/routes'
-import { useLocalePath } from '@/ultis/route.ults'
-import Link from 'next/link'
-import Logo from '@/svg/LogoSvg'
 import { CloseOutlined } from '@ant-design/icons'
+import { Flex } from 'antd'
+import Link from 'next/link'
+import React, { memo, useCallback, useState } from 'react'
+
+import { useLocalePath } from '@/ultis/route.ults'
+
+import HeaderMainLayout from './Child/HeaderMainLayout'
+
+import { Menus } from '@/routes'
+
+import './MainLayout.scss'
 interface MainLayoutProps {
 	children: React.ReactNode
 	[key: string]: any
@@ -15,31 +19,29 @@ interface MainLayoutProps {
 const MainLayout = (props: MainLayoutProps) => {
 	const { children } = props
 	const { pathname, onGetPath } = useLocalePath()
-	const _renderHeader = () => {
-		return (
-			<Flex className="headerMainLayout">
-				<Flex gap={4}>
-					<Logo />
-					<span>UniVini</span>
-				</Flex>
-			</Flex>
-		)
-	}
+	const [openMenu, setOpenMenu] = useState(false)
+	const toggleMenus = useCallback(() => {
+		setOpenMenu((prev) => !prev)
+	}, [])
 	const _renderSideBar = () => {
 		return (
-			<Flex className="sideBarMainLayoutWrapper">
+			<Flex
+				className={`sideBarMainLayoutWrapper ${
+					openMenu ? 'openLayoutMenu' : 'closeLayoutMenu'
+				}`}
+			>
 				<Flex vertical className="sideBarMainLayout">
 					<Flex className="sideBarMenuToggle">
 						<CloseOutlined
 							className="sideBarMenuToggleICon"
-							// onClick={() => onChangeRoute(mainRoutes.login)}
+							onClick={toggleMenus}
 						/>
 						<span>Menu</span>
 					</Flex>
 					<Flex vertical className="sideBarMainLayoutItem">
 						{Menus.map((menu) => {
 							const { title, Icon, path } = menu
-							const active = pathname.includes(path)
+							const active = pathname.startsWith(path)
 							return (
 								<Link key={title} href={onGetPath(path)}>
 									<Flex
@@ -61,7 +63,7 @@ const MainLayout = (props: MainLayoutProps) => {
 	}
 	return (
 		<Flex vertical className="wrapperMainLayout">
-			{_renderHeader()}
+			<HeaderMainLayout onToggleMenus={toggleMenus} />
 			<Flex className="bodyMainLayout">
 				{_renderSideBar()}
 				<Flex vertical className="contentMainLayout">

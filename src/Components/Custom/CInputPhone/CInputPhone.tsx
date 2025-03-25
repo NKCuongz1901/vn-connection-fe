@@ -1,3 +1,5 @@
+'use client'
+
 import { Select } from 'antd'
 import { memo } from 'react'
 

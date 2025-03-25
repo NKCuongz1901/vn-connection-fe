@@ -25,7 +25,7 @@ import { mainRoutes } from '@/routes/MainRoutes'
 const { forgetPassword } = mainRoutes
 
 const Login = () => {
-	const { onGetPath } = useLocalePath()
+	const { onGetPath, onChangeRoute } = useLocalePath()
 	const { loadingContext } = useLoading()
 	const { account, onChange, isValidate, onLogin } = useLogin()
 
@@ -70,7 +70,12 @@ const Login = () => {
 						<div className={clsx(classes.buttonSwitch, classes.active)}>
 							Sign In
 						</div>
-						<div className={classes.buttonSwitch}>Sign Up</div>
+						<div
+							className={classes.buttonSwitch}
+							onClick={() => onChangeRoute(mainRoutes.register)}
+						>
+							Sign Up
+						</div>
 					</div>
 					<Flex vertical gap={20}>
 						<Flex align="center" justify="center" className={classes.rightTop3}>
