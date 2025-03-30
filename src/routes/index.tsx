@@ -17,6 +17,9 @@ export const AUTH_ROUTES = {
 	forgetPassword: '/auth/forget_password',
 	registerByPhone: '/auth/register_by_phone',
 }
+export const USER_ROUTES = {
+	profile: '/user/profile',
+}
 export const Menus = [
 	{
 		title: 'Hangout',

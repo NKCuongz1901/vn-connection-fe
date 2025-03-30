@@ -3,7 +3,7 @@ import { CloseOutlined } from '@ant-design/icons'
 import { Flex } from 'antd'
 import { memo, useMemo } from 'react'
 
-import useRegisterAndReset from '@/app/hooks/RegisterAndReset/useRegisterAndReset'
+import useRegisterAndReset from '@/hooks/RegisterAndReset/useRegisterAndReset'
 import { useLoading } from '@/context/LoadingContext'
 import { formatPhone } from '@/ultis/common.ults'
 import { useLocalePath } from '@/ultis/route.ults'

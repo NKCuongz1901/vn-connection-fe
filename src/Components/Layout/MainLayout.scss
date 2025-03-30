@@ -1,4 +1,11 @@
+.wrapperContainerMainLayout {
+	@media (min-width: 1440px) {
+		align-items: center !important;
+	}
+}
+
 .wrapperMainLayout {
+	color: #0f1729;
 	.bodyMainLayout {
 		background-color: #f4f7fc;
 		height: calc(100vh - 80px);
@@ -39,6 +46,8 @@
 		}
 
 		.contentMainLayout {
+			padding: 24px 32px;
+			overflow: auto;
 			height: 100%;
 			flex: 1;
 		}
@@ -54,7 +63,7 @@
 		.bodyMainLayout {
 			height: calc(100vh - 56px);
 			.sideBarMainLayoutWrapper {
-				z-index: 1;
+				z-index: 2;
 				position: absolute;
 				height: 100%;
 				top: 0;

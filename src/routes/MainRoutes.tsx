@@ -11,4 +11,5 @@ export const mainRoutes = {
 	inbox: 'inbox',
 	friend: 'friend',
 	dating: 'dating',
+	profile: 'profile',
 }

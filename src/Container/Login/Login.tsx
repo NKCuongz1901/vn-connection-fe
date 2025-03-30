@@ -4,7 +4,7 @@ import clsx from 'clsx'
 import Link from 'next/link'
 import { memo, useCallback } from 'react'
 
-import useLogin from '@/app/hooks/Login/useLogin'
+import useLogin from '@/hooks/Login/useLogin'
 import { useLoading } from '@/context/LoadingContext'
 import { useLocalePath } from '@/ultis/route.ults'
 

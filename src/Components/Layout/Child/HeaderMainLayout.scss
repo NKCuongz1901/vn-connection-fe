@@ -30,6 +30,7 @@
 	}
 	.headerButton {
 		gap: 12;
+		position: relative;
 		.headerMenuOutlined {
 			display: none;
 		}
@@ -41,6 +42,27 @@
 			background: #eef3f6;
 			border-radius: 50%;
 			color: #7987a4;
+			cursor: pointer;
+		}
+		.menuItemHeaderWrapper {
+			position: absolute;
+			width: 343px;
+			padding: 12px;
+			flex-direction: column;
+			color: #0f1729;
+			right: 0%;
+			top: 50px;
+			border-radius: 8px;
+			border: 1px solid #eef3f6;
+			background: #fff;
+			z-index: 10;
+			/* FAB */
+			box-shadow: -2px -2px 8px 0px rgba(0, 0, 0, 0.1),
+				2px 2px 8px 0px rgba(0, 0, 0, 0.1);
+			.menuItemHeaderChild {
+				padding: 12px 0;
+				cursor: pointer;
+			}
 		}
 	}
 }

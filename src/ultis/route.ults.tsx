@@ -14,11 +14,14 @@ export function useLocalePath() {
 	const handleChangeRoute = (path?: string) => {
 		router.push(handleGetPath(path))
 	}
-
+	const handleGetParam = () => {
+		return params || []
+	}
 	return {
 		pathname: pathname,
 		localePathname: localePathname,
 		onGetPath: handleGetPath,
 		onChangeRoute: handleChangeRoute,
+		onGetParam: handleGetParam,
 	}
 }

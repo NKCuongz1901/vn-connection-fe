@@ -1153,3 +1153,12 @@ export enum OTP_TYPE {
 }
 
 export type OTPType = keyof typeof OTP_TYPE
+
+export const formatDate = {
+	dmy: 'DD/MM/YYYY',
+}
+export const mappingGender = {
+	MALE: 'Male',
+	FEMALE: 'Female',
+	OTHER: 'Other',
+}

@@ -1,0 +1,38 @@
+.layout {
+	width: 100%;
+	span {
+		font-weight: 600;
+	}
+	.wrapper {
+		align-items: center;
+		textarea {
+			resize: none;
+		}
+	}
+}
+.wrapper :global(.ant-input) {
+	padding: 8px 16px;
+	border-radius: 16px;
+	background: #f4f8fc;
+}
+.wrapper :global(.ant-input-group-addon) {
+	padding: 8px 16px;
+	background: #f4f8fc;
+	border-radius: 16px 0 0 16px !important;
+}
+.wrapper :global(.ant-input-affix-wrapper) {
+	border-radius: 16px;
+	padding: 0px 16px;
+}
+.wrapper {
+	input {
+		padding: 12px 16px;
+		&:-webkit-autofill {
+			-webkit-text-fill-color: black;
+			-moz-transition: background-color 2147483647s;
+			-webkit-transition: background-color 2147483647s;
+			-o-transition: background-color 2147483647s;
+			transition: background-color 2147483647s;
+		}
+	}
+}

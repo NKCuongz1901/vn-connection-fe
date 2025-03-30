@@ -1,7 +1,9 @@
 import React from 'react'
 
+import Profile from '@/Container/Profile'
+
 const page = () => {
-	return <div></div>
+	return <Profile />
 }
 
 export default page

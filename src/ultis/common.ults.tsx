@@ -10,3 +10,10 @@ export const isIOS = (): boolean =>
 
 export const formatPhone = (prefix: string, phone: string) =>
 	phone.startsWith('0') ? prefix + phone.slice(1) : prefix + phone
+
+export const getUserInfo = (key) => {
+	const data = JSON.parse(
+		localStorage.getItem('info') || sessionStorage.getItem('info') || '{}',
+	)
+	return key ? data[key] : data
+}

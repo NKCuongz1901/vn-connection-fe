@@ -1,8 +1,8 @@
 'use client'
 import { MenuOutlined, SearchOutlined } from '@ant-design/icons'
 import { IconBellFilled, IconUserCircle } from '@tabler/icons-react'
-import { Flex } from 'antd'
-import { memo, useEffect, useState } from 'react'
+import { Dropdown, Flex } from 'antd'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useLocalePath } from '@/ultis/route.ults'
 
@@ -13,6 +13,7 @@ import LogoSvg from '@/svg/LogoSvg'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import './HeaderMainLayout.scss'
+import { ItemType } from 'antd/es/menu/interface'
 
 interface HeaderMainLayoutProps {
 	onToggleMenus?: () => void
@@ -21,6 +22,31 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 	const { onToggleMenus } = props
 	const { onChangeRoute } = useLocalePath()
 	const [login, setLogin] = useState(false)
+	const userMenus: ItemType[] = useMemo(
+		() => [
+			{
+				key: 'profile',
+				label: 'My Profile',
+				onClick: () => handleMenusClick('profile'),
+			},
+			{
+				key: 'setting',
+				label: 'Account Settings',
+			},
+			{
+				key: 'fns',
+				label: 'Feedback & Support',
+			},
+			{
+				key: 'signout',
+				label: 'Sign out',
+				onClick: () => handleMenusClick('signout'),
+				style: { color: '#F80024' },
+			},
+		],
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[],
+	)
 	const isLogin = () => {
 		if (typeof window !== 'undefined') {
 			return localStorage.getItem('token') || sessionStorage.getItem('token')
@@ -29,6 +55,24 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 	}
 	useEffect(() => {
 		setLogin(Boolean(isLogin()))
+	}, [])
+
+	const handleMenusClick = useCallback((type: string) => {
+		switch (type) {
+			case 'profile':
+				onChangeRoute(mainRoutes.profile)
+				break
+			case 'fns':
+				break
+			case 'signout':
+				localStorage.clear()
+				sessionStorage.clear()
+				onChangeRoute(mainRoutes.login)
+				break
+			default:
+				break
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	return (
@@ -52,9 +96,18 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 						<Flex className="headerIcon">
 							<IconBellFilled />
 						</Flex>
-						<Flex className="headerIcon">
-							<IconUserCircle />
-						</Flex>
+
+						<Dropdown
+							menu={{ items: userMenus }}
+							trigger={['click']}
+							onOpenChange={(open, info) => {
+								console.log(open, info)
+							}}
+						>
+							<Flex className="headerIcon">
+								<IconUserCircle />
+							</Flex>
+						</Dropdown>
 					</>
 				) : (
 					<>

@@ -1,0 +1,72 @@
+.wrapper {
+	overflow: auto;
+	.top {
+		height: 288px;
+		.camera {
+			position: absolute;
+			border-radius: 50%;
+			justify-content: center;
+			align-items: center;
+			border: 1px solid #fff;
+			background: #f4f8fc;
+			height: 24px;
+			width: 24px;
+			cursor: pointer;
+
+			cursor: pointer;
+			.iconCamera {
+				font-size: 16px;
+				color: #006b35;
+				height: 16px;
+				width: 16px;
+			}
+		}
+		.cover {
+			position: relative;
+			height: 220px;
+			width: 100%;
+			& > :global(.ant-image) {
+				width: 100%;
+				img {
+					width: 100%;
+					height: 100%;
+					object-fit: cover;
+				}
+			}
+			.camera {
+				bottom: 16px;
+				right: 16px;
+			}
+		}
+		.avatarWrapper {
+			position: relative;
+			justify-content: center;
+			.avatar {
+				position: relative;
+				top: -40px;
+				border: 2px solid #fff;
+				border-radius: 50%;
+				.camera {
+					bottom: 0;
+					right: 0;
+				}
+			}
+		}
+	}
+	.bottom {
+		.bottomItem {
+			width: 50%;
+			padding: 12px 16px;
+			gap: 12px;
+			flex-direction: column;
+			:first-child {
+				font-weight: 600;
+			}
+			svg {
+				height: 16px;
+				width: 16px;
+				color: #7987a4;
+			}
+		}
+	}
+}

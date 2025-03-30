@@ -20,7 +20,8 @@
 		"jsx-a11y/alt-text": "off",
 		"prefer-const": "warn",
 		"no-fallthrough": "warn",
-		"react/no-unescaped-entities": "off"
+		"react/no-unescaped-entities": "off",
+		"@next/next/no-img-element": "off"
 	},
 	"settings": {
 		"react": {

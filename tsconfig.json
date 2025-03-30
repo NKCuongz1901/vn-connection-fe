@@ -19,7 +19,8 @@
 		],
 		"paths": {
 			"@/*": ["./src/*"]
-		}
+		},
+		"noImplicitAny": false
 	},
 	"noImplicitAny": false, // Thêm dòng này để tắt cảnh báo kiểu 'any'
 	"include": [

@@ -1,4 +1,5 @@
 import { InputProps, ModalProps } from 'antd'
+import { TextAreaProps } from 'antd/es/input'
 
 interface CInputOthersProps {
 	label?: string
@@ -8,7 +9,7 @@ interface CInputOthersProps {
 }
 
 export interface CInputProps extends CInputOthersProps, InputProps {}
-
+export interface CTextAreaProps extends CInputOthersProps, TextAreaProps {}
 interface CModalOthersProps {
 	titleLabel?: string
 	[key: string]: any
