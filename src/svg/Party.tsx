@@ -1,6 +1,6 @@
 import { memo } from 'react'
 
-import { SvgProps } from '@/interface/common/Svg.interface'
+import { SvgProps } from '@/interface/common/common.interface'
 
 const Party = ({ fill, className }: SvgProps) => {
 	return (

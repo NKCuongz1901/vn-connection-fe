@@ -86,7 +86,7 @@ const Profile = ({ id }: ProfileProps) => {
 	}, [toJson(userData)])
 
 	const _renderMessageForU = useCallback(() => {
-		const { who_i_am, title_open_hangout, i_can_offer } = userData || {}
+		const { who_i_am, looking_for, i_can_offer } = userData || {}
 		const content = [
 			{
 				label: 'I am',
@@ -95,7 +95,7 @@ const Profile = ({ id }: ProfileProps) => {
 			},
 			{
 				label: 'I’m looking for',
-				value: title_open_hangout,
+				value: looking_for,
 				id: 2,
 			},
 			{

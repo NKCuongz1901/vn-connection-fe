@@ -5,13 +5,15 @@ import { getUserProfile } from '@/apis/userApis'
 export default function useProfile({ id }: { id?: string }) {
 	const [userData, setUserData] = useState({}) as any
 	const [openEditProfile, setOpenEditProfile] = useState(true)
-	console.log(
-		'🌸🌸🌸 TrieuNinhHan ~ useProfile ~ openEditProfile:',
-		openEditProfile,
-	)
-	const handleGetUserProfile = useCallback(async () => {
+
+	const handleGetUserProfile = useCallback(async (id) => {
 		try {
-			const res: any = await getUserProfile({ id })
+			const res: any = await getUserProfile({
+				id,
+				params: {
+					fields: ['$all'],
+				},
+			})
 			const { code, results } = res || {}
 			if (code === 200) {
 				setUserData(results?.object || {})
@@ -21,17 +23,21 @@ export default function useProfile({ id }: { id?: string }) {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
+
 	const handleOpenEditP = useCallback(() => {
 		setOpenEditProfile(true)
 	}, [])
+
 	const handleCloseEditP = useCallback(() => {
 		console.log('object')
 		setOpenEditProfile(false)
 	}, [])
+
 	useEffect(() => {
-		handleGetUserProfile()
+		handleGetUserProfile(id)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	}, [id])
+
 	return {
 		userData,
 		openEditProfile,

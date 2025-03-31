@@ -19,6 +19,7 @@ export const AUTH_ROUTES = {
 }
 export const USER_ROUTES = {
 	profile: '/user/profile',
+	user: '/user',
 }
 export const Menus = [
 	{

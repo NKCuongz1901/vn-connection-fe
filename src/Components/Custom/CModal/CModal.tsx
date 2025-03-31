@@ -3,10 +3,14 @@ import { memo } from 'react'
 
 import { CModalProps } from '@/interface/CComponent/CComponent.interface'
 
+import './CModal.scss'
+
 const CModal = (_props: CModalProps) => {
-	const { children, ...props } = _props
+	const { children, styles: _styles, ...props } = _props
+	const { content, body, ...styles } = _styles || {}
 	return (
 		<Modal
+			className="wrapperCModal"
 			centered
 			open={true}
 			style={{}}
@@ -14,15 +18,21 @@ const CModal = (_props: CModalProps) => {
 				content: {
 					borderRadius: 24,
 					minHeight: 240,
+					maxHeight: '70vh',
 					display: 'flex',
 					justifyContent: 'space-between',
 					flexDirection: 'column',
+					maxWidth: '100%',
+					...content,
 				},
 				body: {
 					display: 'flex',
 					flexDirection: 'column',
 					flex: 1,
+					overflow: 'auto',
+					...body,
 				},
+				...styles,
 			}}
 			{...props}
 		>

@@ -1,13 +1,14 @@
 'use client'
 
-import { Flex, Input } from 'antd'
+import { Flex, Select } from 'antd'
 import { memo } from 'react'
+import { IconChevronDown } from '@tabler/icons-react'
 
-import { CInputProps } from '@/interface/CComponent/CComponent.interface'
+import { CSelectProps } from '@/interface/CComponent/CComponent.interface'
 
-import classes from './Input.module.scss'
+import classes from './CSelect.module.scss'
 
-const CInput = (_props: CInputProps) => {
+const CSelect = (_props: CSelectProps) => {
 	const { error, label, isRequired, style, ...props } = _props
 	const status = error ? 'error' : ''
 	return (
@@ -17,13 +18,13 @@ const CInput = (_props: CInputProps) => {
 					{label} {isRequired && <span className="error">*</span>}
 				</span>
 			)}
-			<Input
-				allowClear
+			<Select
 				className={classes.wrapper}
+				suffixIcon={<IconChevronDown />}
 				style={{
-					borderRadius: 16,
-					background: '#f4f8fc',
-					height: 44,
+					// borderRadius: 16,
+					// background: '#f4f8fc',
+					// height: 44,
 					...style,
 				}}
 				status={status}
@@ -34,4 +35,4 @@ const CInput = (_props: CInputProps) => {
 	)
 }
 
-export default memo(CInput)
+export default memo(CSelect)

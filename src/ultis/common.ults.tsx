@@ -1,5 +1,7 @@
 'use client'
 
+import { cloneDeep as _cloneDeep } from 'lodash'
+
 export const toJson = (data: any) => {
 	if (data !== undefined) return JSON.stringify(data)
 	return data
@@ -17,3 +19,4 @@ export const getUserInfo = (key) => {
 	)
 	return key ? data[key] : data
 }
+export const cloneDeep = (obj: any) => (obj ? _cloneDeep(obj) : obj)

@@ -1,4 +1,4 @@
-import { InputProps, ModalProps } from 'antd'
+import { DatePickerProps, InputProps, ModalProps, SelectProps } from 'antd'
 import { TextAreaProps } from 'antd/es/input'
 
 interface CInputOthersProps {
@@ -16,3 +16,23 @@ interface CModalOthersProps {
 }
 
 export interface CModalProps extends CModalOthersProps, ModalProps {}
+
+interface CDatePickerOthersProps {
+	label?: string
+	error?: string
+	isRequired?: boolean
+	[key: string]: any
+}
+
+export interface CDatePickerProps
+	extends CDatePickerOthersProps,
+		DatePickerProps {}
+
+interface CSelectOthersProps {
+	label?: string
+	error?: string
+	isRequired?: boolean
+	[key: string]: any
+}
+
+export interface CSelectProps extends CSelectOthersProps, SelectProps {}

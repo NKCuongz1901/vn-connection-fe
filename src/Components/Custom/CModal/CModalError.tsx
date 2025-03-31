@@ -25,7 +25,7 @@ const CModalError = (_props: CModalProps) => {
 	// }
 	return (
 		<CModal
-			className="wrapperCModal"
+			className="wrapperCModalError"
 			onCancel={onCancel}
 			footer={[
 				<Flex key="back" justify="center">

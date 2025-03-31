@@ -1,6 +1,7 @@
 'use client'
 
 import { Flex, Input } from 'antd'
+import { memo } from 'react'
 
 import { CInputProps } from '@/interface/CComponent/CComponent.interface'
 
@@ -8,6 +9,7 @@ import classes from './CInputPassword.module.scss'
 
 const CInputPassword = (_props: CInputProps) => {
 	const { error, style, label, isRequired, ...props } = _props
+	const status = error ? 'error' : ''
 	return (
 		<Flex vertical gap={4}>
 			{label && (
@@ -27,6 +29,7 @@ const CInputPassword = (_props: CInputProps) => {
 					height: 44,
 					...style,
 				}}
+				status={status}
 				{...props}
 			/>
 			{error && <span className="error">{error}</span>}
@@ -34,4 +37,4 @@ const CInputPassword = (_props: CInputProps) => {
 	)
 }
 
-export default CInputPassword
+export default memo(CInputPassword)

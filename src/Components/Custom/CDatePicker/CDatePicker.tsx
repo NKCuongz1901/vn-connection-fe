@@ -1,25 +1,28 @@
 'use client'
 
-import { Flex, Input } from 'antd'
+import { IconCalendarWeekFilled, IconChevronDown } from '@tabler/icons-react'
+import { DatePicker, Flex } from 'antd'
 import { memo } from 'react'
 
-import { CInputProps } from '@/interface/CComponent/CComponent.interface'
+import { CDatePickerProps } from '@/interface/CComponent/CComponent.interface'
 
-import classes from './Input.module.scss'
+import classes from './CDatePicker.module.scss'
 
-const CInput = (_props: CInputProps) => {
+const CDatePicker = (_props: CDatePickerProps) => {
 	const { error, label, isRequired, style, ...props } = _props
 	const status = error ? 'error' : ''
 	return (
 		<Flex vertical gap={4} className={classes.layout}>
 			{label && (
-				<span className="bold">
+				<span>
 					{label} {isRequired && <span className="error">*</span>}
 				</span>
 			)}
-			<Input
+			<DatePicker
 				allowClear
 				className={classes.wrapper}
+				prefix={<IconCalendarWeekFilled />}
+				suffixIcon={<IconChevronDown />}
 				style={{
 					borderRadius: 16,
 					background: '#f4f8fc',
@@ -34,4 +37,4 @@ const CInput = (_props: CInputProps) => {
 	)
 }
 
-export default memo(CInput)
+export default memo(CDatePicker)

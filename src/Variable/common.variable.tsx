@@ -1162,3 +1162,67 @@ export const mappingGender = {
 	FEMALE: 'Female',
 	OTHER: 'Other',
 }
+
+export const genderOpts = [
+	{
+		value: 'MALE',
+		label: mappingGender.MALE,
+	},
+	{
+		value: 'FEMALE',
+		label: mappingGender.FEMALE,
+	},
+	{
+		value: 'OTHER',
+		label: mappingGender.OTHER,
+	},
+]
+export const mappingMod = {
+	TRAVELING: 'Traveling',
+	LEARNING: 'Learning',
+	CHILLING: 'Chilling',
+	OPEN_TO_CHAT: 'Open to chat',
+}
+export const modOpts = [
+	{
+		value: 'TRAVELING',
+		label: mappingMod.TRAVELING,
+	},
+	{
+		value: 'LEARNING',
+		label: mappingMod.LEARNING,
+	},
+	{
+		value: 'CHILLING',
+		label: mappingMod.CHILLING,
+	},
+	{
+		value: 'OPEN_TO_CHAT',
+		label: mappingMod.OPEN_TO_CHAT,
+	},
+]
+export const mappingLanguage = {
+	German: 'German',
+	French: 'French',
+	Arabic: 'Arabic',
+	Italian: 'Italian',
+	Korean: 'Korean',
+	Japanese: 'Japanese',
+	English: 'English',
+	Chinese: 'Chinese',
+	Vietnamese: 'Vietnamese',
+	Thai: 'Thai',
+}
+
+export const languageOpts = [
+	{ value: 'German', label: mappingLanguage.German },
+	{ value: 'French', label: mappingLanguage.French },
+	{ value: 'Arabic', label: mappingLanguage.Arabic },
+	{ value: 'Italian', label: mappingLanguage.Italian },
+	{ value: 'Korean', label: mappingLanguage.Korean },
+	{ value: 'Japanese', label: mappingLanguage.Japanese },
+	{ value: 'English', label: mappingLanguage.English },
+	{ value: 'Chinese', label: mappingLanguage.Chinese },
+	{ value: 'Vietnamese', label: mappingLanguage.Vietnamese },
+	{ value: 'Thai', label: mappingLanguage.Thai },
+]

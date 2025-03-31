@@ -1,6 +1,6 @@
 import { memo } from 'react'
 
-import { SvgProps } from '@/interface/common/Svg.interface'
+import { SvgProps } from '@/interface/common/common.interface'
 
 const TwoUser = ({ fill }: SvgProps) => {
 	const _fill = fill || '#94A3B8'

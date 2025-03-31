@@ -1,4 +1,4 @@
-.wrapperCModal {
+.wrapperCModalError {
 	.cModalContent {
 		flex: 1;
 		.CModalTitle {
@@ -11,4 +11,7 @@
 			justify-content: center;
 		}
 	}
+}
+.wrapperCModal {
+	width: unset !important;
 }
