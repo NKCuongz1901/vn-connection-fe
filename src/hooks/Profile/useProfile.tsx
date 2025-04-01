@@ -4,7 +4,7 @@ import { getUserProfile } from '@/apis/userApis'
 
 export default function useProfile({ id }: { id?: string }) {
 	const [userData, setUserData] = useState({}) as any
-	const [openEditProfile, setOpenEditProfile] = useState(true)
+	const [openEditProfile, setOpenEditProfile] = useState(false)
 
 	const handleGetUserProfile = useCallback(async (id) => {
 		try {
@@ -29,7 +29,6 @@ export default function useProfile({ id }: { id?: string }) {
 	}, [])
 
 	const handleCloseEditP = useCallback(() => {
-		console.log('object')
 		setOpenEditProfile(false)
 	}, [])
 
@@ -43,5 +42,6 @@ export default function useProfile({ id }: { id?: string }) {
 		openEditProfile,
 		onOpenEditP: handleOpenEditP,
 		onCloseEditP: handleCloseEditP,
+		onGetUserProfile: handleGetUserProfile,
 	}
 }

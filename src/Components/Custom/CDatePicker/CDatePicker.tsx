@@ -1,13 +1,16 @@
 'use client'
 
 import { IconCalendarWeekFilled, IconChevronDown } from '@tabler/icons-react'
-import { DatePicker, Flex } from 'antd'
+import { DatePicker, DatePickerProps, Flex } from 'antd'
 import { memo } from 'react'
 
-import { CDatePickerProps } from '@/interface/CComponent/CComponent.interface'
-
 import classes from './CDatePicker.module.scss'
-
+interface CDatePickerOthersProps {
+	label?: string
+	error?: string
+	isRequired?: boolean
+}
+interface CDatePickerProps extends CDatePickerOthersProps, DatePickerProps {}
 const CDatePicker = (_props: CDatePickerProps) => {
 	const { error, label, isRequired, style, ...props } = _props
 	const status = error ? 'error' : ''

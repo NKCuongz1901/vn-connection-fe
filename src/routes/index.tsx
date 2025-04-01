@@ -21,6 +21,9 @@ export const USER_ROUTES = {
 	profile: '/user/profile',
 	user: '/user',
 }
+export const UPLOAD_ROUTES = {
+	name: '/image/upload',
+}
 export const Menus = [
 	{
 		title: 'Hangout',

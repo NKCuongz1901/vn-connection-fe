@@ -7,25 +7,15 @@ import CModal from './CModal'
 
 import './CModal.scss'
 
-const CModalError = (_props: CModalProps) => {
+const CModalSuccess = (_props: CModalProps) => {
 	const { onCancel, message: _message, titleLabel, ...props } = _props
 	let message = _message
-	// let code = error?.response?.data?.code || 0
 	if (typeof message !== 'string') {
 		message = 'Success'
 	}
-	// if (code === 409) {
-	// 	message = 'Login expired, please login again 🍁'
-	// }
-	// const onClose = () => {
-	// 	handleClose()
-	// 	if (code === 409) {
-	// 		window.location.href = '/login'
-	// 	}
-	// }
 	return (
 		<CModal
-			className="wrapperCModal"
+			className="wrapperCModalSuccess"
 			onCancel={onCancel}
 			footer={[
 				<Flex key="back" justify="center">
@@ -48,4 +38,4 @@ const CModalError = (_props: CModalProps) => {
 	)
 }
 
-export default memo(CModalError)
+export default memo(CModalSuccess)

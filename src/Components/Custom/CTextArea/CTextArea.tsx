@@ -10,10 +10,12 @@ const { TextArea } = Input
 
 const CTextArea = (_props: CTextAreaProps) => {
 	const { error, label, isRequired, style, ...props } = _props
+	const status = error ? 'error' : ''
+
 	return (
 		<Flex vertical gap={4} className={classes.layout}>
 			{label && (
-				<span>
+				<span className="bold">
 					{label} {isRequired && <span className="error">*</span>}
 				</span>
 			)}
@@ -25,6 +27,7 @@ const CTextArea = (_props: CTextAreaProps) => {
 					background: '#f4f8fc',
 					...style,
 				}}
+				status={status}
 				{...props}
 			/>
 			{error && <span className="error">{error}</span>}

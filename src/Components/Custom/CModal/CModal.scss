@@ -1,4 +1,6 @@
-.wrapperCModalError {
+.wrapperCModalError,
+.wrapperCModalSuccess,
+.wrapperCModalConfirm {
 	.cModalContent {
 		flex: 1;
 		.CModalTitle {

@@ -20,7 +20,13 @@ interface ProfileProps {
 	id?: string
 }
 const Profile = ({ id }: ProfileProps) => {
-	const { userData, onOpenEditP, openEditProfile, onCloseEditP } = useProfile({
+	const {
+		userData,
+		onOpenEditP,
+		openEditProfile,
+		onCloseEditP,
+		onGetUserProfile,
+	} = useProfile({
 		id,
 	})
 	const _renderTotalInfo = useCallback(() => {
@@ -217,11 +223,14 @@ const Profile = ({ id }: ProfileProps) => {
 			{_renderAbout()}
 			{_renderSumary()}
 			{_renderSpecial()}
-			<ModalEditProfile
-				open={openEditProfile}
-				onClose={onCloseEditP}
-				data={userData}
-			/>
+			{openEditProfile && (
+				<ModalEditProfile
+					open={openEditProfile}
+					onClose={onCloseEditP}
+					data={userData}
+					onGetUserProfile={onGetUserProfile}
+				/>
+			)}
 		</Flex>
 	)
 }

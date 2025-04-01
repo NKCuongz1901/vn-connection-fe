@@ -2,16 +2,19 @@ import {
 	IconCameraFilled,
 	IconGenderBigender,
 	IconHeartFilled,
+	IconHeartPin,
 	IconMapPinFilled,
 	IconMoodSmileFilled,
+	IconUserCog,
 	IconUserFilled,
+	IconUserHeart,
 	IconWorld,
 } from '@tabler/icons-react'
 import { Flex, Image } from 'antd'
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
 
-import { cloneDeep, toJson } from '@/ultis/common.ults'
+import { useLoading } from '@/context/LoadingContext'
+import useEditProfile from '@/hooks/Profile/useEditProfile'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
@@ -21,6 +24,7 @@ import CModal from '@/Components/Custom/CModal/CModal'
 import CSelect from '@/Components/Custom/CSelect'
 import CSelectMuti from '@/Components/Custom/CSelectMuti'
 import CTextArea from '@/Components/Custom/CTextArea'
+import CUpload from '@/Components/Custom/CUpload'
 
 import {
 	formatDate,
@@ -35,64 +39,16 @@ interface ModalEditProfileProps {
 	open: boolean
 	onClose: any
 	data?: any
+	onGetUserProfile?: any
 	[key: string]: any
-}
-const handleParseToData = (data) => {
-	const {
-		avatar,
-		cover,
-		about_me,
-		name,
-		address,
-		birthday,
-		gender,
-		mode,
-		i_am_interested_in,
-		languages_can_speak_array,
-		country_visited,
-	} = cloneDeep(data)
-	const returnData = {
-		avatar,
-		cover,
-		about_me,
-		name,
-		address,
-		birthday: birthday ? dayjs(birthday) : null,
-		gender: genderOpts.find((i) => i.value === gender),
-		mode: modOpts.find((i) => i.value === mode),
-		i_am_interested_in,
-		languages_can_speak: languages_can_speak_array,
-		country_visited,
-	}
-	return returnData
 }
 
 const ModalEditProfile = (props: ModalEditProfileProps) => {
-	const { onClose, open, data } = props
-	const [dataModal, setDataModal] = useState(handleParseToData(data))
-	const [errors, setErrors] = useState({
-		about_me: '',
-		i_am_interested_in: '',
-		languages_can_speak: '',
-		country_visited: '',
-	})
-	const handleChangeData = (key, _value) => {
-		let value = _value
-		switch (key) {
-			case 'birthday':
-				value = _value?.date
-				break
-			default:
-				break
-		}
-		setErrors((prev) => ({ ...prev, [key]: '' }))
-		setDataModal((prev) => ({ ...prev, [key]: value }))
-	}
-	useEffect(() => {
-		const _data = handleParseToData(data)
-		setDataModal(_data)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [toJson(data)])
+	const { onClose, open } = props
+	const { loadingContext } = useLoading()
+	const { dataModal, errors, onSubmit, onCheckImage, onChangeData } =
+		useEditProfile(props)
+
 	const _renderTop = () => {
 		const { avatar, cover } = dataModal || {}
 
@@ -104,20 +60,26 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 						src={cover || '/images/defaultCover.png'}
 					/>
 					<Flex className={classes.camera}>
-						<IconCameraFilled className={classes.iconCamera} />
+						<CUpload onChange={(e) => onCheckImage('cover', e.file)}>
+							<IconCameraFilled className={classes.iconCamera} />
+						</CUpload>
 					</Flex>
 				</Flex>
 				<Flex className={classes.avatarWrapper}>
 					<Flex className={classes.avatar}>
 						<CAvatar src={avatar} size={96} />
+
 						<Flex className={classes.camera}>
-							<IconCameraFilled className={classes.iconCamera} />
+							<CUpload onChange={(e) => onCheckImage('avatar', e.file)}>
+								<IconCameraFilled className={classes.iconCamera} />
+							</CUpload>
 						</Flex>
 					</Flex>
 				</Flex>
 			</Flex>
 		)
 	}
+
 	const _renderMiddle = () => {
 		const { about_me } = dataModal
 		return (
@@ -130,11 +92,12 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					value={about_me}
 					maxLength={200}
 					placeholder="Write something about you"
-					onChange={(e) => handleChangeData('about_me', e.target.value)}
+					onChange={(e) => onChangeData('about_me', e.target.value)}
 				/>
 			</Flex>
 		)
 	}
+
 	const _renderBottom = () => {
 		const {
 			name,
@@ -142,6 +105,9 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 			gender,
 			address,
 			mode,
+			who_i_am,
+			looking_for,
+			i_can_offer,
 			i_am_interested_in,
 			languages_can_speak,
 			country_visited,
@@ -152,41 +118,69 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					<span className={classes.title}>Summary</span>
 					<CInput
 						value={name}
+						error={errors.name}
 						placeholder="Your full name"
 						prefix={<IconUserFilled />}
-						onChange={(e) => handleChangeData('name', e.target.value)}
+						onChange={(e) => onChangeData('name', e.target.value)}
 					/>
 					<CDatePicker
-						value={birthday || ''}
+						value={birthday || null}
+						error={errors.birthday}
 						placeholder="Select date of member since"
 						format={formatDate.dmy}
+						maxDate={dayjs(Date())}
 						onChange={(date, dateString) =>
-							handleChangeData('birthday', { date, dateString })
+							onChangeData('birthday', { date, dateString })
 						}
 					/>
-					<Flex style={{ height: 44 }}>
+					<Flex>
 						<CSelect
 							value={gender}
+							error={errors.gender}
 							options={genderOpts}
 							placeholder="Select your gender"
 							prefix={<IconGenderBigender />}
-							onChange={(e) => handleChangeData('gender', e)}
+							onChange={(e) => onChangeData('gender', e)}
 						/>
 					</Flex>
 					<CInput
 						value={address}
-						onChange={(e) => handleChangeData('address', e.target.value)}
+						error={errors.address}
+						onChange={(e) => onChangeData('address', e.target.value)}
 						prefix={<IconMapPinFilled />}
 						placeholder="Enter your location"
 					/>
-					<Flex style={{ height: 44 }}>
+					<Flex>
 						<CSelect
 							value={mode}
+							error={errors.mode}
 							options={modOpts}
+							onChange={(e) => onChangeData('mode', e)}
 							prefix={<IconMoodSmileFilled />}
 							placeholder="Select your state"
 						/>
 					</Flex>
+					<CInput
+						value={who_i_am}
+						error={errors.who_i_am}
+						placeholder="I am a/an"
+						prefix={<IconUserCog />}
+						onChange={(e) => onChangeData('who_i_am', e.target.value)}
+					/>
+					<CInput
+						value={looking_for}
+						error={errors.looking_for}
+						placeholder="Looking for ..."
+						prefix={<IconHeartPin />}
+						onChange={(e) => onChangeData('looking_for', e.target.value)}
+					/>
+					<CInput
+						value={i_can_offer}
+						error={errors.i_can_offer}
+						placeholder="I can offer ..."
+						prefix={<IconUserHeart />}
+						onChange={(e) => onChangeData('i_can_offer', e.target.value)}
+					/>
 				</Flex>
 				<Flex className={classes.bottomItem}>
 					<span className={classes.title}>Specialties</span>
@@ -197,11 +191,9 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 						label="Interested in"
 						placeholder="Enter your interest"
 						prefix={<IconHeartFilled />}
-						onChange={(e) =>
-							handleChangeData('i_am_interested_in', e.target.value)
-						}
+						onChange={(e) => onChangeData('i_am_interested_in', e.target.value)}
 					/>
-					<Flex style={{ height: 70 }}>
+					<Flex>
 						<CSelectMuti
 							isRequired
 							error={errors.languages_can_speak}
@@ -210,7 +202,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							placeholder="Select your languages"
 							options={languageOpts}
 							prefix={<IconWorld />}
-							onChange={(e) => handleChangeData('languages_can_speak', e)}
+							onChange={(e) => onChangeData('languages_can_speak', e)}
 						/>
 					</Flex>
 					<CTextArea
@@ -221,14 +213,13 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 						error={errors.country_visited}
 						value={country_visited}
 						maxLength={200}
-						onChange={(e) =>
-							handleChangeData('country_visited', e.target.value)
-						}
+						onChange={(e) => onChangeData('country_visited', e.target.value)}
 					/>
 				</Flex>
 			</Flex>
 		)
 	}
+
 	return (
 		<>
 			{open && (
@@ -244,8 +235,9 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					footer={[
 						<Flex key="back" justify="flex-end">
 							<CButton
-								onClick={onClose}
-								ctype="disabled"
+								disabled={loadingContext}
+								onClick={onSubmit}
+								ctype="oranger"
 								style={{ width: 240 }}
 							>
 								Save Change
