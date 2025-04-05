@@ -1,7 +1,13 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+
 import { routing } from '@/i18n/routing'
+
+import { LoadingProvider } from '@/context/LoadingContext'
+import { ModalProvider } from '@/context/ModalContext'
+
+import MainLayout from '@/Components/Layout/MainLayout'
 
 export default async function LocaleLayout({
 	children,
@@ -14,6 +20,8 @@ export default async function LocaleLayout({
 	if (!routing.locales.includes(locale as any)) {
 		notFound()
 	}
+	// const headersList = headers()
+	// const pathname = headersList.get('x-x-pathname') || ''
 
 	// Providing all messages to the client
 	// side is the easiest way to get started
@@ -21,7 +29,11 @@ export default async function LocaleLayout({
 
 	return (
 		<NextIntlClientProvider messages={messages}>
-			{children}
+			<LoadingProvider>
+				<ModalProvider>
+					<MainLayout>{children}</MainLayout>
+				</ModalProvider>
+			</LoadingProvider>
 		</NextIntlClientProvider>
 	)
 }

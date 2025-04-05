@@ -1,0 +1,19 @@
+.wrapperCModalError,
+.wrapperCModalSuccess,
+.wrapperCModalConfirm {
+	.cModalContent {
+		flex: 1;
+		.CModalTitle {
+			font-size: 32px;
+			font-weight: 600;
+		}
+		.CModalBody {
+			display: flex;
+			flex: 1;
+			justify-content: center;
+		}
+	}
+}
+.wrapperCModal {
+	width: unset !important;
+}

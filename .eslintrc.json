@@ -18,7 +18,10 @@
 		"react-hooks/rules-of-hooks": "warn",
 		"react/react-in-jsx-scope": "off",
 		"jsx-a11y/alt-text": "off",
-		"prefer-const": "warn"
+		"prefer-const": "warn",
+		"no-fallthrough": "warn",
+		"react/no-unescaped-entities": "off",
+		"@next/next/no-img-element": "off"
 	},
 	"settings": {
 		"react": {

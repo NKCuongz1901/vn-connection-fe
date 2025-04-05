@@ -40,3 +40,67 @@ a {
 		color-scheme: dark;
 	}
 }
+/* color */
+.error{
+	color:#E53835
+}
+.success{
+	color: #006B35
+}
+.info {
+	color:#0e84e0
+}
+.gray {
+	color:#48546B
+}
+.orange{
+	color:#E55A0F
+}
+.orange-600{
+	color:#E55A0F;
+	font-weight: 600;
+}
+
+/* width */
+.fullW{
+	width: 100%;
+}
+.fullvW{
+	width: 100vw;
+}
+
+
+/* flex */
+.flex-1{
+	flex:1
+}
+
+/* icon */
+.icon-1{
+	height: 20px;
+	width: 20px;
+	cursor: pointer;
+}
+/* Ẩn thanh cuộn mặc định */
+
+::-webkit-scrollbar {
+	width: 4px; /* Điều chỉnh độ rộng nếu muốn */
+	background: transparent;
+  }
+  
+  /* Khi di chuột vào thì hiện */
+  ::-webkit-scrollbar-thumb {
+	background: #94a3b8; /* Màu của thanh cuộn */
+	border-radius: 4px;
+	visibility: hidden;
+  }
+  
+  /* Hiện thanh cuộn khi hover vào vùng cuộn */
+  :hover::-webkit-scrollbar-thumb {
+	visibility: visible;
+  }
+  
+/* font w */
+.bold{
+	font-weight: 600;
+}

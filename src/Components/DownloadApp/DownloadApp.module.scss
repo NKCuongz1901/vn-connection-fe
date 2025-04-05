@@ -1,0 +1,14 @@
+.wrapper {
+	& > :global(.ant-flex) {
+		padding: 12px;
+		display: none;
+		@media (max-width: 688px) {
+			display: flex;
+			width: 375px;
+		}
+		@media (max-width: 376px) {
+			display: flex;
+			width: 100%;
+		}
+	}
+}
