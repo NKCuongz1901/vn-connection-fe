@@ -1,16 +1,19 @@
 import md5 from 'md5'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
 import { loginByPhone } from '@/apis/authApis'
 
-import { formatPhone, toJson } from '@/ultis/common.ults'
+import { formatPhone, isLogin, toJson } from '@/ultis/common.ults'
+import { useLocalePath } from '@/ultis/route.ults'
+import { mainRoutes } from '@/routes/MainRoutes'
 
 export default function useLogin() {
 	const { toggleLoadingContext } = useLoading()
 	const { openError } = useModal()
+	const { onChangeRoute } = useLocalePath()
 	const [account, setAccount] = useState({
 		phone: '',
 		password: '',
@@ -69,6 +72,10 @@ export default function useLogin() {
 			toggleLoadingContext(false)
 		}
 	}
+	useEffect(() => {
+		if (isLogin()) return onChangeRoute(mainRoutes.home)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 	return {
 		isValidate,
 		account,

@@ -16,6 +16,8 @@ import CAvatar from '@/Components/Custom/CAvatar'
 import ModalEditProfile from '@/Components/Profile/ModalEditProfile'
 
 import classes from './Profile.module.scss'
+import { useSafeBack } from '@/ultis/route.ults'
+import { mainRoutes } from '@/routes/MainRoutes'
 interface ProfileProps {
 	id?: string
 }
@@ -29,6 +31,7 @@ const Profile = ({ id }: ProfileProps) => {
 	} = useProfile({
 		id,
 	})
+	const { goBackOrPush } = useSafeBack()
 	const _renderTotalInfo = useCallback(() => {
 		const { avatar, cover, name, address, id } = userData || {}
 		const isMe = id === getUserInfo('id')
@@ -42,7 +45,7 @@ const Profile = ({ id }: ProfileProps) => {
 					/>
 					<Flex className={classes.header}>
 						<Flex className={classes.icon}>
-							<IconChevronLeft />
+							<IconChevronLeft onClick={() => goBackOrPush(mainRoutes.home)} />
 						</Flex>
 						<Flex className={classes.icon}>
 							<IconDots />
@@ -141,10 +144,15 @@ const Profile = ({ id }: ProfileProps) => {
 
 	const _renderSumary = useCallback(() => {
 		const { amount_of_friend, gender, age, birthday } = userData || {}
+		console.log(
+			'🌸🌸🌸 TrieuNinhHan ~ const_renderSumary=useCallback ~ amount_of_friend:',
+			amount_of_friend,
+		)
+
 		const content = [
 			{
 				label: 'Friends',
-				value: amount_of_friend + ' friends',
+				value: (amount_of_friend || 0) + ' friends',
 				id: 1,
 			},
 			{

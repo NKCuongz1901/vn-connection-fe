@@ -19,4 +19,15 @@ export const getUserInfo = (key) => {
 	)
 	return key ? data[key] : data
 }
+export const isLogin = () => {
+	const storage = localStorage.getItem('refresh_token')
+		? localStorage
+		: sessionStorage
+	return (
+		storage.getItem('info') &&
+		storage.getItem('refresh_token') &&
+		storage.getItem('token')
+	)
+}
+
 export const cloneDeep = (obj: any) => (obj ? _cloneDeep(obj) : obj)
