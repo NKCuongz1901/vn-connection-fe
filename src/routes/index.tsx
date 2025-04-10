@@ -20,6 +20,15 @@ export const AUTH_ROUTES = {
 export const USER_ROUTES = {
 	profile: '/user/profile',
 	user: '/user',
+	block: '/user/block',
+	report: '/feedback',
+}
+
+export const FRIEND_ROUTES = {
+	name: '/friend',
+	myFriend: 'friend/my',
+	myRequest: 'friend/my-request',
+	mySent: 'friend/my-sent',
 }
 export const UPLOAD_ROUTES = {
 	name: '/image/upload',

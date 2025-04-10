@@ -31,3 +31,10 @@ export const isLogin = () => {
 }
 
 export const cloneDeep = (obj: any) => (obj ? _cloneDeep(obj) : obj)
+
+export const isFunction = (value: any) => typeof value === 'function'
+export const delay = (n: number) =>
+	new Promise((resolve) => setTimeout(resolve, n))
+export const isMobile = () =>
+	window.matchMedia('(min-width: 0px) and (max-width: 769px)').matches
+export const isEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)

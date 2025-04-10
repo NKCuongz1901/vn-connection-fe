@@ -1,0 +1,28 @@
+.wrapper {
+	overflow: auto;
+	.top {
+		align-items: center;
+		.title {
+			text-align: center;
+			font-size: 24px;
+			font-weight: 600;
+		}
+		.text {
+			color: #48546b;
+			text-align: center;
+
+			/* Body/Body 14 Regular */
+			font-size: 14px;
+		}
+	}
+	.middle {
+		align-items: center;
+		gap: 24px;
+		.topic,
+		.email,
+		.content {
+			width: 100%;
+			min-height: 50px;
+		}
+	}
+}

@@ -6,8 +6,9 @@ import { useModal } from '@/context/ModalContext'
 
 import { loginByPhone } from '@/apis/authApis'
 
-import { formatPhone, isLogin, toJson } from '@/ultis/common.ults'
+import { delay, formatPhone, isLogin, toJson } from '@/ultis/common.ults'
 import { useLocalePath } from '@/ultis/route.ults'
+
 import { mainRoutes } from '@/routes/MainRoutes'
 
 export default function useLogin() {
@@ -60,6 +61,8 @@ export default function useLogin() {
 					localStorage.setItem('info', JSON.stringify(object))
 					localStorage.setItem('refresh_token', JSON.stringify(refresh_token))
 					localStorage.setItem('token', JSON.stringify(token))
+					delay(100)
+					onChangeRoute(mainRoutes.home)
 				} else {
 					sessionStorage.setItem('info', JSON.stringify(object))
 					sessionStorage.setItem('refresh_token', JSON.stringify(refresh_token))

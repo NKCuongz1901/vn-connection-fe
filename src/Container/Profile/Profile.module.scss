@@ -1,7 +1,10 @@
 .wrapper {
 	gap: 12px;
+	padding: 24px 32px !important;
+	width: 100%;
+	overflow: auto;
 	.totalInfo {
-		min-height: 320px;
+		// min-height: 320px;
 		width: 100%;
 		.cover {
 			width: 100%;
@@ -81,6 +84,9 @@
 			}
 			.endButton {
 				gap: 12px;
+				.buttonFriend {
+					visibility: hidden;
+				}
 			}
 		}
 	}
@@ -121,6 +127,9 @@
 		flex-direction: column;
 		.endButton {
 			padding: 12px 0;
+			.buttonFriend {
+				visibility: visible;
+			}
 		}
 	}
 }
