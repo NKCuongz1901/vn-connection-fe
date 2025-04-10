@@ -38,7 +38,7 @@ export default function useProfile({ id }: { id?: string }) {
 					setUserData(results?.object || {})
 				}
 			} catch (error) {
-				console.log('error:', error)
+				console.error('error:', error)
 			} finally {
 				setLoading(false)
 			}

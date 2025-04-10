@@ -17,7 +17,6 @@ export default function useUserMoreAction({
 	isFriend?: any
 	onCallback?: any
 }) {
-	console.log('🌸🌸🌸 TrieuNinhHan ~ isFriend:', isFriend)
 	const { toggleLoadingContext } = useLoading()
 	const { openError, openConfirm, openSuccess } = useModal()
 	const [loading, setLoading] = useState(false)
@@ -33,7 +32,6 @@ export default function useUserMoreAction({
 				})
 			}
 		} catch (error) {
-			console.log('error:', error)
 			openError(error)
 		} finally {
 			setLoading(false)
@@ -56,7 +54,6 @@ export default function useUserMoreAction({
 				})
 			}
 		} catch (error) {
-			console.log('error:', error)
 			openError(error)
 		} finally {
 			setLoading(false)

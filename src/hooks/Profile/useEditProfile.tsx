@@ -131,7 +131,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 				url = results?.object?.url
 			}
 		} catch (error) {
-			console.log('error:', error)
+			console.error('error:', error)
 		} finally {
 			return url
 		}
@@ -166,7 +166,6 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 					})
 				}
 			} catch (error) {
-				console.log('error:', error)
 				openError(error)
 			} finally {
 				toggleLoadingContext()

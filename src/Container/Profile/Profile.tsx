@@ -120,11 +120,6 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 
 	const _renderTotalInfo = useCallback(() => {
 		const { avatar, cover, name, address, id, is_friend } = userData || {}
-		console.log(
-			'🌸🌸🌸 TrieuNinhHan ~ const_renderTotalInfo=useCallback ~ is_friend:',
-			is_friend,
-		)
-
 		const isMe = id === getUserInfo('id')
 		return (
 			<Flex className={classes.totalInfo} vertical>

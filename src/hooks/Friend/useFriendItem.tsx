@@ -18,7 +18,7 @@ export default function useFriendItem({}: any) {
 					}
 				}
 			} catch (error) {
-				console.log(' error:', error)
+				console.error(' error:', error)
 			} finally {
 				setLoading(false)
 			}
@@ -38,7 +38,7 @@ export default function useFriendItem({}: any) {
 					}
 				}
 			} catch (error) {
-				console.log(' error:', error)
+				console.error(' error:', error)
 			} finally {
 				setLoading(false)
 			}
@@ -59,7 +59,7 @@ export default function useFriendItem({}: any) {
 					}
 				}
 			} catch (error) {
-				console.log(' error:', error)
+				console.error(' error:', error)
 			} finally {
 				setLoading(false)
 			}

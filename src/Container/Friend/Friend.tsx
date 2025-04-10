@@ -97,7 +97,7 @@ const Friend = () => {
 					})
 				}
 			} catch (error) {
-				console.log('  error:', error)
+				console.error('  error:', error)
 			} finally {
 				setLoading((prev) => ({ ...prev, [_type]: false }))
 			}

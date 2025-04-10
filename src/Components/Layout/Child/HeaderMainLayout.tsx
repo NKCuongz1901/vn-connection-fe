@@ -97,13 +97,7 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 							<IconBellFilled />
 						</Flex>
 
-						<Dropdown
-							menu={{ items: userMenus }}
-							trigger={['click']}
-							onOpenChange={(open, info) => {
-								console.log(open, info)
-							}}
-						>
+						<Dropdown menu={{ items: userMenus }} trigger={['click']}>
 							<Flex className="headerIcon">
 								<IconUserCircle />
 							</Flex>
