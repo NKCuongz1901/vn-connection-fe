@@ -1226,3 +1226,35 @@ export const languageOpts = [
 	{ value: 'Vietnamese', label: mappingLanguage.Vietnamese },
 	{ value: 'Thai', label: mappingLanguage.Thai },
 ]
+
+export const stateFriends = {
+	ACCEPTED: 'ACCEPTED',
+	PENDING: 'PENDING',
+}
+
+type PaginationType = {
+	page: number
+	limit: number
+	totalPage: number
+}
+
+export const paginationCommon: PaginationType = {
+	page: 1,
+	limit: 20,
+	totalPage: 0,
+}
+
+export const optionFriends = [
+	{
+		value: '1',
+		label: 'All',
+	},
+	{
+		value: '22',
+		label: 'Requests',
+	},
+	{
+		value: '3',
+		label: 'Sent',
+	},
+]

@@ -1,36 +1,130 @@
 'use client'
-import { IconChevronLeft, IconDots } from '@tabler/icons-react'
-import { Flex } from 'antd'
+import { IconChevronLeft } from '@tabler/icons-react'
+import { Dropdown, Flex, Skeleton } from 'antd'
 import dayjs from 'dayjs'
 import { memo, useCallback } from 'react'
 
 import useProfile from '@/hooks/Profile/useProfile'
 
 import { getUserInfo, toJson } from '@/ultis/common.ults'
-
-import CButton from '@/Components/Custom/CButton'
-
-import { formatDate, mappingGender } from '@/Variable/common.variable'
+import { useLocalePath, useSafeBack } from '@/ultis/route.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
+import CButton from '@/Components/Custom/CButton'
 import ModalEditProfile from '@/Components/Profile/ModalEditProfile'
+import UserMoreAction from '@/Components/User/UserMoreAction'
+import ProfileCancelIcon from '@/svg/FriendSvg/ProfileCancelIcon'
+import ProfileTick from '@/svg/FriendSvg/ProfileTick'
+import ShareIcon from '@/svg/FriendSvg/ShareIcon'
+
+import { mainRoutes } from '@/routes/MainRoutes'
+import {
+	formatDate,
+	mappingGender,
+	stateFriends,
+} from '@/Variable/common.variable'
 
 import classes from './Profile.module.scss'
+
+const skeletonItems = [
+	{ id: '2', value: 220 },
+	{ id: '1', value: 120 },
+	{ id: '3', value: 320 },
+	{ id: '4', value: 240 },
+]
 interface ProfileProps {
 	id?: string
+	isMinimize?: boolean
 }
-const Profile = ({ id }: ProfileProps) => {
+const Profile = ({ id, isMinimize }: ProfileProps) => {
 	const {
+		loading,
+		loadingButtonFriend,
 		userData,
 		onOpenEditP,
 		openEditProfile,
 		onCloseEditP,
 		onGetUserProfile,
+		onMenusClick,
+		menus,
 	} = useProfile({
 		id,
 	})
+	const { goBackOrPush } = useSafeBack()
+	const { onChangeRoute } = useLocalePath()
+	const _renderButtonFriend = useCallback(() => {
+		const { is_friend } = userData || {}
+		const { responMenus, cancelMenus, deleteMenus } = menus
+		if (is_friend) {
+			const { state, friend_id } = is_friend || {}
+			if (state === stateFriends.ACCEPTED) {
+				return (
+					<Dropdown
+						disabled={loadingButtonFriend}
+						menu={{ items: deleteMenus }}
+						trigger={['click']}
+					>
+						<CButton ctype="disabled" style={{ height: 40 }}>
+							<Flex>
+								<ProfileTick />
+							</Flex>
+							<span>Friend</span>
+						</CButton>
+					</Dropdown>
+				)
+			} else {
+				if (friend_id === getUserInfo('id')) {
+					return (
+						<Dropdown menu={{ items: responMenus }} trigger={['click']}>
+							<CButton
+								disabled={loadingButtonFriend}
+								ctype="success"
+								style={{ height: 40 }}
+							>
+								<Flex>
+									<ProfileTick fill="white" />
+								</Flex>
+								<span>Respond</span>
+							</CButton>
+						</Dropdown>
+					)
+				} else {
+					return (
+						<Dropdown menu={{ items: cancelMenus }} trigger={['click']}>
+							<CButton
+								disabled={loadingButtonFriend}
+								ctype="disabled"
+								style={{ height: 40 }}
+							>
+								<Flex>
+									<ProfileCancelIcon />
+								</Flex>
+								<span>Cancel Request</span>
+							</CButton>
+						</Dropdown>
+					)
+				}
+			}
+		}
+		return (
+			<CButton
+				disabled={loadingButtonFriend}
+				ctype="oranger"
+				style={{ height: 40 }}
+				onClick={() => onMenusClick('add')}
+			>
+				Add friend
+			</CButton>
+		)
+	}, [userData, menus, loadingButtonFriend, onMenusClick])
+
 	const _renderTotalInfo = useCallback(() => {
-		const { avatar, cover, name, address, id } = userData || {}
+		const { avatar, cover, name, address, id, is_friend } = userData || {}
+		console.log(
+			'🌸🌸🌸 TrieuNinhHan ~ const_renderTotalInfo=useCallback ~ is_friend:',
+			is_friend,
+		)
+
 		const isMe = id === getUserInfo('id')
 		return (
 			<Flex className={classes.totalInfo} vertical>
@@ -41,12 +135,26 @@ const Profile = ({ id }: ProfileProps) => {
 						alt=""
 					/>
 					<Flex className={classes.header}>
-						<Flex className={classes.icon}>
-							<IconChevronLeft />
-						</Flex>
-						<Flex className={classes.icon}>
-							<IconDots />
-						</Flex>
+						{!isMinimize ? (
+							<Flex className={classes.icon}>
+								<IconChevronLeft
+									onClick={() => goBackOrPush(mainRoutes.home)}
+								/>
+							</Flex>
+						) : (
+							<div></div>
+						)}
+						{isMe ? (
+							<div></div>
+						) : (
+							<Flex className={classes.icon}>
+								<UserMoreAction
+									id={id}
+									isFriend={is_friend}
+									onCallback={onGetUserProfile}
+								/>
+							</Flex>
+						)}
 					</Flex>
 				</Flex>
 				<Flex className={classes.infoWrapper}>
@@ -63,8 +171,15 @@ const Profile = ({ id }: ProfileProps) => {
 					<Flex className={classes.endButton}>
 						{isMe ? (
 							<>
-								<CButton ctype="oranger" style={{ height: 40 }}>
-									Invite friend
+								<CButton
+									ctype="oranger"
+									style={{ height: 40 }}
+									onClick={() => onChangeRoute(mainRoutes.search)}
+								>
+									<Flex>
+										<ShareIcon />
+									</Flex>
+									<span>Invite friend</span>
 								</CButton>
 								<CButton
 									ctype="disabled"
@@ -76,10 +191,12 @@ const Profile = ({ id }: ProfileProps) => {
 							</>
 						) : (
 							<>
-								<CButton ctype="oranger" style={{ height: 40 }}>
-									Add friend
-								</CButton>
-								<CButton ctype="disabled" style={{ height: 40 }}>
+								{!isMinimize && _renderButtonFriend()}
+								<CButton
+									ctype="disabled"
+									style={{ height: 40 }}
+									onClick={() => onChangeRoute(mainRoutes.inbox)}
+								>
 									Inbox
 								</CButton>
 							</>
@@ -89,7 +206,7 @@ const Profile = ({ id }: ProfileProps) => {
 			</Flex>
 		)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [toJson(userData)])
+	}, [toJson(userData), _renderButtonFriend])
 
 	const _renderMessageForU = useCallback(() => {
 		const { who_i_am, looking_for, i_can_offer } = userData || {}
@@ -144,7 +261,7 @@ const Profile = ({ id }: ProfileProps) => {
 		const content = [
 			{
 				label: 'Friends',
-				value: amount_of_friend + ' friends',
+				value: (amount_of_friend || 0) + ' friends',
 				id: 1,
 			},
 			{
@@ -216,6 +333,24 @@ const Profile = ({ id }: ProfileProps) => {
 		)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toJson(userData)])
+
+	if (loading) {
+		return (
+			<Flex className={classes.wrapper} vertical>
+				<Flex className={classes.totalInfo} vertical>
+					<Skeleton.Input active style={{ width: '100%', height: 320 }} />
+				</Flex>
+				{skeletonItems.map((i) => (
+					<Skeleton.Input
+						key={i.id}
+						active
+						className={classes.contentBody}
+						style={{ width: '100%', height: i.value }}
+					/>
+				))}
+			</Flex>
+		)
+	}
 	return (
 		<Flex className={classes.wrapper} vertical>
 			{_renderTotalInfo()}

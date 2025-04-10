@@ -1,19 +1,25 @@
 import createMiddleware from 'next-intl/middleware'
 import { routing } from './i18n/routing'
 import { NextRequest, NextResponse } from 'next/server'
-import { exclusiveStartWith } from './middlewareData'
+
+import { exclusiveStartWith, includesPath } from './middlewareData'
 
 export default createMiddleware(routing)
 
 export function middleware(request: NextRequest, _response: NextResponse) {
-	if (!exclusiveStartWith.some((i) => request.nextUrl.pathname.startsWith(i))) {
-		const pathname = request.nextUrl.pathname
+	const pathname = request.nextUrl.pathname
+	if (!exclusiveStartWith.some((i) => pathname.startsWith(i))) {
 		const response = NextResponse.next()
 		response.headers.set('x-x-pathname', pathname)
-		if (request.nextUrl.pathname.startsWith('/about')) {
+		if (pathname.startsWith('/about')) {
 		}
 
-		if (request.nextUrl.pathname.startsWith('/dashboard')) {
+		if (pathname.startsWith('/dashboard')) {
+		}
+		if (!includesPath.some((path) => pathname.includes(path))) {
+			const url = request.nextUrl.clone()
+			url.pathname = '/en/login'
+			return NextResponse.redirect(url)
 		}
 		return response
 	}

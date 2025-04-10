@@ -1,4 +1,5 @@
 export const mainRoutes = {
+	home: '/',
 	login: 'login',
 	forgetPassword: 'forget-password',
 	register: 'register',

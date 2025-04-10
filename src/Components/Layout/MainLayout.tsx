@@ -4,14 +4,17 @@ import { Flex } from 'antd'
 import Link from 'next/link'
 import React, { memo, useCallback, useEffect, useState } from 'react'
 
+import { isLogin } from '@/ultis/common.ults'
 import { useLocalePath } from '@/ultis/route.ults'
 
+import AuthLayout from './Child/AuthLayout'
 import HeaderMainLayout from './Child/HeaderMainLayout'
 
+import { appLayoutAuth } from '@/app/variable/layoutData'
 import { Menus } from '@/routes'
+import { mainRoutes } from '@/routes/MainRoutes'
 
 import './MainLayout.scss'
-import { appLayoutAuth } from '@/app/variable/layoutData'
 interface MainLayoutProps {
 	children: React.ReactNode
 	[key: string]: any
@@ -19,7 +22,7 @@ interface MainLayoutProps {
 
 const MainLayout = (props: MainLayoutProps) => {
 	const { children } = props
-	const { pathname, onGetPath, localePathname } = useLocalePath()
+	const { pathname, onGetPath, localePathname, onChangeRoute } = useLocalePath()
 	const [openMenu, setOpenMenu] = useState(false)
 	const [content, setContent] = useState(null) as any
 	const toggleMenus = useCallback(() => {
@@ -64,34 +67,29 @@ const MainLayout = (props: MainLayoutProps) => {
 		)
 	}
 	useEffect(() => {
+		const login = isLogin()
 		if (!appLayoutAuth.some((i) => pathname.includes(i))) {
-			setContent(
-				<Flex vertical className="wrapperMainLayout">
-					<HeaderMainLayout onToggleMenus={toggleMenus} />
-					<Flex className="bodyMainLayout">
-						{_renderSideBar()}
-						<Flex vertical className="contentMainLayout">
-							{children}
+			if (!login) {
+				onChangeRoute(mainRoutes.login)
+			} else {
+				setContent(
+					<Flex vertical className="wrapperMainLayout">
+						<HeaderMainLayout onToggleMenus={toggleMenus} />
+						<Flex className="bodyMainLayout">
+							{_renderSideBar()}
+							<Flex vertical className="contentMainLayout">
+								{children}
+							</Flex>
 						</Flex>
-					</Flex>
-				</Flex>,
-			)
+					</Flex>,
+				)
+			}
 		} else {
-			setContent(
-				<Flex
-					vertical
-					className="wrapperContainerMainLayout"
-					style={{
-						background: 'white',
-						color: 'black',
-						height: '100vh',
-						fontSize: 14,
-						overflow: 'auto',
-					}}
-				>
-					{children}
-				</Flex>,
-			)
+			if (login) {
+				onChangeRoute(mainRoutes.home)
+			} else {
+				setContent(<AuthLayout>{children}</AuthLayout>)
+			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [localePathname, openMenu])

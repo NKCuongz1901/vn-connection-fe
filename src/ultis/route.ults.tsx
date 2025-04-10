@@ -7,11 +7,11 @@ export function useLocalePath() {
 	const pathname = localePathname.split('/').slice(2).join('/')
 
 	const locale = params?.locale || 'en'
-	const handleGetPath = (path?: string) => {
+	const handleGetPath = (path: string) => {
 		const cleanPath = path ? path.replace(/^\/+/, '') : '' // Xóa dấu `/` ở đầu nếu có
 		return cleanPath ? `/${locale}/${cleanPath}` : `/${locale}`
 	}
-	const handleChangeRoute = (path?: string) => {
+	const handleChangeRoute = (path: string) => {
 		router.push(handleGetPath(path))
 	}
 	const handleGetParam = () => {
@@ -24,4 +24,20 @@ export function useLocalePath() {
 		onChangeRoute: handleChangeRoute,
 		onGetParam: handleGetParam,
 	}
+}
+
+export const useSafeBack = () => {
+	const router = useRouter()
+	const { onChangeRoute } = useLocalePath()
+	const goBackOrPush = (fallbackUrl: string) => {
+		const referrer = document.referrer
+		const currentOrigin = window.location.origin
+		if (referrer && referrer.startsWith(currentOrigin)) {
+			router.back()
+		} else {
+			onChangeRoute(fallbackUrl)
+		}
+	}
+
+	return { goBackOrPush }
 }

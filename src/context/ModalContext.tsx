@@ -25,7 +25,6 @@ interface openConfirmProps {
 	[key: string]: any
 }
 const ModalContext = createContext({
-	openModal: ({}) => {},
 	openError: (_error: any) => {},
 	openSuccess: (_success: openSuccessProps) => {},
 	openConfirm: (_confrim: openConfirmProps) => {},
@@ -34,9 +33,6 @@ const ModalContext = createContext({
 export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 	const [open, setOpen] = useState({ type: '' }) as any
 
-	const openModal = useCallback(({ type = 'confirm', ...others }) => {
-		setOpen({ type, ...others })
-	}, [])
 	const openError = useCallback((error: any) => {
 		console.log('error', error)
 		setOpen({ type: 'error', error: error })
@@ -94,7 +90,6 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<ModalContext.Provider
 			value={{
-				openModal,
 				closeModal,
 				openError,
 				openSuccess,
