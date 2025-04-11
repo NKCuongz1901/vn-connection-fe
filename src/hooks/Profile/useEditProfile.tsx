@@ -160,7 +160,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 					openSuccess({
 						message: 'Update your profile successfull',
 						onAccept: () => {
-							onGetUserProfile?.()
+							onGetUserProfile?.({})
 							onClose()
 						},
 					})

@@ -1,0 +1,102 @@
+.wrapper {
+	height: 100%;
+	.left {
+		max-width: 375px;
+		min-width: 375px;
+		background: #fff;
+		border-inline: 1px solid #eef3f6;
+		padding: 0 16px;
+		.leftTop {
+			align-items: center;
+			padding: 10px 0;
+			height: 48px;
+			.icon {
+				cursor: pointer;
+				height: 32px;
+				width: 32px;
+			}
+			.title {
+				font-size: 18px;
+				font-weight: 600;
+				align-items: center;
+				justify-content: center;
+				flex: 1;
+			}
+		}
+		.leftMiddle {
+			.optionFriends {
+				width: 100%;
+				align-items: center;
+				justify-content: center;
+				border-bottom: 1px solid #eef3f6;
+				height: 44px;
+				cursor: pointer;
+			}
+			.active {
+				color: #006b35;
+				border-bottom: 2px solid #006b35;
+				font-weight: 600;
+			}
+		}
+		.leftBottom {
+			max-height: calc(100vh - 80px - 48px - 42px - 2px);
+
+			.search {
+				padding: 16px 16px 8px 16px;
+				align-items: center;
+				width: 100%;
+				.iconSearch {
+					font-size: 20px;
+					color: #7987a4;
+				}
+			}
+			.itemWrapper {
+				overflow: auto;
+				&::-webkit-scrollbar {
+					display: none;
+				}
+				.itemContainer {
+					padding: 8px 16px;
+					align-items: center;
+					gap: 8px;
+				}
+			}
+		}
+	}
+	.right {
+		flex: 1;
+		width: 100%;
+	}
+	.notFound {
+		width: 100%;
+		align-items: center;
+		color: #7987a4;
+		justify-content: center;
+		gap: 4px;
+		text-align: center;
+		margin-top: 80px;
+		.title {
+			font-size: 20px;
+			font-weight: 600;
+			text-align: center;
+		}
+		.exploreButton {
+			margin-top: 16px;
+			& > :global(.ant-btn) {
+				width: 160px;
+			}
+		}
+	}
+}
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		.left {
+			max-width: 100%;
+			min-width: 100%;
+		}
+		.right {
+			display: none;
+		}
+	}
+}

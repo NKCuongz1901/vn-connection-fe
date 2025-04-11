@@ -13,6 +13,7 @@ axios.interceptors.request.use(
 		if (accessToken && !config.headers['Authorization']) {
 			config.headers['Authorization'] =
 				'Bearer ' + JSON.parse(accessToken ?? '')
+			config.headers['platform'] = 'WEB'
 		}
 		return config
 	},
