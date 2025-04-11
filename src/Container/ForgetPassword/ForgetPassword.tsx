@@ -40,7 +40,6 @@ const ForgetPassword = ({
 		onSubmitPhone,
 		onSubmitOtp,
 		onSubmitPass,
-		a,
 	} = useRegisterAndReset({
 		type,
 	})
@@ -99,7 +98,6 @@ const ForgetPassword = ({
 
 	return (
 		<Flex className={classes.wrapper} vertical align="center">
-			<div onClick={a}>asdasdasdasd</div>
 			<Flex className={classes.title}>
 				<Flex>{title}</Flex>
 				<CloseOutlined
