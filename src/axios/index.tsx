@@ -1,6 +1,12 @@
 'use client'
-
 import axios from 'axios'
+
+import {
+	getStorageCookie,
+	handleRemoveAllCookie,
+	handleStorageCookie,
+	isPersistCookie,
+} from '@/ultis/storage.ults'
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL
 let isRefreshing = false
@@ -8,11 +14,9 @@ let refreshSubscribers = [] as any
 let refreshTokenPromise = null as any
 axios.interceptors.request.use(
 	(config) => {
-		const accessToken =
-			localStorage.getItem('token') || sessionStorage.getItem('token')
+		const accessToken = getStorageCookie('token')
 		if (accessToken && !config.headers['Authorization']) {
-			config.headers['Authorization'] =
-				'Bearer ' + JSON.parse(accessToken ?? '')
+			config.headers['Authorization'] = 'Bearer ' + (accessToken ?? '')
 			config.headers['platform'] = 'WEB'
 		}
 		return config
@@ -32,36 +36,41 @@ const refreshToken = async () => {
 	if (!isRefreshing) {
 		isRefreshing = true
 		try {
-			const refreshToken =
-				localStorage.getItem('refresh_token') ||
-				sessionStorage.getItem('refresh_token') ||
-				'""'
-			const isLocal = Boolean(localStorage.getItem('refresh_token'))
-			const response = await axios.post('/auth/refresh', {
-				refresh_token: JSON.parse(refreshToken),
+			const refreshToken = getStorageCookie('refresh_token')
+			const response: any = await axios.post('/auth/refresh', {
+				refresh_token: refreshToken,
 			})
-			if (response.data?.code === 200) {
-				const newAccessToken = response.data?.results?.object?.access_token
-				const newRefreshToken = response.data?.results?.object?.refresh_token
-				if (isLocal) {
-					localStorage.setItem('token', JSON.stringify(newAccessToken))
-					localStorage.setItem('refresh_token', JSON.stringify(newRefreshToken))
+			if (response?.code === 200) {
+				const newAccessToken = response.results?.object?.access_token
+				const newRefreshToken = response.results?.object?.refresh_token
+				if (isPersistCookie()) {
+					handleStorageCookie({
+						key: 'token',
+						data: newAccessToken,
+						expireInDays: 300,
+					})
+					handleStorageCookie({
+						key: 'refresh_token',
+						data: newRefreshToken,
+						expireInDays: 300,
+					})
 				} else {
-					sessionStorage.setItem('token', JSON.stringify(newAccessToken))
-					sessionStorage.setItem(
-						'refresh_token',
-						JSON.stringify(newRefreshToken),
-					)
+					handleStorageCookie({
+						key: 'token',
+						data: newAccessToken,
+					})
+					handleStorageCookie({
+						key: 'refresh_token',
+						data: newRefreshToken,
+					})
 				}
-
 				onRefreshed(newAccessToken)
 				return newAccessToken
 			}
 		} catch (error: any) {
 			console.error('Unable to refresh token', error)
 			if (error?.response?.data?.code === 434) {
-				localStorage.clear()
-				sessionStorage.clear()
+				handleRemoveAllCookie()
 			}
 			throw error
 		} finally {
@@ -95,15 +104,13 @@ axios.interceptors.response.use(
 			} catch (refreshError: any) {
 				console.log('Failed to refresh token', refreshError)
 				if (refreshError?.response?.data?.code === 409) {
-					localStorage.clear()
-					sessionStorage.clear()
+					handleRemoveAllCookie()
 				}
 				return Promise.reject(refreshError)
 			}
 		}
 		if (error?.response?.data?.code === 409) {
-			localStorage.clear()
-			sessionStorage.clear()
+			handleRemoveAllCookie()
 		}
 
 		return Promise.reject(error?.response?.data)

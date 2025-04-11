@@ -5,6 +5,8 @@ import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 
+import { useModal } from '@/context/ModalContext'
+
 import { getFriends } from '@/apis/friendApis'
 
 import { isArray, uniqueArray } from '@/ultis/array.ults'
@@ -23,6 +25,7 @@ import { mainRoutes } from '@/routes/MainRoutes'
 
 const Friend = () => {
 	const _refFirst = useRef(false)
+	const { openError } = useModal()
 	const { onChangeRoute } = useLocalePath()
 	const [activeTab, setActiveTab] = useState(optionFriends[0].value)
 	const [searchText, setSearchText] = useState('')
@@ -97,6 +100,7 @@ const Friend = () => {
 				}
 			} catch (error) {
 				console.error('  error:', error)
+				openError(error)
 			} finally {
 				setLoading((prev) => ({ ...prev, [_type]: false }))
 				_refFirst.current = true

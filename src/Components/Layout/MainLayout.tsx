@@ -4,7 +4,7 @@ import { Flex } from 'antd'
 import Link from 'next/link'
 import React, { memo, useCallback, useEffect, useState } from 'react'
 
-import { isLogin } from '@/ultis/common.ults'
+import { isLogin } from '@/ultis/storage.ults'
 import { useLocalePath } from '@/ultis/route.ults'
 
 import AuthLayout from './Child/AuthLayout'

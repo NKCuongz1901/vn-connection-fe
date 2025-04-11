@@ -118,24 +118,28 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 		}
 		return true
 	}, [])
-	const handleUploadImage = useCallback(async (file) => {
-		if (!file) return ''
-		let url = ''
-		try {
-			const formData = new FormData()
+	const handleUploadImage = useCallback(
+		async (file) => {
+			if (!file) return ''
+			let url = ''
+			try {
+				const formData = new FormData()
 
-			formData.set('image', file)
-			const res = (await uploadProgress(formData)) as any
-			const { code, results } = res || {}
-			if (code === 200) {
-				url = results?.object?.url
+				formData.set('image', file)
+				const res = (await uploadProgress(formData)) as any
+				const { code, results } = res || {}
+				if (code === 200) {
+					url = results?.object?.url
+				}
+			} catch (error) {
+				console.error('error:', error)
+				openError(error)
+			} finally {
+				return url
 			}
-		} catch (error) {
-			console.error('error:', error)
-		} finally {
-			return url
-		}
-	}, [])
+		},
+		[openError],
+	)
 	const handleCheckImage = useCallback((key, file) => {
 		const { imageUrl } = handleParseFileImg(file)
 		setFiles((prev) => ({ ...prev, [key]: file }))

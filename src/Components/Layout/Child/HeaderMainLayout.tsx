@@ -5,6 +5,7 @@ import { Dropdown, Flex } from 'antd'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useLocalePath } from '@/ultis/route.ults'
+import { handleRemoveAllCookie, isLogin } from '@/ultis/storage.ults'
 
 import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
@@ -47,12 +48,12 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[],
 	)
-	const isLogin = () => {
-		if (typeof window !== 'undefined') {
-			return localStorage.getItem('token') || sessionStorage.getItem('token')
-		}
-		return false
-	}
+	// const isLogin = () => {
+	// 	if (typeof window !== 'undefined') {
+	// 		return localStorage.getItem('token') || sessionStorage.getItem('token')
+	// 	}
+	// 	return false
+	// }
 	useEffect(() => {
 		setLogin(Boolean(isLogin()))
 	}, [])
@@ -65,8 +66,7 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 			case 'fns':
 				break
 			case 'signout':
-				localStorage.clear()
-				sessionStorage.clear()
+				handleRemoveAllCookie()
 				onChangeRoute(mainRoutes.login)
 				break
 			default:

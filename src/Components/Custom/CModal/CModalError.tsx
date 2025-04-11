@@ -1,35 +1,46 @@
 import { Flex } from 'antd'
 import { memo } from 'react'
 
+import { useLocalePath } from '@/ultis/route.ults'
+import { handleRemoveAllCookie } from '@/ultis/storage.ults'
+
 import { CModalProps } from '@/interface/CComponent/CComponent.interface'
 import CButton from '../CButton'
 import CModal from './CModal'
 
-import './CModal.scss'
+import { mainRoutes } from '@/routes/MainRoutes'
 
+import './CModal.scss'
+const codes = [409, 401]
 const CModalError = (_props: CModalProps) => {
 	const { onCancel, error, ...props } = _props
+	const { onChangeRoute } = useLocalePath()
 	let message = error?.response?.data?.message || error?.message || error
-	// let code = error?.response?.data?.code || 0
+	const code = error?.response?.data?.code || error?.code || 0
 	if (typeof message !== 'string') {
 		message = 'Unknow error'
 	}
-	// if (code === 409) {
-	// 	message = 'Login expired, please login again 🍁'
-	// }
-	// const onClose = () => {
-	// 	handleClose()
-	// 	if (code === 409) {
-	// 		window.location.href = '/login'
-	// 	}
-	// }
+	if (code === 409) {
+		message = 'Login expired, please login again 🍁'
+	}
+
+	const onClose = (e: any) => {
+		if (onCancel) {
+			onCancel(e)
+		}
+
+		if (codes.includes(code)) {
+			onChangeRoute(mainRoutes.login)
+			handleRemoveAllCookie()
+		}
+	}
 	return (
 		<CModal
 			className="wrapperCModalError"
-			onCancel={onCancel}
+			onCancel={onClose}
 			footer={[
 				<Flex key="back" justify="center">
-					<CButton onClick={onCancel} ctype="oranger" style={{ width: 240 }}>
+					<CButton onClick={onClose} ctype="oranger" style={{ width: 240 }}>
 						Confirm
 					</CButton>
 				</Flex>,

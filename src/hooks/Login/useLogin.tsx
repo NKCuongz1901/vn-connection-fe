@@ -6,8 +6,9 @@ import { useModal } from '@/context/ModalContext'
 
 import { loginByPhone } from '@/apis/authApis'
 
-import { delay, formatPhone, isLogin, toJson } from '@/ultis/common.ults'
+import { delay, formatPhone, toJson } from '@/ultis/common.ults'
 import { useLocalePath } from '@/ultis/route.ults'
+import { handleStorageCookie, isLogin } from '@/ultis/storage.ults'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 
@@ -58,16 +59,23 @@ export default function useLogin() {
 			if (res.code === 200) {
 				const { object, refresh_token, token } = res.results || {}
 				if (isRemember) {
-					localStorage.setItem('info', JSON.stringify(object))
-					localStorage.setItem('refresh_token', JSON.stringify(refresh_token))
-					localStorage.setItem('token', JSON.stringify(token))
-					delay(100)
-					onChangeRoute(mainRoutes.home)
+					handleStorageCookie({ key: 'info', data: object, expireInDays: 300 })
+					handleStorageCookie({
+						key: 'refresh_token',
+						data: refresh_token,
+						expireInDays: 300,
+					})
+					handleStorageCookie({ key: 'token', data: token, expireInDays: 300 })
 				} else {
-					sessionStorage.setItem('info', JSON.stringify(object))
-					sessionStorage.setItem('refresh_token', JSON.stringify(refresh_token))
-					sessionStorage.setItem('token', JSON.stringify(token))
+					handleStorageCookie({ key: 'info', data: object })
+					handleStorageCookie({
+						key: 'refresh_token',
+						data: refresh_token,
+					})
+					handleStorageCookie({ key: 'token', data: token })
 				}
+				await delay(100)
+				onChangeRoute(mainRoutes.home)
 			}
 		} catch (error: any) {
 			openError(error)

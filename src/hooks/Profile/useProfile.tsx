@@ -1,6 +1,7 @@
 import { ItemType } from 'antd/es/menu/interface'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { useModal } from '@/context/ModalContext'
 import useFriendItem from '../Friend/useFriendItem'
 
 import { getUserProfile } from '@/apis/userApis'
@@ -8,6 +9,8 @@ import { getUserProfile } from '@/apis/userApis'
 import { delay } from '@/ultis/common.ults'
 
 export default function useProfile({ id }: { id?: string }) {
+	const { openError } = useModal()
+
 	const {
 		onAccept,
 		onAdd,
@@ -39,12 +42,13 @@ export default function useProfile({ id }: { id?: string }) {
 				}
 			} catch (error) {
 				console.error('error:', error)
+				openError(error)
 			} finally {
 				setLoading(false)
 			}
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		},
-		[],
+		[openError],
 	)
 
 	const handleOpenEditP = useCallback(() => {
