@@ -6,8 +6,9 @@ import { memo, useCallback } from 'react'
 
 import useProfile from '@/hooks/Profile/useProfile'
 
-import { getUserInfo, toJson } from '@/ultis/common.ults'
+import { toJson } from '@/ultis/common.ults'
 import { useLocalePath, useSafeBack } from '@/ultis/route.ults'
+import { getUserInfo } from '@/ultis/storage.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
