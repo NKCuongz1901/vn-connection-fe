@@ -21,10 +21,10 @@ export const metadata: Metadata = {
 	description: 'Welcome to UniVini',
 	openGraph: {
 		title: 'UniVini',
-		url: '/images/univini-logo.png',
+		url: 'https://univini.com/images/univini-logo.png',
 		images: [
 			{
-				url: '/images/univini-logo.png',
+				url: 'https://univini.com/images/univini-logo.png',
 				alt: 'this is UniVini',
 			},
 		],
