@@ -73,7 +73,6 @@ const Friend = () => {
 	const getListFriend = useCallback(
 		async (_type: string, searchText: string) => {
 			try {
-				_refFirst.current = true
 				const type = _type || optionFriends[0].value
 				const { page, limit } = _paginationRefs.current[type] || {}
 				setLoading((prev) => ({ ...prev, [_type]: true }))
@@ -100,6 +99,7 @@ const Friend = () => {
 				console.error('  error:', error)
 			} finally {
 				setLoading((prev) => ({ ...prev, [_type]: false }))
+				_refFirst.current = true
 			}
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
