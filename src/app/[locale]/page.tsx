@@ -4,5 +4,5 @@ export default function Term() {
 
 	const pathname = headersList.get('x-x-pathname') || ''
 	console.log('🎇🧧🧧🧧🎇 TrieuNinhHan ~ Term ~ pathname:', pathname)
-	return <div>hehehehhehee</div>
+	return <div className="p-10">Welcome to UniVini!</div>
 }

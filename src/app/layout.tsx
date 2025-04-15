@@ -17,15 +17,15 @@ const geistMono = localFont({
 })
 
 export const metadata: Metadata = {
-	title: 'UNIVINI',
-	description: 'Welcome to UNIVINI',
+	title: 'UniVini',
+	description: 'Welcome to UniVini',
 	openGraph: {
-		title: 'UNIVINI',
-		url: 'https://firebasestorage.googleapis.com/v0/b/fir-5f468.appspot.com/o/hoa.jpg?alt=media&token=4c405dcf-ed46-44fe-a5a2-8c58bee20c06',
+		title: 'UniVini',
+		url: 'https://univini.com/images/univini-logo.png',
 		images: [
 			{
-				url: 'https://firebasestorage.googleapis.com/v0/b/fir-5f468.appspot.com/o/hoa.jpg?alt=media&token=4c405dcf-ed46-44fe-a5a2-8c58bee20c06',
-				alt: 'this is dandelion',
+				url: 'https://univini.com/images/univini-logo.png',
+				alt: 'this is UniVini',
 			},
 		],
 		type: 'website',
