@@ -20,7 +20,6 @@ interface openSuccessProps {
 interface openConfirmProps {
 	message: string
 	titleLabel?: string
-	onClose?: any
 	onAccept?: any
 	[key: string]: any
 }

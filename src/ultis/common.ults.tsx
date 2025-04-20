@@ -21,3 +21,18 @@ export const delay = (n: number) =>
 export const isMobile = () =>
 	window.matchMedia('(min-width: 0px) and (max-width: 769px)').matches
 export const isEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+
+export const getCurrentLocation = (): Promise<{ lat: number; lng: number }> => {
+	return new Promise((resolve, reject) => {
+		navigator.geolocation.getCurrentPosition(
+			(position) => {
+				const lat = position.coords.latitude
+				const lng = position.coords.longitude
+				resolve({ lat, lng })
+			},
+			(error) => {
+				reject(error)
+			},
+		)
+	})
+}

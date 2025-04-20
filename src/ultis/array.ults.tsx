@@ -14,3 +14,7 @@ export const uniqueArray = (arr: any[], condition: string) => {
 	if (!isArray(arr) || !condition) return arr
 	return _.uniqBy(arr, condition)
 }
+
+export const arrayFrom = (n: number) => {
+	return Array.from({ length: n })
+}

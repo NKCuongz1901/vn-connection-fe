@@ -1,13 +1,15 @@
-import Party from '@/svg/Party'
-import { mainRoutes } from './MainRoutes'
-import People from '@/svg/People'
 import Event from '@/svg/Event'
-import UpcomingEvent from '@/svg/UpcomingEvent'
-import Message3 from '@/svg/Message3'
-import SearchNormal from '@/svg/SearchNormal'
-import Messenger from '@/svg/Messenger'
-import TwoUser from '@/svg/TwoUser'
 import Heart from '@/svg/Heart'
+import Message3 from '@/svg/Message3'
+import Messenger from '@/svg/Messenger'
+import OverviewIcon from '@/svg/OverviewIcon'
+import Party from '@/svg/Party'
+import People from '@/svg/People'
+import SearchNormal from '@/svg/SearchNormal'
+import TwoUser from '@/svg/TwoUser'
+import UpcomingEvent from '@/svg/UpcomingEvent'
+
+import { mainRoutes } from './MainRoutes'
 
 export const AUTH_ROUTES = {
 	loginPhone: '/auth/login_by_phone',
@@ -23,7 +25,9 @@ export const USER_ROUTES = {
 	block: '/user/block',
 	report: '/feedback',
 }
-
+export const POST_ROUTES = {
+	name: 'post',
+}
 export const FRIEND_ROUTES = {
 	name: '/friend',
 	myFriend: 'friend/my',
@@ -62,6 +66,12 @@ export const Menus = [
 		title: 'Discussions',
 		Icon: Message3,
 		path: mainRoutes.discussions,
+		child: [],
+	},
+	{
+		title: 'Overview',
+		Icon: OverviewIcon,
+		path: mainRoutes.overview,
 		child: [],
 	},
 	{

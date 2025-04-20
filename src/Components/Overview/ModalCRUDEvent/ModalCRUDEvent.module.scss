@@ -1,0 +1,130 @@
+.container {
+	.wrapperModal {
+		padding: 16px;
+		gap: 32px;
+		.left {
+			min-width: 284px;
+			max-width: 284px;
+			gap: 12px;
+			.upload {
+				height: 200px;
+				border: 1px dashed #cbd5e1;
+				border-radius: 16px;
+				position: relative;
+				.uploadText {
+					width: 100%;
+					height: 100%;
+					align-items: center;
+					justify-content: center;
+				}
+				.iconCancel {
+					position: absolute;
+					right: 0;
+					top: 0;
+					cursor: pointer;
+					z-index: 2;
+				}
+			}
+			.uploadError {
+				border-color: #e53835;
+			}
+			.error {
+				color: #e53835;
+				margin-top: -8px;
+			}
+		}
+		.right {
+			flex: 1;
+			gap: 16px;
+			.entrance {
+				gap: 12px;
+				.entranceOpt {
+					justify-content: space-between;
+					align-items: center;
+				}
+				.checkBoxWrapper {
+					gap: 12px;
+				}
+				.entranceFee {
+					gap: 12px;
+				}
+			}
+			.pricing {
+				gap: 12px;
+				.pricingTop {
+					justify-content: space-between;
+					align-items: center;
+				}
+				.pricingBottom {
+					gap: 12px;
+				}
+			}
+
+			.time {
+				gap: 4px;
+
+				.timePicker {
+					gap: 12px;
+				}
+			}
+
+			.gap4 {
+				gap: 4px;
+				.repeat {
+					gap: 8px;
+					.repeatItem {
+						justify-content: center;
+						align-items: center;
+						height: 40px;
+						width: 40px;
+						background: #f4f8fc;
+						border-radius: 16px;
+						cursor: pointer;
+					}
+					.repeatItemChecked {
+						border: 2px solid #006b35;
+						color: #006b35;
+						font-weight: 600;
+					}
+				}
+			}
+		}
+	}
+	.title {
+		font-weight: 600;
+	}
+}
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.container {
+		.wrapperModal {
+			flex-direction: column;
+			.left {
+				min-width: 100%;
+				max-width: 100%;
+			}
+		}
+	}
+}
+
+@media (min-width: 0px) and (max-width: 376px) {
+	.container {
+		.wrapperModal {
+			.right {
+				.entrance {
+					.checkBoxWrapper {
+						flex-direction: column;
+					}
+					.entranceFee {
+						flex-direction: column;
+					}
+				}
+				.pricing {
+					.pricingBottom {
+						flex-direction: column;
+					}
+				}
+			}
+		}
+	}
+}

@@ -9,7 +9,7 @@
 		flex: 1;
 		.mainLogo {
 			position: absolute;
-			top: 20%;
+			top: min(20%, 154px);
 			width: 27.5%;
 		}
 		.gradiant {

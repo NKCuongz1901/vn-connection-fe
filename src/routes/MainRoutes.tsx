@@ -8,6 +8,7 @@ export const mainRoutes = {
 	event: 'event',
 	upcomingEvent: 'upcoming-event',
 	discussions: 'discussions',
+	overview: 'overview',
 	search: 'search',
 	inbox: 'inbox',
 	friend: 'friend',

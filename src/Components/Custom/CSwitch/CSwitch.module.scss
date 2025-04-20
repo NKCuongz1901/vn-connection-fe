@@ -1,0 +1,18 @@
+.layout {
+	// width: 100%;
+}
+.oranger {
+	& > :global(.ant-switch-checked) {
+		background-color: #e55a0f !important;
+	}
+}
+.disabled {
+	& > :global(.ant-switch-checked) {
+		background-color: #eef3f6 !important;
+	}
+}
+.success {
+	& > :global(.ant-switch-checked) {
+		background-color: #006b35 !important;
+	}
+}

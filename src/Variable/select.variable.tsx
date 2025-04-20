@@ -28,3 +28,46 @@ export const topicReportOpt = [
 		label: "I don't want to see this content",
 	},
 ]
+
+export const repeatOpt = [
+	{
+		value: 'NONE',
+		label: 'Never repeat',
+	},
+	{
+		value: 'DAILY',
+		label: 'Daily',
+	},
+	{
+		value: 'WEEKLY',
+		label: 'Weekly',
+	},
+	{
+		value: 'BI_WEEK',
+		label: 'Two weeks',
+	},
+	{
+		value: 'THREE_WEEK',
+		label: 'Three Weeks',
+	},
+
+	{
+		value: 'MULTI_DAYS',
+		label: 'Multiple days',
+	},
+	{
+		value: 'MONTHLY',
+		label: 'Monthly',
+	},
+]
+
+export const ticketEntranceType = [
+	{
+		value: 'ONLY',
+		label: 'Only',
+	},
+	{
+		value: 'MULTIPLE_TICKET',
+		label: 'Multiple price',
+	},
+]
