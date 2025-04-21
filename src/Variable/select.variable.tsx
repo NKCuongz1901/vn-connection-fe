@@ -61,13 +61,19 @@ export const repeatOpt = [
 	},
 ]
 
-export const ticketEntranceType = [
+export const ticketEntranceType = {
+	ONLY: 'ONLY',
+	FREE: 'FREE',
+	MULTIPLE_TICKET: 'MULTIPLE_TICKET',
+}
+
+export const ticketEntranceTypeOpt = [
 	{
-		value: 'ONLY',
+		value: ticketEntranceType.ONLY,
 		label: 'Only',
 	},
 	{
-		value: 'MULTIPLE_TICKET',
+		value: ticketEntranceType.MULTIPLE_TICKET,
 		label: 'Multiple price',
 	},
 ]

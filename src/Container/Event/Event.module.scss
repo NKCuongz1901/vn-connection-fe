@@ -1,0 +1,26 @@
+.wrapper {
+	padding: 24px 32px !important;
+	height: 100%;
+	width: 100%;
+	gap: 12px;
+	.wrapperItem {
+		flex-wrap: wrap;
+		gap: 16px;
+	}
+}
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		padding: 24px 8px !important;
+		height: 100%;
+		width: 100%;
+		.title {
+			width: 100%;
+		}
+		.wrapperItem {
+			flex-wrap: wrap;
+			gap: 8px;
+			width: 100%;
+		}
+	}
+}

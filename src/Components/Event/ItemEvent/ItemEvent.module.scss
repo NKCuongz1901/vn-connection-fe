@@ -1,0 +1,112 @@
+.wrapper {
+	width: 100%;
+	height: 100%;
+	max-width: 368px;
+	max-height: 308px;
+	border-radius: 16px;
+	position: relative;
+	cursor: pointer;
+	.image {
+		width: 100%;
+		height: 200px;
+		border-radius: 16px;
+
+		img {
+			border-radius: 16px 16px 0 0;
+			object-fit: cover !important;
+		}
+	}
+	.spaceTime {
+		position: absolute;
+		padding-right: 16px;
+		justify-content: space-between;
+		font-weight: 600;
+		width: 100%;
+		font-size: 12px;
+		top: 200px;
+		transform: translateY(-50%);
+		.time {
+			padding: 6px 12px;
+			justify-content: center;
+			align-items: center;
+			gap: 4px;
+			border-radius: 0px 29px 29px 0px;
+			border-left: 2px solid #006b35;
+			color: #006b35;
+
+			background: #fff;
+		}
+		.spaceTimeRight {
+			gap: 8px;
+			.iconRepeatWrapper {
+				padding: 6px;
+				justify-content: center;
+				align-items: flex-start;
+				background: #fff;
+				gap: 4px;
+				color: #006b35;
+				border-radius: 50%;
+				/* elv-2 */
+				box-shadow: 0px 0px 16px 0px rgba(0, 58, 111, 0.08);
+			}
+			.away {
+				color: #48546b;
+
+				border-radius: 29px;
+				background: #fff;
+				padding: 6px 12px 6px 8px;
+				justify-content: center;
+				align-items: center;
+				gap: 4px;
+				/* elv-2 */
+				box-shadow: 0px 0px 16px 0px rgba(0, 58, 111, 0.08);
+			}
+		}
+	}
+	.info {
+		height: 70px;
+		padding: 24px 16px 12px 12px;
+		align-items: center;
+		gap: 8px;
+		align-self: stretch;
+		flex: 1;
+		background: #fff;
+		border-radius: 0 0 16px 16px;
+
+		.infoLeft {
+			width: 57px;
+			padding: 8px 12px;
+			align-items: center;
+			gap: 4px;
+			border-radius: 12px;
+			background: #f1f5f8;
+			font-weight: 600;
+			color: #48546b;
+			font-size: 12px;
+			.day {
+				font-size: 20px;
+				color: #006b35;
+			}
+		}
+		.infoRight {
+			width: calc(100% - 65px);
+			justify-content: space-between;
+			height: 100%;
+			span {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.title {
+				font-weight: 600;
+			}
+			.address {
+				color: #48546b;
+			}
+			.ticketType {
+				color: #e55a0f;
+				font-weight: 600;
+			}
+		}
+	}
+}

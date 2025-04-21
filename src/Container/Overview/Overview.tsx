@@ -1,7 +1,7 @@
 import { memo, useCallback, useState } from 'react'
 
 import CButton from '@/Components/Custom/CButton'
-import ModalCRUDEvent from '@/Components/Overview/ModalCRUDEvent'
+import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
 
 interface openModalProps {
 	type: string | null

@@ -14,7 +14,7 @@ import { useLocalePath } from '@/ultis/route.ults'
 import { convertStringToNumber, formatNumberString } from '@/ultis/string.ults'
 
 import { mainRoutes } from '@/routes/MainRoutes'
-import { repeatOpt, ticketEntranceType } from '@/Variable/select.variable'
+import { repeatOpt, ticketEntranceTypeOpt } from '@/Variable/select.variable'
 
 const handleParseData = (data: any) => {
 	const {
@@ -44,7 +44,8 @@ const handleParseData = (data: any) => {
 		latitude,
 		longitude,
 		thumbnails,
-		ticket_entrance_type: ticket_entrance_type || ticketEntranceType[0].value,
+		ticket_entrance_type:
+			ticket_entrance_type || ticketEntranceTypeOpt[0].value,
 		limit_participant,
 		ticket_entrance: {
 			min: formatNumberString(minEntr),
@@ -96,7 +97,7 @@ export default function useCRUDEvent({ data, edit_type }: any) {
 				if (!ticket_entrance_type) {
 					setEvent((prev) => ({
 						...prev,
-						ticket_entrance_type: ticketEntranceType[0].value,
+						ticket_entrance_type: ticketEntranceTypeOpt[0].value,
 					}))
 				}
 				break
@@ -219,7 +220,7 @@ export default function useCRUDEvent({ data, edit_type }: any) {
 		if (ticketSw) {
 			const { min: minEntr, max: maxEntr } = ticket_entrance
 			const fieldEntrs = { minEntr, maxEntr }
-			if (ticket_entrance_type === ticketEntranceType[0].value) {
+			if (ticket_entrance_type === ticketEntranceTypeOpt[0].value) {
 				if (!minEntr) {
 					_error.minEntr = 'Field is required'
 				}
@@ -319,12 +320,12 @@ export default function useCRUDEvent({ data, edit_type }: any) {
 		let _menu_price = ''
 		if (ticketSw) {
 			switch (ticket_entrance_type) {
-				case ticketEntranceType[0].value:
+				case ticketEntranceTypeOpt[0].value:
 					{
 						_ticket_entrance = _minEntr
 					}
 					break
-				case ticketEntranceType[1].value:
+				case ticketEntranceTypeOpt[1].value:
 					{
 						_ticket_entrance = `${_minEntr}:${_maxEntr}`
 					}

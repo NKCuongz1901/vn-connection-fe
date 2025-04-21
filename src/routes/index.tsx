@@ -27,6 +27,7 @@ export const USER_ROUTES = {
 }
 export const POST_ROUTES = {
 	name: 'post',
+	myPost: 'post/my',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',

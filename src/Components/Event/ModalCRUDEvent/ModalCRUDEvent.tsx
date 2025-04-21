@@ -28,7 +28,7 @@ import CTextArea from '@/Components/Custom/CTextArea'
 import CUpload from '@/Components/Custom/CUpload'
 
 import { daysOfWeek } from '@/Variable/common.variable'
-import { repeatOpt, ticketEntranceType } from '@/Variable/select.variable'
+import { repeatOpt, ticketEntranceTypeOpt } from '@/Variable/select.variable'
 
 import classes from './ModalCRUDEvent.module.scss'
 
@@ -96,7 +96,7 @@ const ModalCRUDEvent = ({ onClose, loadingContext }: ModalCRUDEventProps) => {
 					{ticketSw ? (
 						<>
 							<Flex className={classes.checkBoxWrapper}>
-								{ticketEntranceType.map(({ value, label }) => (
+								{ticketEntranceTypeOpt.map(({ value, label }) => (
 									<CCheckRadio
 										label={label}
 										key={value}
@@ -106,7 +106,7 @@ const ModalCRUDEvent = ({ onClose, loadingContext }: ModalCRUDEventProps) => {
 								))}
 							</Flex>
 							<Flex className={classes.entranceFee}>
-								{ticket_entrance_type === ticketEntranceType[0].value ? (
+								{ticket_entrance_type === ticketEntranceTypeOpt[0].value ? (
 									<CInput
 										value={minEntr}
 										error={error.minEntr}
