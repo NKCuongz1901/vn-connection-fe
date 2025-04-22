@@ -1,3 +1,5 @@
+import { PaginationType } from '@/interface/common/common.interface'
+
 export const countryCodes = [
 	{
 		name: 'افغانستان',
@@ -1232,15 +1234,9 @@ export const stateFriends = {
 	PENDING: 'PENDING',
 }
 
-type PaginationType = {
-	page: number
-	limit: number
-	totalPage: number
-}
-
 export const paginationCommon: PaginationType = {
 	page: 1,
-	limit: 20,
+	limit: 5,
 	totalPage: 0,
 }
 

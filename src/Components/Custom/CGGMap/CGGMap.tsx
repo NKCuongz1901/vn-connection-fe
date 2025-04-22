@@ -27,7 +27,7 @@ interface CGGMapProps {
 const CGGMap = (_props: CGGMapProps) => {
 	const { latitude, longitude, onSubmit, onClose } = _props
 	const { isLoaded } = useLoadScript({
-		googleMapsApiKey: '', // ← Thay bằng API key của bạn
+		googleMapsApiKey: process.env.NEXT_PUBLIC_GGMAP_KEY || '', // ← Thay bằng API key của bạn
 		libraries,
 	})
 

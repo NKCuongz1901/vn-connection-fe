@@ -84,7 +84,10 @@ const ItemEvent = ({ data, type }) => {
 			onClick={() => onChangeRoute(`${type}/${id}`)}
 		>
 			<Flex className={classes.image}>
-				<CImage src={thumbnails[0]} preview={false} />
+				<CImage
+					src={thumbnails[0] || '/images/defaultThumbnail.png'}
+					preview={false}
+				/>
 			</Flex>
 			{_renderSpaceTime()}
 			{_renderInfo()}

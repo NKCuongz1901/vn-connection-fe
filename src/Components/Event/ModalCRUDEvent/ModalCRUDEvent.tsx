@@ -35,11 +35,16 @@ import classes from './ModalCRUDEvent.module.scss'
 interface ModalCRUDEventProps {
 	open: boolean
 	onClose: any
+	onSuccess?: any
 	[key: string]: any
 }
-const ModalCRUDEvent = ({ onClose, loadingContext }: ModalCRUDEventProps) => {
+const ModalCRUDEvent = ({
+	onClose,
+	onSuccess,
+	loadingContext,
+}: ModalCRUDEventProps) => {
 	const { event, error, toggle, onToggle, onChangeValue, onSubmit } =
-		useCRUDEvent({})
+		useCRUDEvent({ onSuccess, onClose })
 	const _renderLeft = () => {
 		const { title, thumbnails } = event
 		return (

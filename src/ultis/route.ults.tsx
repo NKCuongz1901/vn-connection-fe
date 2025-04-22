@@ -1,4 +1,9 @@
-import { useParams, usePathname, useRouter } from 'next/navigation'
+import {
+	useParams,
+	usePathname,
+	useRouter,
+	useSearchParams,
+} from 'next/navigation'
 
 export function useLocalePath() {
 	const params = useParams()
@@ -40,4 +45,21 @@ export const useSafeBack = () => {
 	}
 
 	return { goBackOrPush }
+}
+
+export const useQuery = () => {
+	const searchParams = useSearchParams()
+
+	const hangleGetQuerry = (key?: string) => {
+		if (key) {
+			return searchParams.get(key) // trả về giá trị cụ thể
+		}
+
+		const entries = Array.from(searchParams.entries())
+		return Object.fromEntries(entries) // trả về object toàn bộ query
+	}
+
+	return {
+		onGetQuerry: hangleGetQuerry,
+	}
 }

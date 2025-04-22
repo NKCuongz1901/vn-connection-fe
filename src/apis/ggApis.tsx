@@ -18,8 +18,6 @@ export const getAddressFromLatLng = async ({
 				'Accept-Language': 'vi', // lấy kết quả tiếng Việt (nếu có)
 			},
 		})
-		console.log('🌸🌸🌸 TrieuNinhHan ~ res:', res)
-
 		return res?.data || res || null
 	} catch (error) {
 		console.error('Nominatim error:', error)

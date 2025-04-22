@@ -64,7 +64,19 @@ const handleParseData = (data: any) => {
 	}
 }
 
-export default function useCRUDEvent({ data, edit_type }: any) {
+interface CRUDEventProps {
+	data?: any
+	edit_type?: string
+	onClose: any
+	onSuccess?: any
+}
+
+export default function useCRUDEvent({
+	data,
+	edit_type,
+	onSuccess,
+	onClose,
+}: CRUDEventProps) {
 	const { openConfirm, openError, openSuccess } = useModal()
 	const { toggleLoadingContext } = useLoading()
 	const { onChangeRoute } = useLocalePath()
@@ -365,8 +377,14 @@ export default function useCRUDEvent({ data, edit_type }: any) {
 			if (code === 200) {
 				openSuccess({
 					message: 'create event successfully',
-					onAccept: () =>
-						onChangeRoute(`${mainRoutes.event}/${results?.object?.id}`),
+					onAccept: () => {
+						if (onSuccess) {
+							onSuccess?.(results?.object)
+						} else {
+							onChangeRoute(`${mainRoutes.event}/${results?.object?.id}`)
+						}
+						onClose()
+					},
 				})
 			}
 		} catch (error) {

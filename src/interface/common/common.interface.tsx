@@ -6,3 +6,9 @@ export interface SvgProps {
 	className?: string
 	[key: string]: any
 }
+
+export type PaginationType = {
+	page: number
+	limit: number
+	totalPage: number
+}
