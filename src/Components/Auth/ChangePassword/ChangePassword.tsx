@@ -6,6 +6,7 @@ import CInputPassword from '@/Components/Custom/CInputPassword'
 import ImageChangePassword from './ImageChangePassword'
 
 import classes from './ChangePassword.module.scss'
+import CInput from '@/Components/Custom/CInput'
 
 interface ChangePasswordProps {
 	disabled?: boolean
@@ -14,11 +15,13 @@ interface ChangePasswordProps {
 	confirmPassword?: string
 	title: string
 	note: string
+	name?: string
 	errors?: {
 		[key: string]: any
 	}
 	onChangePassword?: any
 	onChangeConfirmPassword?: any
+	onChangeCommonData?: any
 	onAccept?: any
 	[key: string]: any
 }
@@ -27,12 +30,14 @@ const ChangePassword = ({
 	disabled,
 	isRegister,
 	password,
+	name,
 	confirmPassword,
 	errors,
 	title = 'Change your password',
 	note,
 	onChangePassword,
 	onChangeConfirmPassword,
+	onChangeCommonData,
 	onAccept,
 }: ChangePasswordProps) => {
 	return (
@@ -49,6 +54,15 @@ const ChangePassword = ({
 					<div className={classes.note}>{note}</div>
 				</Flex>
 				<Flex vertical gap={12} className="fullW">
+					{isRegister && (
+						<CInput
+							isRequired
+							value={name}
+							label={'Name'}
+							placeholder={'Your name'}
+							onChange={(e) => onChangeCommonData(e.target.value)}
+						/>
+					)}
 					<CInputPassword
 						isRequired
 						value={password}

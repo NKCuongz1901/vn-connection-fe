@@ -13,7 +13,11 @@ const DownloadApp = () => {
 		: 'https://play.google.com/store/apps/details?id=com.vnconnections.app&hl=vi'
 	return (
 		<div className={classes.wrapper}>
-			<Flex align="center" justify="space-between">
+			<Flex
+				align="center"
+				justify="space-between"
+				className={classes.container}
+			>
 				<Flex align="center" gap={8}>
 					<IconApp />
 					<Flex vertical>
@@ -22,13 +26,8 @@ const DownloadApp = () => {
 					</Flex>
 				</Flex>
 				<CButton
+					className={classes.bnt}
 					type="primary"
-					style={{
-						height: 32,
-						padding: '8px 12px',
-						lineHeight: '17px',
-						width: 72,
-					}}
 					onClick={() => window.open(link, '_blank')}
 				>
 					OPEN

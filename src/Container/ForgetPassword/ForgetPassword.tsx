@@ -43,7 +43,8 @@ const ForgetPassword = ({
 	} = useRegisterAndReset({
 		type,
 	})
-	const { title, prefix, phone, otp, password, confirmPassword } = accountInfo
+	const { title, prefix, phone, otp, password, confirmPassword, name } =
+		accountInfo
 	const isRegister = useMemo(() => type === OTP_TYPE.REGISTER, [type])
 
 	const _renderContent = () => {
@@ -83,11 +84,13 @@ const ForgetPassword = ({
 						isRegister={isRegister}
 						password={password}
 						confirmPassword={confirmPassword}
+						name={name}
 						errors={errors}
 						title={steps[step]}
 						note="Make sure it's at least 8 characters long and includes a mix of letters, numbers, and symbols"
 						onChangePassword={onChangeData('password')}
 						onChangeConfirmPassword={onChangeData('confirmPassword')}
+						onChangeCommonData={onChangeData('name')}
 						onAccept={onSubmitPass}
 					/>
 				)

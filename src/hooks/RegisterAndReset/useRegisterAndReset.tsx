@@ -34,6 +34,7 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 		confirmPassword: '',
 		prefix: '+84',
 		uid: '',
+		name: '',
 		type,
 	})
 	const [errors, setErrors] = useState({})
@@ -128,7 +129,7 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 
 	const handleSubmitPass = useCallback(async () => {
 		const isRegister = type === OTP_TYPE.REGISTER
-		const { uid, password, prefix, phone } = accountInfo
+		const { uid, password, prefix, phone, name } = accountInfo
 		toggleLoadingContext(true)
 
 		try {
@@ -139,7 +140,8 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 			if (isRegister) {
 				payload = {
 					...payload,
-					name: formatPhone(prefix, phone),
+					name: name,
+					// name: formatPhone(prefix, phone),
 					email: '',
 					invite_code: '',
 				}
@@ -163,9 +165,11 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toJson(accountInfo), step])
 	const handleValidate = useCallback(() => {
-		const { phone, password, confirmPassword } = accountInfo
+		const { phone, password, confirmPassword, name } = accountInfo
 		const error: { [key: string]: any } = {}
 		let value = false
+		const isRegister = type === OTP_TYPE.REGISTER
+
 		switch (step) {
 			case 0:
 				if (phone.length >= 9) {
@@ -174,12 +178,21 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 				break
 			case 2:
 				error.confirmPassword = null
-				if (passwordRegex.test(password) && password === confirmPassword) {
+
+				if (
+					passwordRegex.test(password) &&
+					password === confirmPassword &&
+					(!isRegister || name.trim())
+				) {
 					value = true
 					break
 				}
+
 				if (password !== confirmPassword && confirmPassword) {
 					error.confirmPassword = 'Confirm password do not match'
+				}
+				if (!name.trim() && isRegister) {
+					error.name = 'Field is required'
 				}
 				break
 
