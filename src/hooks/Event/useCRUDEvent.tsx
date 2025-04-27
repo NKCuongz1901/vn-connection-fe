@@ -1,10 +1,10 @@
 import dayjs from 'dayjs'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { createPost } from '@/apis/postApis'
+import { createPost, editPost } from '@/apis/postApis'
 import { uploadProgress } from '@/apis/uploadApis'
 
 import { isArray } from '@/ultis/array.ults'
@@ -14,7 +14,11 @@ import { useLocalePath } from '@/ultis/route.ults'
 import { convertStringToNumber, formatNumberString } from '@/ultis/string.ults'
 
 import { mainRoutes } from '@/routes/MainRoutes'
-import { repeatOpt, ticketEntranceTypeOpt } from '@/Variable/select.variable'
+import {
+	repeatOpt,
+	ticketEntranceType,
+	ticketEntranceTypeOpt,
+} from '@/Variable/select.variable'
 
 const handleParseData = (data: any) => {
 	const {
@@ -39,8 +43,8 @@ const handleParseData = (data: any) => {
 		title,
 		description,
 		address,
-		start_time: start_time ? dayjs(start_time) : null,
-		end_time: end_time ? dayjs(end_time) : null,
+		start_time: start_time ? dayjs(Number(start_time)) : null,
+		end_time: end_time ? dayjs(Number(end_time)) : null,
 		latitude,
 		longitude,
 		thumbnails,
@@ -97,16 +101,19 @@ export default function useCRUDEvent({
 		description: '',
 	})
 	const [toggle, setToggle] = useState({
-		ticketSw: false,
-		pricingSw: false,
+		ticketSw: [
+			ticketEntranceType.MULTIPLE_TICKET,
+			ticketEntranceType.ONLY,
+		].includes(data?.ticket_entrance_type),
+		pricingSw: !!data?.menu_price,
 	})
-
+	const id = useMemo(() => data?.id, [data])
 	const handleToggle = ({ key, value }) => {
 		const { ticket_entrance_type } = event
 
 		switch (key) {
 			case 'ticketSw':
-				if (!ticket_entrance_type) {
+				if (!ticket_entrance_type || ticket_entrance_type === 'FREE') {
 					setEvent((prev) => ({
 						...prev,
 						ticket_entrance_type: ticketEntranceTypeOpt[0].value,
@@ -292,12 +299,10 @@ export default function useCRUDEvent({
 			const { code, results } = res || {}
 			if (code === 200) {
 				url = results?.object?.url
+				return url
 			}
 		} catch (error) {
-			console.error('error:', error)
-			openError(error)
-		} finally {
-			return url
+			throw error
 		}
 	}
 
@@ -320,9 +325,9 @@ export default function useCRUDEvent({
 		const { ticketSw, pricingSw } = toggle
 		const { min: minEntr, max: maxEntr } = ticket_entrance
 		const { min: minPrice, max: maxPrice } = menu_price
-		const _thumbnails = isArray(thumbnails, 1)
+		const _thumbnails = fileImg
 			? [await handleUploadImage(fileImg)]
-			: []
+			: thumbnails
 		const _minEntr = String(convertStringToNumber(minEntr))
 		const _maxEntr = String(convertStringToNumber(maxEntr))
 		const _minPrice = String(convertStringToNumber(minPrice))
@@ -372,11 +377,13 @@ export default function useCRUDEvent({
 		toggleLoadingContext(true)
 		try {
 			const payload = await handleParsePayload()
-			const res: any = await createPost(payload)
+			const res: any = id
+				? await editPost({ id, payload })
+				: await createPost(payload)
 			const { code, results } = res || {}
 			if (code === 200) {
 				openSuccess({
-					message: 'create event successfully',
+					message: id ? 'Edit event successfully' : 'Create event successfully',
 					onAccept: () => {
 						if (onSuccess) {
 							onSuccess?.(results?.object)
@@ -398,7 +405,9 @@ export default function useCRUDEvent({
 			return
 		}
 		openConfirm({
-			message: 'Do you want create event ?',
+			message: id
+				? 'Do you want edit this event ?'
+				: 'Do you want create event ?',
 			onAccept: handleCreatePost,
 		})
 	}

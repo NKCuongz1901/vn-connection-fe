@@ -11,6 +11,14 @@
 			display: flex;
 			flex: 1;
 			justify-content: center;
+			text-align: center;
+		}
+		.CModalBodySelect {
+			width: 100%;
+			gap: 12px;
+			button {
+				width: 100%;
+			}
 		}
 	}
 }

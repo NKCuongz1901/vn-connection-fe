@@ -2,18 +2,80 @@ import { convertParams } from '@/ultis/object.ults'
 import axios from '../axios'
 
 import { POST_ROUTES } from '@/routes'
+import { mainRoutes } from '@/routes/MainRoutes'
 
 export const createPost = async (payload: any) => {
 	const url = POST_ROUTES.name // myprofile
 	return await axios.post(url, payload)
+}
+export const editPost = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: any
+}) => {
+	const url = `${POST_ROUTES.name}/${id}`
+	return await axios.put(url, payload)
 }
 
 export const getListPost = async (_params: any) => {
 	const { type, ...params } = _params || {}
 	let url = '' // myprofile
 	switch (type) {
+		case mainRoutes.upcomingEvent:
+			url = POST_ROUTES.search
+			break
+
 		default:
 			url = POST_ROUTES.myPost
+			break
+	}
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const getDetailPost = async ({
+	id,
+	params,
+}: {
+	id: string
+	params: any
+}) => {
+	const url = `${POST_ROUTES.name}/${id}`
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const deletePost = async ({
+	id,
+	params,
+}: {
+	id: string
+	params: any
+}) => {
+	const url = `${POST_ROUTES.name}/${id}`
+
+	return await axios.delete(url, {
+		params: params ? convertParams(params) : null,
+	})
+}
+
+export const joinPost = async (payload: any) => {
+	const url = POST_ROUTES.participant
+
+	return await axios.post(url, payload)
+}
+
+export const getListParticipant = async (_params: any) => {
+	const { type, ...params } = _params || {}
+	let url = '' // myprofile
+	switch (type) {
+		default:
+			url = POST_ROUTES.participant
 			break
 	}
 	return await axios.get(url, {

@@ -9,9 +9,11 @@ import { formatNumberString } from '@/ultis/string.ults'
 import CImage from '@/Components/Custom/CImage'
 
 import { repeatOpt, ticketEntranceType } from '@/Variable/select.variable'
+import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './ItemEvent.module.scss'
-const ItemEvent = ({ data, type }) => {
+
+const ItemEvent = ({ data }) => {
 	const { onChangeRoute } = useLocalePath()
 	const { id, thumbnails, start_time, end_time } = data
 	const { day, weekday, month, time: _start_time } = getDateInfo(start_time)
@@ -81,7 +83,7 @@ const ItemEvent = ({ data, type }) => {
 		<Flex
 			className={classes.wrapper}
 			vertical
-			onClick={() => onChangeRoute(`${type}/${id}`)}
+			onClick={() => onChangeRoute(`${mainRoutes.event}/${id}`)}
 		>
 			<Flex className={classes.image}>
 				<CImage

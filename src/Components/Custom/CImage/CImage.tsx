@@ -9,6 +9,7 @@ const CImage = (_props: ImageProps) => {
 			<Image
 				className={classes.image}
 				src={src || '/images/defaultCover.png'}
+				preview={false}
 				{...props}
 			/>
 		</Flex>

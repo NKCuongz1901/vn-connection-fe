@@ -49,6 +49,7 @@ export const useSafeBack = () => {
 
 export const useQuery = () => {
 	const searchParams = useSearchParams()
+	const params = useParams()
 
 	const hangleGetQuerry = (key?: string) => {
 		if (key) {
@@ -58,8 +59,26 @@ export const useQuery = () => {
 		const entries = Array.from(searchParams.entries())
 		return Object.fromEntries(entries) // trả về object toàn bộ query
 	}
+	const handleGetParams = (key?: string) => {
+		if (!params) return key ? undefined : {}
+
+		if (key) return params[key]
+		return params
+	}
 
 	return {
 		onGetQuerry: hangleGetQuerry,
+		onGetParams: handleGetParams,
+	}
+}
+export const handleGoToPage = (...args) => {
+	if (typeof window !== 'undefined') {
+		window.open(...args)
+	}
+}
+export const goToGoogleMap = ({ lat, lng }: { lat: number; lng: number }) => {
+	if (typeof window !== 'undefined') {
+		const url = `https://www.google.com/maps?q=${lat},${lng}`
+		handleGoToPage(url, '_blank')
 	}
 }

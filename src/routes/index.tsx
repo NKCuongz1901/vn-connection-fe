@@ -28,6 +28,12 @@ export const USER_ROUTES = {
 export const POST_ROUTES = {
 	name: 'post',
 	myPost: 'post/my',
+	participant: 'participant',
+	search: 'post/search',
+}
+export const CONVERSATION_ROUTES = {
+	name: 'conversation',
+	sendById: 'conversation/send-message-by-user-id',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',

@@ -13,5 +13,6 @@ export const getDateInfo = (
 		weekday: d.format('ddd'), // Thứ bằng tiếng Anh
 		month: d.format('MMM'), // tháng (0-based)
 		time: d.format('HH:mm'),
+		dmy: d.format('DD/MM/YYYY'),
 	}
 }

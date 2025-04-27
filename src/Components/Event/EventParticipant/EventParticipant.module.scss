@@ -1,0 +1,31 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	.participant {
+		font-weight: 600;
+		gap: 4px;
+		:last-child {
+			display: flex;
+			height: 20px;
+			padding: 0px 8px;
+			justify-content: center;
+			align-items: center;
+			color: #006b35;
+			background: #f4f8fc;
+			border-radius: 50%;
+		}
+	}
+	.memberJoin {
+		gap: 8px;
+		.moreMember {
+			height: 32px;
+			width: 32px;
+			background: #f4f7fc;
+			align-items: center;
+			justify-content: center;
+			border-radius: 50%;
+			color: #48546b;
+		}
+	}
+}

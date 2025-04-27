@@ -2,6 +2,7 @@
 
 import { Button, ButtonProps } from 'antd'
 
+import classes from './CButton.module.scss'
 const variant = {
 	oranger: {
 		color: 'white',
@@ -23,20 +24,16 @@ const CButton = (_props: ButtonProps & { ctype?: VariantType }) => {
 	const { children, ctype, style, ...props } = _props
 	const { disabled } = _props
 	return (
-		<Button
-			style={{
-				borderRadius: 100,
-				height: 48,
-				fontWeight: 600,
-				padding: '12px 16px',
-				border: 'none',
-				...(!disabled && ctype ? variant[ctype] || {} : {}),
-				...style,
-			}}
-			{...props}
-		>
-			{children}
-		</Button>
+		<div className={classes.wrapper} style={style}>
+			<Button
+				style={{
+					...(!disabled && ctype ? variant[ctype] || {} : {}),
+				}}
+				{...props}
+			>
+				{children}
+			</Button>
+		</div>
 	)
 }
 

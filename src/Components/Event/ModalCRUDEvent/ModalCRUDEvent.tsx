@@ -34,17 +34,22 @@ import classes from './ModalCRUDEvent.module.scss'
 
 interface ModalCRUDEventProps {
 	open: boolean
+	data?: any
+	edit_type?: any
 	onClose: any
 	onSuccess?: any
 	[key: string]: any
 }
 const ModalCRUDEvent = ({
+	data,
+	edit_type,
 	onClose,
 	onSuccess,
 	loadingContext,
 }: ModalCRUDEventProps) => {
 	const { event, error, toggle, onToggle, onChangeValue, onSubmit } =
-		useCRUDEvent({ onSuccess, onClose })
+		useCRUDEvent({ data, onSuccess, onClose, edit_type })
+	const { id } = data || {}
 	const _renderLeft = () => {
 		const { title, thumbnails } = event
 		return (
@@ -235,6 +240,7 @@ const ModalCRUDEvent = ({
 				</Flex>
 				<Flex className={classes.desc}>
 					<CSelect
+						disabled={!!id}
 						label="Does this event repeat"
 						value={type}
 						options={repeatOpt}
@@ -247,6 +253,7 @@ const ModalCRUDEvent = ({
 				{type === 'MULTI_DAYS' && (
 					<Flex className={classes.repeatDay} vertical>
 						<CSelectMuti
+							disabled={!!id}
 							value={days}
 							error={error.days}
 							options={daysOfWeek}
@@ -260,13 +267,18 @@ const ModalCRUDEvent = ({
 					<Flex className={classes.gap4} vertical>
 						<span className={classes.title}>How many times repeat</span>
 						<Flex className={classes.repeat}>
-							{arrayFrom(7).map((_, index) => (
+							{arrayFrom(15).map((_, index) => (
 								<Flex
 									className={clsx(classes.repeatItem, {
 										[classes.repeatItemChecked]: amount_of_repeat === index + 1,
 									})}
 									key={index}
-									onClick={() => onChangeValue('amount_of_repeat')(index + 1)}
+									onClick={() => {
+										if (!!id) {
+											return
+										}
+										onChangeValue('amount_of_repeat')(index + 1)
+									}}
 								>
 									{index + 1}
 								</Flex>
@@ -301,7 +313,7 @@ const ModalCRUDEvent = ({
 			<CModal
 				onClose={onClose}
 				onCancel={onClose}
-				title="Create event"
+				title={id ? 'Edit event' : 'Create event'}
 				styles={{
 					content: {
 						width: 800,
@@ -315,7 +327,7 @@ const ModalCRUDEvent = ({
 							ctype="oranger"
 							style={{ width: 200 }}
 						>
-							Create event
+							{id ? 'Edit event' : 'Create event'}
 						</CButton>
 					</Flex>,
 				]}

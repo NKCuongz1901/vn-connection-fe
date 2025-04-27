@@ -54,7 +54,7 @@ export const removeStorageCookie = (key: string) => {
 	}
 }
 
-export const getUserInfo = (key: string) => {
+export const getUserInfo = (key?: string) => {
 	const data = getStorageCookie('info') || {}
 	return key ? data[key] : data
 }

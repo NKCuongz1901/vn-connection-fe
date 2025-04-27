@@ -1,0 +1,15 @@
+.wrapper {
+	position: relative;
+	.bandage {
+		position: absolute;
+		bottom: -5px;
+		right: -5px;
+		height: 16px;
+		width: 16px;
+		border-radius: 99px;
+		border: 1px solid #fff;
+		background: #e55a0f;
+		align-items: center;
+		justify-content: center;
+	}
+}

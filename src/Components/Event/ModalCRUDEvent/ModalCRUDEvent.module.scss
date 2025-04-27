@@ -72,11 +72,16 @@
 				gap: 4px;
 				.repeat {
 					gap: 8px;
+					overflow: auto;
+					max-width: 400px;
+					&::-webkit-scrollbar:horizontal {
+						height: 4px;
+					}
 					.repeatItem {
 						justify-content: center;
 						align-items: center;
 						height: 40px;
-						width: 40px;
+						min-width: 40px;
 						background: #f4f8fc;
 						border-radius: 16px;
 						cursor: pointer;
