@@ -129,7 +129,7 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 
 	const handleSubmitPass = useCallback(async () => {
 		const isRegister = type === OTP_TYPE.REGISTER
-		const { uid, password, prefix, phone, name } = accountInfo
+		const { uid, password, name } = accountInfo
 		toggleLoadingContext(true)
 
 		try {
