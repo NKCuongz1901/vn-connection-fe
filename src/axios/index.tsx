@@ -14,10 +14,10 @@ let refreshSubscribers = [] as any
 let refreshTokenPromise = null as any
 axios.interceptors.request.use(
 	(config) => {
+		config.headers['platform'] = 'WEB'
 		const accessToken = getStorageCookie('token')
 		if (accessToken && !config.headers['Authorization']) {
 			config.headers['Authorization'] = 'Bearer ' + (accessToken ?? '')
-			config.headers['platform'] = 'WEB'
 		}
 		return config
 	},
