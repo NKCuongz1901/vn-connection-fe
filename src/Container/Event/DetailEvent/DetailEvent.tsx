@@ -15,7 +15,7 @@ import { Dropdown, Flex, Skeleton } from 'antd'
 import { memo } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
-import useDetailEvent from '@/hooks/Event/userDetailEvent'
+import useDetailEvent from '@/hooks/Event/useDetailEvent'
 
 import { getDateInfo } from '@/ultis/date.ults'
 import { isEmptyObject } from '@/ultis/object.ults'
@@ -27,6 +27,7 @@ import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
 import CButton from '@/Components/Custom/CButton'
 import CImage from '@/Components/Custom/CImage'
 import CModalSelect from '@/Components/Custom/CModal/CModalSelect'
+import EventComment from '@/Components/Event/EventComment'
 import EventParticipant from '@/Components/Event/EventParticipant'
 import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
 import ModalMyFriend from '@/Components/Friend/ModalMyFriend'
@@ -401,11 +402,13 @@ const DetailEvent = ({ id }: DetailEventProps) => {
 					{_renderTop()}
 					{_renderDetail()}
 					{_renderDesc()}
-					{/* <Flex className={classes.comment}></Flex> */}
+					<Flex className={classes.comment}>
+						<EventComment id={id} />
+					</Flex>
 					{_renderModal()}
 				</Flex>
 			) : (
-				<div>ko cos data</div>
+				<Flex className={classes.noData}>Post does not exist</Flex>
 			)}
 		</div>
 	)

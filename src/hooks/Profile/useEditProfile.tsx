@@ -29,6 +29,8 @@ const handleParseToData = (data) => {
 		who_i_am,
 		looking_for,
 		i_can_offer,
+		longitude,
+		latitude,
 	} = cloneDeep(data)
 	const returnData = {
 		avatar,
@@ -45,6 +47,8 @@ const handleParseToData = (data) => {
 		who_i_am,
 		looking_for,
 		i_can_offer,
+		longitude,
+		latitude,
 	}
 	return returnData
 }
@@ -81,15 +85,25 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 	})
 	const handleChangeData = useCallback((key, _value) => {
 		let value = _value
+		let otherState = {}
 		switch (key) {
 			case 'birthday':
 				value = _value?.date
+				break
+			case 'address':
+				const {} = _value || {}
+				const { lng, lat, display_name } = _value || {}
+				value = display_name
+				otherState = {
+					longitude: lng,
+					latitude: lat,
+				}
 				break
 			default:
 				break
 		}
 		setErrors((prev) => ({ ...prev, [key]: '' }))
-		setDataModal((prev) => ({ ...prev, [key]: value }))
+		setDataModal((prev) => ({ ...prev, [key]: value, ...otherState }))
 	}, [])
 	const handleValidate = useCallback((data) => {
 		const { languages_can_speak } = data || {}
@@ -196,6 +210,8 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 			who_i_am,
 			looking_for,
 			i_can_offer,
+			longitude,
+			latitude,
 		} = dataModal
 		const payload = {
 			id: data.id,
@@ -209,10 +225,12 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 			who_i_am,
 			looking_for,
 			i_can_offer,
-			gender: gender?.value || null,
-			mode: mode?.value || null,
+			gender: gender?.value || gender || null,
+			mode: mode?.value || mode || null,
 			languages_can_speak: languages_can_speak.join(', '),
 			birthday: dayjs(birthday).toISOString(),
+			longitude,
+			latitude,
 		}
 		openConfirm({
 			message: 'Do you want to update profile ?',

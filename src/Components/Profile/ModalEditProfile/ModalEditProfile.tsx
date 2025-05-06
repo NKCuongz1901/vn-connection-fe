@@ -20,6 +20,7 @@ import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
 import CDatePicker from '@/Components/Custom/CDatePicker'
 import CInput from '@/Components/Custom/CInput'
+import CInputMap from '@/Components/Custom/CInputMap'
 import CModal from '@/Components/Custom/CModal/CModal'
 import CSelect from '@/Components/Custom/CSelect'
 import CSelectMuti from '@/Components/Custom/CSelectMuti'
@@ -111,6 +112,8 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 			i_am_interested_in,
 			languages_can_speak,
 			country_visited,
+			longitude,
+			latitude,
 		} = dataModal
 		return (
 			<Flex className={classes.bottom}>
@@ -143,12 +146,14 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							onChange={(e) => onChangeData('gender', e)}
 						/>
 					</Flex>
-					<CInput
+					<CInputMap
 						value={address}
+						longitude={longitude}
+						latitude={latitude}
 						error={errors.address}
-						onChange={(e) => onChangeData('address', e.target.value)}
-						prefix={<IconMapPinFilled />}
 						placeholder="Enter your location"
+						onSubmitModal={(value) => onChangeData('address', value)}
+						prefix={<IconMapPinFilled />}
 					/>
 					<Flex>
 						<CSelect

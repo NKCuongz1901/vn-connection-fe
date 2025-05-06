@@ -30,6 +30,7 @@ export const POST_ROUTES = {
 	myPost: 'post/my',
 	participant: 'participant',
 	search: 'post/search',
+	comment: 'comment',
 }
 export const CONVERSATION_ROUTES = {
 	name: 'conversation',

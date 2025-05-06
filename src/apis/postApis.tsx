@@ -5,7 +5,7 @@ import { POST_ROUTES } from '@/routes'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 export const createPost = async (payload: any) => {
-	const url = POST_ROUTES.name // myprofile
+	const url = POST_ROUTES.name
 	return await axios.post(url, payload)
 }
 export const editPost = async ({
@@ -21,7 +21,7 @@ export const editPost = async ({
 
 export const getListPost = async (_params: any) => {
 	const { type, ...params } = _params || {}
-	let url = '' // myprofile
+	let url = ''
 	switch (type) {
 		case mainRoutes.upcomingEvent:
 			url = POST_ROUTES.search
@@ -72,7 +72,7 @@ export const joinPost = async (payload: any) => {
 
 export const getListParticipant = async (_params: any) => {
 	const { type, ...params } = _params || {}
-	let url = '' // myprofile
+	let url = ''
 	switch (type) {
 		default:
 			url = POST_ROUTES.participant
@@ -81,4 +81,26 @@ export const getListParticipant = async (_params: any) => {
 	return await axios.get(url, {
 		params: convertParams(params),
 	})
+}
+export const getListListCommentById = async (params: any) => {
+	const url = POST_ROUTES.comment
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const sendCommentPost = async (payload: {
+	post_id: string
+	content: string
+	[key: string]: any
+}) => {
+	const url = POST_ROUTES.comment
+
+	return await axios.post(url, payload)
+}
+
+export const deleteCommentPost = async (id: string) => {
+	const url = `${POST_ROUTES.comment}/${id}`
+	return await axios.delete(url)
 }

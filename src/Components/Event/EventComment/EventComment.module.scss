@@ -1,0 +1,134 @@
+.wrapper {
+	width: 100%;
+	overflow: scroll;
+
+	.container {
+		width: 100%;
+		overflow: auto;
+
+		gap: 12px;
+		.note {
+			gap: 4px;
+			font-weight: 600;
+
+			.title {
+				color: #0f1729;
+				font-size: 16px;
+			}
+			.number {
+				padding: 0px 8px;
+				justify-content: center;
+				align-items: center;
+				border-radius: 99px;
+				background: #f4f8fc;
+				color: #006b35;
+			}
+		}
+		.commentBox {
+			width: 100%;
+			position: relative;
+			:global(.ant-input) {
+				padding: 12px 44px 12px 16px;
+			}
+			.iconSend {
+				position: absolute;
+				z-index: 2;
+				justify-content: center;
+				align-items: center;
+				border-radius: 999px;
+				background: #e55a0f;
+				height: 28px;
+				width: 28px;
+				right: 16px;
+				top: 12px;
+				cursor: pointer;
+			}
+			.disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
+				pointer-events: none;
+			}
+		}
+		.hr {
+			width: 100%;
+			border-color: #eef3f6;
+			background: #eef3f6;
+			height: 1px;
+		}
+		.commentWrapper {
+			height: calc(100vh - 150px);
+			.commentList {
+				overflow: auto;
+				.commentItem {
+					padding: 4px 16px;
+					gap: 4px;
+					.avatar {
+						margin-top: 4px;
+					}
+					.commentInfo {
+						padding: 8px 12px 12px 12px;
+						flex-direction: column;
+						justify-content: center;
+						gap: 4px;
+						flex: 1;
+						border-radius: 16px;
+						background: #f4f8fc;
+						.info {
+							justify-content: space-between;
+							gap: 4px;
+							align-items: center;
+							.infoText {
+								gap: 4px;
+								align-items: center;
+
+								:first-child {
+									font-weight: 600;
+								}
+								:last-child {
+									color: #94a3b8;
+								}
+							}
+							.commentAction {
+								cursor: pointer;
+							}
+						}
+						.content {
+							word-break: break-word;
+							white-space: pre;
+						}
+					}
+				}
+				.skeletonWrapper {
+					padding: 4px 16px;
+					gap: 4px;
+					.skeleton {
+						border-radius: 16px;
+						height: 70px;
+						width: 100%;
+					}
+				}
+				.loading {
+					opacity: 0.5;
+					pointer-events: none;
+				}
+			}
+		}
+	}
+}
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		.container {
+			.commentWrapper {
+				.commentList {
+					.commentItem {
+						padding: 4px;
+					}
+					.skeletonWrapper {
+						padding: 4px;
+					}
+				}
+			}
+		}
+	}
+}
