@@ -226,7 +226,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>Message for you</div>
+					<div className={classes.title}>Message for you:</div>
 					{content.map((item) => (
 						<Flex key={item.id} vertical>
 							<div className={classes.label}>{item.label}</div>
