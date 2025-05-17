@@ -31,6 +31,7 @@ export const POST_ROUTES = {
 	participant: 'participant',
 	search: 'post/search',
 	comment: 'comment',
+	updateMember: 'post/update-member',
 }
 export const CONVERSATION_ROUTES = {
 	name: 'conversation',
@@ -46,18 +47,18 @@ export const UPLOAD_ROUTES = {
 	name: '/image/upload',
 }
 export const Menus = [
-	{
-		title: 'Hangout',
-		Icon: Party,
-		path: mainRoutes.hangout,
-		child: [],
-	},
-	{
-		title: 'My networks',
-		Icon: People,
-		path: mainRoutes.network,
-		child: [],
-	},
+	// {
+	// 	title: 'Hangout',
+	// 	Icon: Party,
+	// 	path: mainRoutes.hangout,
+	// 	child: [],
+	// },
+	// {
+	// 	title: 'My networks',
+	// 	Icon: People,
+	// 	path: mainRoutes.network,
+	// 	child: [],
+	// },
 	{
 		title: 'My Events',
 		Icon: Event,
@@ -70,40 +71,40 @@ export const Menus = [
 		path: mainRoutes.upcomingEvent,
 		child: [],
 	},
-	{
-		title: 'Discussions',
-		Icon: Message3,
-		path: mainRoutes.discussions,
-		child: [],
-	},
-	{
-		title: 'Overview',
-		Icon: OverviewIcon,
-		path: mainRoutes.overview,
-		child: [],
-	},
-	{
-		title: 'Search',
-		Icon: SearchNormal,
-		path: mainRoutes.search,
-		child: [],
-	},
-	{
-		title: 'Inbox',
-		Icon: Messenger,
-		path: mainRoutes.inbox,
-		child: [],
-	},
+	// {
+	// 	title: 'Discussions',
+	// 	Icon: Message3,
+	// 	path: mainRoutes.discussions,
+	// 	child: [],
+	// },
+	// {
+	// 	title: 'Overview',
+	// 	Icon: OverviewIcon,
+	// 	path: mainRoutes.overview,
+	// 	child: [],
+	// },
+	// {
+	// 	title: 'Search',
+	// 	Icon: SearchNormal,
+	// 	path: mainRoutes.search,
+	// 	child: [],
+	// },
+	// {
+	// 	title: 'Inbox',
+	// 	Icon: Messenger,
+	// 	path: mainRoutes.inbox,
+	// 	child: [],
+	// },
 	{
 		title: 'Friends',
 		Icon: TwoUser,
 		path: mainRoutes.friend,
 		child: [],
 	},
-	{
-		title: 'Dating',
-		Icon: Heart,
-		path: mainRoutes.dating,
-		child: [],
-	},
+	// {
+	// 	title: 'Dating',
+	// 	Icon: Heart,
+	// 	path: mainRoutes.dating,
+	// 	child: [],
+	// },
 ]

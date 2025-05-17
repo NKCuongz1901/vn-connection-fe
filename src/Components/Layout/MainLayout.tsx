@@ -86,7 +86,7 @@ const MainLayout = (props: MainLayoutProps) => {
 			}
 		} else {
 			if (login) {
-				onChangeRoute(mainRoutes.home)
+				onChangeRoute(Menus[0].path)
 			} else {
 				setContent(<AuthLayout>{children}</AuthLayout>)
 			}
