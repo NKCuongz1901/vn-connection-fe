@@ -18,7 +18,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
 	title: 'UniVini',
-	description: 'Welcome to UniVini',
+	description: 'Welcome to https://univini.com/',
 	openGraph: {
 		title: 'UniVini',
 		url: 'https://univini.com/images/univini-logo.png',
