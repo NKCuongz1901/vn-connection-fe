@@ -12,6 +12,7 @@ import CButton from '../CButton'
 import CModal from '../CModal/CModal'
 
 import classes from './CGGMap.module.scss'
+import { getUserInfo } from '@/ultis/storage.ults'
 
 const libraries: any = ['places']
 
@@ -57,6 +58,9 @@ const CGGMap = (_props: CGGMapProps) => {
 	}
 	const handleSetDefaultCenter = async () => {
 		try {
+			const { latitude, longitude } = getUserInfo()
+			setDefaultCenter({ lat: latitude || 0, lng: longitude || 0 })
+
 			const res = await getCurrentLocation()
 			const { lat, lng } = res
 			setDefaultCenter({ lat, lng })
