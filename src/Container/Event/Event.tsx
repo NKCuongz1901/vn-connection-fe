@@ -71,7 +71,7 @@ const Event = (_props: EventProps) => {
 			</Flex>
 			<Flex ref={_childRef} className={classes.wrapperItem} onScroll={onScroll}>
 				{listPost.map((data) => (
-					<ItemEvent key={data.id} data={data} />
+					<ItemEvent key={data.id} data={data} type={type} />
 				))}
 				{loading &&
 					arrayFrom(3).map((_, index) => (

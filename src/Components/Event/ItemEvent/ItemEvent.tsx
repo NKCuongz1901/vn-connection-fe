@@ -13,7 +13,7 @@ import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './ItemEvent.module.scss'
 
-const ItemEvent = ({ data }) => {
+const ItemEvent = ({ data, type }) => {
 	const { onChangeRoute } = useLocalePath()
 	const { id, thumbnails, start_time, end_time } = data
 	const { day, weekday, month, time: _start_time } = getDateInfo(start_time)
@@ -83,7 +83,7 @@ const ItemEvent = ({ data }) => {
 		<Flex
 			className={classes.wrapper}
 			vertical
-			onClick={() => onChangeRoute(`${mainRoutes.event}/${id}`)}
+			onClick={() => onChangeRoute(`${type}/${id}`)}
 		>
 			<Flex className={classes.image}>
 				<CImage

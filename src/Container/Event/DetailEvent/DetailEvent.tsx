@@ -47,9 +47,10 @@ const skeletonItems = [
 
 interface DetailEventProps {
 	id: string
+	type?: string
 	[key: string]: any
 }
-const DetailEvent = ({ id }: DetailEventProps) => {
+const DetailEvent = ({ id, type }: DetailEventProps) => {
 	const {
 		detailPost,
 		loading,
@@ -86,7 +87,7 @@ const DetailEvent = ({ id }: DetailEventProps) => {
 			<Flex className={classes.action}>
 				<Flex
 					className={classes.icon}
-					onClick={() => goBackOrPush(mainRoutes.event)}
+					onClick={() => goBackOrPush(type || mainRoutes.event)}
 				>
 					<IconChevronLeft />
 				</Flex>

@@ -58,7 +58,10 @@ export default function useEventComment({ id }: useEventCommentProps) {
 				_paginationRefs.current.totalPage = totalPage
 				setCommentList((prev: any[]) => {
 					const contents = isNew ? [] : prev
-					const dataShow = uniqueArray([...contents, ...rows], 'id') as any[]
+					const dataShow = uniqueArray(
+						[...contents, ...(rows || [])],
+						'id',
+					) as any[]
 					return dataShow
 				})
 				setTotal(count)

@@ -10,7 +10,7 @@ import { mainRoutes } from '@/routes/MainRoutes'
 const Page = () => {
 	const { onGetParams } = useQuery()
 	const id = onGetParams('id') as string
-	return <DetailEvent id={id} type={mainRoutes.event} />
+	return <DetailEvent id={id} type={mainRoutes.upcomingEvent} />
 }
 
 export default Page
