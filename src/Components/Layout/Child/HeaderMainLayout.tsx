@@ -78,7 +78,9 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 	return (
 		<Flex className="headerMainLayoutWrapper">
 			<Flex className="headerMainLayout">
-				<Flex gap={4} className="homeMainLayout">
+				<Flex gap={4} className="homeMainLayout"
+					onClick={() => onChangeRoute(mainRoutes.home)}
+					>
 					<LogoSvg />
 					<div>UniVini</div>
 				</Flex>
