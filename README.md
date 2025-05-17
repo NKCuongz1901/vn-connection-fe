@@ -30,7 +30,6 @@ bun dev
 8. Define variable
 9. Define type/interface
 
-
 ## Rule passing props down
 
 1. Id, key
