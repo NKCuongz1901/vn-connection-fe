@@ -15,6 +15,7 @@ import { Menus } from '@/routes'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import './MainLayout.scss'
+import { buildVersion } from '../../../utils/version'
 interface MainLayoutProps {
 	children: React.ReactNode
 	[key: string]: any
@@ -35,7 +36,7 @@ const MainLayout = (props: MainLayoutProps) => {
 					openMenu ? 'openLayoutMenu' : 'closeLayoutMenu'
 				}`}
 			>
-				<Flex vertical className="sideBarMainLayout">
+				<Flex vertical className="sideBarMainLayout" style={{ height: '100%' }}>
 					<Flex className="sideBarMenuToggle">
 						<CloseOutlined
 							className="sideBarMenuToggleICon"
@@ -62,6 +63,7 @@ const MainLayout = (props: MainLayoutProps) => {
 							)
 						})}
 					</Flex>
+					<Flex className='justify-end items-end item' style={{ marginTop: 'auto', padding: '12px', fontSize: '12px', color: '#64748B' }}>Version: {buildVersion}</Flex>
 				</Flex>
 			</Flex>
 		)

@@ -1,5 +1,6 @@
 import { Flex } from 'antd'
 import { memo } from 'react'
+import { buildVersion } from '../../../utils/version'
 
 const TermPolicy = () => {
 	return (
@@ -19,6 +20,9 @@ const TermPolicy = () => {
 				<span>Privacy Policy</span>
 			</Flex>
 			<span>Copyrightⓒ(Inc)UniVini. All rights reserved.</span>
+			<span>Version: {buildVersion}</span>
+
+								
 		</Flex>
 	)
 }
