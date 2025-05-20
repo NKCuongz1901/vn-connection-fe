@@ -35,16 +35,17 @@ const handleParseData = (data: any) => {
 		ticket_entrance,
 		menu_price,
 		repeat_type,
+		id,
 	} = data || {}
 	const [minEntr, maxEntr] = (ticket_entrance || '').split(':')
 	const [minPrice, maxPrice] = (menu_price || '').split(':')
-	const { type, days, amount_of_repeat } = repeat_type || {}
+	const { type, days, amount_of_repeat } = id ? repeat_type || {} : {}
 	return {
 		title,
 		description,
 		address,
-		start_time: start_time ? dayjs(Number(start_time)) : null,
-		end_time: end_time ? dayjs(Number(end_time)) : null,
+		start_time: id && start_time ? dayjs(Number(start_time)) : null,
+		end_time: id && end_time ? dayjs(Number(end_time)) : null,
 		latitude,
 		longitude,
 		thumbnails,

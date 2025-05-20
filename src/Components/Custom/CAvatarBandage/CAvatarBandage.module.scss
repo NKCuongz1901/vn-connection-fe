@@ -1,6 +1,7 @@
 .wrapper {
 	position: relative;
-	.bandage {
+	.bandage,
+	.custom {
 		position: absolute;
 		bottom: -5px;
 		right: -5px;
@@ -11,5 +12,9 @@
 		background: #e55a0f;
 		align-items: center;
 		justify-content: center;
+	}
+	.custom {
+		background: #fff;
+		border: none;
 	}
 }

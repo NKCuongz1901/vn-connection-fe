@@ -5,7 +5,12 @@ import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
 import { sendMessageById } from '@/apis/conversationApis'
-import { deletePost, getDetailPost, joinPost } from '@/apis/postApis'
+import {
+	deletePost,
+	getDetailPost,
+	getListParticipant,
+	joinPost,
+} from '@/apis/postApis'
 
 import { delay } from '@/ultis/common.ults'
 import { useLocalePath } from '@/ultis/route.ults'
@@ -33,6 +38,7 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 		type: null,
 		dataModal: null,
 	})
+	const [participantList, setParticipantList] = useState([]) as any[]
 
 	const handleSetLoading = ({ key, value }) => {
 		setLoading((prev) => ({ ...prev, [key]: value }))
@@ -43,9 +49,12 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 
 		try {
 			const params = {
-				fields: ['$all', { user: ['name', 'phone', 'avatar'] }],
+				fields: ['$all', { user: ['name', 'phone', 'avatar', 'id'] }],
 			}
-			const res: any = await getDetailPost({ id, params })
+			const [res, _]: any[] = await Promise.all([
+				getDetailPost({ id, params }),
+				handleGetListParticipant(),
+			])
 			const { code, results } = res || {}
 			if (code === 200) {
 				_data = results?.object
@@ -133,6 +142,28 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}
+
+	const handleGetListParticipant = async () => {
+		try {
+			const params = {
+				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
+				where: { post_id: id, type: 'ADMIN' },
+				page: 1,
+				limit: 10,
+			}
+			const res: any = await getListParticipant(params)
+			const { code, results } = res || {}
+			await delay(1000)
+			if (code === 200) {
+				const { rows } = results?.objects || {}
+				setParticipantList(rows || [])
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+		}
+	}
+
 	const handleShareFriend = async (id: string) => {
 		setLoadingShare((prev: any) => ({ ...prev, [id]: true }))
 		try {
@@ -184,15 +215,54 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 
 	const postMenus: ItemType[] = useMemo(
 		() => {
-			const { user_id } = detailPost || {}
+			const { user_id, repeat_type } = detailPost || {}
+			const { type } = repeat_type || {}
+
+			const isRepeat = type !== repeatOpt[0].value
+
 			const id = getUserInfo('id')
+			const isHost =
+				id === user_id ||
+				!!participantList.find((item) => item.user_id === getUserInfo('id'))
 			return [
+				...(isHost
+					? [
+							{
+								key: 'extend',
+								label: 'Extend event',
+								onClick: () =>
+									handleSetOpenModal({ type: 'extend', dataModal: detailPost }),
+							},
+							{
+								key: 'edit',
+								label: 'Edit event',
+								onClick: () =>
+									!isRepeat &&
+									handleSetOpenModal({ type: 'edit', dataModal: detailPost }),
+								children: isRepeat
+									? [
+											{
+												key: 'ALL',
+												label: 'Edit all future events',
+												onClick: () => handleMenusClick({ key: 'ALL' }),
+											},
+											{
+												key: 'ONLY_THIS_EVENT',
+												label: 'Edit only this event',
+												onClick: () =>
+													handleMenusClick({ key: 'ONLY_THIS_EVENT' }),
+											},
+									  ]
+									: null,
+							},
+					  ]
+					: []),
 				{
 					key: 'share',
 					label: 'Share event',
 					onClick: () => handleMenusClick({ key: 'share' }),
 				},
-				...(id === user_id
+				...(isHost
 					? [
 							{
 								key: 'cancel',
@@ -205,8 +275,9 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 			]
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[JSON.stringify(detailPost)],
+		[JSON.stringify(detailPost), JSON.stringify(participantList)],
 	)
+
 	const editMenus: ItemType[] = useMemo(
 		() => {
 			return [
@@ -238,6 +309,7 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 		postMenus,
 		editMenus,
 		shareList,
+		participantList,
 		onCancelEvent: handleCancelEvent,
 		onSetOpenModal: handleSetOpenModal,
 		onJoinPostConfirm: handleJoinPostConfirm,

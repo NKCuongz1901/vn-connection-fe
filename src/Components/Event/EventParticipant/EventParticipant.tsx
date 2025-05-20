@@ -51,7 +51,10 @@ const EventParticipant = ({ id }: EventParticipant) => {
 				})}
 
 				{total > limit && (
-					<Flex className={classes.moreMember}>
+					<Flex
+						className={classes.moreMember}
+						onClick={() => setOpenModal(true)}
+					>
 						<GroupPeopleIcon />
 					</Flex>
 				)}

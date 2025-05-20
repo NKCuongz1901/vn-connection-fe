@@ -4,7 +4,6 @@ import './globals.css'
 import { headers } from 'next/headers'
 import { appLayoutExclusive } from './variable/layoutData'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
-import { buildVersion } from '../../utils/version'
 
 const geistSans = localFont({
 	src: './fonts/GeistVF.woff',

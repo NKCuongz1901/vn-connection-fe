@@ -9,7 +9,6 @@ import { formatNumberString } from '@/ultis/string.ults'
 import CImage from '@/Components/Custom/CImage'
 
 import { repeatOpt, ticketEntranceType } from '@/Variable/select.variable'
-import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './ItemEvent.module.scss'
 

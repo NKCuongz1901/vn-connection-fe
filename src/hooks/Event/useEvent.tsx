@@ -30,6 +30,7 @@ export default function useEvent({ type }: any) {
 				page,
 				limit,
 				type,
+				radius: 20,
 			})
 			const { code, results } = res || {}
 			await delay(1000)

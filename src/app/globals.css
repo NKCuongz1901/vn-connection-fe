@@ -104,3 +104,10 @@ a {
 .bold{
 	font-weight: 600;
 }
+.pac-container {
+    z-index: 1200 !important;
+}
+.hdpi.pac-logo:after{
+	background-image:none;
+	height: 0;
+}

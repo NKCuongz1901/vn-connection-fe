@@ -18,8 +18,8 @@ import classes from './MyFriend.module.scss'
 interface MyFriendProps {
 	customComp?: any
 	desc?: {
-		icon: any
-		label: string
+		icon?: any
+		label?: string
 	}
 }
 const MyFriend = (_props: MyFriendProps) => {

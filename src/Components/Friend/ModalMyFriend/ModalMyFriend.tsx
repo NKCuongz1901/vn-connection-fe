@@ -11,10 +11,14 @@ interface ModalMyFriendProps {
 	title: string
 	onClose: any
 	customComp?: any
+	desc?: {
+		label?: string
+		icon?: any
+	}
 }
 
 const ModalMyFriend = (_props: ModalMyFriendProps) => {
-	const { onClose, customComp, title } = _props
+	const { onClose, customComp, title, desc } = _props
 	return (
 		<div className={classes.wrapper}>
 			<CModal
@@ -30,10 +34,12 @@ const ModalMyFriend = (_props: ModalMyFriendProps) => {
 			>
 				<Flex vertical>
 					<MyFriend
-						desc={{
-							label: 'Share link to your friends',
-							icon: <AttachIcon />,
-						}}
+						desc={
+							desc || {
+								label: 'Share link to your friends',
+								icon: <AttachIcon />,
+							}
+						}
 						customComp={customComp}
 					/>
 				</Flex>

@@ -17,16 +17,17 @@ import { memo } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import useDetailEvent from '@/hooks/Event/useDetailEvent'
 
+import { cloneDeep } from '@/ultis/common.ults'
 import { getDateInfo } from '@/ultis/date.ults'
 import { isEmptyObject } from '@/ultis/object.ults'
 import { goToGoogleMap, useSafeBack } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 import { formatNumberString } from '@/ultis/string.ults'
 
-import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
 import CButton from '@/Components/Custom/CButton'
 import CImage from '@/Components/Custom/CImage'
 import CModalSelect from '@/Components/Custom/CModal/CModalSelect'
+import EventCoHost from '@/Components/Event/EventCoHost'
 import EventComment from '@/Components/Event/EventComment'
 import EventParticipant from '@/Components/Event/EventParticipant'
 import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
@@ -108,11 +109,14 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 			is_joined,
 			user_id,
 			repeat_type,
+			amount_of_participant,
+			limit_participant,
 		} = detailPost || {}
 		const { type } = repeat_type || {}
 		const id = getUserInfo('id')
-		const isMe = id === user_id
+		const isHost = id === user_id
 		const isRepeat = type !== repeatOpt[0].value
+		const isFull = amount_of_participant + 1 >= limit_participant
 		let ticketValue = ''
 		const [minEntr, maxEntr] = (ticket_entrance || '').split(':')
 		switch (ticket_entrance_type) {
@@ -134,7 +138,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 				<Flex className={classes.title}>
 					<div className={classes.titleLabel}>{title}</div>
 					<Flex className={classes.btn}>
-						{isMe ? (
+						{isHost ? (
 							isRepeat ? (
 								<Dropdown trigger={['click']} menu={{ items: editMenus }}>
 									<CButton
@@ -164,7 +168,11 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 								icon={<GroupPeopleJoinIcon fill="#006B35" />}
 								onClick={() => onJoinPostConfirm('leave')}
 							>
-								Joined
+								Interested
+							</CButton>
+						) : isFull ? (
+							<CButton ctype="oranger" disabled={true}>
+								Full
 							</CButton>
 						) : (
 							<CButton
@@ -173,7 +181,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 								icon={<GroupPeopleJoinIcon />}
 								onClick={() => onJoinPostConfirm('join')}
 							>
-								Join
+								Interested
 							</CButton>
 						)}
 						<CButton
@@ -253,17 +261,13 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 			weekday: weekdayEnd,
 			time: timeEnd,
 		} = getDateInfo(end_time)
-
-		const { avatar: uAvatar } = user || {}
 		const { type } = repeat_type || {}
 		const typeRepeat =
 			(repeatOpt.find((i) => i.value === type)?.label || '') + ','
 		return (
 			<Flex className={classes.detail} vertical>
-				<Flex className={classes.hostBy}>
-					<div className={classes.title}>Host by</div>
-					<CAvatarBandage src={uAvatar} />
-				</Flex>
+				{id && <EventCoHost id={id} user={user} />}
+
 				{id && <EventParticipant id={id} />}
 
 				<Flex className={classes.detailInfo} vertical>
@@ -280,7 +284,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 						</span>
 					</Flex>
 					<Flex
-						className={classes.detailInfoItemC}
+						className={classes.detailInfoItem}
 						onClick={() => goToGoogleMap({ lat: latitude, lng: longitude })}
 					>
 						<IconMapPinFilled />
@@ -371,6 +375,13 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 							onSuccess={onGetDetailPost}
 						/>
 					)
+				}
+				break
+			case 'extend':
+				{
+					const _dataModal = cloneDeep(dataModal)
+					_dataModal.id = null
+					Content = <ModalCRUDEvent {...propsModal} data={_dataModal} />
 				}
 				break
 			default:

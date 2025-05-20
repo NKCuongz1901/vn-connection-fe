@@ -5,7 +5,7 @@ import { useModal } from '@/context/ModalContext'
 
 import {
 	deleteCommentPost,
-	getListListCommentById,
+	getListCommentById,
 	sendCommentPost,
 } from '@/apis/postApis'
 
@@ -38,12 +38,12 @@ export default function useEventComment({ id }: useEventCommentProps) {
 		setCommentContent(content)
 	}
 
-	const handleGetListPost = async () => {
+	const handleGetListCommentById = async () => {
 		setLoading(true)
 		try {
 			const { page, limit } = _paginationRefs.current
 			const isNew = page === 1
-			const res: any = await getListListCommentById({
+			const res: any = await getListCommentById({
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
 				where: { post_id: id },
 				page,
@@ -78,7 +78,7 @@ export default function useEventComment({ id }: useEventCommentProps) {
 
 		if (!isLoadMore || loading) return
 		_paginationRefs.current.page += 1
-		await handleGetListPost()
+		await handleGetListCommentById()
 	}
 
 	const handleAutoLoadMore = () => {
@@ -160,7 +160,7 @@ export default function useEventComment({ id }: useEventCommentProps) {
 	}, [JSON.stringify(commentList)])
 
 	useEffect(() => {
-		handleGetListPost()
+		handleGetListCommentById()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id])
 

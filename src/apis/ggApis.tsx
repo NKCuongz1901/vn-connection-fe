@@ -24,3 +24,18 @@ export const getAddressFromLatLng = async ({
 		return null
 	}
 }
+
+export const getFullAddressFromLatLng = async ({
+	lat,
+	lng,
+}: {
+	lat: number
+	lng: number
+}) => {
+	const url = 'map/google/geocode/json'
+
+	return await axios.post(url, {
+		latitude: lat,
+		longitude: lng,
+	})
+}
