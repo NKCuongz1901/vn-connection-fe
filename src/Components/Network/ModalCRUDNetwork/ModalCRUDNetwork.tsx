@@ -1,0 +1,221 @@
+import { IconCameraFilled, IconMapPinFilled } from '@tabler/icons-react'
+import { Flex, Skeleton } from 'antd'
+import { memo, useCallback } from 'react'
+
+import { useLoading } from '@/context/LoadingContext'
+import useCRUDNetwork from '@/hooks/Network/useCRUDNetwork'
+
+import { toJson } from '@/ultis/common.ults'
+
+import CAvatar from '@/Components/Custom/CAvatar'
+import CButton from '@/Components/Custom/CButton'
+import CImage from '@/Components/Custom/CImage'
+import CInput from '@/Components/Custom/CInput'
+import CInputMap from '@/Components/Custom/CInputMap'
+import CModal from '@/Components/Custom/CModal/CModal'
+import CSelect from '@/Components/Custom/CSelect'
+import CTextArea from '@/Components/Custom/CTextArea'
+import CUpload from '@/Components/Custom/CUpload'
+import HappyIcon from '@/svg/HappyIcon'
+import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
+
+import classes from './ModalCRUDNetwork.module.scss'
+
+interface ModalCRUDNetworkProps {
+	data?: any
+	onClose: () => void
+	onSuccess?: (data: any) => void
+}
+
+const ModalCRUDNetwork = ({
+	data,
+	onClose,
+	onSuccess,
+}: ModalCRUDNetworkProps) => {
+	const { loadingContext } = useLoading()
+	const {
+		loadingOpt,
+		categoryNetworkOpts,
+		stateNetworkOpts,
+		dataModal,
+		errors,
+		onChangeData,
+		onCheckImage,
+		onSubmit,
+	} = useCRUDNetwork({
+		data,
+		onSuccess,
+		onClose,
+	})
+	const { id } = data || {}
+
+	const _renderTop = useCallback(() => {
+		const { thumbnail, avatar, title } = dataModal || {}
+		return (
+			<Flex className={classes.top} vertical>
+				<Flex className={classes.cover}>
+					<CImage
+						preview
+						className={classes.image}
+						src={thumbnail || '/images/defaultCover.png'}
+					/>
+					<Flex className={classes.camera}>
+						<CUpload onChange={(e) => onCheckImage('thumbnail', e.file)}>
+							<IconCameraFilled className={classes.iconCamera} />
+						</CUpload>
+					</Flex>
+				</Flex>
+				<Flex className={classes.avatarWrapper}>
+					<Flex className={classes.avatar}>
+						<CAvatar src={avatar || ''} size={96} />
+
+						<Flex className={classes.camera}>
+							<CUpload onChange={(e) => onCheckImage('avatar', e.file)}>
+								<IconCameraFilled className={classes.iconCamera} />
+							</CUpload>
+						</Flex>
+					</Flex>
+				</Flex>
+				<Flex className={classes.name}>
+					<CInput
+						value={title}
+						error={errors.title}
+						label="Network name"
+						isRequired
+						placeholder="Network name"
+						onChange={(e) => onChangeData('title', e.target.value)}
+					/>
+				</Flex>
+			</Flex>
+		)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [toJson(dataModal), toJson(errors)])
+	const _renderBottom = useCallback(() => {
+		return (
+			<Flex className={classes.bottom}>
+				{_renderLeft()}
+				{_renderRight()}
+			</Flex>
+		)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [toJson(dataModal), toJson(errors), loadingOpt])
+	const _renderLeft = () => {
+		const { bio, type, category, longitude, latitude, address } =
+			dataModal || {}
+		return (
+			<Flex className={classes.left} vertical>
+				<CInput
+					isRequired
+					showCount={true}
+					value={bio}
+					error={errors.bio}
+					label="Bio"
+					placeholder="Bio"
+					prefix={<PeopleHexagonIcon />}
+					onChange={(e) => onChangeData('bio', e.target.value)}
+					maxLength={30}
+				/>
+				<Flex className={classes.item}>
+					<CSelect
+						isRequired
+						showCount
+						value={type}
+						options={stateNetworkOpts}
+						error={errors.type}
+						label="State"
+						placeholder="Choose your state"
+						onChange={(e) => onChangeData('type', e)}
+						prefix={<HappyIcon />}
+					/>
+				</Flex>
+				<Flex className={classes.item}>
+					<CSelect
+						isRequired
+						showCount
+						value={category}
+						options={categoryNetworkOpts}
+						error={errors.category}
+						label="Category"
+						placeholder="Which category fits you best?"
+						onChange={(e) => onChangeData('category', e)}
+						prefix={<HappyIcon />}
+					/>
+				</Flex>
+				<Flex className={classes.item}>
+					<CInputMap
+						value={address}
+						error={errors.address}
+						isRequired
+						label="Location"
+						placeholder="Enter your location"
+						longitude={longitude}
+						latitude={latitude}
+						onSubmitModal={(e) => onChangeData('address', e)}
+						prefix={<IconMapPinFilled style={{ color: '#7987A4' }} />}
+					/>
+				</Flex>
+			</Flex>
+		)
+	}
+	const _renderRight = () => {
+		const { about } = dataModal || {}
+		return (
+			<Flex className={classes.right}>
+				<CTextArea
+					isRequired
+					showCount
+					label="About"
+					placeholder="Describe the network"
+					value={about}
+					error={errors.about}
+					maxLength={1000}
+					onChange={(e) => onChangeData('about', e.target.value)}
+				/>
+			</Flex>
+		)
+	}
+	const _renderLoading = () => {
+		return <Skeleton.Input active className={classes.skeleton} />
+	}
+	return (
+		<div className={classes.wrapper}>
+			<CModal
+				onClose={onClose}
+				onCancel={onClose}
+				title={id ? 'Edit network' : 'Create network'}
+				styles={{
+					content: {
+						width: 800,
+					},
+				}}
+				footer={[
+					<Flex key="back" justify="flex-end">
+						<CButton
+							disabled={loadingContext}
+							onClick={onSubmit}
+							ctype="oranger"
+							style={{ width: 200 }}
+						>
+							{id ? 'Edit network' : 'Create network'}
+						</CButton>
+					</Flex>,
+				]}
+			>
+				<div className={classes.container}>
+					<Flex className={classes.wrapperModal}>
+						{loadingOpt ? (
+							_renderLoading()
+						) : (
+							<>
+								{_renderTop()}
+								{_renderBottom()}
+							</>
+						)}
+					</Flex>
+				</div>
+			</CModal>
+		</div>
+	)
+}
+
+export default memo(ModalCRUDNetwork)

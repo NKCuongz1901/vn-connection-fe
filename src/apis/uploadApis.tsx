@@ -17,3 +17,21 @@ export const uploadProgress = async (
 		throw error
 	}
 }
+
+export const handleUploadImage = async (file) => {
+	if (!file) return ''
+	let url = ''
+	try {
+		const formData = new FormData()
+
+		formData.set('image', file)
+		const res = (await uploadProgress(formData)) as any
+		const { code, results } = res || {}
+		if (code === 200) {
+			url = results?.object?.url
+			return url
+		}
+	} catch (error) {
+		throw error
+	}
+}

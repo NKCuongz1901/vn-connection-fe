@@ -5,7 +5,7 @@ import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
 import { createPost, editPost } from '@/apis/postApis'
-import { uploadProgress } from '@/apis/uploadApis'
+import { handleUploadImage } from '@/apis/uploadApis'
 
 import { isArray } from '@/ultis/array.ults'
 import { cloneDeep } from '@/ultis/common.ults'
@@ -287,23 +287,6 @@ export default function useCRUDEvent({
 			return false
 		} else {
 			return true
-		}
-	}
-	const handleUploadImage = async (file) => {
-		if (!file) return ''
-		let url = ''
-		try {
-			const formData = new FormData()
-
-			formData.set('image', file)
-			const res = (await uploadProgress(formData)) as any
-			const { code, results } = res || {}
-			if (code === 200) {
-				url = results?.object?.url
-				return url
-			}
-		} catch (error) {
-			throw error
 		}
 	}
 

@@ -10,7 +10,7 @@ import { delay, formatPhone, toJson } from '@/ultis/common.ults'
 import { useLocalePath } from '@/ultis/route.ults'
 import { handleStorageCookie, isLogin } from '@/ultis/storage.ults'
 
-import { Menus } from '@/routes'
+import { mainRoutes } from '@/routes/MainRoutes'
 
 export default function useLogin() {
 	const { toggleLoadingContext } = useLoading()
@@ -75,7 +75,7 @@ export default function useLogin() {
 					handleStorageCookie({ key: 'token', data: token })
 				}
 				await delay(100)
-				onChangeRoute(Menus[0].path)
+				onChangeRoute(mainRoutes.upcomingEvent)
 			}
 		} catch (error: any) {
 			openError(error)
@@ -84,7 +84,7 @@ export default function useLogin() {
 		}
 	}
 	useEffect(() => {
-		if (isLogin()) return onChangeRoute(Menus[0].path)
+		if (isLogin()) return onChangeRoute(mainRoutes.upcomingEvent)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 	return {

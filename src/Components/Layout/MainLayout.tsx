@@ -63,7 +63,17 @@ const MainLayout = (props: MainLayoutProps) => {
 							)
 						})}
 					</Flex>
-					<Flex className='justify-end items-end item' style={{ marginTop: 'auto', padding: '12px', fontSize: '12px', color: '#64748B' }}>Version: {buildVersion}</Flex>
+					<Flex
+						className="justify-end items-end item"
+						style={{
+							marginTop: 'auto',
+							padding: '12px',
+							fontSize: '12px',
+							color: '#64748B',
+						}}
+					>
+						Version: {buildVersion}
+					</Flex>
 				</Flex>
 			</Flex>
 		)
@@ -88,7 +98,7 @@ const MainLayout = (props: MainLayoutProps) => {
 			}
 		} else {
 			if (login) {
-				onChangeRoute(Menus[0].path)
+				onChangeRoute(mainRoutes.upcomingEvent)
 			} else {
 				setContent(<AuthLayout>{children}</AuthLayout>)
 			}

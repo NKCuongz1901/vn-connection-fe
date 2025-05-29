@@ -25,3 +25,13 @@
 .wrapperCModal {
 	width: unset !important;
 }
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapperCModal {
+		div {
+			.ant-modal-content {
+				padding: 12px;
+			}
+		}
+	}
+}

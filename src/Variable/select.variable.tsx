@@ -77,3 +77,67 @@ export const ticketEntranceTypeOpt = [
 		label: 'Multiple price',
 	},
 ]
+
+export const stateNetworkOpts = [
+	{
+		value: 'Business',
+		label: 'Business',
+	},
+	{
+		value: 'Community',
+		label: 'Community',
+	},
+	{
+		value: 'Club',
+		label: 'Club',
+	},
+	{
+		value: 'Local Guide',
+		label: 'Local Guide',
+	},
+	{
+		value: 'Local Tours',
+		label: 'Local Tours',
+	},
+	{
+		value: 'Hiking Guide',
+		label: 'Hiking Guide',
+	},
+	{
+		value: 'Hiking Tours',
+		label: 'Hiking Tours',
+	},
+]
+
+export const categoryNetworkOpts = [
+	{
+		value: 'Language, Social Clubs, Workshops',
+		label: 'Language, Social Clubs, Workshops',
+	},
+	{
+		value: 'Hiking, Running, Cycling, and Biking Clubs',
+		label: 'Hiking, Running, Cycling, and Biking Clubs',
+	},
+	{
+		value: 'Sports, Hobbies, and Lifestyle Communities',
+		label: 'Sports, Hobbies, and Lifestyle Communities',
+	},
+	{
+		value: 'Local Guides, Tours, and Travel Agencies',
+		label: 'Local Guides, Tours, and Travel Agencies',
+	},
+	{
+		value: 'Beauty, Salon, Spa & Tattoo',
+		label: 'Beauty, Salon, Spa & Tattoo',
+	},
+	{
+		value: 'Homemade International & Veggie Cuisine',
+		label: 'Homemade International & Veggie Cuisine',
+	},
+	{
+		value: 'Local Handmade and Custom Products',
+		label: 'Local Handmade and Custom Products',
+	},
+	{ value: 'Business (Other)', label: 'Business (Other)' },
+	{ value: 'Charity and Giveaways', label: 'Charity and Giveaways' },
+]

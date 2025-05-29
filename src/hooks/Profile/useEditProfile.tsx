@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { uploadProgress } from '@/apis/uploadApis'
+import { handleUploadImage } from '@/apis/uploadApis'
 import { updateUserProfile } from '@/apis/userApis'
 
 import { isArray } from '@/ultis/array.ults'
@@ -132,28 +132,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 		}
 		return true
 	}, [])
-	const handleUploadImage = useCallback(
-		async (file) => {
-			if (!file) return ''
-			let url = ''
-			try {
-				const formData = new FormData()
 
-				formData.set('image', file)
-				const res = (await uploadProgress(formData)) as any
-				const { code, results } = res || {}
-				if (code === 200) {
-					url = results?.object?.url
-				}
-			} catch (error) {
-				console.error('error:', error)
-				openError(error)
-			} finally {
-				return url
-			}
-		},
-		[openError],
-	)
 	const handleCheckImage = useCallback((key, file) => {
 		const { imageUrl } = handleParseFileImg(file)
 		setFiles((prev) => ({ ...prev, [key]: file }))

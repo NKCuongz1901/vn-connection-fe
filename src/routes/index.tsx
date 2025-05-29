@@ -36,6 +36,9 @@ export const POST_ROUTES = {
 export const CONVERSATION_ROUTES = {
 	name: 'conversation',
 	sendById: 'conversation/send-message-by-user-id',
+	categoryList: 'conversation/category-list',
+	networkGroup: 'conversation/network-group',
+	createConversation: 'conversation/create-conversation',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',

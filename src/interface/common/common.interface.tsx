@@ -12,3 +12,8 @@ export type PaginationType = {
 	limit: number
 	totalPage: number
 }
+
+export interface selectType {
+	value: any
+	label: any
+}
