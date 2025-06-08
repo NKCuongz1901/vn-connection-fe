@@ -141,3 +141,30 @@ export const categoryNetworkOpts = [
 	{ value: 'Business (Other)', label: 'Business (Other)' },
 	{ value: 'Charity and Giveaways', label: 'Charity and Giveaways' },
 ]
+
+export const radiusOpts = [
+	{
+		value: 1,
+		label: 'Under 1km',
+	},
+	{
+		value: 2,
+		label: 'Under 2km',
+	},
+	{
+		value: 5,
+		label: 'Under 5km',
+	},
+	{
+		value: 10,
+		label: 'Under 10km',
+	},
+	{
+		value: 20,
+		label: 'Under 20km',
+	},
+	{
+		value: 50,
+		label: 'Under 50km',
+	},
+]

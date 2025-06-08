@@ -3,7 +3,7 @@ import Event from '@/svg/Event'
 // import Message3 from '@/svg/Message3'
 // import Messenger from '@/svg/Messenger'
 // import OverviewIcon from '@/svg/OverviewIcon'
-// import Party from '@/svg/Party'
+import Party from '@/svg/Party'
 // import People from '@/svg/People'
 // import SearchNormal from '@/svg/SearchNormal'
 import TwoUser from '@/svg/TwoUser'
@@ -49,13 +49,21 @@ export const FRIEND_ROUTES = {
 export const UPLOAD_ROUTES = {
 	name: '/image/upload',
 }
+export const HANGOUT_ROUTES = {
+	name: 'hangout',
+	userOpenHangoutNow: 'hangout/user-open-hangout-now',
+	search: 'hangout/search',
+	myPast: 'hangout/my-past',
+	myCurrent: 'hangout/my-current',
+	hangoutWaiting: 'participant/waiting',
+}
 export const Menus = [
-	// {
-	// 	title: 'Hangout',
-	// 	Icon: Party,
-	// 	path: mainRoutes.hangout,
-	// 	child: [],
-	// },
+	{
+		title: 'Hangout',
+		Icon: Party,
+		path: mainRoutes.hangout,
+		child: [],
+	},
 	// {
 	// 	title: 'My networks',
 	// 	Icon: People,

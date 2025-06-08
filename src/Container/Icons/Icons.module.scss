@@ -1,0 +1,24 @@
+.wrapper {
+	flex-wrap: wrap;
+	padding: 20px !important;
+	gap: 12px;
+	overflow: auto;
+	.item {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		width: 300px;
+		.icon {
+			height: 40;
+			width: 40;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border: 1px solid black;
+			svg {
+				height: 36px;
+				width: 36px;
+			}
+		}
+	}
+}

@@ -1,0 +1,129 @@
+import {
+	IconGenderBigender,
+	IconGenderFemale,
+	IconGenderMale,
+} from '@tabler/icons-react'
+import { Flex } from 'antd'
+import { memo, useCallback, useState } from 'react'
+
+import { sendHangout } from '@/apis/hangoutApi'
+
+import { isArray } from '@/ultis/array.ults'
+import { getDiffFromNow } from '@/ultis/date.ults'
+
+import CButton from '@/Components/Custom/CButton'
+import CImage from '@/Components/Custom/CImage'
+import { useModal } from '@/context/ModalContext'
+import ClockIcon from '@/svg/ClockIcon'
+import MapIcon from '@/svg/MapIcon'
+
+import classes from './ItemHangout.module.scss'
+
+interface ItemHangoutProps {
+	item: any
+	isHiddenButton?: boolean
+	setOpenHangoutList?: React.Dispatch<React.SetStateAction<any>>
+
+	setOpenHangoutSearch?: React.Dispatch<React.SetStateAction<any>>
+}
+const ItemHangout = ({
+	item,
+	isHiddenButton = false,
+	setOpenHangoutList = undefined,
+	setOpenHangoutSearch = undefined,
+}: ItemHangoutProps) => {
+	const [loading, setLoading] = useState(false)
+	const { openError, openSuccess } = useModal()
+
+	const {
+		id,
+		participants,
+		avatar,
+		away,
+		start_time,
+		title,
+		user,
+		title_open_hangout,
+	} = item || {}
+	const { name, languages_can_speak, gender, age } = (user ? user : item) || {}
+	const { value: time, unit } = start_time
+		? getDiffFromNow({
+				input: Number(start_time),
+		  })
+		: { value: 30, unit: 'minute' }
+
+	const handleSendHangout = useCallback(async (id: string) => {
+		setLoading(true)
+		try {
+			const res: any = await sendHangout({ idol_id: id })
+			if (res?.code === 200) {
+				if (setOpenHangoutList) {
+					setOpenHangoutList((prev) => prev.filter((item) => item.id !== id))
+				}
+				if (setOpenHangoutSearch) {
+					setOpenHangoutSearch((prev) => prev.filter((item) => item.id !== id))
+				}
+				openSuccess({
+					message:
+						'Hangout request sent successfully, please wait for response!',
+				})
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoading(false)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
+	const GENDER = {
+		FEMALE: <IconGenderFemale style={{ color: '#ED5DCD', height: 16 }} />,
+		MALE: <IconGenderMale style={{ color: '#2381FF', height: 16 }} />,
+		OTHER: <IconGenderBigender style={{ color: '#006B35', height: 16 }} />,
+	}
+	return (
+		<Flex key={id} className={classes.itemHangout} vertical>
+			<Flex className={classes.avatar}>
+				{isArray(participants, 1) ? (
+					participants.map((participants) => {
+						const { avatar, id } = participants?.user || {}
+						return <CImage src={avatar} key={id} />
+					})
+				) : (
+					<CImage src={avatar} />
+				)}
+			</Flex>
+			<Flex className={classes.timeSpace}>
+				<Flex className={classes.timeSpaceItem}>
+					<MapIcon />
+					{away} km away
+				</Flex>
+				<Flex className={classes.timeSpaceItem}>
+					<ClockIcon />
+					{time} {unit}s ago
+				</Flex>
+			</Flex>
+			<Flex className={classes.info} vertical>
+				<span className={classes.title}>{title || title_open_hangout}</span>
+				<Flex className={classes.otherInfo}>
+					<Flex className={classes.infoItem} vertical>
+						<span>
+							{name}, {age} {GENDER[gender]}
+						</span>
+						<span>{languages_can_speak}</span>
+					</Flex>
+					{!isHiddenButton && (
+						<CButton
+							ctype="oranger"
+							onClick={() => handleSendHangout(id)}
+							disabled={loading}
+						>
+							Say Hello
+						</CButton>
+					)}
+				</Flex>
+			</Flex>
+		</Flex>
+	)
+}
+
+export default memo(ItemHangout)

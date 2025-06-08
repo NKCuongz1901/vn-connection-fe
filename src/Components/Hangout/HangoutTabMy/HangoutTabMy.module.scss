@@ -1,0 +1,49 @@
+.wrapper {
+	display: flex;
+	gap: 12px;
+	flex-direction: column;
+	.tabContent {
+		display: flex;
+		gap: 12px;
+		flex-direction: column;
+	}
+	.infoPeople {
+		.people {
+			gap: 4px;
+			flex: 1;
+			align-items: center;
+			.title {
+				font-weight: 600;
+			}
+			.number {
+				color: #006b35;
+			}
+		}
+		.radius {
+			width: 125px;
+		}
+	}
+	.hangoutWrapper {
+		overflow: auto;
+		gap: 16px;
+		flex-wrap: wrap;
+		min-height: 200px;
+
+		.skeleton {
+			min-width: 368px;
+			max-width: 368px;
+			height: 235px;
+			& > :global(.ant-skeleton-input) {
+				min-width: 368px;
+				max-width: 368px;
+				height: 235px;
+				border-radius: 16px;
+			}
+		}
+		.loadmore {
+			width: 100%;
+			align-items: center;
+			justify-content: center;
+		}
+	}
+}

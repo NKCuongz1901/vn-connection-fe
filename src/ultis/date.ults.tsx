@@ -16,3 +16,30 @@ export const getDateInfo = (
 		dmy: d.format('DD/MM/YYYY'),
 	}
 }
+
+export const getDiffFromNow = ({
+	input,
+}: {
+	input: dayjs.ConfigType
+}): { value: number; unit: string } => {
+	const now = dayjs()
+	const target = dayjs(input)
+	const diffInSeconds = now.diff(target, 'second', true)
+
+	if (diffInSeconds < 60) {
+		return { value: Math.ceil(diffInSeconds), unit: 'second' }
+	}
+
+	const diffInMinutes = diffInSeconds / 60
+	if (diffInMinutes < 60) {
+		return { value: Math.ceil(diffInMinutes), unit: 'minute' }
+	}
+
+	const diffInHours = diffInMinutes / 60
+	if (diffInHours < 24) {
+		return { value: Math.ceil(diffInHours), unit: 'hour' }
+	}
+
+	const diffInDays = diffInHours / 24
+	return { value: Math.ceil(diffInDays), unit: 'day' }
+}
