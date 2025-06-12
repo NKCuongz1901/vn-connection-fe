@@ -93,6 +93,7 @@ const HangoutChat = ({ postId }) => {
 				)
 			case 'MEMBER_ACCEPT':
 			case 'TITLE_CHANGE':
+			case 'ADDRESS':
 				return <Flex className={classes.memberAccept}>{content}</Flex>
 			default:
 				return <Flex className={classes.memberAccept}>{type}</Flex>
@@ -101,7 +102,11 @@ const HangoutChat = ({ postId }) => {
 	const _renderItemChat = ({ item }) => {
 		const { id, user, isFirst, isLast, type, user_id, isTemp } = item || {}
 		const isMe = getUserInfo('id') === user_id
-		const isMemberAction = ['MEMBER_ACCEPT', 'TITLE_CHANGE'].includes(type)
+		const isMemberAction = [
+			'MEMBER_ACCEPT',
+			'TITLE_CHANGE',
+			'ADDRESS',
+		].includes(type)
 		const isNot = isMe || isMemberAction
 		return (
 			<Flex
