@@ -92,7 +92,7 @@ export const getListCommentById = async (params: any) => {
 
 export const sendCommentPost = async (payload: {
 	post_id: string
-	content: string
+	content?: string
 	[key: string]: any
 }) => {
 	const url = POST_ROUTES.comment
@@ -108,4 +108,12 @@ export const deleteCommentPost = async (id: string) => {
 export const updateMemberPost = async (payload: any) => {
 	const url = POST_ROUTES.updateMember
 	return await axios.post(url, payload)
+}
+
+export const getListSticket = async (params: any) => {
+	const url = POST_ROUTES.sticker
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
 }

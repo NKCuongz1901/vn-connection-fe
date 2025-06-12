@@ -1236,7 +1236,7 @@ export const stateFriends = {
 
 export const paginationCommon: PaginationType = {
 	page: 1,
-	limit: 20,
+	limit: 10,
 	totalPage: 0,
 }
 export const paginationZero: PaginationType = {

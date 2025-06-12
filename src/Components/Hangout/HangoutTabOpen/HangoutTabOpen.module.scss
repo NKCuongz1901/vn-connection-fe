@@ -25,12 +25,12 @@
 		min-height: 200px;
 
 		.skeleton {
-			min-width: 368px;
-			max-width: 368px;
+			min-width: 343px;
+			max-width: 343px;
 			height: 235px;
 			& > :global(.ant-skeleton-input) {
-				min-width: 368px;
-				max-width: 368px;
+				min-width: 343px;
+				max-width: 343px;
 				height: 235px;
 				border-radius: 16px;
 			}

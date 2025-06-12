@@ -26,6 +26,9 @@ import TwoUser from '@/svg/TwoUser'
 import UpcomingEvent from '@/svg/UpcomingEvent'
 import MapIcon from '@/svg/MapIcon'
 import ClockIcon from '@/svg/ClockIcon'
+import SendIcon from '@/svg/SendIcon'
+import ImageIcon from '@/svg/ImageIcon'
+import MoreIcon from '@/svg/MoreIcon'
 
 const Icons = () => {
 	const icons = [
@@ -56,6 +59,9 @@ const Icons = () => {
 		{ ICON: PencilIcon, name: '@/svg/Hangout/PencilIcon', key: '21' },
 		{ ICON: MapIcon, name: '@/svg/MapIcon', key: '22' },
 		{ ICON: ClockIcon, name: '@/svg/ClockIcon', key: '22' },
+		{ ICON: SendIcon, name: '@/svg/SendIcon', key: '23' },
+		{ ICON: ImageIcon, name: '@/svg/ImageIcon', key: '24' },
+		{ ICON: MoreIcon, name: '@/svg/MoreIcon', key: '25' },
 	]
 
 	return (

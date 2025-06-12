@@ -43,6 +43,7 @@ const ModelChooseHangout = ({
 	onSubmit,
 }: ModelChooseHangoutProps) => {
 	const [state, setState] = useState(data)
+	console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :46 ~ data:', data)
 
 	return (
 		<div className={classes.wrapper}>

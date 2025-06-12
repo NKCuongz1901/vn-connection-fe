@@ -1,0 +1,263 @@
+.hangoutChatWrapper {
+	display: flex;
+	height: 100%;
+	background: #fff;
+	width: 100%;
+	min-width: 800px;
+	.chatContainer {
+		width: 100%;
+
+		.title,
+		.header {
+			align-items: center;
+			font-size: 18px;
+			font-weight: 600;
+			border-bottom: 1px solid #eef3f6;
+			padding: 16px;
+			width: 100%;
+			height: 52px;
+			gap: 4px;
+			& .skeleton {
+				height: 30px;
+				width: 100%;
+			}
+		}
+		.header {
+			justify-content: space-between;
+			.action {
+				gap: 12px;
+				.iconMore,
+				.iconClose {
+					padding: 6px;
+					border-radius: 99px;
+					background: #f4f8fc;
+					height: 32px;
+					width: 32px;
+					justify-content: center;
+					align-items: center;
+					cursor: pointer;
+				}
+			}
+		}
+		.chatContent {
+			display: flex !important;
+			flex: 1;
+			width: 100%;
+			height: 200px;
+			overflow-x: scroll;
+			flex-direction: column-reverse;
+			gap: 4px;
+			padding: 12px 28px;
+			& .skeleton {
+				height: 100%;
+				width: 100%;
+			}
+			.skeletonWrapper {
+				padding: 4px 16px;
+				gap: 4px;
+				.skeleton {
+					border-radius: 16px;
+					height: 30px;
+					width: 100%;
+				}
+			}
+			.itemChat {
+				max-width: 100%;
+				.contentItem {
+					max-width: 100%;
+					gap: 4px;
+					.avatar {
+						margin-top: 4px;
+						min-width: 32px;
+						display: flex;
+					}
+					.contentInfo {
+						max-width: 100%;
+						gap: 4px;
+						.name {
+							color: #006b35;
+
+							font-size: 12px;
+							font-weight: 600;
+						}
+						.content {
+							max-width: 100%;
+
+							:global(.ant-image) {
+								height: 100%;
+								height: 80px;
+							}
+							img {
+								object-fit: cover;
+							}
+							.text {
+								min-width: 200px;
+								max-width: 80%;
+								padding: 8px 12px;
+								gap: 4px;
+								border-radius: 16px;
+								background: #f4f8fc;
+								word-break: break-word;
+								display: flex;
+								flex-direction: column;
+							}
+							.medias {
+								flex-wrap: wrap;
+								gap: 2px;
+								border-radius: 16px;
+								overflow: hidden;
+								.media {
+									height: 140px;
+									border-radius: 16px;
+									overflow: hidden;
+								}
+								:global(.ant-image) {
+									height: 140px;
+								}
+								:global(.ant-flex) {
+									justify-content: flex-start;
+								}
+								img {
+									object-fit: cover;
+									border-radius: 16px;
+									overflow: hidden;
+								}
+							}
+							.time {
+								margin-top: 4px;
+								font-size: 10px;
+								font-weight: 400;
+								color: #48546b;
+							}
+							.memberAccept {
+								color: #135a19;
+							}
+						}
+					}
+				}
+			}
+			.mt2 {
+				margin-top: 8px;
+			}
+			.isMe {
+				justify-content: flex-end;
+				.contentItem {
+					// justify-content: flex-end;
+
+					.contentInfo {
+						// justify-content: flex-end;
+
+						.content {
+							justify-content: flex-end;
+
+							.text {
+								color: #135a19;
+								background: #e7f5e9;
+								word-break: break-word;
+								div {
+									display: flex;
+									justify-content: flex-end;
+								}
+							}
+							.medias {
+								:global(.ant-flex) {
+									justify-content: flex-end;
+								}
+							}
+							.time {
+								display: flex;
+								justify-content: flex-end;
+							}
+						}
+					}
+				}
+			}
+			.isLast {
+			}
+			.isCenter {
+				width: 100%;
+				justify-content: center;
+
+				.contentItem {
+					gap: 4px;
+
+					.contentInfo {
+						.content {
+							.memberAccept {
+								color: #135a19;
+								margin-bottom: 8px;
+							}
+						}
+					}
+				}
+			}
+			.isTemp {
+				opacity: 0.5;
+			}
+		}
+		.chatBox {
+			width: 100%;
+			height: 64px;
+			display: flex;
+			padding: 12px 16px;
+			justify-content: center;
+			align-items: center;
+			gap: 8px;
+			.iconHappi,
+			.sendButton {
+				cursor: pointer;
+			}
+			.chooseImg {
+				display: none;
+			}
+		}
+		.chatBoxSticket {
+			display: none;
+			gap: 12px;
+			padding: 12px;
+			.stickerTitle {
+				gap: 16px;
+
+				.stickerItemTitle {
+					padding: 8px;
+					cursor: pointer;
+					img {
+						height: 32px;
+						width: 32px;
+					}
+				}
+				& > :hover {
+					border-radius: 16px;
+					overflow: hidden;
+					background: #e7f5e9;
+				}
+			}
+			.stickerActive {
+				border-radius: 16px;
+				overflow: hidden;
+				background: #e7f5e9;
+			}
+			.contentSticker {
+				flex-wrap: wrap;
+				overflow: auto;
+				.stickerItem {
+					padding: 8px;
+					cursor: pointer;
+					img {
+						height: 48px;
+						width: 48px;
+					}
+				}
+				& > :hover {
+					border-radius: 16px;
+					overflow: hidden;
+					background: #e7f5e9;
+				}
+			}
+		}
+		.showSticker {
+			height: 240px;
+			display: flex;
+		}
+	}
+}

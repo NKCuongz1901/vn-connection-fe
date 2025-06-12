@@ -69,8 +69,8 @@ export default function useHangoutTabMy(ref) {
 					},
 				],
 				type: 'current',
-				page: 1,
-				limit: 50,
+				page,
+				limit,
 			})
 			const { code, results } = res || {}
 			if (code === 200) {
@@ -113,8 +113,8 @@ export default function useHangoutTabMy(ref) {
 						],
 					},
 				],
-				page: 1,
-				limit: 50,
+				page,
+				limit,
 			})
 			const { code, results } = res || {}
 			if (code === 200) {
@@ -136,7 +136,6 @@ export default function useHangoutTabMy(ref) {
 		}
 	}
 	const handleLoadMore = useCallback(() => {
-		console.log('object moremy')
 		const { past, current } = loadMore.current || {}
 		const isLoadMore = past || current
 		if (!isLoadMore || loading.past || loading.past) return

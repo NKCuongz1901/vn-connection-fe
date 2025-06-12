@@ -1,14 +1,17 @@
 'use client'
 import { IconCheck, IconX } from '@tabler/icons-react'
 import { Flex } from 'antd'
+import clsx from 'clsx'
 import { memo } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import useHangout from '@/hooks/Hangout/useHangout'
+import { onPushState } from '@/ultis/route.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
 import CSwitch from '@/Components/Custom/CSwitch'
+import HangoutChat from '@/Components/Hangout/HangoutChat'
 import HangoutTabMy from '@/Components/Hangout/HangoutTabMy'
 import HangoutTabOpen from '@/Components/Hangout/HangoutTabOpen'
 import ModelChooseHangout from '@/Components/Hangout/ModelChooseHangout'
@@ -24,8 +27,9 @@ const Hangout = () => {
 		_tabsOpenRef,
 		modal,
 		currentPage,
-		myWaitting,
 		setModal,
+		postId,
+		myWaitting,
 		setCurrentPage,
 		onUpdateUserInfo,
 		onScroll,
@@ -87,7 +91,10 @@ const Hangout = () => {
 					userData.is_open_hangout && <HangoutTabOpen ref={_tabsOpenRef} />
 				) : (
 					<>
-						<HangoutTabMy ref={_tabsOpenRef} />
+						<HangoutTabMy
+							ref={_tabsOpenRef}
+							onClick={(id) => onPushState({ id })}
+						/>
 					</>
 				)}
 			</Flex>
@@ -158,13 +165,17 @@ const Hangout = () => {
 	}
 
 	return (
-		<div className={classes.wrapper} onScroll={() => console.log('object')}>
-			<Flex className={classes.container} onScroll={onScroll}>
+		<div className={classes.wrapper}>
+			<Flex
+				className={clsx(classes.container, { [classes.minify]: postId })}
+				onScroll={onScroll}
+			>
 				{_renderTop()}
 				{_renderWaitting()}
 				{_renderBottom()}
 				{modal?.type && _renderModal()}
 			</Flex>
+			{postId && <HangoutChat key={postId} postId={postId} />}
 		</div>
 	)
 }

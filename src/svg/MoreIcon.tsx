@@ -1,0 +1,37 @@
+import { memo } from 'react'
+
+import { SvgProps } from '@/interface/common/common.interface'
+
+const MoreSvg = ({ fill }: SvgProps) => {
+	const _fill = fill || '#0F1729'
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			viewBox="0 0 20 20"
+			fill="none"
+		>
+			<path
+				d="M4.16667 8.3335C3.25 8.3335 2.5 9.0835 2.5 10.0002C2.5 10.9168 3.25 11.6668 4.16667 11.6668C5.08333 11.6668 5.83333 10.9168 5.83333 10.0002C5.83333 9.0835 5.08333 8.3335 4.16667 8.3335Z"
+				fill={_fill}
+				stroke={_fill}
+				stroke-width="0.5"
+			/>
+			<path
+				d="M15.8327 8.3335C14.916 8.3335 14.166 9.0835 14.166 10.0002C14.166 10.9168 14.916 11.6668 15.8327 11.6668C16.7493 11.6668 17.4993 10.9168 17.4993 10.0002C17.4993 9.0835 16.7493 8.3335 15.8327 8.3335Z"
+				fill={_fill}
+				stroke={_fill}
+				stroke-width="0.5"
+			/>
+			<path
+				d="M10.0007 8.3335C9.08398 8.3335 8.33398 9.0835 8.33398 10.0002C8.33398 10.9168 9.08398 11.6668 10.0007 11.6668C10.9173 11.6668 11.6673 10.9168 11.6673 10.0002C11.6673 9.0835 10.9173 8.3335 10.0007 8.3335Z"
+				fill={_fill}
+				stroke={_fill}
+				stroke-width="0.5"
+			/>
+		</svg>
+	)
+}
+
+export default memo(MoreSvg)

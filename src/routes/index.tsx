@@ -32,6 +32,7 @@ export const POST_ROUTES = {
 	search: 'post/search',
 	comment: 'comment',
 	updateMember: 'post/update-member',
+	sticker: 'sticker',
 }
 export const CONVERSATION_ROUTES = {
 	name: 'conversation',

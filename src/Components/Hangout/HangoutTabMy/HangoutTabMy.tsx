@@ -12,6 +12,7 @@ import ItemHangout from '../ItemHangout'
 
 import classes from './HangoutTabMy.module.scss'
 function HangoutTabMy(props, ref) {
+	const { onClick } = props
 	const { TabsData, loading, loadMore, onLoadMore } = useHangoutTabMy(ref)
 
 	const _renderTabData = ({ id, label, data }) => {
@@ -25,7 +26,9 @@ function HangoutTabMy(props, ref) {
 				</Flex>
 				<Flex className={classes.hangoutWrapper}>
 					{data.map((item) => (
-						<ItemHangout isHiddenButton key={item.id} item={item} />
+						<div key={item.id} onClick={() => onClick(item.id)}>
+							<ItemHangout isHiddenButton item={item} />
+						</div>
 					))}
 					{loading[id]
 						? arrayFrom(3).map((_, index) => (

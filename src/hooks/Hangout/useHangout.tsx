@@ -8,6 +8,7 @@ import { actionParticipant, getMyHangoutWaitting } from '@/apis/hangoutApi'
 import { getUserProfile, updateUserProfile } from '@/apis/userApis'
 
 import { delay } from '@/ultis/common.ults'
+import { useQuery } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 
 type userDataProps = {
@@ -19,6 +20,8 @@ type userDataProps = {
 export default function useHangout() {
 	const { toggleLoadingContext } = useLoading()
 	const { openError, openSuccess } = useModal()
+	const { onGetQuerry } = useQuery()
+	const { id } = onGetQuerry()
 
 	const _tabsOpenRef = useRef<any>()
 	const [currentPage, setCurrentPage] = useState(0)
@@ -30,6 +33,7 @@ export default function useHangout() {
 		longitude: null,
 	})
 	const [myWaitting, setMyWaitting] = useState([]) as any[]
+	const [postId, setPostId] = useState('')
 
 	const handleGetUserProfile = async () => {
 		const id = getUserInfo('id')
@@ -157,7 +161,9 @@ export default function useHangout() {
 			toggleLoadingContext(false)
 		}
 	}
-
+	useEffect(() => {
+		setPostId(id)
+	}, [id])
 	useEffect(() => {
 		handleGetUserProfile()
 		handleGetMyWaitting()
@@ -169,6 +175,8 @@ export default function useHangout() {
 		currentPage,
 		modal,
 		myWaitting,
+		postId,
+		setPostId,
 		setModal,
 		setCurrentPage,
 		onUpdateUserInfo: handleUpdateUserInfo,

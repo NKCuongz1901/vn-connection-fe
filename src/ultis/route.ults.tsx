@@ -51,13 +51,9 @@ export const useQuery = () => {
 	const searchParams = useSearchParams()
 	const params = useParams()
 
-	const hangleGetQuerry = (key?: string) => {
-		if (key) {
-			return searchParams.get(key) // trả về giá trị cụ thể
-		}
-
+	const hangleGetQuerry = () => {
 		const entries = Array.from(searchParams.entries())
-		return Object.fromEntries(entries) // trả về object toàn bộ query
+		return Object.fromEntries(entries) || {} // trả về object toàn bộ query
 	}
 	const handleGetParams = (key?: string) => {
 		if (!params) return key ? undefined : {}
@@ -81,4 +77,7 @@ export const goToGoogleMap = ({ lat, lng }: { lat: number; lng: number }) => {
 		const url = `https://www.google.com/maps?q=${lat},${lng}`
 		handleGoToPage(url, '_blank')
 	}
+}
+export const onPushState = (params: { [key: string]: any }) => {
+	window.history.pushState({}, '', '?' + new URLSearchParams(params).toString())
 }

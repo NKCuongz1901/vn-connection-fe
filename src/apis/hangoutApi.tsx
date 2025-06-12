@@ -59,3 +59,27 @@ export const sendHangout = async (payload: any) => {
 // 	const url = USER_ROUTES.report
 // 	return await axios.post(url, payload)
 // }
+export const getHangoutById = async ({
+	id,
+	params,
+}: {
+	id: string
+	params: { [key: string]: any }
+}) => {
+	const url = HANGOUT_ROUTES.name + `/${id}` // myprofile
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const updateHangoutById = async (_payload: any) => {
+	const { id, ...payload } = _payload || {}
+	const url = HANGOUT_ROUTES.name + `/${id}`
+	return await axios.put(url, payload)
+}
+
+export const deleteHangoutParticipantId = async ({ id }: { id: string }) => {
+	const url = POST_ROUTES.participant + `/${id}`
+	return await axios.delete(url)
+}
