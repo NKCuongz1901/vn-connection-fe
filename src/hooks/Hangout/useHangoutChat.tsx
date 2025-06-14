@@ -1,3 +1,4 @@
+import { useLoadScript } from '@react-google-maps/api'
 import { ItemType } from 'antd/es/menu/interface'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
@@ -15,7 +16,7 @@ import {
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { uniqueArray } from '@/ultis/array.ults'
+import { mappingMessageChat, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
 import { onPushState } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
@@ -23,6 +24,7 @@ import { randomString } from '@/ultis/string.ults'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'
+const libraries: any = ['places']
 
 type useHangoutChatProps = {
 	postId: string
@@ -33,7 +35,11 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const _loadmore = useRef<boolean>(true)
 	const _scrollRef = useRef<HTMLDivElement>(null)
-
+	const { isLoaded } = useLoadScript({
+		googleMapsApiKey: process.env.NEXT_PUBLIC_GGMAP_KEY || '', // ← Thay bằng API key của bạn
+		libraries,
+		language: 'en',
+	})
 	const [modal, setModal] = useState({ type: '', data: null }) as any
 	const [hangoutInfo, setHangoutInfo] = useState<{ [key: string]: any }>({})
 	const [stickerList, setStickerList] = useState([]) as any[]
@@ -43,35 +49,39 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 	const [commentList, setCommentList] = useState<any[]>([])
 	const [loading, setLoading] = useState(false)
 	const [loadingPage, setLoadingPage] = useState(false)
+	const [showGGmap, setShowGGmap] = useState(false)
 	const handleMenusClick = ({ key }: { [key: string]: any }) => {
-		const { title } = hangoutInfo
+		const { title, latitude, longitude, id } = hangoutInfo
 		switch (key) {
-			// case 'report':
-			// 	window.open(onGetPath('/report'), '_blank')
-			// 	break
+			case 'report':
+				setModal({ type: 'report', data: { hangout_id: id } })
+				break
 			case 'edit':
 				setModal({ type: 'choose', data: title })
 				break
 			case 'leave':
 				handleLeaveHangout()
 				break
+			case 'editMettingPoint':
+				setModal({ type: 'location', data: { latitude, longitude } })
+				break
 			default:
 		}
 	}
 	const menus: ItemType[] = useMemo(() => {
 		const { user } = hangoutInfo
-		const _isMe = getUserInfo('id') === user?.id
+		const isMe = getUserInfo('id') === user?.id
 
 		return [
-			// ...(!isMe
-			// 	? [
-			// 			{
-			// 				key: 'report',
-			// 				label: 'Report Hangout',
-			// 				onClick: () => handleMenusClick({ key: 'report' }),
-			// 			},
-			// 	  ]
-			// 	: []),
+			...(!isMe
+				? [
+						{
+							key: 'report',
+							label: 'Report Hangout',
+							onClick: () => handleMenusClick({ key: 'report' }),
+						},
+				  ]
+				: []),
 			{
 				key: 'edit',
 				label: 'Edit Hangout',
@@ -82,11 +92,11 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 				label: 'Leave Hangout',
 				onClick: () => handleMenusClick({ key: 'leave' }),
 			},
-			// {
-			// 	key: 'editMettingPoint',
-			// 	label: 'Edit metting point',
-			// 	onClick: () => handleMenusClick({ key: 'editMettingPoint' }),
-			// },
+			{
+				key: 'editMettingPoint',
+				label: 'Edit metting point',
+				onClick: () => handleMenusClick({ key: 'editMettingPoint' }),
+			},
 		]
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [hangoutInfo])
@@ -95,18 +105,16 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 		if (!isNoLoading) setLoading(true)
 		try {
 			const { page, limit } = _paginationRefs.current
-			// const isNew = page === 1
-			// if (isNew) {
-			// 	setCommentList([])
-			// }
 			const res: any = await getListCommentById({
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
 				where: { post_id: postId },
 				page: isNoLoading ? 1 : page,
-				limit,
+				limit: isNoLoading ? 10 : limit,
 			})
 			const { code, results } = res || {}
-			await delay(1000)
+			if (!isNoLoading) {
+				await delay(1000)
+			}
 
 			if (code === 200) {
 				const { rows: _rows } = results?.objects || {}
@@ -118,12 +126,7 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 					const newData = isNoLoading
 						? uniqueArray([..._rows, ...contents], 'id')
 						: uniqueArray([...contents, ..._rows], 'id') || []
-					const dataShow = newData.map((item, index) => ({
-						...item,
-						isFirst: newData?.[index + 1]?.user_id === item?.user_id,
-						isLast: newData?.[index - 1]?.user_id !== item?.user_id,
-						_id: item.id,
-					}))
+					const dataShow = mappingMessageChat(newData)
 
 					return dataShow
 				})
@@ -202,11 +205,7 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 			setCommentList((prev: any[]) => {
 				const contents = prev
 				const newData = [_res, ...contents]
-				const dataShow = newData.map((item, index) => ({
-					...item,
-					isFirst: newData?.[index + 1]?.user_id === item?.user_id,
-					isLast: newData?.[index - 1]?.user_id !== item?.user_id,
-				}))
+				const dataShow = mappingMessageChat(newData)
 
 				return dataShow
 			})
@@ -223,11 +222,7 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 			setCommentList((prev: any[]) => {
 				const contents = prev
 				const newData = uniqueArray([{ ..._data, _id }, ...contents], '_id')
-				const dataShow = newData.map((item, index) => ({
-					...item,
-					isFirst: newData?.[index + 1]?.user_id === item?.user_id,
-					isLast: newData?.[index - 1]?.user_id !== item?.user_id,
-				}))
+				const dataShow = mappingMessageChat(newData)
 
 				return dataShow
 			})
@@ -275,7 +270,29 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 			setLoadingPage(false)
 		}
 	}
-
+	const handleEditLocation = async ({ lat, lng }) => {
+		toggleLoadingContext(true)
+		try {
+			const res: any = await updateHangoutById({
+				id: postId,
+				latitude: lat,
+				longitude: lng,
+			})
+			if (res?.code == 200) {
+				setHangoutInfo((prev) => ({
+					...prev,
+					latitude: lat,
+					longtitude: lng,
+				}))
+				setModal({ type: '' })
+				handleGetListCommentById(true)
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			toggleLoadingContext()
+		}
+	}
 	useEffect(() => {
 		_paginationRefs.current.page = 1
 		handleGetInfoHangout()
@@ -301,11 +318,15 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 		menus,
 		modal,
 		setModal,
+		isLoaded,
+		showGGmap,
+		setShowGGmap,
 		setText,
 		setActiveSticker,
 		setShowSticker,
 		onSendMessage: handleSendMessage,
 		onScroll: handleScroll,
 		onChangeTitleHangout: handleChangeTitleHangout,
+		onEditLocation: handleEditLocation,
 	}
 }

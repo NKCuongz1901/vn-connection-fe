@@ -1,12 +1,12 @@
 'use client'
-import React, { useState } from 'react'
+import { Flex } from 'antd'
+import { useState } from 'react'
 
 import CModal from '@/Components/Custom/CModal/CModal'
+import CButton from '@/Components/Custom/CButton'
+import CTextArea from '@/Components/Custom/CTextArea'
 
 import classes from './ModelChooseHangout.module.scss'
-import CButton from '@/Components/Custom/CButton'
-import { Flex } from 'antd'
-import CTextArea from '@/Components/Custom/CTextArea'
 
 const suggestion = [
 	'visit tourist attractions',
@@ -43,8 +43,6 @@ const ModelChooseHangout = ({
 	onSubmit,
 }: ModelChooseHangoutProps) => {
 	const [state, setState] = useState(data)
-	console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :46 ~ data:', data)
-
 	return (
 		<div className={classes.wrapper}>
 			<CModal

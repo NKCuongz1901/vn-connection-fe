@@ -1,0 +1,41 @@
+.container {
+	gap: 4px;
+	.waitingItem {
+		width: 100%;
+		background: white;
+
+		justify-content: space-between;
+		align-items: center;
+		padding: 8px 16px;
+		.waitingItemLeft {
+			gap: 12px;
+			.name {
+				font-weight: 600;
+			}
+		}
+		.btnAction {
+			gap: 12px;
+			.iconCancel,
+			.iconAccept {
+				border-radius: 50%;
+				height: 24px;
+				width: 24px;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				svg {
+					height: 16px;
+					width: 16px;
+				}
+			}
+			.iconCancel {
+				background-color: rgba(0, 58, 111, 0.08);
+				color: #000;
+			}
+			.iconAccept {
+				color: #fff;
+				background-color: #006b35;
+			}
+		}
+	}
+}

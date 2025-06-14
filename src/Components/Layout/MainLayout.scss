@@ -1,11 +1,22 @@
 .wrapperContainerMainLayout {
 	@media (min-width: 1440px) {
 		align-items: center !important;
+		width: 100%;
+	}
+	@media (max-width: 1440px) {
+		// align-items: center !important;
+		width: 100%;
 	}
 }
-
+.mainLayout {
+	display: flex;
+	justify-content: center;
+	background: white;
+}
 .wrapperMainLayout {
 	color: #0f1729;
+	max-width: 1440px;
+	min-width: 1440px;
 	.bodyMainLayout {
 		background-color: #f4f7fc;
 		height: calc(100vh - 80px);
@@ -15,6 +26,8 @@
 				width: 240px;
 				background: white;
 				height: 100%;
+				border-right: 1px solid #eef3f6;
+				background: #fff;
 				.sideBarMenuToggle {
 					display: none;
 				}
@@ -53,8 +66,17 @@
 		}
 	}
 }
-
+@media (max-width: 1440px) {
+	.mainLayout {
+		justify-content: initial;
+		overflow: auto;
+	}
+}
 @media (min-width: 0px) and (max-width: 769px) {
+	.wrapperMainLayout {
+		max-width: 100%;
+		min-width: 100%;
+	}
 	.wrapperMainLayout {
 		.headerMainLayout {
 			min-height: 56px;

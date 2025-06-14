@@ -1,13 +1,29 @@
 .itemHangout {
 	position: relative;
 	min-width: 343px;
-	max-width: 343px;
+	max-width: 366px;
 	height: 235px;
 	background: #fff;
 	border-radius: 16px;
 	overflow: hidden;
-	.avatar {
-		height: 140px;
+	.avatars {
+		min-height: 140px;
+		max-height: 140px;
+		.avatar {
+			position: relative;
+			width: 100%;
+			.moreImages {
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.6);
+				color: #fff;
+				align-items: center;
+				justify-content: center;
+			}
+		}
 		:global(.ant-image) {
 			height: 100%;
 		}
@@ -21,6 +37,7 @@
 		transform: translateY(-50%);
 		right: 16px;
 		gap: 4px;
+		z-index: 1;
 		.timeSpaceItem {
 			padding: 6px 12px;
 			justify-content: center;
@@ -49,6 +66,8 @@
 				color: #48546b;
 				gap: 4px;
 				flex: 1;
+				overflow: auto;
+				height: 52px;
 				span {
 					width: 240px;
 					white-space: nowrap;

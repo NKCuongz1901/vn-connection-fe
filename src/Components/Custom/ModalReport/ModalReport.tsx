@@ -18,17 +18,18 @@ import FeedbackIcon from '@/svg/FeedbackIcon'
 
 import { topicReportOpt } from '@/Variable/select.variable'
 
-import classes from './ModalReportUser.module.scss'
+import classes from './ModalReport.module.scss'
 
-interface ModalReportUserProps {
+interface ModalReportProps {
 	open: boolean
 	onClose: any
 	data?: any
+	message?: string
 	[key: string]: any
 }
 
-const ModalReportUser = (props: ModalReportUserProps) => {
-	const { onClose, open, data } = props
+const ModalReport = (props: ModalReportProps) => {
+	const { onClose, open, data, message } = props
 	const { loadingContext, toggleLoadingContext } = useLoading()
 	const { openConfirm, openError, openSuccess } = useModal()
 	const [errors, setErrors] = useState({
@@ -45,13 +46,13 @@ const ModalReportUser = (props: ModalReportUserProps) => {
 		setErrors((prev) => ({ ...prev, [key]: '' }))
 		setDataModal((prev) => ({ ...prev, [key]: value }))
 	}, [])
-	const handleValidate = useCallback((data: any) => {
-		const { email } = data
+	const handleValidate = useCallback((dataModal: any) => {
+		const { email } = dataModal
 		const _errors: any = Object.fromEntries(
 			Object.entries({
 				email: 'Please enter your email',
 				content: 'Please enter your proble',
-			}).filter(([key]) => !data?.[key]),
+			}).filter(([key]) => !dataModal?.[key]),
 		)
 		if (!_errors.email && !isEmail(email)) {
 			_errors.email = 'Please enter correct email'
@@ -91,13 +92,13 @@ const ModalReportUser = (props: ModalReportUserProps) => {
 			topic: topic?.value || '',
 			content,
 			images: [],
-			user_id: data,
+			...data,
 		}
 		openConfirm({
-			message: 'You want to report this user ?',
+			message: message || 'You want to report this user ?',
 			onAccept: () => handleReportUser(payload),
 		})
-	}, [data, dataModal, handleReportUser, handleValidate, openConfirm])
+	}, [data, dataModal, message, handleReportUser, handleValidate, openConfirm])
 	const _renderTop = () => {
 		return (
 			<Flex className={classes.top} vertical>
@@ -187,4 +188,4 @@ const ModalReportUser = (props: ModalReportUserProps) => {
 	)
 }
 
-export default ModalReportUser
+export default ModalReport

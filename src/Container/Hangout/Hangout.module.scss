@@ -82,6 +82,21 @@
 					}
 				}
 			}
+			.waitingOther {
+				justify-content: space-between;
+				width: 100%;
+				align-items: center;
+				background: #fff;
+				padding: 12px;
+				.waitingOtherMore {
+					min-width: fit-content;
+					color: #e55a0f;
+					text-align: center;
+					font-size: 12px;
+					font-weight: 600;
+					cursor: pointer;
+				}
+			}
 		}
 		.bottom {
 			width: 100%;
@@ -108,6 +123,7 @@
 	.minify {
 		min-width: 375px;
 		max-width: 375px;
+		background: #fff;
 		padding: 16px;
 	}
 }
@@ -118,6 +134,7 @@
 			min-width: 0px;
 			max-width: 0px;
 			padding: 0;
+			background: #fff;
 		}
 	}
 }

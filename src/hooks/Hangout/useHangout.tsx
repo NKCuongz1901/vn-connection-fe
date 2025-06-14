@@ -183,5 +183,6 @@ export default function useHangout() {
 		onScroll: handleScroll,
 		onActionPart: handleActionPart,
 		OnChangeTitleHangout: handleOnChangeTitleHangout,
+		onGetMyWaitting: handleGetMyWaitting,
 	}
 }

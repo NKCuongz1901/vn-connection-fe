@@ -4,7 +4,7 @@ import { memo } from 'react'
 
 import useUserMoreAction from '@/hooks/User/useUserMoreAction'
 
-import ModalReportUser from '../ModalReportUser'
+import ModalReport from '../../Custom/ModalReport'
 
 const UserMoreAction = ({
 	id,
@@ -26,7 +26,11 @@ const UserMoreAction = ({
 				<IconDots style={{ cursor: 'pointer' }} />
 			</Dropdown>
 			{open.open && (
-				<ModalReportUser open={open.open} data={open.data} onClose={onClose} />
+				<ModalReport
+					open={open.open}
+					data={{ user_id: open.data }}
+					onClose={onClose}
+				/>
 			)}
 		</Flex>
 	)

@@ -16,6 +16,10 @@ const variant = {
 		color: '#EEF3F6 ',
 		background: '#006B35',
 	},
+	error: {
+		color: '#F80024',
+		background: '#EEF3F6 ',
+	},
 }
 
 type VariantType = keyof typeof variant | null | undefined | '' | false

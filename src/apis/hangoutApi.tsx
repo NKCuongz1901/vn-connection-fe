@@ -83,3 +83,7 @@ export const deleteHangoutParticipantId = async ({ id }: { id: string }) => {
 	const url = POST_ROUTES.participant + `/${id}`
 	return await axios.delete(url)
 }
+export const deleteMutiHangoutParticipantId = async (payload: any) => {
+	const url = POST_ROUTES.actionMultiWaiting
+	return await axios.post(url, payload)
+}

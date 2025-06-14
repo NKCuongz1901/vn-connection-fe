@@ -45,6 +45,7 @@ const ItemHangout = ({
 		user,
 		title_open_hangout,
 	} = item || {}
+	const images = (participants || []).slice(0, 3)
 	const { name, languages_can_speak, gender, age } = (user ? user : item) || {}
 	const { value: time, unit } = start_time
 		? getDiffFromNow({
@@ -80,13 +81,28 @@ const ItemHangout = ({
 		MALE: <IconGenderMale style={{ color: '#2381FF', height: 16 }} />,
 		OTHER: <IconGenderBigender style={{ color: '#006B35', height: 16 }} />,
 	}
+	const _renderMoreImages = () => {
+		if (!isArray(participants, 4)) return null
+		return (
+			<Flex className={classes.moreImages} vertical>
+				<span>{participants.length - 3} + </span>
+
+				<span>People</span>
+			</Flex>
+		)
+	}
 	return (
 		<Flex key={id} className={classes.itemHangout} vertical>
-			<Flex className={classes.avatar}>
-				{isArray(participants, 1) ? (
-					participants.map((participants) => {
-						const { avatar, id } = participants?.user || {}
-						return <CImage src={avatar} key={id} />
+			<Flex className={classes.avatars}>
+				{isArray(images, 1) ? (
+					images.map((part, index) => {
+						const { avatar, id } = part?.user || {}
+						return (
+							<Flex className={classes.avatar} key={id}>
+								<CImage src={avatar} />
+								{index === 2 && _renderMoreImages()}
+							</Flex>
+						)
 					})
 				) : (
 					<CImage src={avatar} />
@@ -106,10 +122,10 @@ const ItemHangout = ({
 				<span className={classes.title}>{title || title_open_hangout}</span>
 				<Flex className={classes.otherInfo}>
 					<Flex className={classes.infoItem} vertical>
-						<span>
+						<div>
 							{name}, {age} {GENDER[gender]}
-						</span>
-						<span>{languages_can_speak}</span>
+						</div>
+						<div>{languages_can_speak}</div>
 					</Flex>
 					{!isHiddenButton && (
 						<CButton

@@ -29,6 +29,7 @@ export const POST_ROUTES = {
 	name: 'post',
 	myPost: 'post/my',
 	participant: 'participant',
+	actionMultiWaiting: 'participant/action-multi-waiting',
 	search: 'post/search',
 	comment: 'comment',
 	updateMember: 'post/update-member',

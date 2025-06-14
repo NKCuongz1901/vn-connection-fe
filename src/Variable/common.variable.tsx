@@ -1268,3 +1268,10 @@ export const daysOfWeek = [
 	{ value: 5, label: 'Saturday' },
 	{ value: 6, label: 'Sunday' },
 ]
+
+export const specialTypeMessage = [
+	'MEMBER_ACCEPT',
+	'TITLE_CHANGE',
+	'ADDRESS',
+	'MEMBER_LEAVE',
+]

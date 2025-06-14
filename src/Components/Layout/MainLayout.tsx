@@ -106,7 +106,7 @@ const MainLayout = (props: MainLayoutProps) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [localePathname, openMenu])
 
-	return <>{content}</>
+	return <div className="mainLayout">{content}</div>
 }
 
 export default memo(MainLayout)

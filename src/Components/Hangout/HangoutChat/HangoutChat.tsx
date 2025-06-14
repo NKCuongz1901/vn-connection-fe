@@ -1,3 +1,5 @@
+import { GoogleMap, Marker } from '@react-google-maps/api'
+import { IconMapPinFilled } from '@tabler/icons-react'
 import { Dropdown, Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
@@ -5,12 +7,14 @@ import Link from 'next/link'
 import { memo, useCallback } from 'react'
 
 import { arrayFrom } from '@/ultis/array.ults'
-import { onPushState, useLocalePath } from '@/ultis/route.ults'
+import { goToGoogleMap, onPushState, useLocalePath } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
+import CGGMap from '@/Components/Custom/CGGMap/CGGMap'
 import CImage from '@/Components/Custom/CImage'
 import CInput from '@/Components/Custom/CInput'
+import ModalReport from '@/Components/Custom/ModalReport'
 import useHangoutChat from '@/hooks/Hangout/useHangoutChat'
 import { mainRoutes } from '@/routes/MainRoutes'
 import HappyIcon from '@/svg/HappyIcon'
@@ -19,7 +23,11 @@ import MoreIcon from '@/svg/MoreIcon'
 import SendIcon from '@/svg/SendIcon'
 import ModelChooseHangout from '../ModelChooseHangout'
 
+import { specialTypeMessage } from '@/Variable/common.variable'
+
 import classes from './HangoutChat.module.scss'
+
+const containerStyle = { width: '100%', height: '104px' }
 
 const HangoutChat = ({ postId }) => {
 	const { onGetPath } = useLocalePath()
@@ -37,14 +45,18 @@ const HangoutChat = ({ postId }) => {
 		menus,
 		modal,
 		setModal,
+		isLoaded,
+		showGGmap,
+		setShowGGmap,
 		setText,
 		setActiveSticker,
 		setShowSticker,
 		onSendMessage,
 		onScroll,
 		onChangeTitleHangout,
+		onEditLocation,
 	} = useHangoutChat({ postId })
-	console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :40 ~ HangoutChat ~ menus:', menus)
+	const { latitude, longitude } = hangoutInfo || {}
 
 	const _renderContentChat = ({
 		type,
@@ -94,6 +106,7 @@ const HangoutChat = ({ postId }) => {
 			case 'MEMBER_ACCEPT':
 			case 'TITLE_CHANGE':
 			case 'ADDRESS':
+			case 'MEMBER_LEAVE':
 				return <Flex className={classes.memberAccept}>{content}</Flex>
 			default:
 				return <Flex className={classes.memberAccept}>{type}</Flex>
@@ -102,18 +115,13 @@ const HangoutChat = ({ postId }) => {
 	const _renderItemChat = ({ item }) => {
 		const { id, user, isFirst, isLast, type, user_id, isTemp } = item || {}
 		const isMe = getUserInfo('id') === user_id
-		const isMemberAction = [
-			'MEMBER_ACCEPT',
-			'TITLE_CHANGE',
-			'ADDRESS',
-		].includes(type)
+		const isMemberAction = specialTypeMessage.includes(type)
 		const isNot = isMe || isMemberAction
 		return (
 			<Flex
 				className={clsx(classes.itemChat, {
-					[classes.mt2]: !isFirst,
+					[classes.mt2]: isFirst,
 					[classes.isMe]: isMe,
-					[classes.isLast]: isLast,
 					[classes.isLast]: isLast,
 					[classes.isCenter]: isMemberAction,
 					[classes.isTemp]: isTemp,
@@ -123,11 +131,11 @@ const HangoutChat = ({ postId }) => {
 				<Flex className={classes.contentItem}>
 					{!isNot && (
 						<Flex className={classes.avatar}>
-							{!isFirst && <CAvatar src={user?.avatar} />}
+							{isFirst && <CAvatar src={user?.avatar} />}
 						</Flex>
 					)}
 					<Flex className={classes.contentInfo} vertical>
-						{!isFirst && !isNot && (
+						{isFirst && !isNot && (
 							<Flex className={classes.name}>{user?.name}</Flex>
 						)}
 						<Flex className={classes.content}>{_renderContentChat(item)}</Flex>
@@ -205,6 +213,8 @@ const HangoutChat = ({ postId }) => {
 	}
 	const _renderModal = () => {
 		const { type, data } = modal || {}
+		const { latitude, longitude } = data
+
 		let content = <></>
 		switch (type) {
 			case 'choose':
@@ -216,10 +226,44 @@ const HangoutChat = ({ postId }) => {
 					/>
 				)
 				break
+			case 'location':
+				content = (
+					<CGGMap
+						latitude={latitude}
+						longitude={longitude}
+						onClose={() => setModal(null)}
+						onSubmit={onEditLocation}
+					/>
+				)
+				break
+			case 'report':
+				content = (
+					<ModalReport
+						open
+						onClose={() => setModal(null)}
+						data={data}
+						message={'You want to report this hangout?'}
+					/>
+				)
+				break
 			default:
 				break
 		}
 		return content
+	}
+	const _renderGGMap = () => {
+		if (!isLoaded || showGGmap) return null
+		return (
+			<div className={classes.ggMap}>
+				<GoogleMap
+					center={{ lat: latitude, lng: longitude }}
+					zoom={15}
+					mapContainerStyle={containerStyle}
+				>
+					{<Marker position={{ lat: latitude, lng: longitude }} />}
+				</GoogleMap>
+			</div>
+		)
 	}
 	return (
 		<div className={classes.hangoutChatWrapper}>
@@ -237,17 +281,30 @@ const HangoutChat = ({ postId }) => {
 						</Flex>
 					</Flex>
 				</Flex>
-				<Flex className={classes.title}>
-					{hangoutInfo?.participants?.map((item) => (
-						<Link
-							key={item?.id}
-							href={onGetPath(`${mainRoutes.profile}/${item?.user_id}`)}
-							target="_blank"
+				<Flex className={classes.participants}>
+					<Flex className={classes.avatars}>
+						{hangoutInfo?.participants?.map((item) => (
+							<Link
+								key={item?.id}
+								href={onGetPath(`${mainRoutes.profile}/${item?.user_id}`)}
+								target="_blank"
+							>
+								<CAvatar key={item?.id} src={item?.user?.avatar} />
+							</Link>
+						))}
+					</Flex>
+					<Flex gap={4}>
+						<Flex
+							onClick={() => goToGoogleMap({ lat: latitude, lng: longitude })}
 						>
-							<CAvatar key={item?.id} src={item?.user?.avatar} />
-						</Link>
-					))}
+							<IconMapPinFilled size={18} color="#006b35" cursor="pointer" />
+						</Flex>
+						<Flex onClick={() => setShowGGmap((pre) => !pre)}>
+							Meeting point
+						</Flex>
+					</Flex>
 				</Flex>
+				{_renderGGMap()}
 				<Flex
 					className={classes.chatContent}
 					vertical
@@ -290,7 +347,7 @@ const HangoutChat = ({ postId }) => {
 					</Flex>
 				</Flex>
 				{_renderSticketList()}
-				{_renderModal()}
+				{modal?.type && _renderModal()}
 			</Flex>
 		</div>
 	)

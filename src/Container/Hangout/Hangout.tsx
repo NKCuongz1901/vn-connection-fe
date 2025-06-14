@@ -15,6 +15,7 @@ import HangoutChat from '@/Components/Hangout/HangoutChat'
 import HangoutTabMy from '@/Components/Hangout/HangoutTabMy'
 import HangoutTabOpen from '@/Components/Hangout/HangoutTabOpen'
 import ModelChooseHangout from '@/Components/Hangout/ModelChooseHangout'
+import ModelMorePeople from '@/Components/Hangout/ModelMorePeople'
 import PencilIcon from '@/svg/Hangout/PencilIcon'
 import Party from '@/svg/Party'
 
@@ -35,6 +36,7 @@ const Hangout = () => {
 		onScroll,
 		onActionPart,
 		OnChangeTitleHangout,
+		onGetMyWaitting,
 	} = useHangout()
 
 	const _renderTop = () => {
@@ -114,6 +116,17 @@ const Hangout = () => {
 					/>
 				)
 				break
+			case 'morePeople':
+				content = (
+					<ModelMorePeople
+						postId={postId}
+						onClose={() => {
+							setModal(null)
+							onGetMyWaitting()
+						}}
+					/>
+				)
+				break
 			default:
 				break
 		}
@@ -121,45 +134,54 @@ const Hangout = () => {
 	}
 
 	const _renderWaitting = () => {
+		const item = myWaitting[0]
+		if (!item) return null
 		return (
 			<Flex vertical className={classes.waitingWrapper}>
-				{myWaitting.map((item) => (
-					<Flex key={item.id} className={classes.waitingItem}>
-						<Flex className={classes.waitingItemLeft}>
-							<CAvatar src={item?.user?.avatar} />
-							<Flex vertical className={classes.nameWrapper}>
-								<span className={classes.name}>{item?.user?.name}</span>
-								<span className={classes.desc}>
-									Request to join this hangout
-								</span>
-							</Flex>
-						</Flex>
-						<Flex className={classes.btnAction}>
-							<Flex
-								className={classes.iconCancel}
-								onClick={() =>
-									onActionPart({
-										id: item?.id,
-										request_join_status: 'REJECT',
-									})
-								}
-							>
-								<IconX />
-							</Flex>
-							<Flex
-								className={classes.iconAccept}
-								onClick={() =>
-									onActionPart({
-										id: item?.id,
-										request_join_status: 'ACCEPT',
-									})
-								}
-							>
-								<IconCheck />
-							</Flex>
+				<Flex className={classes.waitingItem}>
+					<Flex className={classes.waitingItemLeft}>
+						<CAvatar src={item?.user?.avatar} />
+						<Flex vertical className={classes.nameWrapper}>
+							<span className={classes.name}>{item?.user?.name}</span>
+							<span className={classes.desc}>Request to join this hangout</span>
 						</Flex>
 					</Flex>
-				))}
+					<Flex className={classes.btnAction}>
+						<Flex
+							className={classes.iconCancel}
+							onClick={() =>
+								onActionPart({
+									id: item?.id,
+									request_join_status: 'REJECT',
+								})
+							}
+						>
+							<IconX />
+						</Flex>
+						<Flex
+							className={classes.iconAccept}
+							onClick={() =>
+								onActionPart({
+									id: item?.id,
+									request_join_status: 'ACCEPT',
+								})
+							}
+						>
+							<IconCheck />
+						</Flex>
+					</Flex>
+				</Flex>
+				<Flex className={classes.waitingOther}>
+					<Flex className={classes.waitingOtherText}>
+						{myWaitting.length || 0} people Say Hello 👋 to you
+					</Flex>
+					<Flex
+						className={classes.waitingOtherMore}
+						onClick={() => setModal({ type: 'morePeople', data: { postId } })}
+					>
+						Show all
+					</Flex>
+				</Flex>
 			</Flex>
 		)
 	}
