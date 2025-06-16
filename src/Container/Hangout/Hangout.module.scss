@@ -25,6 +25,11 @@
 				padding: 12px 16px;
 				gap: 16px;
 				border-radius: 16px;
+				.skeleton {
+					border-radius: 16px;
+					height: 82px;
+					width: 100%;
+				}
 				.switchStatus,
 				.titleHangout {
 					justify-content: space-between;
@@ -130,6 +135,9 @@
 
 @media (min-width: 0px) and (max-width: 769px) {
 	.wrapper {
+		.container {
+			padding: 8px;
+		}
 		.minify {
 			min-width: 0px;
 			max-width: 0px;

@@ -1,6 +1,6 @@
 'use client'
 import { IconCheck, IconX } from '@tabler/icons-react'
-import { Flex } from 'antd'
+import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { memo } from 'react'
 
@@ -20,6 +20,7 @@ import PencilIcon from '@/svg/Hangout/PencilIcon'
 import Party from '@/svg/Party'
 
 import classes from './Hangout.module.scss'
+import { randomString } from '@/ultis/string.ults'
 
 const Hangout = () => {
 	const { loadingContext } = useLoading()
@@ -30,7 +31,9 @@ const Hangout = () => {
 		currentPage,
 		setModal,
 		postId,
+		key,
 		myWaitting,
+		loadingProfile,
 		setCurrentPage,
 		onUpdateUserInfo,
 		onScroll,
@@ -48,24 +51,32 @@ const Hangout = () => {
 					<span className={classes.title}>Hangout</span>
 				</Flex>
 				<Flex className={classes.top2} vertical>
-					<Flex className={classes.switchStatus}>
-						<span>Available hangout now</span>
-						<CSwitch
-							value={is_open_hangout}
-							disabled={loadingContext}
-							ctype="success"
-							onChange={(value) => onUpdateUserInfo({ is_open_hangout: value })}
-						/>
-					</Flex>
-					<Flex
-						className={classes.titleHangout}
-						onClick={() => setModal({ type: 'choose', data: userData })}
-					>
-						<span>{title_open_hangout || 'I want to hang out'}</span>
-						<Flex>
-							<PencilIcon />
-						</Flex>
-					</Flex>
+					{loadingProfile ? (
+						<Skeleton.Input active className={classes.skeleton} />
+					) : (
+						<>
+							<Flex className={classes.switchStatus}>
+								<span>Available hangout now</span>
+								<CSwitch
+									value={is_open_hangout}
+									disabled={loadingContext}
+									ctype="success"
+									onChange={(value) =>
+										onUpdateUserInfo({ is_open_hangout: value })
+									}
+								/>
+							</Flex>
+							<Flex
+								className={classes.titleHangout}
+								onClick={() => setModal({ type: 'choose', data: userData })}
+							>
+								<span>{title_open_hangout || 'I want to hang out'}</span>
+								<Flex>
+									<PencilIcon />
+								</Flex>
+							</Flex>
+						</>
+					)}
 				</Flex>
 			</Flex>
 		)
@@ -95,7 +106,10 @@ const Hangout = () => {
 					<>
 						<HangoutTabMy
 							ref={_tabsOpenRef}
-							onClick={(id) => onPushState({ id })}
+							onClick={(id) => {
+								key.current = randomString()
+								onPushState({ id })
+							}}
 						/>
 					</>
 				)}
@@ -197,7 +211,7 @@ const Hangout = () => {
 				{_renderBottom()}
 				{modal?.type && _renderModal()}
 			</Flex>
-			{postId && <HangoutChat key={postId} postId={postId} />}
+			{postId && <HangoutChat key={key.current} postId={postId} />}
 		</div>
 	)
 }

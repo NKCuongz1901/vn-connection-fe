@@ -7,6 +7,7 @@ import { Flex } from 'antd'
 import { memo, useCallback, useState } from 'react'
 
 import { sendHangout } from '@/apis/hangoutApi'
+import { joinPost } from '@/apis/postApis'
 
 import { isArray } from '@/ultis/array.ults'
 import { getDiffFromNow } from '@/ultis/date.ults'
@@ -22,6 +23,7 @@ import classes from './ItemHangout.module.scss'
 interface ItemHangoutProps {
 	item: any
 	isHiddenButton?: boolean
+	onClick?: any
 	setOpenHangoutList?: React.Dispatch<React.SetStateAction<any>>
 
 	setOpenHangoutSearch?: React.Dispatch<React.SetStateAction<any>>
@@ -29,6 +31,7 @@ interface ItemHangoutProps {
 const ItemHangout = ({
 	item,
 	isHiddenButton = false,
+	onClick,
 	setOpenHangoutList = undefined,
 	setOpenHangoutSearch = undefined,
 }: ItemHangoutProps) => {
@@ -44,6 +47,7 @@ const ItemHangout = ({
 		title,
 		user,
 		title_open_hangout,
+		origin_id,
 	} = item || {}
 	const images = (participants || []).slice(0, 3)
 	const { name, languages_can_speak, gender, age } = (user ? user : item) || {}
@@ -53,29 +57,36 @@ const ItemHangout = ({
 		  })
 		: { value: 30, unit: 'minute' }
 
-	const handleSendHangout = useCallback(async (id: string) => {
-		setLoading(true)
-		try {
-			const res: any = await sendHangout({ idol_id: id })
-			if (res?.code === 200) {
-				if (setOpenHangoutList) {
-					setOpenHangoutList((prev) => prev.filter((item) => item.id !== id))
+	const handleSendHangout = useCallback(
+		async ({ idol_id, post_id }: { idol_id?: string; post_id?: string }) => {
+			setLoading(true)
+			try {
+				const res: any = await (post_id
+					? joinPost({ post_id })
+					: sendHangout({ idol_id: idol_id }))
+				if (res?.code === 200) {
+					if (setOpenHangoutList) {
+						setOpenHangoutList((prev) => prev.filter((item) => item.id !== id))
+					}
+					if (setOpenHangoutSearch) {
+						setOpenHangoutSearch((prev) =>
+							prev.filter((item) => item.id !== id),
+						)
+					}
+					openSuccess({
+						message:
+							'Hangout request sent successfully, please wait for response!',
+					})
 				}
-				if (setOpenHangoutSearch) {
-					setOpenHangoutSearch((prev) => prev.filter((item) => item.id !== id))
-				}
-				openSuccess({
-					message:
-						'Hangout request sent successfully, please wait for response!',
-				})
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoading(false)
 			}
-		} catch (error) {
-			openError(error)
-		} finally {
-			setLoading(false)
-		}
+		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+		[],
+	)
 	const GENDER = {
 		FEMALE: <IconGenderFemale style={{ color: '#ED5DCD', height: 16 }} />,
 		MALE: <IconGenderMale style={{ color: '#2381FF', height: 16 }} />,
@@ -92,7 +103,7 @@ const ItemHangout = ({
 		)
 	}
 	return (
-		<Flex key={id} className={classes.itemHangout} vertical>
+		<Flex key={id} className={classes.itemHangout} vertical onClick={onClick}>
 			<Flex className={classes.avatars}>
 				{isArray(images, 1) ? (
 					images.map((part, index) => {
@@ -130,7 +141,11 @@ const ItemHangout = ({
 					{!isHiddenButton && (
 						<CButton
 							ctype="oranger"
-							onClick={() => handleSendHangout(id)}
+							onClick={() =>
+								handleSendHangout(
+									origin_id ? { post_id: origin_id } : { idol_id: id },
+								)
+							}
 							disabled={loading}
 						>
 							Say Hello

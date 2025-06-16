@@ -2,7 +2,7 @@
 import { CloseOutlined } from '@ant-design/icons'
 import { Flex } from 'antd'
 import Link from 'next/link'
-import React, { memo, useCallback, useEffect, useState } from 'react'
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
 
 import { isLogin } from '@/ultis/storage.ults'
 import { useLocalePath } from '@/ultis/route.ults'
@@ -24,11 +24,26 @@ interface MainLayoutProps {
 const MainLayout = (props: MainLayoutProps) => {
 	const { children } = props
 	const { pathname, onGetPath, localePathname, onChangeRoute } = useLocalePath()
+	const ref = useRef<HTMLDivElement>(null)
+
 	const [openMenu, setOpenMenu] = useState(false)
 	const [content, setContent] = useState(null) as any
 	const toggleMenus = useCallback(() => {
 		setOpenMenu((prev) => !prev)
 	}, [])
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (ref.current && !ref.current.contains(event.target as Node)) {
+				setOpenMenu(false)
+			}
+		}
+
+		document.addEventListener('mousedown', handleClickOutside)
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside)
+		}
+	}, [])
+
 	const _renderSideBar = () => {
 		return (
 			<Flex
@@ -36,7 +51,12 @@ const MainLayout = (props: MainLayoutProps) => {
 					openMenu ? 'openLayoutMenu' : 'closeLayoutMenu'
 				}`}
 			>
-				<Flex vertical className="sideBarMainLayout" style={{ height: '100%' }}>
+				<Flex
+					ref={ref}
+					vertical
+					className="sideBarMainLayout"
+					style={{ height: '100%' }}
+				>
 					<Flex className="sideBarMenuToggle">
 						<CloseOutlined
 							className="sideBarMenuToggleICon"

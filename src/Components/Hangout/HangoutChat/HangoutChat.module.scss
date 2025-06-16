@@ -38,6 +38,48 @@
 			height: 104px;
 			width: 100%;
 			position: relative;
+			overflow: hidden;
+		}
+		.waitingWrapper {
+			overflow: auto;
+			max-height: 60px;
+			.waitingItem {
+				padding: 8px 16px;
+				justify-content: space-between;
+				align-items: center;
+
+				.waitingItemLeft {
+					align-items: center;
+					gap: 4px;
+					.opacityDown {
+						opacity: 0.5;
+					}
+				}
+				.btnAction {
+					gap: 8px;
+					.iconCancel,
+					.iconAccept {
+						border-radius: 50%;
+						height: 24px;
+						width: 24px;
+						align-items: center;
+						justify-content: center;
+						cursor: pointer;
+						svg {
+							height: 16px;
+							width: 16px;
+						}
+					}
+					.iconCancel {
+						background-color: rgba(0, 58, 111, 0.08);
+						color: #000;
+					}
+					.iconAccept {
+						color: #fff;
+						background-color: #006b35;
+					}
+				}
+			}
 		}
 		.header {
 			justify-content: space-between;
@@ -277,5 +319,10 @@
 			height: 240px;
 			display: flex;
 		}
+	}
+}
+@media (min-width: 0px) and (max-width: 769px) {
+	.hangoutChatWrapper {
+		min-width: 100%;
 	}
 }

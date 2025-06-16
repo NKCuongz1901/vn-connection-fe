@@ -10,6 +10,7 @@ import { getUserProfile, updateUserProfile } from '@/apis/userApis'
 import { delay } from '@/ultis/common.ults'
 import { useQuery } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
+import { randomString } from '@/ultis/string.ults'
 
 type userDataProps = {
 	is_open_hangout: boolean
@@ -34,9 +35,11 @@ export default function useHangout() {
 	})
 	const [myWaitting, setMyWaitting] = useState([]) as any[]
 	const [postId, setPostId] = useState('')
-
+	const key = useRef<string>(randomString())
+	const [loadingProfile, setLoadingProfile] = useState<boolean>(false)
 	const handleGetUserProfile = async () => {
 		const id = getUserInfo('id')
+		setLoadingProfile(true)
 		try {
 			const res: any = await getUserProfile({
 				id,
@@ -57,6 +60,8 @@ export default function useHangout() {
 			}
 		} catch (error) {
 			openError(error)
+		} finally {
+			setLoadingProfile(false)
 		}
 	}
 	const handleUpdateUserInfo = async (otherData) => {
@@ -171,11 +176,13 @@ export default function useHangout() {
 	}, [])
 	return {
 		userData,
+		loadingProfile,
 		_tabsOpenRef,
 		currentPage,
 		modal,
 		myWaitting,
 		postId,
+		key,
 		setPostId,
 		setModal,
 		setCurrentPage,

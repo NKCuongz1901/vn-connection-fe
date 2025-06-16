@@ -1,12 +1,12 @@
 import { GoogleMap, Marker } from '@react-google-maps/api'
-import { IconMapPinFilled } from '@tabler/icons-react'
+import { IconCheck, IconMapPinFilled, IconX } from '@tabler/icons-react'
 import { Dropdown, Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { memo, useCallback } from 'react'
 
-import { arrayFrom } from '@/ultis/array.ults'
+import { arrayFrom, isArray } from '@/ultis/array.ults'
 import { goToGoogleMap, onPushState, useLocalePath } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 
@@ -47,6 +47,7 @@ const HangoutChat = ({ postId }) => {
 		setModal,
 		isLoaded,
 		showGGmap,
+		listParticipant,
 		setShowGGmap,
 		setText,
 		setActiveSticker,
@@ -55,6 +56,7 @@ const HangoutChat = ({ postId }) => {
 		onScroll,
 		onChangeTitleHangout,
 		onEditLocation,
+		onActionPart,
 	} = useHangoutChat({ postId })
 	const { latitude, longitude } = hangoutInfo || {}
 
@@ -265,6 +267,52 @@ const HangoutChat = ({ postId }) => {
 			</div>
 		)
 	}
+	const _renderListWaiting = () => {
+		const { WAITING } = listParticipant || {}
+		if (!isArray(WAITING, 1)) {
+			return null
+		}
+		return (
+			<Flex vertical className={classes.waitingWrapper}>
+				{WAITING.map((item) => {
+					const { user, id } = item as any
+					return (
+						<Flex key={id} className={classes.waitingItem}>
+							<Flex className={classes.waitingItemLeft}>
+								<CAvatar src={user?.avatar} />
+								<span>{user?.name}</span>
+								<span className={classes.opacityDown}>want to join</span>
+							</Flex>
+							<Flex className={classes.btnAction}>
+								<Flex
+									className={classes.iconCancel}
+									onClick={() =>
+										onActionPart({
+											id: item?.id,
+											request_join_status: 'REJECT',
+										})
+									}
+								>
+									<IconX />
+								</Flex>
+								<Flex
+									className={classes.iconAccept}
+									onClick={() =>
+										onActionPart({
+											id: item?.id,
+											request_join_status: 'ACCEPT',
+										})
+									}
+								>
+									<IconCheck />
+								</Flex>
+							</Flex>
+						</Flex>
+					)
+				})}
+			</Flex>
+		)
+	}
 	return (
 		<div className={classes.hangoutChatWrapper}>
 			<Flex className={classes.chatContainer} vertical>
@@ -305,6 +353,7 @@ const HangoutChat = ({ postId }) => {
 					</Flex>
 				</Flex>
 				{_renderGGMap()}
+				{_renderListWaiting()}
 				<Flex
 					className={classes.chatContent}
 					vertical

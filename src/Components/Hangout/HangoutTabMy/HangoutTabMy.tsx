@@ -26,9 +26,12 @@ function HangoutTabMy(props, ref) {
 				</Flex>
 				<Flex className={classes.hangoutWrapper}>
 					{data.map((item) => (
-						<div key={item.id} onClick={() => onClick(item.id)}>
-							<ItemHangout isHiddenButton item={item} />
-						</div>
+						<ItemHangout
+							isHiddenButton
+							item={item}
+							key={item.id}
+							onClick={() => onClick(item.id)}
+						/>
 					))}
 					{loading[id]
 						? arrayFrom(3).map((_, index) => (

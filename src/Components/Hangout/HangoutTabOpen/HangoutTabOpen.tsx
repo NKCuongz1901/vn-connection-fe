@@ -14,6 +14,8 @@ function HangoutTabOpen(props, ref) {
 		total,
 		hangoutList,
 		loading,
+		radius,
+		setRadius,
 		setOpenHangoutList,
 		setOpenHangoutSearch,
 		onLoadMore,
@@ -28,7 +30,11 @@ function HangoutTabOpen(props, ref) {
 					<span className={classes.title}>people hangouts</span>
 				</Flex>
 				<Flex className={classes.radius}>
-					<CSelect value={10} options={radiusOpts} />
+					<CSelect
+						value={radius}
+						options={radiusOpts}
+						onChange={(e) => setRadius(e)}
+					/>
 				</Flex>
 			</Flex>
 			<Flex className={classes.hangoutWrapper}>

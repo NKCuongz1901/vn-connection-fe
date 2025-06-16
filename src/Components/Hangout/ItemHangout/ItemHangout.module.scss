@@ -83,3 +83,16 @@
 		}
 	}
 }
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.itemHangout {
+		min-width: calc(320px);
+		max-width: calc(50% - 8px);
+	}
+}
+@media (min-width: 0px) and (max-width: 725px) {
+	.itemHangout {
+		min-width: calc(320px);
+		max-width: 100%;
+	}
+}

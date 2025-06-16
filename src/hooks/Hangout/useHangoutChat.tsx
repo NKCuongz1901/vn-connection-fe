@@ -3,12 +3,14 @@ import { ItemType } from 'antd/es/menu/interface'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
+	actionParticipant,
 	deleteHangoutParticipantId,
 	getHangoutById,
 	updateHangoutById,
 } from '@/apis/hangoutApi'
 import {
 	getListCommentById,
+	getListParticipant,
 	getListSticket,
 	sendCommentPost,
 } from '@/apis/postApis'
@@ -31,7 +33,7 @@ type useHangoutChatProps = {
 }
 export default function useHangoutChat({ postId }: useHangoutChatProps) {
 	const { toggleLoadingContext } = useLoading()
-	const { openError } = useModal()
+	const { openError, openSuccess } = useModal()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const _loadmore = useRef<boolean>(true)
 	const _scrollRef = useRef<HTMLDivElement>(null)
@@ -47,6 +49,11 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 	const [showSticker, setShowSticker] = useState(false)
 	const [text, setText] = useState('')
 	const [commentList, setCommentList] = useState<any[]>([])
+	const [listParticipant, setListParticipant] = useState<{
+		[key: string]: any
+	}>({
+		WAITING: [],
+	})
 	const [loading, setLoading] = useState(false)
 	const [loadingPage, setLoadingPage] = useState(false)
 	const [showGGmap, setShowGGmap] = useState(false)
@@ -293,6 +300,68 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 			toggleLoadingContext()
 		}
 	}
+	const handleGetWaitingParticipant = async ({ request_join_status }) => {
+		try {
+			const res: any = await getListParticipant({
+				fields: [
+					'$all',
+					{
+						user: [
+							'name',
+							'phone',
+							'avatar',
+							'languages_can_speak',
+							'birthday',
+							'id',
+							'gender',
+							'is_verified',
+						],
+					},
+				],
+				where: {
+					post_id: postId,
+					request_join_status,
+				},
+				page: 1,
+				limit: 50,
+			})
+			if (res?.code == 200) {
+				setListParticipant((pre) => ({
+					...pre,
+					[request_join_status]: res?.results?.objects?.rows || [],
+				}))
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+		}
+	}
+	const handleActionPart = async ({
+		id,
+		request_join_status,
+	}: {
+		id: string
+		request_join_status: string
+	}) => {
+		toggleLoadingContext(true)
+		try {
+			const res: any = await actionParticipant({ id, request_join_status })
+			if (res?.code === 200) {
+				handleGetListCommentById(true)
+				setListParticipant((prev) => ({
+					...prev,
+					WAITING: prev.WAITING.filter((item) => item?.id !== id),
+				}))
+				openSuccess({
+					message: `You ${request_join_status.toLocaleLowerCase()} request !`,
+				})
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			toggleLoadingContext(false)
+		}
+	}
 	useEffect(() => {
 		_paginationRefs.current.page = 1
 		handleGetInfoHangout()
@@ -302,6 +371,7 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 
 	useEffect(() => {
 		handleGetSticker()
+		handleGetWaitingParticipant({ request_join_status: 'WAITING' })
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -320,6 +390,7 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 		setModal,
 		isLoaded,
 		showGGmap,
+		listParticipant,
 		setShowGGmap,
 		setText,
 		setActiveSticker,
@@ -328,5 +399,6 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 		onScroll: handleScroll,
 		onChangeTitleHangout: handleChangeTitleHangout,
 		onEditLocation: handleEditLocation,
+		onActionPart: handleActionPart,
 	}
 }

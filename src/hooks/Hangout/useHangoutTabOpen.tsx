@@ -23,8 +23,8 @@ export default function useHangoutTabOpen(ref) {
 	const [openHangoutSearch, setOpenHangoutSearch] = useState([]) as any[]
 	const [loading, setLoading] = useState({ open: false, search: false })
 	const loadMore = useRef({ open: true, search: false })
-
 	const [total, setTotal] = useState({ open: 0, search: 0 })
+	const [radius, setRadius] = useState(10)
 	const isMounted = useRef(false)
 	const hangoutList = useMemo(
 		() => [...openHangoutSearch, ...openHangoutList],
@@ -55,7 +55,7 @@ export default function useHangoutTabOpen(ref) {
 				],
 				page,
 				limit,
-				radius: 10,
+				radius: radius,
 			})
 			if (!isMounted) return
 			const { code, results } = res || {}
@@ -91,7 +91,7 @@ export default function useHangoutTabOpen(ref) {
 				fields: ['$all'],
 				page,
 				limit,
-				radius: 10,
+				radius: radius,
 			})
 			if (!isMounted) return
 			const { code, results } = res || {}
@@ -118,7 +118,6 @@ export default function useHangoutTabOpen(ref) {
 	}
 
 	const handleLoadMore = useCallback(() => {
-		console.log('object more tab')
 		const { search, open } = loadMore.current || {}
 		const isLoadMore = search || open
 		if (!isLoadMore || loading.open || loading.search) return
@@ -142,10 +141,12 @@ export default function useHangoutTabOpen(ref) {
 	)
 
 	useEffect(() => {
+		_paginationSearch.current.page = 1
+		_paginationOpen.current.page = 1
 		handleSearchUserOpenHangout()
 		handleUserOpenHangout()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	}, [radius])
 	useEffect(() => {
 		isMounted.current = true
 		return () => {
@@ -157,6 +158,8 @@ export default function useHangoutTabOpen(ref) {
 		total,
 		hangoutList,
 		loading,
+		radius,
+		setRadius,
 		setOpenHangoutList,
 		setOpenHangoutSearch,
 		onLoadMore: handleLoadMore,
