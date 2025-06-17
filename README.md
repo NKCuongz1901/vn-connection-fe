@@ -34,7 +34,6 @@ bun dev
 9. Define type/interface
 
 
-
 ## Rule passing props down
 
 1. Id, key
