@@ -35,3 +35,59 @@ export const createConversation = async (payload: any) => {
 
 	return await axios.post(url, payload)
 }
+
+export const getConvStranger = async (params: { [key: string]: any } = {}) => {
+	const url = CONVERSATION_ROUTES.stranger
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+export const getConvPersonal = async (params: { [key: string]: any } = {}) => {
+	const url = CONVERSATION_ROUTES.personal
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const getConvMessById = async (params: {
+	id: string
+	[key: string]: any
+}) => {
+	const { id, ..._params } = params || {}
+	const url = CONVERSATION_ROUTES.name + '/' + id + '/messages'
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const getConvInfoById = async (params: {
+	id: string
+	[key: string]: any
+}) => {
+	const { id, ..._params } = params || {}
+	const url = CONVERSATION_ROUTES.name + '/' + id
+
+	return await axios.get(url, {
+		params: convertParams(_params),
+	})
+}
+export const getConvMembersById = async (params: {
+	id: string
+	[key: string]: any
+}) => {
+	const { id, ..._params } = params || {}
+	const url = CONVERSATION_ROUTES.name + '/' + id + '/members'
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const sendMessage = async (payload: any) => {
+	const url = CONVERSATION_ROUTES.sendMess
+
+	return await axios.post(url, payload)
+}

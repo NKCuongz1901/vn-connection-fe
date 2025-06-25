@@ -126,7 +126,7 @@ const ItemHangout = ({
 				</Flex>
 				<Flex className={classes.timeSpaceItem}>
 					<ClockIcon />
-					{time} {unit}s ago
+					{time} {unit ? unit + 's ago' : ''}
 				</Flex>
 			</Flex>
 			<Flex className={classes.info} vertical>

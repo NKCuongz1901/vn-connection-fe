@@ -29,6 +29,7 @@ import ClockIcon from '@/svg/ClockIcon'
 import SendIcon from '@/svg/SendIcon'
 import ImageIcon from '@/svg/ImageIcon'
 import MoreIcon from '@/svg/MoreIcon'
+import SearchIcon from '@/svg/SearchIcon'
 
 const Icons = () => {
 	const icons = [
@@ -62,6 +63,7 @@ const Icons = () => {
 		{ ICON: SendIcon, name: '@/svg/SendIcon', key: '23' },
 		{ ICON: ImageIcon, name: '@/svg/ImageIcon', key: '24' },
 		{ ICON: MoreIcon, name: '@/svg/MoreIcon', key: '25' },
+		{ ICON: SearchIcon, name: '@/svg/SearchIcon', key: '26' },
 	]
 
 	return (

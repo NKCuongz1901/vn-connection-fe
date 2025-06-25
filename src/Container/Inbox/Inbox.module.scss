@@ -1,0 +1,82 @@
+.wrapper {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	background: white;
+	.container {
+		height: 100%;
+		width: 100%;
+		.convContainer {
+			min-width: 392px;
+			max-width: 392px;
+			height: 100%;
+			border-right: 1px solid #eef3f6;
+			gap: 16px;
+			.searchBar {
+				// height: 44px;
+				padding: 16px 16px 0 16px;
+			}
+			.convList {
+				padding: 0 16px 16px 16px;
+				height: calc(100% - 44px);
+				overflow: auto;
+				width: 100%;
+				overflow-x: hidden;
+				.convItemWrapper {
+					height: 60px;
+					width: 100%;
+					cursor: pointer;
+					.convItem {
+						padding: 8px 0;
+						width: 100%;
+						gap: 12px;
+						:global(.ant-avatar) {
+							min-width: 40px;
+							min-height: 40px;
+						}
+						.info {
+							width: 100%;
+							height: 100%;
+							justify-content: space-between;
+							.infoTop {
+								justify-content: space-between;
+								gap: 4px;
+								.name {
+									font-weight: 600;
+									width: 190px;
+									overflow: hidden;
+									white-space: nowrap;
+									text-overflow: ellipsis;
+								}
+								.long {
+									width: 208px;
+								}
+								.time {
+									align-items: center;
+									gap: 8px;
+									min-width: fit-content;
+									.unread {
+										width: 8px;
+										height: 8px;
+										border-radius: 99px;
+										background: #2381ff;
+									}
+								}
+							}
+							.text {
+								width: 284px;
+								white-space: nowrap;
+								overflow: hidden;
+								text-overflow: ellipsis;
+							}
+						}
+					}
+				}
+			}
+		}
+		.chatContainer {
+			width: 100%;
+		}
+	}
+}

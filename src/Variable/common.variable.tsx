@@ -1236,12 +1236,12 @@ export const stateFriends = {
 
 export const paginationCommon: PaginationType = {
 	page: 1,
-	limit: 50,
+	limit: 20,
 	totalPage: 0,
 }
 export const paginationZero: PaginationType = {
 	page: 0,
-	limit: 20,
+	limit: 50,
 	totalPage: 0,
 }
 export const optionFriends = [
@@ -1275,3 +1275,9 @@ export const specialTypeMessage = [
 	'ADDRESS',
 	'MEMBER_LEAVE',
 ]
+
+export const mappingTypeMessage = {
+	STICKER: 'Send a sticker',
+	MEDIAS: 'Send a media',
+	IMAGE: 'Send a image',
+}

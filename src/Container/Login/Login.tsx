@@ -27,7 +27,7 @@ const { forgetPassword } = mainRoutes
 const Login = () => {
 	const { onGetPath, onChangeRoute } = useLocalePath()
 	const { loadingContext } = useLoading()
-	const { account, onChange, isValidate, onLogin } = useLogin()
+	const { account, onChange, isValidate, onLogin, handleSocket } = useLogin()
 
 	const _renderLeft = useCallback(() => {
 		return (
@@ -40,7 +40,12 @@ const Login = () => {
 						<MainLogo />
 					</div>
 				</Flex>
-				<Flex align="center" justify="center" className={classes.title}>
+				<Flex
+					align="center"
+					justify="center"
+					className={classes.title}
+					onClick={handleSocket}
+				>
 					UniVini
 				</Flex>
 				<Flex vertical>

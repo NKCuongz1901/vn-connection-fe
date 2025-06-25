@@ -1,0 +1,65 @@
+.InboxChatWrapper {
+	display: flex;
+	height: 100%;
+	background: #fff;
+	width: 100%;
+	min-width: 712px;
+	.chatContainer {
+		width: 100%;
+
+		.title,
+		.header {
+			align-items: center;
+			font-size: 18px;
+			font-weight: 600;
+			border-bottom: 1px solid #eef3f6;
+			padding: 8px 16px;
+			width: 100%;
+			height: 52px;
+			gap: 4px;
+			.userInChat {
+				align-items: center;
+				gap: 8px;
+			}
+			& .skeleton {
+				height: 30px;
+				width: 100%;
+			}
+		}
+		.pinMess {
+			align-items: center;
+			border-bottom: 1px solid #eef3f6;
+			padding: 8px 16px;
+			width: 100%;
+			height: 52px;
+			gap: 4px;
+		}
+
+		.header {
+			justify-content: space-between;
+			.action {
+				gap: 12px;
+				.iconMore,
+				.iconClose {
+					padding: 6px;
+					border-radius: 99px;
+					background: #f4f8fc;
+					height: 32px;
+					width: 32px;
+					justify-content: center;
+					align-items: center;
+					cursor: pointer;
+				}
+			}
+		}
+		.chatBox {
+			flex: 1;
+			overflow: auto;
+		}
+	}
+}
+@media (min-width: 0px) and (max-width: 769px) {
+	.hangoutChatWrapper {
+		min-width: 100%;
+	}
+}
