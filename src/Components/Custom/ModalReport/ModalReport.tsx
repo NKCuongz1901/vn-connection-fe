@@ -25,11 +25,12 @@ interface ModalReportProps {
 	onClose: any
 	data?: any
 	message?: string
+	title?: string
 	[key: string]: any
 }
 
 const ModalReport = (props: ModalReportProps) => {
-	const { onClose, open, data, message } = props
+	const { onClose, open, data, message, title } = props
 	const { loadingContext, toggleLoadingContext } = useLoading()
 	const { openConfirm, openError, openSuccess } = useModal()
 	const [errors, setErrors] = useState({
@@ -159,7 +160,7 @@ const ModalReport = (props: ModalReportProps) => {
 				<CModal
 					onClose={onClose}
 					onCancel={onClose}
-					title="Create discussion"
+					title={title || 'Create discussion'}
 					styles={{
 						content: {
 							width: 800,

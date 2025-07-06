@@ -2,19 +2,16 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useModal } from '@/context/ModalContext'
 
-import { getListPost } from '@/apis/postApis'
+import { getConvPersonal, getConvStranger } from '@/apis/conversationApis'
 
 import { isArray, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay, toJson } from '@/ultis/common.ults'
+import { cloneDeep, toJson } from '@/ultis/common.ults'
+import { useQuery } from '@/ultis/route.ults'
+import { randomString } from '@/ultis/string.ults'
 
 import { paginationCommon } from '@/Variable/common.variable'
 
 import { PaginationType } from '@/interface/common/common.interface'
-import { mainRoutes } from '@/routes/MainRoutes'
-import { set } from 'lodash'
-import { getConvPersonal, getConvStranger } from '@/apis/conversationApis'
-import { useQuery } from '@/ultis/route.ults'
-import { randomString } from '@/ultis/string.ults'
 
 export default function useInbox() {
 	const { openError } = useModal()
@@ -38,7 +35,10 @@ export default function useInbox() {
 	const [listConvStranger, setListConvStranger] = useState<any[]>([])
 	const [listConvPersonal, setListConvPersonal] = useState<any[]>([])
 
-	const [convId, setConvId] = useState('')
+	const [convId, setConvId] = useState(id || '')
+
+	const [enable, setEnable] = useState(true)
+	const [show, setShow] = useState(false)
 
 	const handleGetConvStranger = async () => {
 		setLoadingConv((prev) => ({ ...prev, stranger: true }))
@@ -130,6 +130,7 @@ export default function useInbox() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 	useEffect(() => {
+		key.current = randomString()
 		setConvId(id)
 	}, [id])
 	return {
@@ -137,6 +138,10 @@ export default function useInbox() {
 		listConvStranger,
 		listConvPersonal,
 		convId,
+		enable,
+		show,
+		setShow,
+		setEnable,
 		setConvId,
 		onScroll: handleScroll,
 	}

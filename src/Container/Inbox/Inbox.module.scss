@@ -9,13 +9,13 @@
 		width: 100%;
 		.convContainer {
 			min-width: 392px;
-			max-width: 392px;
-			height: 100%;
-			border-right: 1px solid #eef3f6;
-			gap: 16px;
 			.searchBar {
 				// height: 44px;
 				padding: 16px 16px 0 16px;
+			}
+			.backButton {
+				padding: 8px 16px 0 16px;
+				cursor: pointer;
 			}
 			.convList {
 				padding: 0 16px 16px 16px;
@@ -77,6 +77,106 @@
 		}
 		.chatContainer {
 			width: 100%;
+		}
+		.newRq {
+			padding: 8px 16px;
+			margin: 0 16px;
+			border-radius: 16px;
+			background: #f4f8fc;
+			align-items: center;
+			min-height: 56px;
+			gap: 8px;
+			cursor: pointer;
+			.messageIcon {
+				position: relative;
+				.count {
+					position: absolute;
+					color: #fff;
+					text-align: center;
+					font-size: 8px;
+					font-weight: 600;
+					line-height: 10px; /* 125% */
+					background: red;
+					border-radius: 50%;
+					height: 10px;
+					min-width: 10px;
+					width: fit-content;
+					padding: 0 2px;
+					right: 0px;
+					border: 1px solid white;
+				}
+			}
+			.messageTitle {
+				flex: 1;
+				.title {
+					font-weight: 600;
+				}
+			}
+			.iconCancel {
+				color: #7b88a6;
+				cursor: pointer;
+			}
+		}
+	}
+}
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		.container {
+			.convContainer {
+				min-width: 100%;
+
+				.searchBar {
+				}
+				.backButton {
+				}
+			}
+			.mini {
+				display: none;
+			}
+
+			.chatContainer {
+				width: 100%;
+			}
+			.newRq {
+				padding: 8px 16px;
+				margin: 0 16px;
+				border-radius: 16px;
+				background: #f4f8fc;
+				align-items: center;
+				min-height: 56px;
+				gap: 8px;
+				cursor: pointer;
+				.messageIcon {
+					position: relative;
+					.count {
+						position: absolute;
+						color: #fff;
+						text-align: center;
+						font-size: 8px;
+						font-weight: 600;
+						line-height: 10px; /* 125% */
+						background: red;
+						border-radius: 50%;
+						height: 10px;
+						min-width: 10px;
+						width: fit-content;
+						padding: 0 2px;
+						right: 0px;
+						border: 1px solid white;
+					}
+				}
+				.messageTitle {
+					flex: 1;
+					.title {
+						font-weight: 600;
+					}
+				}
+				.iconCancel {
+					color: #7b88a6;
+					cursor: pointer;
+				}
+			}
 		}
 	}
 }

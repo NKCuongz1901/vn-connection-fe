@@ -1274,6 +1274,8 @@ export const specialTypeMessage = [
 	'TITLE_CHANGE',
 	'ADDRESS',
 	'MEMBER_LEAVE',
+	'PIN',
+	'UNPIN',
 ]
 
 export const mappingTypeMessage = {

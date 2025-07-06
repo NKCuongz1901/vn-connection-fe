@@ -1,13 +1,13 @@
 'use client'
 
 import { Flex, Input } from 'antd'
-import { memo } from 'react'
+import { forwardRef, memo } from 'react'
 
 import { CInputProps } from '@/interface/CComponent/CComponent.interface'
 
 import classes from './Input.module.scss'
 
-const CInput = (_props: CInputProps) => {
+const CInput = forwardRef((_props: CInputProps, ref: any) => {
 	const { error, label, isRequired, style, ...props } = _props
 	const status = error ? 'error' : ''
 	return (
@@ -18,6 +18,7 @@ const CInput = (_props: CInputProps) => {
 				</span>
 			)}
 			<Input
+				ref={ref}
 				allowClear
 				className={classes.wrapper}
 				style={{
@@ -32,6 +33,7 @@ const CInput = (_props: CInputProps) => {
 			{error && <span className="error">{error}</span>}
 		</Flex>
 	)
-}
+})
+CInput.displayName = 'CInput' // 👈 THÊM DÒNG NÀY ĐỂ FIX
 
 export default memo(CInput)

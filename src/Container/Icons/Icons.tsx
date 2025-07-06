@@ -30,6 +30,12 @@ import SendIcon from '@/svg/SendIcon'
 import ImageIcon from '@/svg/ImageIcon'
 import MoreIcon from '@/svg/MoreIcon'
 import SearchIcon from '@/svg/SearchIcon'
+import ReplyIcon from '@/svg/ReplyIcon'
+import MessageIcon from '@/svg/MessageIcon'
+import PinIcon from '@/svg/PinIcon'
+import BellIcon from '@/svg/BellIcon'
+import FlagIcon from '@/svg/FlagIcon'
+import TrashIcon from '@/svg/TrashIcon'
 
 const Icons = () => {
 	const icons = [
@@ -64,6 +70,12 @@ const Icons = () => {
 		{ ICON: ImageIcon, name: '@/svg/ImageIcon', key: '24' },
 		{ ICON: MoreIcon, name: '@/svg/MoreIcon', key: '25' },
 		{ ICON: SearchIcon, name: '@/svg/SearchIcon', key: '26' },
+		{ ICON: ReplyIcon, name: '@/svg/ReplyIcon', key: '27' },
+		{ ICON: MessageIcon, name: '@/svg/MessageIcon', key: '28' },
+		{ ICON: PinIcon, name: '@/svg/PinIcon', key: '29' },
+		{ ICON: BellIcon, name: '@/svg/BellIcon', key: '30' },
+		{ ICON: FlagIcon, name: '@/svg/FlagIcon', key: '31' },
+		{ ICON: TrashIcon, name: '@/svg/TrashIcon', key: '32' },
 	]
 
 	return (

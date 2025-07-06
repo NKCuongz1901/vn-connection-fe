@@ -44,6 +44,8 @@ export const CONVERSATION_ROUTES = {
 	stranger: 'conversation/stranger',
 	personal: 'conversation/personal',
 	sendMess: 'conversation/send-message',
+	message: 'message',
+	messagePin: 'message/pin',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',

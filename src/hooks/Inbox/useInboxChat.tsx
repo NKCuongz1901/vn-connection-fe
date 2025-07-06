@@ -1,48 +1,62 @@
-import { ItemType } from 'antd/es/menu/interface'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { mappingMessageChat, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay } from '@/ultis/common.ults'
-import { getStorageCookie, getUserInfo } from '@/ultis/storage.ults'
-import { generateCustomUuid, randomString } from '@/ultis/string.ults'
-
 import {
+	deleteMessageById,
 	getConvInfoById,
 	getConvMembersById,
 	getConvMessById,
+	getPinMessageById,
+	pinMessageById,
 	sendMessage,
 } from '@/apis/conversationApis'
+import { handleUploadImage } from '@/apis/uploadApis'
+
+import { mappingMessageChat, uniqueArray } from '@/ultis/array.ults'
+import { cloneDeep, delay } from '@/ultis/common.ults'
+import { getUserInfo } from '@/ultis/storage.ults'
+import { generateCustomUuid, randomString } from '@/ultis/string.ults'
+
 import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'
-import { io } from 'socket.io-client'
-const libraries: any = ['places']
 
 type useHangoutChatProps = {
 	convId: string
 }
 export default function useInboxChat({ convId }: useHangoutChatProps) {
-	const { toggleLoadingContext } = useLoading()
-	const { openError, openSuccess } = useModal()
+	const { openError } = useModal()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const _loadmore = useRef<boolean>(true)
 	const _scrollRef = useRef<HTMLDivElement>(null)
+
 	const [convInfo, setConvInfo] = useState<{ [key: string]: any }>({})
 	const [members, setMember] = useState<any[]>([])
 	const [messList, setMessList] = useState<any[]>([])
+
+	const [modal, setModal] = useState({ type: '', data: null }) as any
+	const [openSetting, setOpenSetting] = useState(false)
+
+	const [pinList, setPinList] = useState<any[]>([])
 	const [loading, setLoading] = useState(false)
 	const [loadingPage, setLoadingPage] = useState(false)
+	const [loadingConvInfo, setLoadingConvInfo] = useState(false)
 
 	const handleGetListMessById = async (isNoLoading?: boolean) => {
-		if (!isNoLoading) setLoading(true)
+		if (!isNoLoading) {
+			setLoading(true)
+		}
 		try {
 			const { page, limit } = _paginationRefs.current
+			let isNew = false
+			if (!isNoLoading && page === 1) {
+				setMessList([])
+				isNew = true
+			}
 			const res: any = await getConvMessById({
 				id: convId,
 				page: isNoLoading ? 1 : page,
-				limit: isNoLoading ? 10 : limit,
+				limit: isNoLoading ? 20 : limit,
 			})
 			const { code, results } = res || {}
 			if (!isNoLoading) {
@@ -55,12 +69,19 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 					_loadmore.current = false
 				}
 				setMessList((prev: any[]) => {
-					const contents = prev || []
-					const mappingRow = _rows.map((i) => ({
-						user_id: i?.sender_id,
-						user: i?.sender,
-						...i,
-					}))
+					const contents = isNew ? [] : prev
+					const mappingRow = _rows.map((i) => {
+						return {
+							...i,
+							user_id: i?.sender_id,
+							user: i?.sender,
+							parent: {
+								...i?.parent,
+								user_id: i?.parent?.sender_id,
+								user: i?.parent?.sender,
+							},
+						}
+					})
 					const newData = isNoLoading
 						? uniqueArray([...mappingRow, ...contents], 'id')
 						: uniqueArray([...contents, ...mappingRow], 'id') || []
@@ -76,27 +97,50 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 	}
 	const handleLoadMore = async () => {
 		if (!_loadmore.current || loading) return
-		_paginationRefs.current.page += 1
+		const { limit } = _paginationRefs.current
+		const currentPage = Math.ceil((messList || []).length / limit)
+		_paginationRefs.current.page = currentPage + 1
 		await handleGetListMessById()
 	}
 
 	const handleSendMessage = async ({
-		type,
+		type: _type,
 		content,
-		medias,
-		parent_id,
+		medias: _medias,
+		parent,
 	}: {
 		type: string
 		content?: string
-		medias?: []
-		parent_id?: string
+		medias?: any[]
+		parent?: any
 	}) => {
 		try {
+			let type = _type
+			let medias = []
+			if (_medias?.length > 0) {
+				const uploadPromises = _medias.map((media) =>
+					handleUploadImage(media.file),
+				)
+				const resList = await Promise.all(uploadPromises)
+				type = 'MEDIAS'
+				medias = (resList || []).map((i) => ({
+					url: i,
+					type: 'IMAGE',
+					fileName: null,
+					width: 692,
+					height: 1500,
+					ratio: 0.4613333333333333,
+					thumbnail: null,
+					duration: 0,
+				}))
+			}
+			const parent_id = parent?.id
 			const _id = randomString()
 			const message = {
 				type,
 				message_local_id: generateCustomUuid(),
 				...(parent_id && { parent_id }),
+				...(medias.length > 0 && { medias }),
 			} as {
 				[key: string]: any
 			}
@@ -112,6 +156,7 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 				id: _id,
 				_id,
 				isTemp: true,
+				...(parent && { parent }),
 			}
 			setMessList((prev: any[]) => {
 				const contents = prev
@@ -132,7 +177,13 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 				const contents = prev
 				const newData = uniqueArray(
 					[
-						{ user_id: _data.sender_id, user: _data?.sender, ..._data, _id },
+						{
+							user_id: _data.sender_id,
+							user: _data?.sender,
+							..._data,
+							_id,
+							...(parent && { parent }),
+						},
 						...contents,
 					],
 					'_id',
@@ -147,7 +198,7 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 	}
 
 	const handleGetInfoConv = async () => {
-		setLoadingPage(true)
+		setLoadingConvInfo(true)
 		try {
 			const res: any = await getConvInfoById({
 				id: convId,
@@ -157,12 +208,12 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 		} catch (error) {
 			openError(error)
 		} finally {
-			setLoadingPage(false)
+			setLoadingConvInfo(false)
 		}
 	}
 
-	const handleGetMembersConv = async () => {
-		setLoadingPage(true)
+	const handleGetMembersConv = async (isNoLoading = false) => {
+		if (!isNoLoading) setLoadingPage(true)
 		try {
 			const res: any = await getConvMembersById({
 				id: convId,
@@ -177,36 +228,126 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 			setLoadingPage(false)
 		}
 	}
+	const handleDeleteMessage = async (value) => {
+		const { id } = value || {}
+		try {
+			setMessList((prev) =>
+				prev.map((i) => (i.id === id ? { ...i, isTemp: true } : i)),
+			)
+			const res: any = await deleteMessageById({ id })
+			if (res?.results?.object) {
+				setMessList((prev) => {
+					const _data = prev.filter((i) => i.id !== id)
+					return mappingMessageChat(_data)
+				})
+			}
+		} catch (error) {
+			openError(error)
+			setMessList((prev) =>
+				prev.map((i) => (i.id === id ? { ...i, isTemp: false } : i)),
+			)
+		} finally {
+		}
+	}
 
+	const handlePinMessage = async ({ key, value }) => {
+		const { id } = value || {}
+		try {
+			const res: any = await pinMessageById({
+				id: id,
+				payload: {
+					type_pin: key,
+				},
+			})
+			const { code, results } = res || {}
+			if (code === 200) {
+				setMessList((prev) =>
+					prev.map((i) =>
+						i.id === id
+							? { ...i, pin_message_at: !!results?.object?.pin_message_at }
+							: i,
+					),
+				)
+				handleGetListMessById(true)
+				handleGetPinMessage()
+			}
+		} catch (error) {
+			openError(error)
+		}
+	}
+	const handleActionMessage = async ({ key, value }) => {
+		switch (key) {
+			case 'delete':
+				handleDeleteMessage(value)
+				break
+			case 'pin':
+			case 'unpin':
+				handlePinMessage({ key, value })
+				break
+			default:
+				break
+		}
+	}
+	const handleGetPinMessage = async () => {
+		try {
+			const res: any = await getPinMessageById({
+				id: convId,
+				params: {
+					page: 1,
+					limit: 20,
+				},
+			})
+			if (res) {
+				const _data = res?.results?.objects?.rows
+				setPinList(_data)
+			}
+		} catch (error) {
+			openError(error)
+		}
+	}
+	const handleActionSettingConv = ({ key, value }) => {
+		console.log(
+			`🏖️🏖️🏖️ TrieuNinhHan ~ :310 ~ handleActionSettingConv ~ { key, value }:`,
+			{ key, value },
+		)
+		switch (key) {
+			case 'noti':
+				handleGetMembersConv(true)
+				break
+			case 'back':
+				setOpenSetting(false)
+				break
+			default:
+				break
+		}
+	}
 	useEffect(() => {
 		_paginationRefs.current.page = 1
 		handleGetInfoConv()
 		handleGetListMessById()
 		handleGetMembersConv()
+		handleGetPinMessage()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [convId])
 
-	const handleSocket = () => {
-		const token = getStorageCookie('token')
-		const uid = getUserInfo()?.id
-		const socket = io('http://dev-api.univini.com:9001', {
-			transports: ['websocket'],
-			query: {
-				token:
-					'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwYXlsb2FkIjp7InVzZXJfaWQiOiJlMTEwNDM2MC0wNzIxLTExZjAtYjM4NC0zZDI5ZmM4OWUyMTUiLCJyb2xlIjoiVVNFUiIsInR5cGUiOiJBQ0NFU1NfVE9LRU4iLCJuYW1lIjoiMTEyMyJ9LCJyb2xlIjoiVVNFUiIsImV4cCI6IjIwMjUtMDctMjVUMDA6NTU6NTEuNjQ3WiJ9.AewMq8uNCStuU-ckZSYCxvofYfCivwTEv3wVG9rZlfY',
-				uid: 'e1104360-0721-11f0-b384-3d29fc89e215',
-			},
-		})
-	}
 	return {
 		_scrollRef,
 		messList,
+		pinList,
 		members,
 		convInfo,
 		loadingPage,
 		loading,
+		loadingConvInfo,
+		modal,
+		setModal,
+		openSetting,
+		setOpenSetting,
 		onSendMessage: handleSendMessage,
 		onLoadMore: handleLoadMore,
-		handleSocket: handleSocket,
+		onActionMessage: handleActionMessage,
+		onGetPinMessage: handleGetPinMessage,
+		onGetListMessById: handleGetListMessById,
+		onActionSettingConv: handleActionSettingConv,
 	}
 }

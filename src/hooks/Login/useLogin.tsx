@@ -24,7 +24,7 @@ export default function useLogin() {
 		prefix: '+84',
 	})
 	const handleSocket = () => {
-		const socket = io('http://dev-api.univini.com:9001', {
+		const _socket = io('http://dev-api.univini.com:9001', {
 			transports: ['websocket'],
 			query: {
 				token:
