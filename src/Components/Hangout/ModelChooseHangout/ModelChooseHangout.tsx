@@ -54,6 +54,7 @@ const ModelChooseHangout = ({
 							onClick={() => onSubmit(state)}
 							ctype="oranger"
 							style={{ width: 200 }}
+							disabled={!state?.trim()}
 						>
 							Save
 						</CButton>
