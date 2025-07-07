@@ -184,11 +184,12 @@ export default function useRegisterAndReset({
 				break
 			case 2:
 				error.confirmPassword = null
+				error.name = null
 
 				if (
 					passwordRegex.test(password) &&
 					password === confirmPassword &&
-					(!isRegister || name.trim())
+					(!isRegister || name.trim().length > 5)
 				) {
 					value = true
 					break
@@ -197,8 +198,8 @@ export default function useRegisterAndReset({
 				if (password !== confirmPassword && confirmPassword) {
 					error.confirmPassword = 'Confirm password do not match'
 				}
-				if (!name.trim() && isRegister) {
-					error.name = 'Field is required'
+				if (name && name.trim().length < 5 && isRegister) {
+					error.name = 'Please enter both your first and last name'
 				}
 				break
 
