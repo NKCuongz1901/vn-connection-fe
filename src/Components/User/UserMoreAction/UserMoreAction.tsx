@@ -27,6 +27,7 @@ const UserMoreAction = ({
 			</Dropdown>
 			{open.open && (
 				<ModalReport
+					title="Create discussion"
 					open={open.open}
 					data={{ user_id: open.data }}
 					onClose={onClose}

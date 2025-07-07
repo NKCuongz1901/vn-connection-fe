@@ -160,7 +160,7 @@ const ModalReport = (props: ModalReportProps) => {
 				<CModal
 					onClose={onClose}
 					onCancel={onClose}
-					title={title || 'Create discussion'}
+					title={title || 'Report'}
 					styles={{
 						content: {
 							width: 800,
