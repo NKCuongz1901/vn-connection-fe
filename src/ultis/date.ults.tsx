@@ -43,3 +43,8 @@ export const getDiffFromNow = ({
 	// const diffInDays = diffInHours / 24
 	return { value: target.format('DD/MM/YY'), unit: '' }
 }
+
+export const getAge = (dateString: string) => {
+	if (!dateString) return ''
+	return dayjs().diff(dayjs(dateString), 'year')
+}
