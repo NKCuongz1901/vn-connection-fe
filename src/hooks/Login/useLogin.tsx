@@ -20,7 +20,7 @@ export default function useLogin() {
 	const [account, setAccount] = useState({
 		phone: '',
 		password: '',
-		isRemember: false,
+		isRemember: true,
 		prefix: '+84',
 	})
 	const handleSocket = () => {
