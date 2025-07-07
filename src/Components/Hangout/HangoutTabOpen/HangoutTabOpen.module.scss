@@ -40,5 +40,19 @@
 			align-items: center;
 			justify-content: center;
 		}
+		.noHangout {
+			width: 100%;
+			align-items: center;
+			color: #7987a4;
+			gap: 8px;
+			.titleNoHangout {
+				font-size: 20px;
+				font-weight: 600;
+			}
+			.textNoHangout {
+				white-space: pre;
+				text-align: center;
+			}
+		}
 	}
 }

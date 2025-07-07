@@ -3,39 +3,40 @@ import { memo } from 'react'
 
 import classes from './Icons.module.scss'
 
+import BellIcon from '@/svg/BellIcon'
+import ClockIcon from '@/svg/ClockIcon'
 import Event from '@/svg/Event'
 import FeedbackIcon from '@/svg/FeedbackIcon'
+import FlagIcon from '@/svg/FlagIcon'
 import AttachIcon from '@/svg/FriendSvg/AttachIcon'
 import ProfileCancelIcon from '@/svg/FriendSvg/ProfileCancelIcon'
 import ProfileTick from '@/svg/FriendSvg/ProfileTick'
 import ShareIcon from '@/svg/FriendSvg/ShareIcon'
+import NoHangout from '@/svg/Hangout/NoHangout'
 import PencilIcon from '@/svg/Hangout/PencilIcon'
 import HappyIcon from '@/svg/HappyIcon'
 import Heart from '@/svg/Heart'
 import HostIcon from '@/svg/HostIcon'
+import ImageIcon from '@/svg/ImageIcon'
 import LogoSvg from '@/svg/LogoSvg'
+import MapIcon from '@/svg/MapIcon'
 import Message3 from '@/svg/Message3'
+import MessageIcon from '@/svg/MessageIcon'
 import Messenger from '@/svg/Messenger'
+import MoreIcon from '@/svg/MoreIcon'
 import NotFound from '@/svg/NotFound'
 import OverviewIcon from '@/svg/OverviewIcon'
 import Party from '@/svg/Party'
 import People from '@/svg/People'
 import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
+import PinIcon from '@/svg/PinIcon'
+import ReplyIcon from '@/svg/ReplyIcon'
+import SearchIcon from '@/svg/SearchIcon'
 import SearchNormal from '@/svg/SearchNormal'
+import SendIcon from '@/svg/SendIcon'
+import TrashIcon from '@/svg/TrashIcon'
 import TwoUser from '@/svg/TwoUser'
 import UpcomingEvent from '@/svg/UpcomingEvent'
-import MapIcon from '@/svg/MapIcon'
-import ClockIcon from '@/svg/ClockIcon'
-import SendIcon from '@/svg/SendIcon'
-import ImageIcon from '@/svg/ImageIcon'
-import MoreIcon from '@/svg/MoreIcon'
-import SearchIcon from '@/svg/SearchIcon'
-import ReplyIcon from '@/svg/ReplyIcon'
-import MessageIcon from '@/svg/MessageIcon'
-import PinIcon from '@/svg/PinIcon'
-import BellIcon from '@/svg/BellIcon'
-import FlagIcon from '@/svg/FlagIcon'
-import TrashIcon from '@/svg/TrashIcon'
 
 const Icons = () => {
 	const icons = [
@@ -76,6 +77,7 @@ const Icons = () => {
 		{ ICON: BellIcon, name: '@/svg/BellIcon', key: '30' },
 		{ ICON: FlagIcon, name: '@/svg/FlagIcon', key: '31' },
 		{ ICON: TrashIcon, name: '@/svg/TrashIcon', key: '32' },
+		{ ICON: NoHangout, name: '@/svg/Hangout/NoHangout', key: '33' },
 	]
 
 	return (
