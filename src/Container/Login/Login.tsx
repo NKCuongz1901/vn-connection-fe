@@ -107,7 +107,7 @@ const Login = () => {
 								</Checkbox>
 							</Flex>
 							<Link href={onGetPath(forgetPassword)}>
-								<span className={classes.color}>Forger password</span>
+								<span className={classes.color}>Forgot password</span>
 							</Link>
 						</Flex>
 						<CButton
