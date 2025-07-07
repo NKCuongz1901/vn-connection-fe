@@ -6,7 +6,10 @@ import { memo } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import useHangout from '@/hooks/Hangout/useHangout'
+
+import { isArray } from '@/ultis/array.ults'
 import { onPushState } from '@/ultis/route.ults'
+import { randomString } from '@/ultis/string.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
@@ -20,7 +23,6 @@ import PencilIcon from '@/svg/Hangout/PencilIcon'
 import Party from '@/svg/Party'
 
 import classes from './Hangout.module.scss'
-import { randomString } from '@/ultis/string.ults'
 
 const Hangout = () => {
 	const { loadingContext } = useLoading()
@@ -189,12 +191,14 @@ const Hangout = () => {
 					<Flex className={classes.waitingOtherText}>
 						{myWaitting.length || 0} people Say Hello 👋 to you
 					</Flex>
-					<Flex
-						className={classes.waitingOtherMore}
-						onClick={() => setModal({ type: 'morePeople', data: { postId } })}
-					>
-						Show all
-					</Flex>
+					{isArray(myWaitting, 2) && (
+						<Flex
+							className={classes.waitingOtherMore}
+							onClick={() => setModal({ type: 'morePeople', data: { postId } })}
+						>
+							Show all
+						</Flex>
+					)}
 				</Flex>
 			</Flex>
 		)
