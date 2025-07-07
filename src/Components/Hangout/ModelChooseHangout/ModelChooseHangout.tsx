@@ -11,26 +11,19 @@ import classes from './ModelChooseHangout.module.scss'
 
 const suggestion = [
 	'visit tourist attractions',
-
 	'take a day trip',
-
 	'grab beers',
-
 	'go for a walk',
-
 	'get some food',
-
 	'explore the area',
-
 	'exchange languages',
-
 	'drink tea or coffee',
-
 	'catch a movie',
-
 	'bar hopping',
-
 	'attend an event',
+	' hiking',
+	' work together',
+	' find study partners',
 ]
 interface ModelChooseHangoutProps {
 	data?: any
