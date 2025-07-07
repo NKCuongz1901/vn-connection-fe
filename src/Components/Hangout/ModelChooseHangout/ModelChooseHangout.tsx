@@ -1,9 +1,10 @@
 'use client'
 import { Flex } from 'antd'
+import clsx from 'clsx'
 import { useState } from 'react'
 
-import CModal from '@/Components/Custom/CModal/CModal'
 import CButton from '@/Components/Custom/CButton'
+import CModal from '@/Components/Custom/CModal/CModal'
 import CTextArea from '@/Components/Custom/CTextArea'
 
 import classes from './ModelChooseHangout.module.scss'
@@ -81,7 +82,9 @@ const ModelChooseHangout = ({
 							<span
 								key={item}
 								onClick={() => setState(item)}
-								className={classes.item}
+								className={clsx(classes.item, {
+									[classes.active]: state === item,
+								})}
 							>
 								{item}
 							</span>
