@@ -6,5 +6,5 @@ export const forgetPasswordStep = [
 export const registerPasswordStep = [
 	'Verify Phone Number',
 	'OTP Verify',
-	'Create password',
+	'Create account',
 ]
