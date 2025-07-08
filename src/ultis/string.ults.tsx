@@ -39,3 +39,17 @@ export const randomString = () => {
 	}
 	return result
 }
+
+export const generateCustomUuid = () =>
+	[8, 4, 4, 4, 12]
+		.map((len) =>
+			[...Array(len)]
+				.map(
+					() =>
+						'abcdefghijklmnopqrstuvwxyz0123456789'[
+							Math.floor(Math.random() * 36)
+						],
+				)
+				.join(''),
+		)
+		.join('-')

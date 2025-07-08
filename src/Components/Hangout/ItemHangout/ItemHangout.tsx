@@ -10,7 +10,7 @@ import { sendHangout } from '@/apis/hangoutApi'
 import { joinPost } from '@/apis/postApis'
 
 import { isArray } from '@/ultis/array.ults'
-import { getDiffFromNow } from '@/ultis/date.ults'
+import { getAge, getDiffFromNow } from '@/ultis/date.ults'
 
 import CButton from '@/Components/Custom/CButton'
 import CImage from '@/Components/Custom/CImage'
@@ -50,7 +50,12 @@ const ItemHangout = ({
 		origin_id,
 	} = item || {}
 	const images = (participants || []).slice(0, 3)
-	const { name, languages_can_speak, gender, age } = (user ? user : item) || {}
+	const {
+		name,
+		languages_can_speak,
+		gender,
+		birthday: age,
+	} = (user ? user : item) || {}
 	const { value: time, unit } = start_time
 		? getDiffFromNow({
 				input: Number(start_time),
@@ -126,16 +131,17 @@ const ItemHangout = ({
 				</Flex>
 				<Flex className={classes.timeSpaceItem}>
 					<ClockIcon />
-					{time} {unit}s ago
+					{time} {unit ? unit + 's ago' : ''}
 				</Flex>
 			</Flex>
 			<Flex className={classes.info} vertical>
 				<span className={classes.title}>{title || title_open_hangout}</span>
 				<Flex className={classes.otherInfo}>
 					<Flex className={classes.infoItem} vertical>
-						<div>
-							{name}, {age} {GENDER[gender]}
-						</div>
+						<Flex>
+							{name}, {getAge(age)}
+							{GENDER[gender]}
+						</Flex>
 						<div>{languages_can_speak}</div>
 					</Flex>
 					{!isHiddenButton && (

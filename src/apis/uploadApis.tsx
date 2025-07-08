@@ -18,9 +18,10 @@ export const uploadProgress = async (
 	}
 }
 
-export const handleUploadImage = async (file) => {
+export const handleUploadImage = async (file, option = {}) => {
 	if (!file) return ''
 	let url = ''
+	const { isAll } = option || ({} as any)
 	try {
 		const formData = new FormData()
 
@@ -28,6 +29,9 @@ export const handleUploadImage = async (file) => {
 		const res = (await uploadProgress(formData)) as any
 		const { code, results } = res || {}
 		if (code === 200) {
+			if (isAll) {
+				return results?.object || {}
+			}
 			url = results?.object?.url
 			return url
 		}

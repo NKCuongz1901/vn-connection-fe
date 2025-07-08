@@ -59,8 +59,11 @@ const ChangePassword = ({
 							isRequired
 							value={name}
 							label={'Name'}
-							placeholder={'Your name'}
+							error={errors?.name}
+							placeholder={'Your name [5-30] letter'}
 							onChange={(e) => onChangeCommonData(e.target.value)}
+							minLength={5}
+							maxLength={30}
 						/>
 					)}
 					<CInputPassword

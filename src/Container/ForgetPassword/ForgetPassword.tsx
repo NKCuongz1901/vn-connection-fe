@@ -42,6 +42,7 @@ const ForgetPassword = ({
 		onSubmitPass,
 	} = useRegisterAndReset({
 		type,
+		steps,
 	})
 	const { title, prefix, phone, otp, password, confirmPassword, name } =
 		accountInfo

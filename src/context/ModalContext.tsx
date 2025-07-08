@@ -45,7 +45,6 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 		setOpen('')
 	}, [])
 	const pathname = usePathname()
-
 	useEffect(() => {
 		closeModal()
 	}, [pathname, closeModal])

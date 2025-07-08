@@ -21,7 +21,7 @@ export const getDiffFromNow = ({
 	input,
 }: {
 	input: dayjs.ConfigType
-}): { value: number; unit: string } => {
+}): { value: number | string; unit?: string } => {
 	const now = dayjs()
 	const target = dayjs(input)
 	const diffInSeconds = now.diff(target, 'second', true)
@@ -40,6 +40,11 @@ export const getDiffFromNow = ({
 		return { value: Math.ceil(diffInHours), unit: 'hour' }
 	}
 
-	const diffInDays = diffInHours / 24
-	return { value: Math.ceil(diffInDays), unit: 'day' }
+	// const diffInDays = diffInHours / 24
+	return { value: target.format('DD/MM/YY'), unit: '' }
+}
+
+export const getAge = (dateString: string) => {
+	if (!dateString) return ''
+	return dayjs().diff(dayjs(dateString), 'year')
 }

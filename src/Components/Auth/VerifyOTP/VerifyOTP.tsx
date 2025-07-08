@@ -52,7 +52,7 @@ const VerifyOTP = ({
 				</Flex>
 				<Flex>
 					<Input.OTP
-						mask="*"
+						// mask=""
 						formatter={(str) => str.replace(/\D/g, '')}
 						value={value}
 						length={length}

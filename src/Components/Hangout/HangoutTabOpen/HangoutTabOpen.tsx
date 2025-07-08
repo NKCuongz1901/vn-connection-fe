@@ -1,13 +1,19 @@
+import { Flex, Skeleton } from 'antd'
 import { forwardRef } from 'react'
+
+import useHangoutTabOpen from '@/hooks/Hangout/useHangoutTabOpen'
+
+import { arrayFrom, isArray } from '@/ultis/array.ults'
 
 import CButton from '@/Components/Custom/CButton'
 import CSelect from '@/Components/Custom/CSelect'
-import { radiusOpts } from '@/Variable/select.variable'
-import useHangoutTabOpen from '@/hooks/Hangout/useHangoutTabOpen'
-import { arrayFrom } from '@/ultis/array.ults'
-import { Flex, Skeleton } from 'antd'
+import NoHangout from '@/svg/Hangout/NoHangout'
 import ItemHangout from '../ItemHangout'
+
+import { radiusOpts } from '@/Variable/select.variable'
+
 import classes from './HangoutTabOpen.module.scss'
+
 function HangoutTabOpen(props, ref) {
 	const {
 		loadMore,
@@ -21,6 +27,19 @@ function HangoutTabOpen(props, ref) {
 		onLoadMore,
 	} = useHangoutTabOpen(ref)
 	const { open, search } = total
+
+	const _renderNoHangout = () => {
+		if (loading.open || loading.search) return
+		return (
+			<Flex className={classes.noHangout} vertical>
+				<NoHangout />
+				<div className={classes.titleNoHangout}>No hangouts nearby</div>
+				<div className={classes.textNoHangout}>
+					{'Please try again later or\u000Aexpand your search distance'}
+				</div>
+			</Flex>
+		)
+	}
 
 	return (
 		<div className={classes.wrapper}>
@@ -38,14 +57,17 @@ function HangoutTabOpen(props, ref) {
 				</Flex>
 			</Flex>
 			<Flex className={classes.hangoutWrapper}>
-				{hangoutList.map((item) => (
-					<ItemHangout
-						key={item.id}
-						item={item}
-						setOpenHangoutList={setOpenHangoutList}
-						setOpenHangoutSearch={setOpenHangoutSearch}
-					/>
-				))}
+				{isArray(hangoutList, 1)
+					? hangoutList.map((item) => (
+							<ItemHangout
+								key={item.id}
+								item={item}
+								setOpenHangoutList={setOpenHangoutList}
+								setOpenHangoutSearch={setOpenHangoutSearch}
+							/>
+					  ))
+					: _renderNoHangout()}
+
 				{loading.open || loading.search
 					? arrayFrom(3).map((_, index) => (
 							<Skeleton.Input key={index} active className={classes.skeleton} />

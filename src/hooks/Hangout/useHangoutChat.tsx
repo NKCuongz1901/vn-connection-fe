@@ -11,7 +11,6 @@ import {
 import {
 	getListCommentById,
 	getListParticipant,
-	getListSticket,
 	sendCommentPost,
 } from '@/apis/postApis'
 
@@ -44,10 +43,6 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 	})
 	const [modal, setModal] = useState({ type: '', data: null }) as any
 	const [hangoutInfo, setHangoutInfo] = useState<{ [key: string]: any }>({})
-	const [stickerList, setStickerList] = useState([]) as any[]
-	const [activeSticker, setActiveSticker] = useState(0)
-	const [showSticker, setShowSticker] = useState(false)
-	const [text, setText] = useState('')
 	const [commentList, setCommentList] = useState<any[]>([])
 	const [listParticipant, setListParticipant] = useState<{
 		[key: string]: any
@@ -149,15 +144,7 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 		_paginationRefs.current.page += 1
 		await handleGetListCommentById()
 	}
-	const handleScroll = (e: any) => {
-		const clientHeight = e.target.clientHeight
-		const scrollHeight = e.target.scrollHeight
-		const scrollTop = Math.abs(e.target.scrollTop)
-		const isReachedEnd = scrollTop + clientHeight >= scrollHeight - 50
-		if (!isReachedEnd) return
 
-		handleLoadMore()
-	}
 	const handleChangeTitleHangout = async (text: string) => {
 		toggleLoadingContext(true)
 		try {
@@ -198,9 +185,6 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 	}) => {
 		try {
 			const _id = randomString()
-			if (type === 'TEXT') {
-				setText('')
-			}
 			const _res = {
 				content,
 				type,
@@ -237,16 +221,7 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 			openError(error)
 		}
 	}
-	const handleGetSticker = async () => {
-		try {
-			const res: any = await getListSticket({
-				fields: ['$all'],
-			})
-			setStickerList(res?.results?.objects?.rows || [])
-		} catch (error) {
-			openError(error)
-		}
-	}
+
 	const handleGetInfoHangout = async () => {
 		setLoadingPage(true)
 		try {
@@ -370,7 +345,6 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 	}, [postId])
 
 	useEffect(() => {
-		handleGetSticker()
 		handleGetWaitingParticipant({ request_join_status: 'WAITING' })
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
@@ -379,12 +353,8 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 		_scrollRef,
 		commentList,
 		hangoutInfo,
-		activeSticker,
-		showSticker,
-		stickerList,
 		loadingPage,
 		loading,
-		text,
 		menus,
 		modal,
 		setModal,
@@ -392,13 +362,10 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 		showGGmap,
 		listParticipant,
 		setShowGGmap,
-		setText,
-		setActiveSticker,
-		setShowSticker,
 		onSendMessage: handleSendMessage,
-		onScroll: handleScroll,
 		onChangeTitleHangout: handleChangeTitleHangout,
 		onEditLocation: handleEditLocation,
 		onActionPart: handleActionPart,
+		onLoadMore: handleLoadMore,
 	}
 }

@@ -21,7 +21,13 @@ import { passwordRegex } from '@/Variable/regex.variable'
 import { forgetPasswordStep } from '@/Variable/step.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
-export default function useRegisterAndReset({ type }: { type: OTPType }) {
+export default function useRegisterAndReset({
+	type,
+	steps = forgetPasswordStep,
+}: {
+	type: OTPType
+	steps?: string[]
+}) {
 	const { toggleLoadingContext } = useLoading()
 	const { openError, openSuccess } = useModal()
 	const { onChangeRoute } = useLocalePath()
@@ -178,11 +184,12 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 				break
 			case 2:
 				error.confirmPassword = null
+				error.name = null
 
 				if (
 					passwordRegex.test(password) &&
 					password === confirmPassword &&
-					(!isRegister || name.trim())
+					(!isRegister || name.trim().length > 5)
 				) {
 					value = true
 					break
@@ -191,8 +198,8 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 				if (password !== confirmPassword && confirmPassword) {
 					error.confirmPassword = 'Confirm password do not match'
 				}
-				if (!name.trim() && isRegister) {
-					error.name = 'Field is required'
+				if (name && name.trim().length < 5 && isRegister) {
+					error.name = 'Please enter both your first and last name'
 				}
 				break
 
@@ -210,7 +217,7 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 			case 3:
 				setAccountInfo((pre) => ({
 					...pre,
-					title: forgetPasswordStep[step],
+					title: steps[step],
 				}))
 				break
 			default:
@@ -218,11 +225,11 @@ export default function useRegisterAndReset({ type }: { type: OTPType }) {
 					...pre,
 					password: '',
 					opt: '',
-					title: forgetPasswordStep[step],
+					title: steps[step],
 				}))
 				break
 		}
-	}, [step])
+	}, [step, steps])
 
 	useEffect(() => {
 		setIsValidate(handleValidate())

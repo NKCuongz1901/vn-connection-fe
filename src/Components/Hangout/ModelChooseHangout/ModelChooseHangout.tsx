@@ -1,35 +1,29 @@
 'use client'
 import { Flex } from 'antd'
+import clsx from 'clsx'
 import { useState } from 'react'
 
-import CModal from '@/Components/Custom/CModal/CModal'
 import CButton from '@/Components/Custom/CButton'
+import CModal from '@/Components/Custom/CModal/CModal'
 import CTextArea from '@/Components/Custom/CTextArea'
 
 import classes from './ModelChooseHangout.module.scss'
 
 const suggestion = [
 	'visit tourist attractions',
-
 	'take a day trip',
-
 	'grab beers',
-
 	'go for a walk',
-
 	'get some food',
-
 	'explore the area',
-
 	'exchange languages',
-
 	'drink tea or coffee',
-
 	'catch a movie',
-
 	'bar hopping',
-
 	'attend an event',
+	' hiking',
+	' work together',
+	' find study partners',
 ]
 interface ModelChooseHangoutProps {
 	data?: any
@@ -60,6 +54,7 @@ const ModelChooseHangout = ({
 							onClick={() => onSubmit(state)}
 							ctype="oranger"
 							style={{ width: 200 }}
+							disabled={!state?.trim()}
 						>
 							Save
 						</CButton>
@@ -81,7 +76,9 @@ const ModelChooseHangout = ({
 							<span
 								key={item}
 								onClick={() => setState(item)}
-								className={classes.item}
+								className={clsx(classes.item, {
+									[classes.active]: state === item,
+								})}
 							>
 								{item}
 							</span>
