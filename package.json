@@ -1,15 +1,14 @@
 {
   "name": "source-nextjs-univini",
   "version": "0.1.0",
-  "buildVersion": "2025.07.12-025",
+  "buildVersion": "2025.07.12-026",
   "private": true,
   "scripts": {
     "increase-version": "sh scripts/increase-build-version.sh",
     "dev": "next dev --turbo",
     "build": "next lint && next build",
     "start": "next lint && next start -p 3030",
-    "lint": "next lint",
-    "prepare": "husky"
+    "lint": "next lint"
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
