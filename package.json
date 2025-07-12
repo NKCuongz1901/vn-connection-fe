@@ -1,12 +1,13 @@
 {
   "name": "source-nextjs-univini",
   "version": "0.1.0",
-  "buildVersion": "2025.07.12-039",
+  "buildVersion": "2025.07.12-040",
   "private": true,
   "scripts": {
     "increase-version": "sh scripts/increase-build-version.sh",
     "dev": "next dev --turbo",
     "build": "next lint && next build",
+    "build-cicd": "next build",
     "start": "next lint && next start -p 3030",
     "lint": "next lint"
   },
