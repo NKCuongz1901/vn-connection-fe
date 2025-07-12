@@ -16,7 +16,7 @@ const TermPolicy = () => {
 			}}
 		>
 			<Flex gap={12}>
-				<span>Terms of Use 2241</span>
+				<span>Terms of Use 2251</span>
 				<span>Privacy Policy</span>
 			</Flex>
 			<span>Copyrightⓒ(Inc)UniVini. All rights reserved.</span>
