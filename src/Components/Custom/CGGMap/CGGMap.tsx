@@ -26,7 +26,7 @@ const libraries: any = ['places']
 const containerStyle = { width: '100%', height: '400px' }
 
 interface CGGMapProps {
-	title: string
+	title?: string
 	latitude: number
 	longitude: number
 	onClose: any
