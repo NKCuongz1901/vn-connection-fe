@@ -65,6 +65,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 		onJoinPostConfirm,
 		onShareFriend,
 		onGetDetailPost,
+		onCopy,
 	} = useDetailEvent({ id })
 	const { detailLoad } = loading
 	const { loadingContext } = useLoading()
@@ -316,6 +317,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 			open: true,
 			onCancel: () => onSetOpenModal({}),
 			onClose: () => onSetOpenModal({}),
+			onCopy: onCopy,
 			// onSuccess: onSuccess,
 		}
 		switch (type) {

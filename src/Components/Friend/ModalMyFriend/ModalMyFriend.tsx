@@ -15,10 +15,11 @@ interface ModalMyFriendProps {
 		label?: string
 		icon?: any
 	}
+	onCopy?: any
 }
 
 const ModalMyFriend = (_props: ModalMyFriendProps) => {
-	const { onClose, customComp, title, desc } = _props
+	const { onClose, onCopy, customComp, title, desc } = _props
 	return (
 		<div className={classes.wrapper}>
 			<CModal
@@ -41,6 +42,7 @@ const ModalMyFriend = (_props: ModalMyFriendProps) => {
 							}
 						}
 						customComp={customComp}
+						onCopy={onCopy}
 					/>
 				</Flex>
 			</CModal>

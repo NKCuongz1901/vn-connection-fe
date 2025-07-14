@@ -18,13 +18,14 @@ import { getUserInfo } from '@/ultis/storage.ults'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import { repeatOpt } from '@/Variable/select.variable'
+import { copyToClipboard } from '@/ultis/string.ults'
 
 interface useDetailEventProps {
 	id: string
 	[key: string]: any
 }
 export default function useDetailEvent({ id }: useDetailEventProps) {
-	const { openConfirm, openError, closeModal } = useModal()
+	const { openConfirm, openError, openSuccess, closeModal } = useModal()
 	const { toggleLoadingContext } = useLoading()
 	const { onChangeRoute } = useLocalePath()
 	const [detailPost, setDetailPost] = useState({}) as any
@@ -212,7 +213,11 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 				break
 		}
 	}
-
+	const handleCopy = () => {
+		copyToClipboard(detailPost?.share_link, {
+			callback: openSuccess({ message: 'Link copied successfully! ' }),
+		})
+	}
 	const postMenus: ItemType[] = useMemo(
 		() => {
 			const { user_id, repeat_type } = detailPost || {}
@@ -315,5 +320,6 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 		onJoinPostConfirm: handleJoinPostConfirm,
 		onShareFriend: handleShareFriend,
 		onGetDetailPost: handleGetDetailPost,
+		onCopy: handleCopy,
 	}
 }

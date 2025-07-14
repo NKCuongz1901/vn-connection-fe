@@ -4,7 +4,7 @@ import { useModal } from '@/context/ModalContext'
 
 import { getListPost } from '@/apis/postApis'
 
-import { uniqueArray } from '@/ultis/array.ults'
+import { isArray, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
 
 import { paginationCommon } from '@/Variable/common.variable'
@@ -18,17 +18,21 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 	const _parentRef = useRef<HTMLDivElement | null>(null)
 	const _childRef = useRef<HTMLDivElement | null>(null)
 	const [listPost, setListPost] = useState([]) as any[]
+	const [loadmore, setLoadMore] = useState(true)
 	const [total, setTotal] = useState(0)
 	const [loading, setLoading] = useState(false)
-	const handleGetListPost = async () => {
+	const handleGetListPost = async (isNotLoading = false) => {
 		setLoading(true)
 		try {
 			const { page, limit } = _paginationRefs.current
-			const isNew = page === 1
+			let isNew = page === 1
+			if (isNotLoading) {
+				isNew = false
+			}
 			const res: any = await getListPost({
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
-				page,
-				limit,
+				page: !isNotLoading ? page : 1,
+				limit: !isNotLoading ? limit : 50,
 				type,
 				radius: 20,
 			})
@@ -36,10 +40,11 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 			await delay(1000)
 			if (code === 200) {
 				const { rows, count } = results?.objects || {}
-				const totalPage = Math.ceil((count || 0) / (limit || 1))
-				_paginationRefs.current.totalPage = totalPage
+				if (!isNotLoading) {
+					setLoadMore(isArray(rows, limit))
+				}
 				setListPost((prev: any[]) => {
-					const contents = isNew ? [] : prev
+					const contents = isNew && !isNotLoading ? [] : prev
 					const dataShow = uniqueArray([...contents, ...rows], 'id') as any[]
 					return dataShow
 				})
@@ -53,11 +58,11 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 	}
 
 	const handleLoadMore = async () => {
-		const isLoadMore =
-			_paginationRefs.current.page < _paginationRefs.current.totalPage
+		const { limit } = _paginationRefs.current
 
-		if (!isLoadMore || loading) return
-		_paginationRefs.current.page += 1
+		if (!loadmore || loading) return
+		_paginationRefs.current.page =
+			Math.ceil((listPost || []).length / limit) + 1
 		await handleGetListPost()
 	}
 
@@ -70,7 +75,7 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 	}
 	const handleCreateSuccess = (item) => {
 		if (type === mainRoutes.event) {
-			setListPost((prev) => [item, ...prev])
+			handleGetListPost(true)
 		}
 		if (onCRUDSuccess) {
 			onCRUDSuccess({ key: 'create', value: item })

@@ -10,26 +10,38 @@ export const convertStringToNumber = (input: string) => {
 	return Number(input.replaceAll(',', ''))
 }
 
-export const copyToClipboard = (text: string) => {
-	if (!navigator.clipboard) {
+export const copyToClipboard = (
+	text: string,
+	options?: {
+		[key: string]: any
+	},
+) => {
+	navigator.clipboard?.writeText(text).catch((err) => {
+		console.error('Async copy failed', err)
+
+		// Fallback cho browser cũ không hỗ trợ Clipboard API
 		const textarea = document.createElement('textarea')
 		textarea.value = text
 		textarea.style.position = 'fixed'
+		textarea.style.opacity = '0'
 		document.body.appendChild(textarea)
 		textarea.focus()
 		textarea.select()
+
 		try {
 			document.execCommand('copy')
-		} catch (err) {
-			console.error('Copy failed', err)
+			const { callback } = options || {}
+			if (callback) {
+				callback()
+			}
+		} catch (e) {
+			console.error('Fallback copy failed', e)
 		}
+
 		document.body.removeChild(textarea)
-	} else {
-		navigator.clipboard.writeText(text).catch((err) => {
-			console.error('Async copy failed', err)
-		})
-	}
+	})
 }
+
 export const randomString = () => {
 	const characters = 'abcdefghijklmnopqrstuvwxyz0123456789'
 	let result = ''

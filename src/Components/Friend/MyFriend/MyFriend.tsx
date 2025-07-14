@@ -21,9 +21,11 @@ interface MyFriendProps {
 		icon?: any
 		label?: string
 	}
+	onCopy?: any
+	[key: string]: any
 }
 const MyFriend = (_props: MyFriendProps) => {
-	const { customComp, desc } = _props
+	const { customComp, desc, onCopy } = _props
 	const { icon, label } = desc || {}
 	const { onChangeRoute } = useLocalePath()
 	const {
@@ -48,7 +50,7 @@ const MyFriend = (_props: MyFriendProps) => {
 					/>
 				</Flex>
 				{desc && (
-					<Flex className={classes.desc}>
+					<Flex className={classes.desc} onClick={onCopy}>
 						<Flex className={classes.iconDesc}>{icon}</Flex>
 						<Flex className={classes.title}>{label}</Flex>
 					</Flex>
