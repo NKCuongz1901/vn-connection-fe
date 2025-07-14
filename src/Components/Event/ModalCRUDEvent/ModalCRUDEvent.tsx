@@ -47,7 +47,7 @@ const ModalCRUDEvent = ({
 	onSuccess,
 	loadingContext,
 }: ModalCRUDEventProps) => {
-	const { event, error, toggle, onToggle, onChangeValue, onSubmit } =
+	const { event, error, toggle, sameDate, onToggle, onChangeValue, onSubmit } =
 		useCRUDEvent({ data, onSuccess, onClose, edit_type })
 	const { id } = data || {}
 	const _renderLeft = () => {
@@ -244,7 +244,13 @@ const ModalCRUDEvent = ({
 						disabled={!!id}
 						label="Does this event repeat"
 						value={type}
-						options={repeatOpt}
+						options={
+							sameDate
+								? repeatOpt
+								: repeatOpt.filter(
+										(i) => !['DAILY', 'MULTI_DAYS'].includes(i.value),
+								  )
+						}
 						placeholder="Select type repeat"
 						onChange={onChangeValue('type')}
 						maxLength={400}

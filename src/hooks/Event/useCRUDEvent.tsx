@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
@@ -108,6 +108,7 @@ export default function useCRUDEvent({
 		].includes(data?.ticket_entrance_type),
 		pricingSw: !!data?.menu_price,
 	})
+	const [sameDate, setSameDate] = useState(true)
 	const id = useMemo(() => data?.id, [data])
 	const handleToggle = ({ key, value }) => {
 		const { ticket_entrance_type } = event
@@ -395,10 +396,20 @@ export default function useCRUDEvent({
 			onAccept: handleCreatePost,
 		})
 	}
+	useEffect(() => {
+		const { start_time, end_time } = event
+		if (start_time && end_time) {
+			setSameDate(dayjs(start_time).isSame(dayjs(end_time), 'date'))
+		} else {
+			setSameDate(true)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [event.start_time, event.end_time])
 	return {
 		event,
 		error,
 		toggle,
+		sameDate,
 		onToggle: handleToggle,
 		onChangeValue: handleChangeValue,
 		onSubmit: handleSubmit,
