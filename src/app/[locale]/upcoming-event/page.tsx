@@ -4,7 +4,7 @@ import Event from '@/Container/Event'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 const Page = () => {
-	return <Event type={mainRoutes.upcomingEvent} />
+	return <Event type={mainRoutes.upcomingEvent} hiddenAdd />
 }
 
 export default memo(Page)
