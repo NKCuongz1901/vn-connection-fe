@@ -35,6 +35,8 @@ const Hangout = () => {
 		postId,
 		key,
 		myWaitting,
+		hangoutPeople,
+		totalHangout,
 		loadingProfile,
 		setCurrentPage,
 		onUpdateUserInfo,
@@ -57,16 +59,27 @@ const Hangout = () => {
 						<Skeleton.Input active className={classes.skeleton} />
 					) : (
 						<>
-							<Flex className={classes.switchStatus}>
-								<span>Available hangout now</span>
-								<CSwitch
-									value={is_open_hangout}
-									disabled={loadingContext}
-									ctype="success"
-									onChange={(value) =>
-										onUpdateUserInfo({ is_open_hangout: value })
-									}
-								/>
+							<Flex vertical gap="4px">
+								<Flex className={classes.hangoutPeople}>
+									{hangoutPeople.map((people) => (
+										<div key={people.id}>
+											<CAvatar src={people.avatar} />
+										</div>
+									))}
+								</Flex>
+								<Flex className={classes.switchStatus}>
+									<span>
+										{totalHangout + 1} People available to hangout now
+									</span>
+									<CSwitch
+										value={is_open_hangout}
+										disabled={loadingContext}
+										ctype="success"
+										onChange={(value) =>
+											onUpdateUserInfo({ is_open_hangout: value })
+										}
+									/>
+								</Flex>
 							</Flex>
 							<Flex
 								className={classes.titleHangout}

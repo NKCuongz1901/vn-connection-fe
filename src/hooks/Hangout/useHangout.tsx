@@ -4,7 +4,11 @@ import { useEffect, useRef, useState } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { actionParticipant, getMyHangoutWaitting } from '@/apis/hangoutApi'
+import {
+	actionParticipant,
+	getMyHangoutWaitting,
+	getUserOpenHangout,
+} from '@/apis/hangoutApi'
 import { getUserProfile, updateUserProfile } from '@/apis/userApis'
 
 import { delay } from '@/ultis/common.ults'
@@ -37,6 +41,28 @@ export default function useHangout() {
 	const [postId, setPostId] = useState('')
 	const key = useRef<string>(randomString())
 	const [loadingProfile, setLoadingProfile] = useState<boolean>(false)
+
+	const [hangoutPeople, setHangoutPeople] = useState<any[]>([])
+	const [totalHangout, setTotalHangout] = useState(0)
+
+	const handleGetOpenHangout = async () => {
+		try {
+			const res: any = await getUserOpenHangout({
+				fields: ['$all'],
+				radius: 50,
+			})
+			if (res) {
+				const { pagination, results } = res || {}
+				const { rows } = results?.objects || {}
+				const { total } = pagination || {}
+				setHangoutPeople([getUserInfo(), ...rows])
+				setTotalHangout(total || 0)
+			}
+		} catch (error) {
+			openError(error)
+		}
+	}
+
 	const handleGetUserProfile = async () => {
 		const id = getUserInfo('id')
 		setLoadingProfile(true)
@@ -179,6 +205,14 @@ export default function useHangout() {
 		handleGetMyWaitting()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
+	useEffect(() => {
+		if (userData.is_open_hangout) {
+			handleGetOpenHangout()
+		} else {
+			setHangoutPeople([getUserInfo()])
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [userData.is_open_hangout])
 	return {
 		userData,
 		loadingProfile,
@@ -188,6 +222,8 @@ export default function useHangout() {
 		myWaitting,
 		postId,
 		key,
+		hangoutPeople,
+		totalHangout,
 		setPostId,
 		setModal,
 		setCurrentPage,
