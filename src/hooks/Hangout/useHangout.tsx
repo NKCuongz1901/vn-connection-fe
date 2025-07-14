@@ -8,7 +8,7 @@ import { actionParticipant, getMyHangoutWaitting } from '@/apis/hangoutApi'
 import { getUserProfile, updateUserProfile } from '@/apis/userApis'
 
 import { delay } from '@/ultis/common.ults'
-import { useQuery } from '@/ultis/route.ults'
+import { onPushState, useQuery } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 import { randomString } from '@/ultis/string.ults'
 
@@ -159,6 +159,11 @@ export default function useHangout() {
 				openSuccess({
 					message: `You ${request_join_status.toLocaleLowerCase()} request !`,
 				})
+				if (request_join_status === 'ACCEPT') {
+					const { post_id } = res?.results?.object || {}
+					key.current = randomString()
+					onPushState({ id: post_id })
+				}
 			}
 		} catch (error) {
 			openError(error)
