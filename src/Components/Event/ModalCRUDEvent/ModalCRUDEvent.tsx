@@ -235,6 +235,7 @@ const ModalCRUDEvent = ({
 						onChange={onChangeValue('limit_participant')}
 						label="How many people can join?"
 						placeholder="Number of people"
+						maxLength={10}
 						prefix={<IconUsersGroup />}
 					/>
 				</Flex>
