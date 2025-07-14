@@ -1,39 +1,177 @@
-import { memo, useCallback, useState } from 'react'
+import { Flex, Skeleton } from 'antd'
+import { memo } from 'react'
 
-import CButton from '@/Components/Custom/CButton'
+import { useLoading } from '@/context/LoadingContext'
+import useOverview from '@/hooks/Overview/useOverview'
+
+import { arrayFrom } from '@/ultis/array.ults'
+import { useLocalePath } from '@/ultis/route.ults'
+
+import CAvatar from '@/Components/Custom/CAvatar'
+import CSwitch from '@/Components/Custom/CSwitch'
+import EventTitle from '@/Components/Event/EventTitle'
+import ItemEventTicket from '@/Components/Event/ItemEventTicket'
 import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
+import ModelChooseHangout from '@/Components/Hangout/ModelChooseHangout'
+import EventIcon from '@/svg/Event'
+import PencilIcon from '@/svg/Hangout/PencilIcon'
+import Party from '@/svg/Party'
 
-interface openModalProps {
-	type: string | null
-	data: any
-}
+import Event from '../Event'
+
+import { mappingEventTitle } from '@/Variable/event.variable'
+import { mainRoutes } from '@/routes/MainRoutes'
+
+import classes from './Overview.module.scss'
 
 const Overview = () => {
-	const [openModal, setOpenModal] = useState<openModalProps>({
-		type: null,
-		data: null,
-	})
-	const _renderModal = useCallback(() => {
-		const { type } = openModal
+	const { loadingContext } = useLoading()
+	const { onChangeRoute } = useLocalePath()
+	const {
+		_childRef,
+		userData,
+		modal,
+		listMyEvent,
+		loadingProfile,
+		loadingMyEvent,
+		totalMyEvent,
+		totalHangout,
+		hangoutPeople,
+		setModal,
+		OnChangeTitleHangout,
+		onUpdateUserInfo,
+		onCRUDSuccess,
+		onScroll,
+	} = useOverview()
+
+	const _renderHangout = () => {
+		const { is_open_hangout, title_open_hangout } = userData
+		return (
+			<Flex vertical className={classes.hangout}>
+				<Flex
+					className={classes.titleHangout}
+					onClick={() => onChangeRoute(mainRoutes.hangout)}
+				>
+					<Party fill="#006B35" />
+					<span className={classes.title}>Hangout</span>
+				</Flex>
+				<Flex className={classes.contentHangout} vertical>
+					{loadingProfile ? (
+						<Skeleton.Input active className={classes.skeleton} />
+					) : (
+						<>
+							<Flex vertical gap="4px">
+								<Flex className={classes.hangoutPeople}>
+									{hangoutPeople.map((people) => (
+										<div key={people.id}>
+											<CAvatar src={people.avatar} />
+										</div>
+									))}
+								</Flex>
+								<Flex className={classes.switchStatus}>
+									<span>
+										{totalHangout + 1} People available to hangout now
+									</span>
+									<CSwitch
+										value={is_open_hangout}
+										disabled={loadingContext}
+										ctype="success"
+										onChange={(value) =>
+											onUpdateUserInfo({ is_open_hangout: value })
+										}
+									/>
+								</Flex>
+							</Flex>
+							<Flex
+								className={classes.titleHangout}
+								onClick={() => setModal({ type: 'choose', data: userData })}
+							>
+								<span>{title_open_hangout || 'I want to hang out'}</span>
+								<Flex>
+									<PencilIcon />
+								</Flex>
+							</Flex>
+						</>
+					)}
+				</Flex>
+			</Flex>
+		)
+	}
+	const _renderMyEvent = () => {
+		const type = mainRoutes.event
+		return (
+			<Flex vertical className={classes.myEventWrapper}>
+				<Flex
+					className={classes.title}
+					onClick={() => onChangeRoute(mainRoutes.event)}
+				>
+					<EventTitle
+						label={mappingEventTitle[type] || type}
+						number={totalMyEvent}
+						icon={<EventIcon />}
+						onAddNew={(e) => {
+							e?.stopPropagation?.()
+							setModal({ type: 'event', data: null })
+						}}
+					/>
+				</Flex>
+				<Flex
+					ref={_childRef}
+					className={classes.wrapperItem}
+					onScroll={onScroll}
+				>
+					{listMyEvent.map((data) => (
+						<ItemEventTicket key={data.id} data={data} type={type} />
+					))}
+					{loadingMyEvent &&
+						arrayFrom(3).map((_, index) => (
+							<Skeleton.Input
+								key={index}
+								active
+								className={classes.contentSkeleton}
+							/>
+						))}
+				</Flex>
+			</Flex>
+		)
+	}
+	const _renderModal = () => {
+		const { type, data } = modal || {}
 		let Content = <></>
 		const propsModal = {
 			open: true,
-			onClose: () => setOpenModal({ type: null, data: null }),
+			onClose: () => setModal({ type: null, data: null }),
+			onSuccess: (item) => onCRUDSuccess({ key: 'create', value: item }),
 		}
 		switch (type) {
 			case 'event':
 				Content = <ModalCRUDEvent {...propsModal} />
 				break
+			case 'choose':
+				Content = (
+					<ModelChooseHangout
+						data={data?.title_open_hangout || ''}
+						onClose={() => setModal(null)}
+						onSubmit={OnChangeTitleHangout}
+					/>
+				)
+				break
 			default:
 				break
 		}
 		return Content
-	}, [openModal])
+	}
 	return (
-		<div>
-			<CButton onClick={() => setOpenModal({ type: 'event', data: null })}>
-				click
-			</CButton>
+		<div className={classes.wrapper}>
+			<Flex className={classes.container} vertical>
+				{_renderHangout()}
+				{_renderMyEvent()}
+				<Event
+					hiddenAdd
+					type={mainRoutes.upcomingEvent}
+					onCRUDSuccess={onCRUDSuccess}
+				/>
+			</Flex>
 			{_renderModal()}
 		</div>
 	)

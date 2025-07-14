@@ -117,3 +117,11 @@ export const getListSticket = async (params: any) => {
 		params: convertParams(params),
 	})
 }
+
+export const getmyEventInHome = async (params: any = {}) => {
+	const url = POST_ROUTES.myEventInHome
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}

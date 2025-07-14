@@ -15,12 +15,14 @@ interface EventTitleProps {
 	icon: any
 	onClick?: any
 	onAddNew?: any
+	hiddenAdd?: boolean
 	[key: string]: any
 }
 const EventTitle = ({
 	label,
 	number,
 	icon,
+	hiddenAdd = false,
 	onClick,
 	onAddNew,
 }: EventTitleProps) => {
@@ -37,9 +39,11 @@ const EventTitle = ({
 						<IconChevronRight />
 					</Flex>
 				</Flex>
-				<Flex className={classes.buttonAdd} onClick={onAddNew}>
-					<IconSquareRoundedPlusFilled />
-				</Flex>
+				{!hiddenAdd && (
+					<Flex className={classes.buttonAdd} onClick={onAddNew}>
+						<IconSquareRoundedPlusFilled />
+					</Flex>
+				)}
 			</Flex>
 		</div>
 	)

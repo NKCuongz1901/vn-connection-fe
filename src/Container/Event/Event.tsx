@@ -3,6 +3,7 @@ import { Flex, Skeleton } from 'antd'
 import { memo, useCallback, useState } from 'react'
 
 import { arrayFrom } from '@/ultis/array.ults'
+import { useLocalePath } from '@/ultis/route.ults'
 
 import EventTitle from '@/Components/Event/EventTitle'
 import ItemEvent from '@/Components/Event/ItemEvent'
@@ -16,6 +17,8 @@ import classes from './Event.module.scss'
 
 interface EventProps {
 	type: string
+	onCRUDSuccess?: any
+	hiddenAdd?: boolean
 	[key: string]: any
 }
 interface openModalProps {
@@ -24,7 +27,8 @@ interface openModalProps {
 }
 
 const Event = (_props: EventProps) => {
-	const { type } = _props
+	const { type, onCRUDSuccess, hiddenAdd = false } = _props
+	const { onChangeRoute } = useLocalePath()
 	const {
 		loading,
 		total,
@@ -33,7 +37,7 @@ const Event = (_props: EventProps) => {
 		_childRef,
 		onScroll,
 		onSuccess,
-	} = useEvent({ type })
+	} = useEvent({ type, onCRUDSuccess })
 	const [openModal, setOpenModal] = useState<openModalProps>({
 		type: null,
 		data: null,
@@ -58,8 +62,9 @@ const Event = (_props: EventProps) => {
 	}, [openModal])
 	return (
 		<Flex ref={_parentRef} className={classes.wrapper} vertical>
-			<Flex className={classes.title}>
+			<Flex className={classes.title} onClick={() => onChangeRoute(type)}>
 				<EventTitle
+					hiddenAdd={hiddenAdd}
 					label={mappingEventTitle[type] || type}
 					number={total}
 					icon={<EventIcon />}

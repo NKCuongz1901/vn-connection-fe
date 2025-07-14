@@ -1,0 +1,101 @@
+.wrapper {
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+	overflow: overlay;
+	.container {
+		padding: 12px 0px;
+		gap: 12px;
+		width: 100%;
+		overflow: overlay;
+		.hangout {
+			padding: 0 32px;
+			gap: 12px;
+			.titleHangout {
+				gap: 8px;
+				align-items: center;
+				cursor: pointer;
+				.title {
+					font-weight: 600;
+					font-size: 18px;
+				}
+			}
+			.contentHangout {
+				background: #fff;
+				padding: 12px 16px;
+				gap: 16px;
+				border-radius: 16px;
+				.skeleton {
+					border-radius: 16px;
+					height: 82px;
+					width: 100%;
+				}
+				.switchStatus,
+				.titleHangout {
+					justify-content: space-between;
+					align-items: center;
+				}
+				.hangoutPeople {
+					gap: 4px;
+					padding: 4px;
+					border-bottom: 1px solid #f4f8fc;
+					overflow-x: auto;
+					/* Thanh scrollbar ngang */
+
+					&::-webkit-scrollbar:horizontal {
+						height: 4px; /* độ dày thanh ngang */
+					}
+				}
+				.titleHangout {
+					display: flex;
+					padding: 12px 16px;
+					align-items: center;
+					gap: 8px;
+					border-radius: 16px;
+					background: #f4f8fc;
+					cursor: pointer;
+				}
+			}
+		}
+		.myEventWrapper {
+			padding: 0 32px;
+			gap: 12px;
+			width: 100%;
+			margin-bottom: -24px;
+			.title {
+				cursor: pointer;
+			}
+			.wrapperItem {
+				overflow-x: auto;
+				width: 100%;
+				gap: 12px;
+				height: fit-content;
+				padding: 12px 16px;
+				&::-webkit-scrollbar {
+					height: 2px;
+				}
+				.contentSkeleton {
+					width: 285px;
+					height: 78px;
+					border-radius: 16px;
+				}
+			}
+		}
+	}
+}
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		.container {
+			.hangout {
+				padding: 0 8px;
+			}
+			.myEventWrapper {
+				padding: 0 8px;
+				.wrapperItem {
+					padding: 0 8px;
+				}
+			}
+		}
+	}
+}

@@ -2,7 +2,7 @@ import Event from '@/svg/Event'
 // import Heart from '@/svg/Heart'
 // import Message3 from '@/svg/Message3'
 import Messenger from '@/svg/Messenger'
-// import OverviewIcon from '@/svg/OverviewIcon'
+import OverviewIcon from '@/svg/OverviewIcon'
 import Party from '@/svg/Party'
 // import People from '@/svg/People'
 // import SearchNormal from '@/svg/SearchNormal'
@@ -34,6 +34,7 @@ export const POST_ROUTES = {
 	comment: 'comment',
 	updateMember: 'post/update-member',
 	sticker: 'sticker',
+	myEventInHome: 'post/my-event-in-home',
 }
 export const CONVERSATION_ROUTES = {
 	name: 'conversation',
@@ -59,12 +60,19 @@ export const UPLOAD_ROUTES = {
 export const HANGOUT_ROUTES = {
 	name: 'hangout',
 	userOpenHangoutNow: 'hangout/user-open-hangout-now',
+	userOpenHangout: 'hangout/user-open-hangout',
 	search: 'hangout/search',
 	myPast: 'hangout/my-past',
 	myCurrent: 'hangout/my-current',
 	hangoutWaiting: 'participant/waiting',
 }
 export const Menus = [
+	{
+		title: 'Overview',
+		Icon: OverviewIcon,
+		path: mainRoutes.overview,
+		child: [],
+	},
 	{
 		title: 'Hangout',
 		Icon: Party,
@@ -95,12 +103,7 @@ export const Menus = [
 	// 	path: mainRoutes.discussions,
 	// 	child: [],
 	// },
-	// {
-	// 	title: 'Overview',
-	// 	Icon: OverviewIcon,
-	// 	path: mainRoutes.overview,
-	// 	child: [],
-	// },
+
 	// {
 	// 	title: 'Search',
 	// 	Icon: SearchNormal,

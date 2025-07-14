@@ -1,0 +1,64 @@
+.wrapper {
+	cursor: pointer;
+	.container {
+		.time {
+			display: flex;
+			padding: 12px 16px;
+			flex-direction: column;
+			align-items: center;
+			gap: -2px;
+			border-radius: 16px 0px 0px 16px;
+			background: #fff;
+			font-weight: 600;
+			color: #48546b;
+			font-size: 12px;
+			.day {
+				font-size: 20px;
+				color: #006b35;
+			}
+		}
+		.info {
+			display: flex;
+			width: 210px;
+			padding: 8px 8px 8px 16px;
+			flex-direction: column;
+			justify-content: center;
+			align-items: flex-start;
+			gap: 4px;
+			border-radius: 0px 16px 16px 0px;
+			background: #fff;
+			font-size: 12px;
+			.timeInfo {
+				color: #48546b;
+
+				font-size: 12px;
+			}
+			.titleInfo {
+				font-size: 14px;
+				font-weight: 600;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				width: 100%;
+			}
+			.locationInfo {
+				justify-content: space-between;
+				align-items: center;
+				width: 100%;
+				.away,
+				.textDetail {
+					align-items: center;
+					font-weight: 600;
+					gap: 4px;
+				}
+				.textDetail {
+					color: #e55a0f;
+					.icon {
+						height: 16px;
+						width: 16;
+					}
+				}
+			}
+		}
+	}
+}

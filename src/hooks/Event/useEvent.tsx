@@ -12,7 +12,7 @@ import { paginationCommon } from '@/Variable/common.variable'
 import { PaginationType } from '@/interface/common/common.interface'
 import { mainRoutes } from '@/routes/MainRoutes'
 
-export default function useEvent({ type }: any) {
+export default function useEvent({ type, onCRUDSuccess }: any) {
 	const { openError } = useModal()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const _parentRef = useRef<HTMLDivElement | null>(null)
@@ -71,6 +71,9 @@ export default function useEvent({ type }: any) {
 	const handleCreateSuccess = (item) => {
 		if (type === mainRoutes.event) {
 			setListPost((prev) => [item, ...prev])
+		}
+		if (onCRUDSuccess) {
+			onCRUDSuccess({ key: 'create', value: item })
 		}
 	}
 	const handleScroll = (e: any) => {

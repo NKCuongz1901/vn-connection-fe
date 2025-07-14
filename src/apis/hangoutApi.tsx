@@ -87,3 +87,10 @@ export const deleteMutiHangoutParticipantId = async (payload: any) => {
 	const url = POST_ROUTES.actionMultiWaiting
 	return await axios.post(url, payload)
 }
+export const getUserOpenHangout = async (params) => {
+	const url = HANGOUT_ROUTES.userOpenHangout
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}

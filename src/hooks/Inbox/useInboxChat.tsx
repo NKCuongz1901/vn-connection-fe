@@ -65,7 +65,7 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 
 			if (code === 200) {
 				const { rows: _rows } = results?.objects || {}
-				if (_rows.length < limit) {
+				if (!isNoLoading && _rows.length < limit) {
 					_loadmore.current = false
 				}
 				setMessList((prev: any[]) => {
