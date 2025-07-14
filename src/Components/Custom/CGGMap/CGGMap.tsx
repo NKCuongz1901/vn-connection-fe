@@ -26,6 +26,7 @@ const libraries: any = ['places']
 const containerStyle = { width: '100%', height: '400px' }
 
 interface CGGMapProps {
+	title: string
 	latitude: number
 	longitude: number
 	onClose: any
@@ -33,7 +34,7 @@ interface CGGMapProps {
 	[key: string]: any
 }
 const CGGMap = (_props: CGGMapProps) => {
-	const { latitude, longitude, onSubmit, onClose } = _props
+	const { title, latitude, longitude, onSubmit, onClose } = _props
 	const { isLoaded } = useLoadScript({
 		googleMapsApiKey: process.env.NEXT_PUBLIC_GGMAP_KEY || '', // ← Thay bằng API key của bạn
 		libraries,
@@ -121,7 +122,7 @@ const CGGMap = (_props: CGGMapProps) => {
 			<CModal
 				onClose={onClose}
 				onCancel={onClose}
-				title="Create event"
+				title={title || 'Location'}
 				styles={{
 					content: {
 						width: 800,

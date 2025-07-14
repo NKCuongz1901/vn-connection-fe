@@ -195,6 +195,7 @@ const ModalCRUDEvent = ({
 			<>
 				<Flex className={classes.location}>
 					<CInputMap
+						title="Location"
 						value={address}
 						longitude={longitude}
 						latitude={latitude}

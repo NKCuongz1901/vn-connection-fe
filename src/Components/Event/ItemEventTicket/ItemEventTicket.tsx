@@ -13,9 +13,13 @@ import classes from './ItemEventTicket.module.scss'
 const ItemEventTicket = ({ data, type }) => {
 	const { onChangeRoute } = useLocalePath()
 	const { id, start_time, end_time, title, away } = data
-	const { day, weekday, month, time12h: _start_time } = getDateInfo(start_time)
-	const { time12h: _end_time } = getDateInfo(end_time)
-
+	const {
+		day,
+		weekday,
+		month,
+		time12h: _start_time,
+	} = getDateInfo(Number(start_time))
+	const { time12h: _end_time } = getDateInfo(Number(end_time))
 	return (
 		<Flex
 			vertical

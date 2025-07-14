@@ -11,11 +11,13 @@ import CGGMap from '../CGGMap/CGGMap'
 interface CInputMapProps {
 	longitude: number
 	latitude: number
+	title?: string
 	onSubmitModal?: any
 }
 
 const CInputMap = (_props: CInputMapProps & CInputProps) => {
 	const {
+		title,
 		error,
 		label,
 		isRequired,
@@ -65,6 +67,7 @@ const CInputMap = (_props: CInputMapProps & CInputProps) => {
 					onSubmit={onSubmitModal}
 					longitude={longitude}
 					latitude={latitude}
+					title={title}
 				/>
 			)}
 		</Flex>
