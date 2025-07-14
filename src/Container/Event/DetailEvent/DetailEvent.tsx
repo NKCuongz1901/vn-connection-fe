@@ -256,12 +256,12 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 			dmy: dmyStart,
 			weekday: weekdayStart,
 			time: timeStart,
-		} = getDateInfo(start_time)
+		} = getDateInfo(Number(start_time))
 		const {
 			dmy: dmyEnd,
 			weekday: weekdayEnd,
 			time: timeEnd,
-		} = getDateInfo(end_time)
+		} = getDateInfo(Number(end_time))
 		const { type } = repeat_type || {}
 		const typeRepeat =
 			(repeatOpt.find((i) => i.value === type)?.label || '') + ','

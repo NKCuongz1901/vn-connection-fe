@@ -4,7 +4,7 @@ interface getDateInfoOptionsProps {
 	type?: string
 }
 export const getDateInfo = (
-	date: string | Date,
+	date: string | Date | number,
 	_options?: getDateInfoOptionsProps,
 ) => {
 	const d = date ? dayjs(date) : dayjs()

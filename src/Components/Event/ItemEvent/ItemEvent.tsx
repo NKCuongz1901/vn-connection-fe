@@ -15,9 +15,29 @@ import classes from './ItemEvent.module.scss'
 const ItemEvent = ({ data, type }) => {
 	const { onChangeRoute } = useLocalePath()
 	const { id, thumbnails, start_time, end_time } = data
-	const { day, weekday, month, time: _start_time } = getDateInfo(start_time)
-	const { time: _end_time } = getDateInfo(end_time)
-
+	const { time: _start_time } = getDateInfo(Number(start_time))
+	const { time: _end_time } = getDateInfo(Number(end_time))
+	const handleShowTime = () => {
+		const currentTime = +new Date()
+		let timeShow
+		switch (true) {
+			case Number(start_time) > currentTime:
+				timeShow = Number(start_time)
+				break
+			case currentTime > Number(end_time):
+				timeShow = Number(end_time)
+				break
+			default:
+				timeShow = currentTime
+				break
+		}
+		const { day, weekday, month } = getDateInfo(timeShow)
+		return {
+			day,
+			weekday,
+			month,
+		}
+	}
 	const _renderSpaceTime = () => {
 		const { away, repeat_type } = data
 		const { type } = repeat_type || {}
@@ -62,6 +82,7 @@ const ItemEvent = ({ data, type }) => {
 				ticketValue = 'Free'
 				break
 		}
+		const { weekday, day, month } = handleShowTime()
 		return (
 			<Flex className={classes.info}>
 				<Flex className={classes.infoLeft} vertical>
