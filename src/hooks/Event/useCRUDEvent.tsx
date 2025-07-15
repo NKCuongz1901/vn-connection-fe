@@ -242,11 +242,17 @@ export default function useCRUDEvent({
 			const { min: minEntr, max: maxEntr } = ticket_entrance
 			const fieldEntrs = { minEntr, maxEntr }
 			if (ticket_entrance_type === ticketEntranceTypeOpt[0].value) {
+				if (!Number(minEntr)) {
+					_error.minEntr = 'Price must be greater than 0'
+				}
 				if (!minEntr) {
 					_error.minEntr = 'Field is required'
 				}
 			} else {
 				Object.entries(fieldEntrs).forEach(([key, value]) => {
+					if (!Number(value)) {
+						_error[key] = 'Price must be greater than 0'
+					}
 					if (!value) {
 						_error[key] = 'Field is required'
 					}
