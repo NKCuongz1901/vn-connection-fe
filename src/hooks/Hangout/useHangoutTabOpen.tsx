@@ -160,6 +160,7 @@ export default function useHangoutTabOpen(ref) {
 		loading,
 		radius,
 		setRadius,
+		setTotal,
 		setOpenHangoutList,
 		setOpenHangoutSearch,
 		onLoadMore: handleLoadMore,

@@ -25,13 +25,14 @@ interface ItemHangoutProps {
 	isHiddenButton?: boolean
 	onClick?: any
 	setOpenHangoutList?: React.Dispatch<React.SetStateAction<any>>
-
+	setTotal?: React.Dispatch<React.SetStateAction<any>>
 	setOpenHangoutSearch?: React.Dispatch<React.SetStateAction<any>>
 }
 const ItemHangout = ({
 	item,
 	isHiddenButton = false,
 	onClick,
+	setTotal = undefined,
 	setOpenHangoutList = undefined,
 	setOpenHangoutSearch = undefined,
 }: ItemHangoutProps) => {
@@ -77,6 +78,13 @@ const ItemHangout = ({
 						setOpenHangoutSearch((prev) =>
 							prev.filter((item) => item.id !== id),
 						)
+					}
+					if (setTotal) {
+						if (post_id) {
+							setTotal((prev) => ({ ...prev, search: prev.search - 1 }))
+						} else {
+							setTotal((prev) => ({ ...prev, open: prev.open - 1 }))
+						}
 					}
 					openSuccess({
 						message:

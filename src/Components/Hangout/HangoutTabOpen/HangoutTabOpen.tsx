@@ -22,6 +22,7 @@ function HangoutTabOpen(props, ref) {
 		loading,
 		radius,
 		setRadius,
+		setTotal,
 		setOpenHangoutList,
 		setOpenHangoutSearch,
 		onLoadMore,
@@ -64,6 +65,7 @@ function HangoutTabOpen(props, ref) {
 								item={item}
 								setOpenHangoutList={setOpenHangoutList}
 								setOpenHangoutSearch={setOpenHangoutSearch}
+								setTotal={setTotal}
 							/>
 					  ))
 					: _renderNoHangout()}
