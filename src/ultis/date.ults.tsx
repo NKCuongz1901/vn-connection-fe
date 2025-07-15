@@ -7,7 +7,16 @@ export const getDateInfo = (
 	date: string | Date | number,
 	_options?: getDateInfoOptionsProps,
 ) => {
-	const d = date ? dayjs(date) : dayjs()
+	let parsedDate: dayjs.ConfigType = date
+
+	if (typeof date === 'string') {
+		const asNumber = Number(date)
+		if (!Number.isNaN(asNumber)) {
+			parsedDate = asNumber
+		}
+	}
+
+	const d = parsedDate ? dayjs(parsedDate) : dayjs()
 	return {
 		day: d.date(), // số ngày trong tháng
 		weekday: d.format('ddd'), // Thứ bằng tiếng Anh
@@ -28,17 +37,22 @@ export const getDiffFromNow = ({
 	const diffInSeconds = now.diff(target, 'second', true)
 
 	if (diffInSeconds < 60) {
-		return { value: Math.ceil(diffInSeconds), unit: 'second' }
+		return { value: Math.floor(diffInSeconds), unit: 'second' }
 	}
 
 	const diffInMinutes = diffInSeconds / 60
 	if (diffInMinutes < 60) {
-		return { value: Math.ceil(diffInMinutes), unit: 'minute' }
+		return { value: Math.floor(diffInMinutes), unit: 'minute' }
 	}
 
 	const diffInHours = diffInMinutes / 60
 	if (diffInHours < 24) {
-		return { value: Math.ceil(diffInHours), unit: 'hour' }
+		return { value: Math.floor(diffInHours), unit: 'hour' }
+	}
+
+	if (diffInHours < 72) {
+		const diffInDays = diffInHours / 24
+		return { value: Math.floor(diffInDays), unit: 'day' }
 	}
 
 	// const diffInDays = diffInHours / 24
