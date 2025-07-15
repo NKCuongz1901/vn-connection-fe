@@ -231,8 +231,18 @@ export default function useCRUDEvent({
 		}
 		const _error = {} as any
 		Object.entries(fields).forEach(([key, value]) => {
-			if (!value) {
-				_error[key] = 'Field is required'
+			switch (key) {
+				case 'title':
+				case 'description':
+					if (!(value || '').trim()) {
+						_error[key] = 'Field is required'
+					}
+					break
+				default:
+					if (!value) {
+						_error[key] = 'Field is required'
+					}
+					break
 			}
 		})
 		if (type === 'MULTI_DAYS' && !isArray(days, 1)) {
