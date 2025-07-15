@@ -50,7 +50,7 @@ export const getDiffFromNow = ({
 		return { value: Math.floor(diffInHours), unit: 'hour' }
 	}
 
-	if (diffInHours < 72) {
+	if (diffInHours < 24 * 4) {
 		const diffInDays = diffInHours / 24
 		return { value: Math.floor(diffInDays), unit: 'day' }
 	}
