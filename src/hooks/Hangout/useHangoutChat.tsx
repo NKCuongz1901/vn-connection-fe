@@ -29,8 +29,12 @@ const libraries: any = ['places']
 
 type useHangoutChatProps = {
 	postId: string
+	onAction: any
 }
-export default function useHangoutChat({ postId }: useHangoutChatProps) {
+export default function useHangoutChat({
+	postId,
+	onAction,
+}: useHangoutChatProps) {
 	const { toggleLoadingContext } = useLoading()
 	const { openError, openSuccess } = useModal()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
@@ -165,8 +169,14 @@ export default function useHangoutChat({ postId }: useHangoutChatProps) {
 		const { participant } = hangoutInfo
 		try {
 			const res: any = await deleteHangoutParticipantId({ id: participant.id })
+			console.log(
+				'🏖️🏖️🏖️ TrieuNinhHan ~ :176 ~ handleLeaveHangout ~ res:',
+				hangoutInfo,
+			)
+
 			if (res?.code == 200) {
 				onPushState({})
+				onAction({ key: 'leave', value: hangoutInfo })
 			}
 		} catch (error) {
 			openError(error)

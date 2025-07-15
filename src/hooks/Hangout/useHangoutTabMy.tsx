@@ -149,11 +149,17 @@ export default function useHangoutTabMy(ref) {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toJson(myCurrentHangout), toJson(myPastHangout)])
-
+	const handleLeave = (id) => {
+		setMyPastHangout((prev: any[]) => (prev || []).filter((i) => i.id !== id))
+		setMyCurrentHangout((prev: any[]) =>
+			(prev || []).filter((i) => i.id !== id),
+		)
+	}
 	useImperativeHandle(
 		ref,
 		() => ({
 			onLoadMoreOpen: handleLoadMore,
+			onLeave: handleLeave,
 		}),
 		[handleLoadMore],
 	)

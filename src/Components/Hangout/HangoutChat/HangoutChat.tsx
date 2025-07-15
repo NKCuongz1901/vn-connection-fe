@@ -20,7 +20,7 @@ import classes from './HangoutChat.module.scss'
 
 const containerStyle = { width: '100%', height: '104px' }
 
-const HangoutChat = ({ postId }) => {
+const HangoutChat = ({ postId, onAction }) => {
 	const { onGetPath } = useLocalePath()
 
 	const {
@@ -41,7 +41,7 @@ const HangoutChat = ({ postId }) => {
 		onEditLocation,
 		onActionPart,
 		onLoadMore,
-	} = useHangoutChat({ postId })
+	} = useHangoutChat({ postId, onAction })
 	const { latitude, longitude } = hangoutInfo || {}
 
 	if (loadingPage) {
@@ -79,7 +79,7 @@ const HangoutChat = ({ postId }) => {
 			case 'location':
 				content = (
 					<CGGMap
-                        title="Edit Location"
+						title="Edit Location"
 						latitude={latitude}
 						longitude={longitude}
 						onClose={() => setModal(null)}

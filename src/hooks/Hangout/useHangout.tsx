@@ -197,6 +197,20 @@ export default function useHangout() {
 			toggleLoadingContext(false)
 		}
 	}
+	const handleAction = ({ key, value }) => {
+		switch (key) {
+			case 'leave':
+				{
+					const { id } = value || {}
+					if (_tabsOpenRef.current) {
+						_tabsOpenRef.current?.onLeave(id)
+					}
+				}
+				break
+			default:
+				break
+		}
+	}
 	useEffect(() => {
 		setPostId(id)
 	}, [id])
@@ -232,5 +246,6 @@ export default function useHangout() {
 		onActionPart: handleActionPart,
 		OnChangeTitleHangout: handleOnChangeTitleHangout,
 		onGetMyWaitting: handleGetMyWaitting,
+		onAction: handleAction,
 	}
 }

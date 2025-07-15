@@ -44,6 +44,7 @@ const Hangout = () => {
 		onActionPart,
 		OnChangeTitleHangout,
 		onGetMyWaitting,
+		onAction,
 	} = useHangout()
 
 	const _renderTop = () => {
@@ -228,7 +229,9 @@ const Hangout = () => {
 				{_renderBottom()}
 				{modal?.type && _renderModal()}
 			</Flex>
-			{postId && <HangoutChat key={key.current} postId={postId} />}
+			{postId && (
+				<HangoutChat key={key.current} postId={postId} onAction={onAction} />
+			)}
 		</div>
 	)
 }
