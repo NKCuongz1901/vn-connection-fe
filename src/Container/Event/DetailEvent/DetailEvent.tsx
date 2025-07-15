@@ -53,6 +53,7 @@ interface DetailEventProps {
 }
 const DetailEvent = ({ id, type }: DetailEventProps) => {
 	const {
+		_refKeyEventParticipant,
 		detailPost,
 		loading,
 		loadingShare,
@@ -269,7 +270,9 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 			<Flex className={classes.detail} vertical>
 				{id && <EventCoHost id={id} user={user} />}
 
-				{id && <EventParticipant id={id} />}
+				{id && (
+					<EventParticipant id={id} key={_refKeyEventParticipant.current} />
+				)}
 
 				<Flex className={classes.detailInfo} vertical>
 					<Flex className={classes.detailInfoItem}>

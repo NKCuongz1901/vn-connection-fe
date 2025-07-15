@@ -1,5 +1,5 @@
 import { ItemType } from 'antd/es/menu/interface'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
@@ -15,10 +15,10 @@ import {
 import { delay } from '@/ultis/common.ults'
 import { useLocalePath } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
+import { copyToClipboard, randomString } from '@/ultis/string.ults'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import { repeatOpt } from '@/Variable/select.variable'
-import { copyToClipboard } from '@/ultis/string.ults'
 
 interface useDetailEventProps {
 	id: string
@@ -28,6 +28,9 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 	const { openConfirm, openError, openSuccess, closeModal } = useModal()
 	const { toggleLoadingContext } = useLoading()
 	const { onChangeRoute } = useLocalePath()
+
+	const _refKeyEventParticipant = useRef(randomString())
+
 	const [detailPost, setDetailPost] = useState({}) as any
 	const [loading, setLoading] = useState({ detailLoad: false })
 	const [loadingShare, setLoadingShare] = useState({}) as any
@@ -111,6 +114,7 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 			const { code, results } = res || {}
 			if (code === 200) {
 				const { deleted_at } = results?.object || {}
+				_refKeyEventParticipant.current = randomString()
 				if (deleted_at) {
 					setDetailPost((prev: any) => ({ ...prev, is_joined: false }))
 				} else {
@@ -307,6 +311,7 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 	}, [id])
 
 	return {
+		_refKeyEventParticipant,
 		loading,
 		loadingShare,
 		detailPost,
