@@ -3,6 +3,7 @@
 	height: 100%;
 	max-width: 368px;
 	max-height: 308px;
+	min-height: 308px;
 	border-radius: 16px;
 	position: relative;
 	cursor: pointer;
@@ -12,7 +13,10 @@
 		width: 100%;
 		height: 200px;
 		border-radius: 16px;
-
+		:global(.ant-image) {
+			height: 100%;
+			width: 100%;
+		}
 		img {
 			border-radius: 16px 16px 0 0;
 			object-fit: cover !important;

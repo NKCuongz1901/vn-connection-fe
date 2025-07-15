@@ -10,14 +10,13 @@ import { useLocalePath } from '@/ultis/route.ults'
 import CAvatar from '@/Components/Custom/CAvatar'
 import CSwitch from '@/Components/Custom/CSwitch'
 import EventTitle from '@/Components/Event/EventTitle'
+import ItemEvent from '@/Components/Event/ItemEvent'
 import ItemEventTicket from '@/Components/Event/ItemEventTicket'
 import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
 import ModelChooseHangout from '@/Components/Hangout/ModelChooseHangout'
 import EventIcon from '@/svg/Event'
 import PencilIcon from '@/svg/Hangout/PencilIcon'
 import Party from '@/svg/Party'
-
-import Event from '../Event'
 
 import { mappingEventTitle } from '@/Variable/event.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
@@ -42,6 +41,13 @@ const Overview = () => {
 		onUpdateUserInfo,
 		onCRUDSuccess,
 		onScroll,
+
+		loading,
+		total,
+		listPost,
+		_parentRef,
+		_childRefUp,
+		onScrollUp,
 	} = useOverview()
 
 	const _renderHangout = () => {
@@ -162,15 +168,46 @@ const Overview = () => {
 		return Content
 	}
 	return (
-		<div className={classes.wrapper}>
-			<Flex className={classes.container} vertical>
+		<div className={classes.wrapper} ref={_parentRef}>
+			<Flex
+				className={classes.container}
+				vertical
+				ref={_childRefUp}
+				onScroll={onScrollUp}
+			>
 				{_renderHangout()}
 				{_renderMyEvent()}
-				<Event
-					hiddenAdd
-					type={mainRoutes.upcomingEvent}
-					onCRUDSuccess={onCRUDSuccess}
-				/>
+				<Flex className={classes.wrapperUp} vertical>
+					<Flex
+						className={classes.title}
+						onClick={() => onChangeRoute(mainRoutes.upcomingEvent)}
+					>
+						<EventTitle
+							hiddenAdd
+							label={mappingEventTitle[mainRoutes.upcomingEvent]}
+							number={total}
+							icon={<EventIcon />}
+						/>
+					</Flex>
+					<Flex className={classes.wrapperItemUp}>
+						{listPost.map((data) => (
+							<ItemEvent
+								key={data.id}
+								data={data}
+								type={mainRoutes.upcomingEvent}
+							/>
+						))}
+						{loading &&
+							arrayFrom(3).map((_, index) => (
+								<Skeleton.Input
+									key={index}
+									active
+									className={classes.contentBody}
+								/>
+							))}
+					</Flex>
+					{_renderModal()}
+				</Flex>
 			</Flex>
 			{_renderModal()}
 		</div>
