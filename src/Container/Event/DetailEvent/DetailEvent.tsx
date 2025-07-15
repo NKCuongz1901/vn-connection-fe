@@ -247,7 +247,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 			limit_participant,
 			start_time,
 			end_time,
-			address_en,
+			address,
 			repeat_type,
 			id,
 			longitude,
@@ -292,7 +292,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 						onClick={() => goToGoogleMap({ lat: latitude, lng: longitude })}
 					>
 						<IconMapPinFilled />
-						<span>{address_en}</span>
+						<span>{address}</span>
 					</Flex>
 					<Flex className={classes.detailInfoItem}>
 						<IconClockFilled />
