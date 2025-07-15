@@ -6,7 +6,7 @@ import { memo, useCallback, useState } from 'react'
 
 import useChatBox from '@/hooks/ChatBox/useChatBox'
 
-import { arrayFrom } from '@/ultis/array.ults'
+import { arrayFrom, isArray } from '@/ultis/array.ults'
 import { handleParseFileImg } from '@/ultis/file.utls'
 import { getUserInfo } from '@/ultis/storage.ults'
 
@@ -318,13 +318,15 @@ const ChatBox = ({
 				onKeyDown={(e) => {
 					if (e.key === 'Enter') {
 						e.preventDefault()
-						setText('')
-						setReply(null)
-						onSendMessage({
-							type: 'TEXT',
-							content: text,
-							parent: reply,
-						})
+						if (!!text.trim()) {
+							setText('')
+							setReply(null)
+							onSendMessage({
+								type: 'TEXT',
+								content: text,
+								parent: reply,
+							})
+						}
 					}
 				}}
 			>
@@ -368,15 +370,17 @@ const ChatBox = ({
 				<Flex
 					className={classes.sendButton}
 					onClick={() => {
-						setText('')
-						setReply(null)
-						onSendMessage({
-							type: 'TEXT',
-							content: text,
-							parent: reply,
-							medias: fileList,
-						})
-						setFileList([])
+						if (!!text.trim() || isArray(fileList, 1)) {
+							setText('')
+							setReply(null)
+							onSendMessage({
+								type: 'TEXT',
+								content: text,
+								parent: reply,
+								medias: fileList,
+							})
+							setFileList([])
+						}
 					}}
 				>
 					<SendIcon />
