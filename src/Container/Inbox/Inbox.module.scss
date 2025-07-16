@@ -8,6 +8,7 @@
 		height: 100%;
 		width: 100%;
 		.convContainer {
+			gap: 8px;
 			min-width: 392px;
 			.searchBar {
 				// height: 44px;
@@ -16,6 +17,7 @@
 			.backButton {
 				padding: 8px 16px 0 16px;
 				cursor: pointer;
+				align-items: center;
 			}
 			.convList {
 				padding: 0 16px 16px 16px;
