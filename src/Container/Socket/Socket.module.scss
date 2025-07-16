@@ -1,0 +1,23 @@
+.wrapper {
+	width: 100%;
+
+	.containerMessage1 {
+		width: 100%;
+		.connect {
+			color: aquamarine;
+		}
+		.disconnect,
+		.reconnect_error {
+			color: red;
+		}
+		.reconnect_attempt {
+			color: blue;
+		}
+		.reconnect {
+			color: green;
+		}
+		.reconnect_failed {
+			color: black;
+		}
+	}
+}

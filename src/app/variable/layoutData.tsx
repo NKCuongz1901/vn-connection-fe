@@ -5,4 +5,5 @@ export const appLayoutAuth = [
 	mainRoutes.login,
 	mainRoutes.register,
 	mainRoutes.forgetPassword,
+	'socketLogout',
 ]
