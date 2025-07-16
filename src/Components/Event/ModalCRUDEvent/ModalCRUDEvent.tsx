@@ -302,7 +302,7 @@ const ModalCRUDEvent = ({
 						error={error.description}
 						placeholder="Write something here"
 						onChange={onChangeValue('description')}
-						maxLength={1000}
+						maxLength={2000}
 					/>
 				</Flex>
 			</>
