@@ -213,7 +213,7 @@ export default function useCRUDEvent({
 			end_time,
 			thumbnails,
 			ticket_entrance_type,
-			limit_participant,
+			// limit_participant,
 			repeat_type,
 			ticket_entrance,
 			menu_price,
@@ -227,7 +227,7 @@ export default function useCRUDEvent({
 			start_time,
 			end_time,
 			thumbnails,
-			limit_participant,
+			// limit_participant,
 		}
 		const _error = {} as any
 		Object.entries(fields).forEach(([key, value]) => {
