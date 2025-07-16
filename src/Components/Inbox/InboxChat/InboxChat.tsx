@@ -57,10 +57,10 @@ const InboxChat = ({ convId }) => {
 				</Flex>
 				<Flex className={classes.pinInfo} vertical>
 					<span className={classes.titlePin}>Pinned messages</span>
-					<span className={classes.pinLastMess}>
+					<div className={classes.pinLastMess}>
 						{pinList[0]?.sender?.name}:{' '}
 						{mappingType[pinList[0]?.type] || pinList[0]?.content}
-					</span>
+					</div>
 				</Flex>
 			</Flex>
 		)
