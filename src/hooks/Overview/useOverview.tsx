@@ -274,6 +274,7 @@ export default function useOverview() {
 	useEffect(() => {
 		handleGetUserProfile()
 		handleGetMyEvent()
+		handleGetListPost()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
