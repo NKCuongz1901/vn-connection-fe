@@ -7,7 +7,7 @@ import classes from './Socket.module.scss'
 import CInput from '@/Components/Custom/CInput'
 
 const Socket = () => {
-	const { data, setData, message, onSocket } = useSocket()
+	const { data, setData, message, onSocket, onSocket1 } = useSocket()
 	return (
 		<div className={classes.wrapper}>
 			<CInput
@@ -23,6 +23,7 @@ const Socket = () => {
 				onChange={(e) => setData((prev) => ({ ...prev, uid: e.target.value }))}
 			/>
 			<CButton onClick={onSocket}>Connect socket 1</CButton>
+			<CButton onClick={onSocket1}>Connect socket 2 (thường) </CButton>
 			<Flex vertical className={classes.containerMessage1}>
 				{message.map((item) => (
 					<Flex key={item.key} className={classes[item.type]}>
