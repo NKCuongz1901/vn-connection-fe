@@ -39,6 +39,7 @@ export default function useSocket() {
 			reconnection: true,
 			reconnectionAttempts: 10,
 			reconnectionDelay: 5000,
+			path: '/socket',
 		})
 
 		socket.connect()
