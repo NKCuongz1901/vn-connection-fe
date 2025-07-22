@@ -30,17 +30,19 @@ export default function useSocket() {
 
 		// ✅ Tạo socket mới
 		const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
-			transports: ['websocket'],
-			query: {
-				token: data.token || token,
-				uid: data.uid || uid,
-			},
-			autoConnect: false,
-			reconnection: true,
-			reconnectionAttempts: 10,
-			reconnectionDelay: 5000,
-			path: '/socket',
-		})
+            transports: ['websocket'],
+            auth: {
+                Authorization: 'Bearer ' + (data.token || token),
+            },
+            query: {
+                token: data.token || token,
+                uid: data.uid || uid
+            },
+            autoConnect: false,
+            reconnection: true,
+            reconnectionAttempts: 10,
+            reconnectionDelay: 5000,
+        })
 
 		socket.connect()
 		socketRef.current = socket // 🔁 lưu socket mới
