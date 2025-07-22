@@ -43,3 +43,7 @@ npm run dev
   - Other
 - Example :
   - Fix: Wrong text
+
+## CICD
+npm run build-cicd
+pm2 start npm --name "web" -- run start:prod
