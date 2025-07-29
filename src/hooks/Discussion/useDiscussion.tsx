@@ -345,10 +345,12 @@ export default function useDiscussion({}) {
 	const handleChangeUrl = ({ key, value }) => {
 		switch (key) {
 			case 'category_id':
-				setLoading((prev) => ({ ...prev, discuss: true }))
-				setDiscuss([])
-				setTitle('')
-				onPushState({ category_id: value.id })
+				if (category_id !== value.id) {
+					setLoading((prev) => ({ ...prev, discuss: true }))
+					setDiscuss([])
+					setTitle('')
+					onPushState({ category_id: value.id })
+				}
 				break
 
 			default:
