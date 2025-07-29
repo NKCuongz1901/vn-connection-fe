@@ -19,6 +19,7 @@ import FeedbackIcon from '@/svg/FeedbackIcon'
 import { topicReportOpt } from '@/Variable/select.variable'
 
 import classes from './ModalReport.module.scss'
+import CUpload from '../CUpload'
 
 interface ModalReportProps {
 	open: boolean
@@ -139,16 +140,9 @@ const ModalReport = (props: ModalReportProps) => {
 					/>
 				</Flex>
 				<Flex className={classes.content}>
-					<CTextArea
-						showCount
-						isRequired
-						label="Content"
-						placeholder="Describe your problems"
-						error={errors.content}
-						value={content}
-						maxLength={500}
-						onChange={(e) => handleOnChangeData('content', e.target.value)}
-					/>
+					<CUpload onChange={(e) => handleOnChangeData('content', e.file)}>
+						<Flex className={classes.uploadText}>Upload image</Flex>
+					</CUpload>
 				</Flex>
 			</Flex>
 		)
