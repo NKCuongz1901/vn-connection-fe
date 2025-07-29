@@ -1,6 +1,6 @@
 import Event from '@/svg/Event'
 // import Heart from '@/svg/Heart'
-// import Message3 from '@/svg/Message3'
+import Message3 from '@/svg/Message3'
 import Messenger from '@/svg/Messenger'
 import OverviewIcon from '@/svg/OverviewIcon'
 import Party from '@/svg/Party'
@@ -66,6 +66,18 @@ export const HANGOUT_ROUTES = {
 	myCurrent: 'hangout/my-current',
 	hangoutWaiting: 'participant/waiting',
 }
+export const DISCUSS_ROUTES = {
+	name: 'discuss',
+	likeDiscuss: 'discuss/like',
+}
+export const CATEGORY_ROUTES = {
+	name: 'category',
+	myCategory: 'category/my',
+	categoryRecommend: 'category/recommend',
+	likeCategory: 'category/like',
+	categoryExplore: 'category/explore',
+}
+
 export const Menus = [
 	{
 		title: 'Overview',
@@ -97,12 +109,12 @@ export const Menus = [
 		path: mainRoutes.upcomingEvent,
 		child: [],
 	},
-	// {
-	// 	title: 'Discussions',
-	// 	Icon: Message3,
-	// 	path: mainRoutes.discussions,
-	// 	child: [],
-	// },
+	{
+		title: 'Discussions',
+		Icon: Message3,
+		path: mainRoutes.discussions,
+		child: [],
+	},
 
 	// {
 	// 	title: 'Search',

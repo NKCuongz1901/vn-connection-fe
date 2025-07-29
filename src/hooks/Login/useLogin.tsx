@@ -96,7 +96,7 @@ export default function useLogin() {
 					handleStorageCookie({ key: 'token', data: token })
 				}
 				await delay(100)
-				onChangeRoute(mainRoutes.upcomingEvent)
+				onChangeRoute(mainRoutes.overview)
 			}
 		} catch (error: any) {
 			openError(error)
@@ -105,7 +105,7 @@ export default function useLogin() {
 		}
 	}
 	useEffect(() => {
-		if (isLogin()) return onChangeRoute(mainRoutes.upcomingEvent)
+		if (isLogin()) return onChangeRoute(mainRoutes.overview)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 	return {

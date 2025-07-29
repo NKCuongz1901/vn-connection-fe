@@ -82,7 +82,9 @@ a {
 	cursor: pointer;
 }
 /* Ẩn thanh cuộn mặc định */
-
+::-webkit-scrollbar:horizontal {
+	height: 4px; /* độ dày thanh ngang */
+}
 ::-webkit-scrollbar {
 	width: 4px; /* Điều chỉnh độ rộng nếu muốn */
 	background: transparent;

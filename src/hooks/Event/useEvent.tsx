@@ -59,8 +59,7 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 
 	const handleLoadMore = async () => {
 		const { limit } = _paginationRefs.current
-
-		if (!loadmore || loading) return
+		if (!loadmore || loading || !isArray(listPost, 1)) return
 		_paginationRefs.current.page =
 			Math.ceil((listPost || []).length / limit) + 1
 		await handleGetListPost()

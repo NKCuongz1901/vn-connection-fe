@@ -40,6 +40,9 @@ import SendIcon from '@/svg/SendIcon'
 import TrashIcon from '@/svg/TrashIcon'
 import TwoUser from '@/svg/TwoUser'
 import UpcomingEvent from '@/svg/UpcomingEvent'
+import NoPostIcon from '@/svg/DiscusstionSvg/NoPostIcon'
+import MessageMinuIcon from '@/svg/MessageMinuIcon'
+import ShareIconSvg from '@/svg/ShareIconSvg'
 
 const Icons = () => {
 	const icons = [
@@ -98,6 +101,17 @@ const Icons = () => {
 			name: '@/svg/Event/BreakLineEvent',
 			key: randomString(),
 		},
+		{
+			ICON: NoPostIcon,
+			name: '@/svg/DiscusstionSvg/NoPostIcon',
+			key: randomString(),
+		},
+		{
+			ICON: MessageMinuIcon,
+			name: '@/svg/MessageMinuIcon',
+			key: randomString(),
+		},
+		{ ICON: ShareIconSvg, name: '@/svg/ShareIconSvg', key: randomString() },
 	]
 
 	return (

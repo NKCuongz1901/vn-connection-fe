@@ -7,7 +7,7 @@ export const mainRoutes = {
 	network: 'network',
 	event: 'event',
 	upcomingEvent: 'upcoming-event',
-	discussions: 'discussions',
+	discussions: 'discussion',
 	overview: 'overview',
 	search: 'search',
 	inbox: 'inbox',

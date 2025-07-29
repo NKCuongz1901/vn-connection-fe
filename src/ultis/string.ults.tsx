@@ -65,3 +65,14 @@ export const generateCustomUuid = () =>
 				.join(''),
 		)
 		.join('-')
+
+export const parseNumberToShort = (_n: number | string) => {
+	const n = Number(_n)
+	return n >= 1e9
+		? (n / 1e9).toFixed(1).replace(/\.0$/, '') + 'b'
+		: n >= 1e6
+		? (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'm'
+		: n >= 1e3
+		? (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'k'
+		: n.toString()
+}

@@ -118,7 +118,7 @@ const MainLayout = (props: MainLayoutProps) => {
 			}
 		} else {
 			if (login) {
-				onChangeRoute(mainRoutes.upcomingEvent)
+				onChangeRoute(mainRoutes.overview)
 			} else {
 				setContent(<AuthLayout>{children}</AuthLayout>)
 			}
