@@ -53,7 +53,7 @@ const ModalReport = (props: ModalReportProps) => {
 		const _errors: any = Object.fromEntries(
 			Object.entries({
 				email: 'Please enter your email',
-				content: 'Please enter your proble',
+				// content: 'Please enter your proble',
 			}).filter(([key]) => !dataModal?.[key]),
 		)
 		if (!_errors.email && !isEmail(email)) {
@@ -139,11 +139,11 @@ const ModalReport = (props: ModalReportProps) => {
 						onChange={(e) => handleOnChangeData('topic', e)}
 					/>
 				</Flex>
-				<Flex className={classes.content}>
+				{/* <Flex className={classes.content}>
 					<CUpload onChange={(e) => handleOnChangeData('content', e.file)}>
 						<Flex className={classes.uploadText}>Upload image</Flex>
 					</CUpload>
-				</Flex>
+				</Flex> */}
 			</Flex>
 		)
 	}
