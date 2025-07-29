@@ -5,7 +5,7 @@ import { memo } from 'react'
 
 import { isArray } from '@/ultis/array.ults'
 import { getDiffFromNow } from '@/ultis/date.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { onPushState, useLocalePath } from '@/ultis/route.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CImage from '@/Components/Custom/CImage'
@@ -20,11 +20,12 @@ interface DiscussionItemProps {
 	item: any
 	onGetMenus: any
 	onAction?: any
+	onChangeUrl?: any
 	[key: string]: any
 }
 const DiscussionItem = (props: DiscussionItemProps) => {
 	const { onChangeRoute } = useLocalePath()
-	const { item, onGetMenus, onAction } = props || {}
+	const { item, onGetMenus, onAction, onChangeUrl } = props || {}
 	const {
 		user,
 		category,
@@ -81,7 +82,7 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 			user_id,
 		})
 		return (
-			<Flex className={classes.footer}>
+			<Flex className={classes.footer} onClick={(e) => e.stopPropagation()}>
 				<Flex className={classes.footerLeft}>
 					<Flex
 						className={classes.footerIcon}
@@ -95,7 +96,10 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 					</Flex>
 					<div className={classes.vertical} />
 
-					<div className={classes.footerIcon}>
+					<div
+						className={classes.footerIcon}
+						onClick={() => onAction({ key: 'share', value: item })}
+					>
 						<ShareIconSvg />
 					</div>
 				</Flex>
@@ -107,26 +111,14 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 			</Flex>
 		)
 	}
-	// const _renderMyFriendComp = () => {
-
-	// 	const isMe = user_id === getUserInfo('id')
-
-	// 	return (
-	// 		<div className={classes.btnAddHost}>
-	// 			<Dropdown
-	// 				trigger={['click']}
-	// 				menu={{ items: menus }}
-	// 				disabled={loadingCoHost}
-	// 			>
-	// 				<CButton ctype="oranger">{isUpgrate ? 'Add' : 'Delete'}</CButton>
-	// 			</Dropdown>
-	// 		</div>
-	// 	)
-	// }
 
 	return (
 		<div className={classes.wrapper}>
-			<Flex className={classes.container} vertical>
+			<Flex
+				className={classes.container}
+				vertical
+				// onClick={() => onChangeUrl({ key: 'id', value: id })}
+			>
 				<Flex className={classes.header}>
 					<CAvatar src={imageCategory} className={classes.avatar} />
 					<span>Posted on</span>

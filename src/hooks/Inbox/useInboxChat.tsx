@@ -305,11 +305,7 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 			openError(error)
 		}
 	}
-	const handleActionSettingConv = ({ key, value }) => {
-		console.log(
-			`🏖️🏖️🏖️ TrieuNinhHan ~ :310 ~ handleActionSettingConv ~ { key, value }:`,
-			{ key, value },
-		)
+	const handleActionSettingConv = ({ key, value: _value }) => {
 		switch (key) {
 			case 'noti':
 				handleGetMembersConv(true)

@@ -169,10 +169,6 @@ export default function useHangoutChat({
 		const { participant } = hangoutInfo
 		try {
 			const res: any = await deleteHangoutParticipantId({ id: participant.id })
-			console.log(
-				'🏖️🏖️🏖️ TrieuNinhHan ~ :176 ~ handleLeaveHangout ~ res:',
-				hangoutInfo,
-			)
 
 			if (res?.code == 200) {
 				onPushState({})

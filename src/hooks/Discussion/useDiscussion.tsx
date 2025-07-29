@@ -245,13 +245,16 @@ export default function useDiscussion({}) {
 			case 'like':
 				handleLikeDiscuss(value)
 				break
-
+			case 'share':
+				const { user, id } = value || {}
+				const { id: user_id } = user || {}
+				setModal({ type: 'share', data: { id, user_id, props: value } })
+				break
 			default:
 				break
 		}
 	}
 	const handleMenusClick = ({ key, value }) => {
-		console.log('object', { key, value })
 		switch (key) {
 			case 'share':
 				setModal({ type: key, data: value })

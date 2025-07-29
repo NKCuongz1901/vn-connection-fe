@@ -118,7 +118,6 @@ export default function useCRUDNetwork({
 			default:
 				break
 		}
-		console.log({ value, otherState })
 		setErrors((prev) => ({ ...prev, [key]: '' }))
 		setDataModal((prev) => ({ ...prev, [key]: value, ...otherState }))
 	}, [])

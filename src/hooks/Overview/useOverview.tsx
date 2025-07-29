@@ -253,7 +253,6 @@ export default function useOverview() {
 	}
 
 	const handleScrollUp = (e: any) => {
-		console.log('object')
 		const clientHeight = e.target.clientHeight
 		const scrollHeight = e.target.scrollHeight
 		const scrollTop = Math.abs(e.target.scrollTop)
