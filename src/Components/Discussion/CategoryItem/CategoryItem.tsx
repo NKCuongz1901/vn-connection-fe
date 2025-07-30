@@ -21,7 +21,7 @@ const CategoryItem = (props: CategoryItemProp) => {
 	return (
 		<div className={classes.wrapper}>
 			<Flex className={classes.container}>
-				<Flex className={classes.Left}>
+				<Flex className={classes.left}>
 					<div className={classes.image}>
 						<CImage src={image} />
 					</div>
