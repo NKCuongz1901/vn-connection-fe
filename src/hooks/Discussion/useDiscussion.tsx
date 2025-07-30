@@ -6,7 +6,9 @@ import { useModal } from '@/context/ModalContext'
 
 import { sendMessageById } from '@/apis/conversationApis'
 import {
+	deleteDiscussion,
 	getDiscuss,
+	getDiscussDetail,
 	getMyCategory,
 	getRecommendCategory,
 	likeCategory,
@@ -18,7 +20,7 @@ import { isArray, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
 import { onPushState, useQuery } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
-import { copyToClipboard } from '@/ultis/string.ults'
+import { copyToClipboard, randomString } from '@/ultis/string.ults'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'
@@ -27,16 +29,18 @@ export default function useDiscussion({}) {
 	const { openError, openSuccess, openConfirm } = useModal()
 	const { toggleLoadingContext } = useLoading()
 	const { onGetQuerry } = useQuery()
-	const { category_id } = onGetQuerry()
+	const { category_id, id, force_id } = onGetQuerry()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const _paginationRecommendRefs = useRef<PaginationType>(
 		cloneDeep(paginationCommon),
 	)
 	const _loadmore = useRef<boolean>(true)
-
+	const _keyDiscuss = useRef(randomString())
 	const [modal, setModal] = useState({ type: '', data: null }) as any
 	const [title, setTitle] = useState('')
 	const [categoryId, setCategoryId] = useState(category_id || '')
+	const [discussId, setDiscussId] = useState(id || '')
+
 	const [loadingShare, setLoadingShare] = useState({}) as any
 
 	const [myCategory, setMyCategory] = useState<any[]>([])
@@ -44,6 +48,8 @@ export default function useDiscussion({}) {
 	const [discuss, setDiscuss] = useState<any[]>([])
 	const [shareList, setShareList] = useState([]) as any
 	const [loadIds, setLoadingIds] = useState<any[]>([])
+
+	const [discussDetail, setDiscussDetail] = useState<any>(null)
 
 	const [loadingJoin, setLoadingJoin] = useState(false)
 	const [loading, setLoading] = useState({
@@ -158,7 +164,9 @@ export default function useDiscussion({}) {
 				limit,
 			})
 			const { code, results } = res || {}
-			await delay(1000)
+			if (!isNotLoading) {
+				await delay(1000)
+			}
 			if (code === 200) {
 				const { rows } = results?.objects || {}
 				if (!isNotLoading) {
@@ -166,7 +174,11 @@ export default function useDiscussion({}) {
 				}
 				setDiscuss((prev: any[]) => {
 					const contents = isNew && !isNotLoading ? [] : prev
-					const dataShow = uniqueArray([...contents, ...rows], 'id') as any[]
+					const dataShow = (
+						!isNotLoading
+							? uniqueArray([...contents, ...rows], 'id')
+							: uniqueArray([...rows, ...contents], 'id')
+					) as any[]
 					return dataShow
 				})
 			}
@@ -179,7 +191,7 @@ export default function useDiscussion({}) {
 	const handleLoadMore = async () => {
 		if (!_loadmore.current || loading.discuss) return
 		const { limit } = _paginationRefs.current
-		const currentPage = Math.ceil((discuss || []).length / limit)
+		const currentPage = Math.trunc((discuss || []).length / limit)
 		_paginationRefs.current.page = currentPage + 1
 		await handleGetDiscuss()
 	}
@@ -240,6 +252,41 @@ export default function useDiscussion({}) {
 			toggleLoadingContext()
 		}
 	}
+	const handleReplace = async (id) => {
+		try {
+			const res: any = await getDiscussDetail({
+				id,
+				fields: [
+					'$all',
+					{ user: ['name', 'avatar', 'id'] },
+					{
+						medias: [
+							'thumbnail',
+							'duration',
+							'url',
+							'width',
+							'height',
+							'ratio',
+							'type',
+						],
+					},
+					{
+						category: ['id', 'image', 'title'],
+					},
+				],
+			})
+			if (res) {
+				const { object } = res?.results || {}
+				setDiscuss((prev) =>
+					prev.map((item) => (item.id === id ? object : item)),
+				)
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoading((prev) => ({ ...prev, discuss: false }))
+		}
+	}
 	const handleAction = ({ key, value }) => {
 		switch (key) {
 			case 'like':
@@ -250,8 +297,40 @@ export default function useDiscussion({}) {
 				const { id: user_id } = user || {}
 				setModal({ type: 'share', data: { id, user_id, props: value } })
 				break
+			case 'addNew':
+				{
+					const { category_id: _category_id } = value
+					if (!category_id || category_id !== _category_id) {
+						handleGetDiscuss(true)
+					}
+				}
+				break
+			case 'edit':
+				{
+					const { category_id: _category_id, id } = value
+					if (!category_id || category_id !== _category_id) {
+						handleReplace(id)
+					}
+				}
+				break
 			default:
 				break
+		}
+	}
+	const handleDeleteDiscuss = async (id: string) => {
+		toggleLoadingContext(true)
+		try {
+			const res: any = await deleteDiscussion({ id })
+			if (res) {
+				setDiscuss((prev: any[]) => prev.filter((item) => item.id !== id))
+				openSuccess({
+					message: 'You have successfully deleted this discuss',
+				})
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			toggleLoadingContext()
 		}
 	}
 	const handleMenusClick = ({ key, value }) => {
@@ -267,6 +346,12 @@ export default function useDiscussion({}) {
 				break
 			case 'report':
 				setModal({ type: 'report', data: value })
+				break
+			case 'delete':
+				openConfirm({
+					message: 'Do you want to delete this discussion?',
+					onAccept: () => handleDeleteDiscuss(value),
+				})
 				break
 			default:
 				break
@@ -295,11 +380,21 @@ export default function useDiscussion({}) {
 				{
 					key: 'edit',
 					label: 'Edit',
+					onClick: () =>
+						setModal({
+							type: 'edit',
+							data: {
+								id,
+								user_id,
+								...props,
+							},
+						}),
 				},
 				{
 					key: 'delete',
 					label: 'Delete',
 					style: { color: '#F80024' },
+					onClick: () => handleMenusClick({ key: 'delete', value: id }),
 				},
 			)
 		} else {
@@ -355,7 +450,13 @@ export default function useDiscussion({}) {
 					onPushState({ category_id: value.id })
 				}
 				break
-
+			case 'id':
+				if (id !== value.id) {
+					_keyDiscuss.current = randomString()
+					setDiscussDetail(value)
+					onPushState({ id: value.id, ...(category_id && { category_id }) })
+				}
+				break
 			default:
 				break
 		}
@@ -368,6 +469,17 @@ export default function useDiscussion({}) {
 	useEffect(() => {
 		setCategoryId(category_id || '')
 	}, [category_id])
+	useEffect(() => {
+		_keyDiscuss.current = randomString()
+		setDiscussId(id || '')
+	}, [id])
+	useEffect(() => {
+		if (force_id) {
+			_paginationRefs.current.page = 1
+			handleGetDiscuss()
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [force_id])
 	useEffect(() => {
 		const id = setTimeout(() => {
 			_paginationRefs.current.page = 1
@@ -384,14 +496,16 @@ export default function useDiscussion({}) {
 		loadingJoin,
 		loadingShare,
 		shareList,
-
 		myCategory,
 		recommendCategory,
 		discuss,
 		modal,
 		setModal,
 		title,
+		discussId,
+		discussDetail,
 		setTitle,
+
 		onJoinCategory: handleJoinCategory,
 		onGetMenus: handleGetMenus,
 		onCopy: handleCopy,

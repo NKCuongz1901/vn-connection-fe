@@ -90,6 +90,11 @@ export const getListCommentById = async (params: any) => {
 	})
 }
 
+export const likeComment = async ({ id }) => {
+	const url = POST_ROUTES.likeComment + `/${id}`
+	return await axios.post(url, {})
+}
+
 export const sendCommentPost = async (payload: {
 	post_id: string
 	content?: string

@@ -5,14 +5,15 @@ import { memo } from 'react'
 
 import { isArray } from '@/ultis/array.ults'
 import { getDiffFromNow } from '@/ultis/date.ults'
-import { onPushState, useLocalePath } from '@/ultis/route.ults'
+import { useLocalePath } from '@/ultis/route.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CImage from '@/Components/Custom/CImage'
-import { mainRoutes } from '@/routes/MainRoutes'
 import Heart from '@/svg/Heart'
 import MessageMinuIcon from '@/svg/MessageMinuIcon'
 import ShareIconSvg from '@/svg/ShareIconSvg'
+
+import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './DiscussionItem.module.scss'
 
@@ -25,7 +26,12 @@ interface DiscussionItemProps {
 }
 const DiscussionItem = (props: DiscussionItemProps) => {
 	const { onChangeRoute } = useLocalePath()
-	const { item, onGetMenus, onAction, onChangeUrl } = props || {}
+	const {
+		item,
+		onGetMenus,
+		onAction = () => null,
+		onChangeUrl = () => null,
+	} = props || {}
 	const {
 		user,
 		category,
@@ -82,11 +88,14 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 			user_id,
 		})
 		return (
-			<Flex className={classes.footer} onClick={(e) => e.stopPropagation()}>
+			<Flex className={classes.footer}>
 				<Flex className={classes.footerLeft}>
 					<Flex
 						className={classes.footerIcon}
-						onClick={() => onAction({ key: 'like', value: id })}
+						onClick={(e) => {
+							e.stopPropagation()
+							onAction({ key: 'like', value: id })
+						}}
 					>
 						<Heart fill={is_liked ? '#F80024' : '#94A3B8'} /> {amount_of_like}
 					</Flex>
@@ -98,12 +107,18 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 
 					<div
 						className={classes.footerIcon}
-						onClick={() => onAction({ key: 'share', value: item })}
+						onClick={(e) => {
+							e.stopPropagation()
+							onAction({ key: 'share', value: item })
+						}}
 					>
 						<ShareIconSvg />
 					</div>
 				</Flex>
-				<Flex className={classes.footerRight}>
+				<Flex
+					className={classes.footerRight}
+					onClick={(e) => e.stopPropagation()}
+				>
 					<Dropdown trigger={['click']} menu={{ items: menus }}>
 						<IconDots color="#94A3B8" />
 					</Dropdown>
@@ -117,7 +132,7 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 			<Flex
 				className={classes.container}
 				vertical
-				// onClick={() => onChangeUrl({ key: 'id', value: id })}
+				onClick={() => onChangeUrl({ key: 'id', value: item })}
 			>
 				<Flex className={classes.header}>
 					<CAvatar src={imageCategory} className={classes.avatar} />

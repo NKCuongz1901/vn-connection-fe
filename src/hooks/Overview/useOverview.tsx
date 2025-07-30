@@ -212,7 +212,7 @@ export default function useOverview() {
 	const handleLoadMore = async () => {
 		if (!_loadmore.current || loadingMyEvent) return
 		const { limit } = _paginationRefs.current
-		const currentPage = Math.ceil((listMyEvent || []).length / limit)
+		const currentPage = Math.trunc((listMyEvent || []).length / limit)
 		_paginationRefs.current.page = currentPage + 1
 		await handleGetMyEvent()
 	}
@@ -248,7 +248,7 @@ export default function useOverview() {
 
 		if (!loadmore || loading) return
 		_paginationRefs.current.page =
-			Math.ceil((listPost || []).length / limit) + 1
+			Math.trunc((listPost || []).length / limit) + 1
 		await handleGetListPost()
 	}
 

@@ -96,7 +96,7 @@ export default function useSettingConv({
 	const handleLoadMore = async () => {
 		if (!_loadmore.current || !!loading.medias) return
 		const { limit } = _paginationRefs.current
-		const currentPage = Math.ceil((medias || []).length / limit)
+		const currentPage = Math.trunc((medias || []).length / limit)
 		_paginationRefs.current.page = currentPage + 1
 		await handleGetMedia()
 	}

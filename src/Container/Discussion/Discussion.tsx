@@ -9,7 +9,9 @@ import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
 import ModalReport from '@/Components/Custom/ModalReport'
 import CategoryItem from '@/Components/Discussion/CategoryItem'
+import DiscussionDetail from '@/Components/Discussion/DiscussionDetail'
 import DiscussionItem from '@/Components/Discussion/DiscussionItem'
+import ModalCRUDDiscussion from '@/Components/Discussion/ModalCRUDDiscussion'
 import ModalTopic from '@/Components/Discussion/ModalTopic'
 import ModalMyFriend from '@/Components/Friend/ModalMyFriend'
 import useDiscussion from '@/hooks/Discussion/useDiscussion'
@@ -30,6 +32,7 @@ const Discussion = () => {
 		modal,
 		setModal,
 		title,
+		discussId,
 		setTitle,
 		onJoinCategory,
 		onGetMenus,
@@ -61,6 +64,17 @@ const Discussion = () => {
 		)
 	}
 	const _renderLeft = () => {
+		if (discussId) {
+			return (
+				<Flex vertical className={classes.left}>
+					<DiscussionDetail
+						discussId={discussId}
+						topic={myCategory}
+						onAction={onAction}
+					/>
+				</Flex>
+			)
+		}
 		return (
 			<Flex vertical className={classes.left}>
 				<Flex className={classes.searchBar}>
@@ -80,6 +94,7 @@ const Discussion = () => {
 									item={item}
 									onGetMenus={onGetMenus}
 									onAction={onAction}
+									onChangeUrl={onChangeUrl}
 								/>
 						  ))
 						: _renderNoPost()}
@@ -129,14 +144,32 @@ const Discussion = () => {
 				</Flex>
 				<Flex className={classes.topicList} vertical>
 					{(recommendCategory || []).map((item) => (
-						<CategoryItem
+						<div
 							key={item.id}
-							loading={loadingJoin}
-							item={item}
-							onJoinCategory={onJoinCategory}
-						/>
+							onClick={() => {
+								onChangeUrl({ key: 'category_id', value: item })
+							}}
+						>
+							<CategoryItem
+								key={item.id}
+								loading={loadingJoin}
+								item={item}
+								onJoinCategory={onJoinCategory}
+							/>
+						</div>
 					))}
 				</Flex>
+			</Flex>
+		)
+	}
+	const _renderAddNew = () => {
+		if (discussId) return
+		return (
+			<Flex
+				className={classes.addNew}
+				onClick={() => setModal({ type: 'addNew', data: null })}
+			>
+				<div className={classes.addNewIcon}>+</div>
 			</Flex>
 		)
 	}
@@ -220,7 +253,25 @@ const Discussion = () => {
 					/>
 				)
 				break
-
+			case 'addNew':
+				Content = (
+					<ModalCRUDDiscussion
+						{...propsModal}
+						onSuccess={(item) => onAction({ key: 'addNew', value: item })}
+						topic={myCategory}
+					/>
+				)
+				break
+			case 'edit':
+				Content = (
+					<ModalCRUDDiscussion
+						{...propsModal}
+						onSuccess={(item) => onAction({ key: 'edit', value: item })}
+						topic={myCategory}
+						data={data}
+					/>
+				)
+				break
 			default:
 				break
 		}
@@ -231,6 +282,7 @@ const Discussion = () => {
 			<Flex className={classes.container}>
 				{_renderLeft()}
 				{_renderRight()}
+				{_renderAddNew()}
 			</Flex>
 			{_renderModal()}
 		</div>

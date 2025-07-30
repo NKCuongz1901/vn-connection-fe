@@ -13,13 +13,11 @@ import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
 import CModal from '@/Components/Custom/CModal/CModal'
 import CSelect from '@/Components/Custom/CSelect'
-import CTextArea from '@/Components/Custom/CTextArea'
 import FeedbackIcon from '@/svg/FeedbackIcon'
 
 import { topicReportOpt } from '@/Variable/select.variable'
 
 import classes from './ModalReport.module.scss'
-import CUpload from '../CUpload'
 
 interface ModalReportProps {
 	open: boolean
@@ -114,7 +112,7 @@ const ModalReport = (props: ModalReportProps) => {
 	}
 
 	const _renderMiddle = () => {
-		const { topic, email, content } = dataModal
+		const { topic, email } = dataModal
 		return (
 			<Flex className={classes.middle} vertical>
 				<Flex className={classes.email}>

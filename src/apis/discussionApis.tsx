@@ -10,6 +10,17 @@ export const getDiscuss = async (params) => {
 		params: convertParams(params),
 	})
 }
+export const getDiscussDetail = async (params: {
+	id: string
+	[key: string]: any
+}) => {
+	const { id, ..._params } = params || {}
+	const url = DISCUSS_ROUTES.name + '/' + id
+
+	return await axios.get(url, {
+		params: convertParams(_params),
+	})
+}
 export const getMyCategory = async (params) => {
 	const url = CATEGORY_ROUTES.myCategory
 
@@ -38,6 +49,26 @@ export const likeCategory = async ({ id }) => {
 export const likeDiscuss = async ({ id }) => {
 	const url = DISCUSS_ROUTES.likeDiscuss + `/${id}`
 	return await axios.post(url, {})
+}
+
+export const deleteDiscussion = async ({ id }: { id: string }) => {
+	const url = DISCUSS_ROUTES.name + `/${id}`
+	return await axios.delete(url)
+}
+export const createDiscussion = async (payload) => {
+	const url = DISCUSS_ROUTES.name
+	return await axios.post(url, payload)
+}
+
+export const editDiscussion = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: any
+}) => {
+	const url = `${DISCUSS_ROUTES.name}/${id}`
+	return await axios.put(url, payload)
 }
 // export const getHangoutSearch = async (params) => {
 // 	const url = HANGOUT_ROUTES.search // myprofile

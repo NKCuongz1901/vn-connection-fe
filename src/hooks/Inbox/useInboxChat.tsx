@@ -98,7 +98,7 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 	const handleLoadMore = async () => {
 		if (!_loadmore.current || loading) return
 		const { limit } = _paginationRefs.current
-		const currentPage = Math.ceil((messList || []).length / limit)
+		const currentPage = Math.trunc((messList || []).length / limit)
 		_paginationRefs.current.page = currentPage + 1
 		await handleGetListMessById()
 	}

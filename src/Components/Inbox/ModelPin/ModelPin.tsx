@@ -103,7 +103,7 @@ const ModelPin = ({ data, onClose }: ModelPinProps) => {
 	const handleLoadMore = async () => {
 		if (!_loadmore.current || loading) return
 		const { limit } = _paginationRefs.current
-		const currentPage = Math.ceil((pinList || []).length / limit)
+		const currentPage = Math.trunc((pinList || []).length / limit)
 		_paginationRefs.current.page = currentPage + 1
 		await handleGetPinMessage()
 	}
