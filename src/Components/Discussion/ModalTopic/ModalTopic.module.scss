@@ -37,3 +37,18 @@
 		}
 	}
 }
+@media (min-width: 0px) and (max-width: 700px) {
+	.container {
+		.content {
+			.topic {
+				.topicChildrenWrapper {
+					flex-direction: column;
+					.topicChildren {
+						min-width: 100%;
+						max-width: 100%;
+					}
+				}
+			}
+		}
+	}
+}

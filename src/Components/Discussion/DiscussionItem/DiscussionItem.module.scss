@@ -71,3 +71,39 @@
 		font-weight: 600;
 	}
 }
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		.container {
+			padding: 8px 12px;
+			.header {
+				.avatar {
+				}
+			}
+			.body {
+				.bodyHeader {
+				}
+				.medias {
+					.media {
+						:global(.ant-image) {
+						}
+						img {
+						}
+					}
+				}
+			}
+			.footer {
+				.footerLeft {
+					.vertical {
+					}
+					.footerIcon {
+						cursor: pointer;
+						svg {
+						}
+					}
+				}
+			}
+		}
+		.title {
+		}
+	}
+}

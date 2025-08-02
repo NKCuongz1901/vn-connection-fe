@@ -38,6 +38,7 @@ export default function useDiscussion({}) {
 	const _keyDiscuss = useRef(randomString())
 	const [modal, setModal] = useState({ type: '', data: null }) as any
 	const [title, setTitle] = useState('')
+	const [titleTopic, setTitleTopic] = useState('')
 	const [categoryId, setCategoryId] = useState(category_id || '')
 	const [discussId, setDiscussId] = useState(id || '')
 
@@ -196,10 +197,19 @@ export default function useDiscussion({}) {
 		await handleGetDiscuss()
 	}
 	const handleScroll = (e: any) => {
+		console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :200 ~ handleScroll ~ e:', e)
 		const clientHeight = e.target.clientHeight
 		const scrollHeight = e.target.scrollHeight
 		const scrollTop = Math.abs(e.target.scrollTop)
+		console.log(
+			'🏖️🏖️🏖️ TrieuNinhHan ~ :204 ~ handleScroll ~ scrollTop:',
+			scrollTop,
+		)
 		const isReachedEnd = scrollTop + clientHeight >= scrollHeight - 50
+		console.log(
+			'🏖️🏖️🏖️ TrieuNinhHan ~ :205 ~ handleScroll ~ isReachedEnd:',
+			isReachedEnd,
+		)
 		if (!isReachedEnd) return
 
 		handleLoadMore()
@@ -504,8 +514,10 @@ export default function useDiscussion({}) {
 		title,
 		discussId,
 		discussDetail,
-		setTitle,
+		titleTopic,
 
+		setTitleTopic,
+		setTitle,
 		onJoinCategory: handleJoinCategory,
 		onGetMenus: handleGetMenus,
 		onCopy: handleCopy,

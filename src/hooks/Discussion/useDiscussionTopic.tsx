@@ -38,7 +38,7 @@ export default function useDiscussionTopic({ type }) {
 				limit,
 				...(titleTopic && { where: { title: titleTopic } }),
 			})
-			await delay(1000)
+			await delay(200)
 			if (res) {
 				const { rows } = res?.results?.objects || {}
 				setCategory(rows || [])

@@ -36,4 +36,4 @@ const CInput = forwardRef((_props: CInputProps, ref: any) => {
 })
 CInput.displayName = 'CInput' // 👈 THÊM DÒNG NÀY ĐỂ FIX
 
-export default memo(CInput)
+export default memo(CInput) as React.FC<CInputProps>

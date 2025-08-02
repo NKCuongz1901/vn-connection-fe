@@ -118,3 +118,14 @@
 		height: 40px !important;
 	}
 }
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		.container {
+			height: calc(100% - 20px);
+			.body {
+				height: calc(100dvh - 100px);
+			}
+		}
+	}
+}

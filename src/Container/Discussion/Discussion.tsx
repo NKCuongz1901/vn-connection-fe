@@ -19,6 +19,7 @@ import NoPostIcon from '@/svg/DiscusstionSvg/NoPostIcon'
 import SearchIcon from '@/svg/SearchIcon'
 
 import classes from './Discussion.module.scss'
+import clsx from 'clsx'
 
 const Discussion = () => {
 	const {
@@ -33,6 +34,8 @@ const Discussion = () => {
 		setModal,
 		title,
 		discussId,
+		titleTopic,
+		setTitleTopic,
 		setTitle,
 		onJoinCategory,
 		onGetMenus,
@@ -116,16 +119,22 @@ const Discussion = () => {
 					</div>
 				</Flex>
 				<Flex className={classes.topicList} vertical>
-					{(myCategory || []).map((item) => (
-						<div
-							key={item.id}
-							onClick={() => {
-								onChangeUrl({ key: 'category_id', value: item })
-							}}
-						>
-							<CategoryItem item={item} hiddenJoin />
-						</div>
-					))}
+					{(myCategory || []).map(
+						(item) =>
+							item?.title
+								?.toLocaleLowerCase()
+								?.includes(titleTopic.toLocaleLowerCase()) && (
+								<div
+									key={item.id}
+									onClick={() => {
+										onChangeUrl({ key: 'category_id', value: item })
+									}}
+									className={classes.categoryItem}
+								>
+									<CategoryItem item={item} hiddenJoin />
+								</div>
+							),
+					)}
 				</Flex>
 			</Flex>
 		)
@@ -143,21 +152,27 @@ const Discussion = () => {
 					</div>
 				</Flex>
 				<Flex className={classes.topicList} vertical>
-					{(recommendCategory || []).map((item) => (
-						<div
-							key={item.id}
-							onClick={() => {
-								onChangeUrl({ key: 'category_id', value: item })
-							}}
-						>
-							<CategoryItem
-								key={item.id}
-								loading={loadingJoin}
-								item={item}
-								onJoinCategory={onJoinCategory}
-							/>
-						</div>
-					))}
+					{(recommendCategory || []).map(
+						(item) =>
+							item?.title
+								?.toLocaleLowerCase()
+								?.includes(titleTopic.toLocaleLowerCase()) && (
+								<div
+									className={classes.categoryItem}
+									key={item.id}
+									onClick={() => {
+										onChangeUrl({ key: 'category_id', value: item })
+									}}
+								>
+									<CategoryItem
+										key={item.id}
+										loading={loadingJoin}
+										item={item}
+										onJoinCategory={onJoinCategory}
+									/>
+								</div>
+							),
+					)}
 				</Flex>
 			</Flex>
 		)
@@ -178,10 +193,31 @@ const Discussion = () => {
 			<Flex vertical className={classes.right}>
 				<Flex className={classes.searchBar}>
 					<CInput
-						disabled
+						value={titleTopic}
 						prefix={<SearchIcon />}
 						placeholder="Search"
 						style={{ borderRadius: 40, height: 40 }}
+						onChange={(e) => setTitleTopic(e.target.value)}
+					/>
+				</Flex>
+				<Flex vertical className={classes.category}>
+					{_renderJoin()}
+					{_renderSuggestion()}
+				</Flex>
+			</Flex>
+		)
+	}
+	const _renderTop = () => {
+		if (discussId) return
+		return (
+			<Flex vertical className={clsx(classes.right, classes.top)}>
+				<Flex className={classes.searchBar}>
+					<CInput
+						value={titleTopic}
+						prefix={<SearchIcon />}
+						placeholder="Search"
+						style={{ borderRadius: 40, height: 40 }}
+						onChange={(e) => setTitleTopic(e.target.value)}
 					/>
 				</Flex>
 				<Flex vertical className={classes.category}>
@@ -279,7 +315,13 @@ const Discussion = () => {
 	}
 	return (
 		<div className={classes.wrapper}>
-			<Flex className={classes.container}>
+			<Flex
+				className={clsx(classes.container, {
+					[classes.containerHidden]: discussId,
+				})}
+				onScroll={onScroll}
+			>
+				{_renderTop()}
 				{_renderLeft()}
 				{_renderRight()}
 				{_renderAddNew()}
