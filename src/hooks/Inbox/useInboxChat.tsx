@@ -38,6 +38,7 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 	const [openSetting, setOpenSetting] = useState(false)
 
 	const [pinList, setPinList] = useState<any[]>([])
+	const [totalPin, setTotalPin] = useState<number>(0)
 	const [loading, setLoading] = useState(false)
 	const [loadingPage, setLoadingPage] = useState(false)
 	const [loadingConvInfo, setLoadingConvInfo] = useState(false)
@@ -298,8 +299,9 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 				},
 			})
 			if (res) {
-				const _data = res?.results?.objects?.rows
-				setPinList(_data)
+				const { rows, count } = res?.results?.objects || {}
+				setPinList(rows)
+				setTotalPin(count || 0)
 			}
 		} catch (error) {
 			openError(error)
@@ -336,6 +338,7 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 		loading,
 		loadingConvInfo,
 		modal,
+		totalPin,
 		setModal,
 		openSetting,
 		setOpenSetting,

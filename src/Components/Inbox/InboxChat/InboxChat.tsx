@@ -16,6 +16,8 @@ import ModelPin from '../ModelPin'
 import SettingConv from '../SettingConv'
 
 import classes from './InboxChat.module.scss'
+import { IconChevronCompactRight } from '@tabler/icons-react'
+import ArrrowRightIcon from '@/svg/ArrrowRightIcon'
 
 const mappingType = {
 	MEDIAS: 'Pin a image',
@@ -30,6 +32,7 @@ const InboxChat = ({ convId }) => {
 		loadingPage,
 		loading,
 		pinList,
+		totalPin,
 		modal,
 		setModal,
 		openSetting,
@@ -52,15 +55,21 @@ const InboxChat = ({ convId }) => {
 				className={classes.pinMess}
 				onClick={() => setModal({ type: 'pin', data: { id: convId } })}
 			>
-				<Flex className={classes.pinIcon}>
-					<PinIcon />
+				<Flex className={classes.pinLeft}>
+					<Flex className={classes.pinIcon}>
+						<PinIcon />
+					</Flex>
+					<Flex className={classes.pinInfo} vertical>
+						<span className={classes.titlePin}>Pinned messages</span>
+						<div className={classes.pinLastMess}>
+							{pinList[0]?.sender?.name}:{' '}
+							{mappingType[pinList[0]?.type] || pinList[0]?.content}
+						</div>
+					</Flex>
 				</Flex>
-				<Flex className={classes.pinInfo} vertical>
-					<span className={classes.titlePin}>Pinned messages</span>
-					<div className={classes.pinLastMess}>
-						{pinList[0]?.sender?.name}:{' '}
-						{mappingType[pinList[0]?.type] || pinList[0]?.content}
-					</div>
+				<Flex className={classes.numberPin}>
+					<span className={classes.text}>+ {totalPin}</span>
+					<ArrrowRightIcon />
 				</Flex>
 			</Flex>
 		)
