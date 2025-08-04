@@ -118,6 +118,7 @@ export default function useChatBox({
 				  ]
 				: []),
 		]
+		console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :121 ~ handleGetMenus ~ menus:', menus)
 		return menus
 	}
 	useEffect(() => {

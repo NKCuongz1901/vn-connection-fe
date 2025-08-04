@@ -22,6 +22,7 @@ import CUploadMuti from '../Custom/CUploadMuti'
 import { specialTypeMessage } from '@/Variable/common.variable'
 
 import classes from './ChatBox.module.scss'
+import MoreIcon from '@/svg/MoreIcon'
 interface ChatBoxProps {
 	type?: string
 	itemList?: any[]
@@ -41,6 +42,7 @@ const ChatBox = ({
 	loading,
 	onActionMessage,
 }: ChatBoxProps) => {
+	console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :45 ~ ChatBox ~ itemList:', itemList)
 	const {
 		_refInput,
 		activeSticker,
@@ -190,13 +192,20 @@ const ChatBox = ({
 							<Flex className={classes.name}>{user?.name}</Flex>
 						)}
 						<Flex className={classes.content}>
-							<Dropdown
-								trigger={['click']}
-								menu={{ items: onGetMenus({ item, isMe }) }}
-								disabled={isTemp || isMemberAction}
-							>
-								{_renderContentChat(item)}
-							</Dropdown>
+							{!(isTemp || isMemberAction) && (
+								<Dropdown
+									trigger={['click']}
+									menu={{ items: onGetMenus({ item, isMe }) }}
+									disabled={isTemp || isMemberAction}
+								>
+									<Flex className={classes.moreIconWrapper}>
+										<Flex className={classes.moreIcon}>
+											<MoreIcon />
+										</Flex>
+									</Flex>
+								</Dropdown>
+							)}
+							{_renderContentChat(item)}
 						</Flex>
 					</Flex>
 				</Flex>
