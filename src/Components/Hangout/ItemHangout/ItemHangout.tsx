@@ -49,6 +49,7 @@ const ItemHangout = ({
 		user,
 		title_open_hangout,
 		origin_id,
+		age: _age,
 	} = item || {}
 	const images = (participants || []).slice(0, 3)
 	const {
@@ -147,7 +148,7 @@ const ItemHangout = ({
 				<Flex className={classes.otherInfo}>
 					<Flex className={classes.infoItem} vertical>
 						<Flex>
-							{name}, {getAge(age)}
+							{name}, {_age || getAge(age)}
 							{GENDER[gender]}
 						</Flex>
 						<div>{languages_can_speak}</div>
