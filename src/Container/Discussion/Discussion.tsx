@@ -113,7 +113,7 @@ const Discussion = () => {
 					className={classes.titleTopic}
 					onClick={() => setModal({ type: 'topic', data: 'join' })}
 				>
-					<div className={classes.title}>Joined topics</div>
+					<div className={classes.title}>My Channels</div>
 					<div className={classes.arrowIcon}>
 						<IconChevronRight />
 					</div>
@@ -146,7 +146,7 @@ const Discussion = () => {
 					className={classes.titleTopic}
 					onClick={() => setModal({ type: 'topic', data: 'explore' })}
 				>
-					<div className={classes.title}>Topics suggestions</div>
+					<div className={classes.title}>Channels Suggestions</div>
 					<div className={classes.arrowIcon}>
 						<IconChevronRight />
 					</div>
