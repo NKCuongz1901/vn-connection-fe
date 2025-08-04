@@ -4,6 +4,7 @@ import { getListSticket } from '@/apis/postApis'
 
 import { useModal } from '@/context/ModalContext'
 import { ItemType } from 'antd/es/menu/interface'
+import { copyToClipboard } from '@/ultis/string.ults'
 
 type useHangoutChatProps = {
 	type?: string
@@ -15,7 +16,7 @@ export default function useChatBox({
 	type,
 	onActionMessage,
 }: useHangoutChatProps) {
-	const { openError } = useModal()
+	const { openError, openSuccess } = useModal()
 	const _refInput = useRef() as any
 	const [stickerList, setStickerList] = useState([]) as any[]
 	const [activeSticker, setActiveSticker] = useState(0)
@@ -47,8 +48,36 @@ export default function useChatBox({
 		setReply(item)
 		_refInput?.current?.focus()
 	}
+	const handleCopy = (data) => {
+		copyToClipboard(data, {
+			callback: openSuccess({ message: 'Link copied successfully! ' }),
+		})
+	}
+	const handleActionMessage = ({ key, value }) => {
+		switch (key) {
+			case 'copy':
+				handleCopy(value?.content)
+				break
+
+			default:
+				break
+		}
+	}
 	const handleGetMenus = ({ isMe, item }: { [key: string]: any }) => {
 		const _props = []
+		const { type: typeMessage } = item || {}
+		switch (typeMessage) {
+			case 'TEXT':
+				_props.push({
+					key: 'copy',
+					label: 'Copy',
+					onClick: () => handleActionMessage({ key: 'copy', value: item }),
+				})
+				break
+
+			default:
+				break
+		}
 		switch (type) {
 			case 'inbox':
 				{
