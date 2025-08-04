@@ -1,6 +1,7 @@
 'use client'
 import { IconChevronRight } from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
+import clsx from 'clsx'
 import { memo } from 'react'
 
 import { arrayFrom, isArray } from '@/ultis/array.ults'
@@ -19,8 +20,11 @@ import NoPostIcon from '@/svg/DiscusstionSvg/NoPostIcon'
 import SearchIcon from '@/svg/SearchIcon'
 
 import classes from './Discussion.module.scss'
-import clsx from 'clsx'
 
+const mappingTopicTitle = {
+	explore: 'Channels Suggestions',
+	join: 'My Channels',
+}
 const Discussion = () => {
 	const {
 		loadingShare,
@@ -113,7 +117,7 @@ const Discussion = () => {
 					className={classes.titleTopic}
 					onClick={() => setModal({ type: 'topic', data: 'join' })}
 				>
-					<div className={classes.title}>My Channels</div>
+					<div className={classes.title}>{mappingTopicTitle.join}</div>
 					<div className={classes.arrowIcon}>
 						<IconChevronRight />
 					</div>
@@ -146,7 +150,7 @@ const Discussion = () => {
 					className={classes.titleTopic}
 					onClick={() => setModal({ type: 'topic', data: 'explore' })}
 				>
-					<div className={classes.title}>Channels Suggestions</div>
+					<div className={classes.title}>{mappingTopicTitle.explore}</div>
 					<div className={classes.arrowIcon}>
 						<IconChevronRight />
 					</div>
@@ -245,6 +249,7 @@ const Discussion = () => {
 	}
 	const _renderModal = () => {
 		const { type, data } = modal || {}
+		console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :248 ~ _renderModal ~ data:', data)
 		let Content = <></>
 		const propsModal = {
 			open: true,
@@ -278,7 +283,7 @@ const Discussion = () => {
 			case 'topic':
 				Content = (
 					<ModalTopic
-						title="My channel"
+						title={mappingTopicTitle[data] || mappingTopicTitle.join}
 						{...propsModal}
 						type={data}
 						onClose={() => {
