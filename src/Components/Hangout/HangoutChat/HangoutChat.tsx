@@ -79,7 +79,7 @@ const HangoutChat = ({ postId, onAction }) => {
 			case 'location':
 				content = (
 					<CGGMap
-						title="Edit Location"
+						title="Location"
 						latitude={latitude}
 						longitude={longitude}
 						onClose={() => setModal(null)}

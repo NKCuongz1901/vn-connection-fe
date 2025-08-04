@@ -177,7 +177,7 @@ const ModalReport = (props: ModalReportProps) => {
 								handleImportImg(newList)
 							}}
 						>
-							<ImageIcon /> <span> &nbsp;Add image</span>
+							<ImageIcon /> <span> &nbsp;Upload image</span>
 						</CUploadMuti>
 					</Flex>
 					<Flex className={classes.medias}>

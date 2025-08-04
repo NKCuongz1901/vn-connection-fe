@@ -20,6 +20,8 @@ import CInput from '../CInput'
 import CModal from '../CModal/CModal'
 
 import classes from './CGGMap.module.scss'
+import PinIcon from '@/svg/PinIcon'
+import { IconMapPinFilled } from '@tabler/icons-react'
 
 const libraries: any = ['places']
 
@@ -40,7 +42,6 @@ const CGGMap = (_props: CGGMapProps) => {
 		libraries,
 		language: 'en',
 	})
-	const firstRender = useRef(true)
 	const autoCompleteRef = useRef<any>(null)
 
 	const [marker, setMarker] = useState<google.maps.LatLngLiteral | null>({
@@ -61,7 +62,7 @@ const CGGMap = (_props: CGGMapProps) => {
 		setDefaultCenter({ lat, lng })
 	}
 
-	const [data, setData] = useState({})
+	const [data, setData] = useState({}) as any
 	const [loading, setLoading] = useState(false)
 	const [defaultCenter, setDefaultCenter] = useState({
 		lat: latitude,
@@ -109,11 +110,7 @@ const CGGMap = (_props: CGGMapProps) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 	useEffect(() => {
-		if (!firstRender.current) {
-			handleGetAddress(marker)
-		} else {
-			firstRender.current = false
-		}
+		handleGetAddress(marker)
 	}, [marker])
 	if (!isLoaded) return <div>Loading...</div>
 
@@ -160,20 +157,31 @@ const CGGMap = (_props: CGGMapProps) => {
 
 					<Flex vertical className={classes.mapWrapper}>
 						{defaultCenter.lat && defaultCenter.lng ? (
-							<GoogleMap
-								mapContainerStyle={containerStyle}
-								center={defaultCenter}
-								zoom={15}
-								onClick={(e) => {
-									const lat = e.latLng?.lat()
-									const lng = e.latLng?.lng()
-									if (lat && lng) {
-										setMarker({ lat, lng })
-									}
-								}}
-							>
-								{marker && <Marker position={marker} />}
-							</GoogleMap>
+							<>
+								<GoogleMap
+									mapContainerStyle={containerStyle}
+									center={defaultCenter}
+									zoom={15}
+									onClick={(e) => {
+										const lat = e.latLng?.lat()
+										const lng = e.latLng?.lng()
+										if (lat && lng) {
+											setMarker({ lat, lng })
+										}
+									}}
+								>
+									{marker && <Marker position={marker} />}
+								</GoogleMap>
+								<Flex className={classes.address} vertical>
+									<div className={classes.text}>My current address</div>
+									<Flex className={classes.location}>
+										<div>
+											<IconMapPinFilled color="#E55A0F" />
+										</div>
+										<span>{data?.display_name}</span>
+									</Flex>
+								</Flex>
+							</>
 						) : (
 							<span>Please grant location permission</span>
 						)}
