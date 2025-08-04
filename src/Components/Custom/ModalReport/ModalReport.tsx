@@ -1,4 +1,6 @@
+import { IconCircleXFilled } from '@tabler/icons-react'
 import { Flex } from 'antd'
+import { debounce } from 'lodash'
 import { useCallback, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
@@ -6,14 +8,18 @@ import { useModal } from '@/context/ModalContext'
 
 import { reportUser } from '@/apis/userApis'
 
-import { isArray } from '@/ultis/array.ults'
-import { isEmail } from '@/ultis/common.ults'
-
 import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
 import CModal from '@/Components/Custom/CModal/CModal'
 import CSelect from '@/Components/Custom/CSelect'
 import FeedbackIcon from '@/svg/FeedbackIcon'
+import ImageIcon from '@/svg/ImageIcon'
+import { isArray } from '@/ultis/array.ults'
+import { isEmail } from '@/ultis/common.ults'
+import { handleParseFileImg, handleUploadMedia } from '@/ultis/file.utls'
+
+import CImage from '../CImage'
+import CUploadMuti from '../CUploadMuti'
 
 import { topicReportOpt } from '@/Variable/select.variable'
 
@@ -42,6 +48,26 @@ const ModalReport = (props: ModalReportProps) => {
 		email: '',
 		content: '',
 	})
+	const [fileList, setFileList] = useState([])
+
+	const handleImportImg = debounce((_values) => {
+		const values = []
+
+		if (isArray(_values, 1)) {
+			_values.forEach((i) => {
+				const { imageUrl, file } = handleParseFileImg(i?.originFileObj) || {}
+				if (imageUrl) {
+					values.push({ imageUrl, file })
+				}
+			})
+		}
+
+		setFileList((prev) => {
+			const combined = [...prev, ...values]
+			return combined.slice(0, 5)
+		})
+	}, 200)
+
 	const handleOnChangeData = useCallback((key, value) => {
 		setErrors((prev) => ({ ...prev, [key]: '' }))
 		setDataModal((prev) => ({ ...prev, [key]: value }))
@@ -67,7 +93,12 @@ const ModalReport = (props: ModalReportProps) => {
 		async (payload) => {
 			try {
 				toggleLoadingContext(true)
-				const res = await reportUser(payload)
+				let media = []
+				if (isArray(fileList, 1)) {
+					media = await handleUploadMedia(fileList)
+				}
+				const images = (media || []).map((item) => item.url)
+				const res = await reportUser({ ...payload, images })
 				if (res) {
 					openSuccess({
 						message: 'You have reported successfully.',
@@ -80,9 +111,9 @@ const ModalReport = (props: ModalReportProps) => {
 				toggleLoadingContext()
 			}
 		},
-		[onClose, openError, openSuccess, toggleLoadingContext],
+		[onClose, fileList, openError, openSuccess, toggleLoadingContext],
 	)
-	const handleSubmit = useCallback(() => {
+	const handleSubmit = useCallback(async () => {
 		if (!handleValidate(dataModal)) {
 			return
 		}
@@ -137,11 +168,36 @@ const ModalReport = (props: ModalReportProps) => {
 						onChange={(e) => handleOnChangeData('topic', e)}
 					/>
 				</Flex>
-				{/* <Flex className={classes.content}>
-					<CUpload onChange={(e) => handleOnChangeData('content', e.file)}>
-						<Flex className={classes.uploadText}>Upload image</Flex>
-					</CUpload>
-				</Flex> */}
+
+				<Flex className={classes.chooseImg} vertical>
+					<Flex className={classes.upload}>
+						<CUploadMuti
+							fileList={fileList.map((i) => i.file)}
+							onChange={({ file: _file, fileList: newList }) => {
+								handleImportImg(newList)
+							}}
+						>
+							<ImageIcon /> <span> &nbsp;Add image</span>
+						</CUploadMuti>
+					</Flex>
+					<Flex className={classes.medias}>
+						{fileList.map((i) => (
+							<Flex key={i.imageUrl || i?.url} className={classes.media}>
+								<CImage preview={true} src={i.imageUrl || i?.url} />
+								<Flex
+									className={classes.chooseImgCancel}
+									onClick={() => {
+										setFileList((prev) =>
+											prev.filter((prev) => prev.imageUrl !== i.imageUrl),
+										)
+									}}
+								>
+									<IconCircleXFilled />
+								</Flex>
+							</Flex>
+						))}
+					</Flex>
+				</Flex>
 			</Flex>
 		)
 	}

@@ -24,5 +24,38 @@
 			width: 100%;
 			min-height: 50px;
 		}
+		.chooseImg {
+			gap: 4px;
+			width: 100%;
+			.upload {
+				width: fit-content;
+				cursor: pointer;
+				font-size: 14px;
+				font-weight: 600;
+			}
+		}
+		.medias {
+			gap: 8px;
+			overflow: auto;
+
+			.media {
+				position: relative;
+
+				img {
+					border-radius: 16px;
+					height: 220px;
+					width: fit-content;
+				}
+				.chooseImgCancel {
+					width: 20px;
+					height: 20px;
+					position: absolute;
+					right: 4px;
+					top: 4px;
+					color: #fff;
+					cursor: pointer;
+				}
+			}
+		}
 	}
 }

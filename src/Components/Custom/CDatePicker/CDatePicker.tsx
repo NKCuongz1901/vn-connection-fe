@@ -40,4 +40,4 @@ const CDatePicker = (_props: CDatePickerProps) => {
 	)
 }
 
-export default memo(CDatePicker)
+export default memo(CDatePicker) as React.FC<CDatePickerProps>
