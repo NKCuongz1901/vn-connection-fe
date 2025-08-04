@@ -42,7 +42,6 @@ const ChatBox = ({
 	loading,
 	onActionMessage,
 }: ChatBoxProps) => {
-	console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :45 ~ ChatBox ~ itemList:', itemList)
 	const {
 		_refInput,
 		activeSticker,

@@ -249,7 +249,6 @@ const Discussion = () => {
 	}
 	const _renderModal = () => {
 		const { type, data } = modal || {}
-		console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :248 ~ _renderModal ~ data:', data)
 		let Content = <></>
 		const propsModal = {
 			open: true,
