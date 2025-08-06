@@ -26,6 +26,8 @@
 		& :global(.ant-select-selector) {
 			background: #f4f8fc !important;
 			border-radius: 16px;
+			min-height: 40px;
+
 			& :global(.ant-select-prefix) {
 				height: 20px;
 			}
