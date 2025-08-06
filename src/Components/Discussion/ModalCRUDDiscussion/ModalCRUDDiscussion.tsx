@@ -124,6 +124,7 @@ const ModalCRUDDiscussion = (props: ModalCRUDDiscussionProps) => {
 							</Flex>
 							<Flex className={classes.upload}>
 								<CUploadMuti
+									maxCount={0}
 									fileList={fileList.map((i) => i.file)}
 									onChange={({ file: _file, fileList: newList }) => {
 										onImportImg(newList)

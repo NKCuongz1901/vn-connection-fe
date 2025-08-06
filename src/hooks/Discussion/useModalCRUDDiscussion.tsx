@@ -24,7 +24,7 @@ export default function useModalCRUDDiscussion({
 	onClose,
 	topic,
 }: useModalCRUDDiscussionProps) {
-	const { openConfirm, openError, openSuccess } = useModal()
+	const { openConfirm, openError, openSuccess, closeModal } = useModal()
 	const { toggleLoadingContext } = useLoading()
 
 	const categoryOption = useMemo(() => {
@@ -144,10 +144,16 @@ export default function useModalCRUDDiscussion({
 				}
 			})
 		}
-
+		const maxItem = 5 - (dataSubmit?.medias?.length || 0)
 		setFileList((prev) => {
 			const combined = [...prev, ...values]
-			return combined.slice(0, 5)
+			if ((combined || []).length > maxItem) {
+				openConfirm({
+					message: 'You can only upload up to 5 media',
+					onAccept: () => closeModal(),
+				})
+			}
+			return combined.slice(0, maxItem)
 		})
 	}, 200)
 	const handleCreateDiscussion = async () => {
