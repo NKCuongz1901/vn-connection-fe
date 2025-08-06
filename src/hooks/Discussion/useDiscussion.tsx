@@ -112,7 +112,14 @@ export default function useDiscussion({}) {
 					return prev.filter((item) => item.id !== id)
 				})
 				setMyCategory((prev) => {
-					return [...prev, item]
+					return [
+						...prev,
+						{
+							...item,
+							amount_of_user: (item.amount_of_user || 0) + 1,
+							is_liked: true,
+						},
+					]
 				})
 			}
 		} catch (error) {
