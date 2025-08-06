@@ -110,9 +110,12 @@ const Discussion = () => {
 			</Flex>
 		)
 	}
-	const _renderJoin = () => {
+	const _renderJoin = (vertical = false) => {
 		return (
-			<Flex vertical className={classes.topic}>
+			<Flex
+				vertical
+				className={clsx(classes.topic, { [classes.join]: vertical })}
+			>
 				<Flex
 					className={classes.titleTopic}
 					onClick={() => setModal({ type: 'topic', data: 'join' })}
@@ -143,9 +146,12 @@ const Discussion = () => {
 			</Flex>
 		)
 	}
-	const _renderSuggestion = () => {
+	const _renderSuggestion = (vertical = false) => {
 		return (
-			<Flex vertical className={classes.topic}>
+			<Flex
+				vertical
+				className={clsx(classes.topic, { [classes.suggest]: vertical })}
+			>
 				<Flex
 					className={classes.titleTopic}
 					onClick={() => setModal({ type: 'topic', data: 'explore' })}
@@ -205,8 +211,8 @@ const Discussion = () => {
 					/>
 				</Flex>
 				<Flex vertical className={classes.category}>
-					{_renderJoin()}
-					{_renderSuggestion()}
+					{_renderJoin(true)}
+					{_renderSuggestion(true)}
 				</Flex>
 			</Flex>
 		)

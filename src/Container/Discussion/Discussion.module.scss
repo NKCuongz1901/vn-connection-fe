@@ -91,6 +91,15 @@
 						gap: 8px;
 					}
 				}
+				.join {
+					max-height: 260px;
+					min-height: 260px;
+					overflow: auto;
+				}
+				.suggest {
+					flex: 1;
+					overflow: auto;
+				}
 			}
 		}
 		.addNew {
