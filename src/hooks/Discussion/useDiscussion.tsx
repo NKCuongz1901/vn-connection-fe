@@ -442,6 +442,7 @@ export default function useDiscussion({}) {
 
 			if (code === 200) {
 				setShareList((prev: any) => ({ ...prev, [id]: true }))
+				openSuccess({ message: 'Share link to your friend successfully' })
 			}
 		} catch (error) {
 			openError(error)
