@@ -15,9 +15,8 @@ import PinIcon from '@/svg/PinIcon'
 import ModelPin from '../ModelPin'
 import SettingConv from '../SettingConv'
 
-import classes from './InboxChat.module.scss'
-import { IconChevronCompactRight } from '@tabler/icons-react'
 import ArrrowRightIcon from '@/svg/ArrrowRightIcon'
+import classes from './InboxChat.module.scss'
 
 const mappingType = {
 	MEDIAS: 'Pin a image',
