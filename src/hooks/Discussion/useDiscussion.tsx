@@ -250,6 +250,7 @@ export default function useDiscussion({}) {
 		try {
 			const res: any = await blockUser(id)
 			if (res) {
+				setDiscuss((prev) => (prev || []).filter((item) => item.user_id !== id))
 				openSuccess({
 					message: 'You have successfully locked this user',
 				})
