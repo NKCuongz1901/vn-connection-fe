@@ -173,7 +173,7 @@ const CGGMap = (_props: CGGMapProps) => {
 									{marker && <Marker position={marker} />}
 								</GoogleMap>
 								<Flex className={classes.address} vertical>
-									<div className={classes.text}>My current address</div>
+									<div className={classes.text}>Your current address</div>
 									<Flex className={classes.location}>
 										<div>
 											<IconMapPinFilled color="#E55A0F" />

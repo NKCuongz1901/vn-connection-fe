@@ -266,11 +266,12 @@ export default function useHangoutChat({
 				latitude: lat,
 				longitude: lng,
 			})
-			if (res?.code == 200) {
+			const { code, results } = res || {}
+			if (code == 200) {
+				const { object } = results || {}
 				setHangoutInfo((prev) => ({
 					...prev,
-					latitude: lat,
-					longtitude: lng,
+					...object,
 				}))
 				setModal({ type: '' })
 				handleGetListCommentById(true)
