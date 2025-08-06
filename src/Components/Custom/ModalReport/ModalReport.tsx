@@ -37,7 +37,7 @@ interface ModalReportProps {
 const ModalReport = (props: ModalReportProps) => {
 	const { onClose, open, data, message, title } = props
 	const { loadingContext, toggleLoadingContext } = useLoading()
-	const { openConfirm, openError, openSuccess } = useModal()
+	const { openConfirm, openError, openSuccess, closeModal } = useModal()
 	const [errors, setErrors] = useState({
 		topic: '',
 		email: '',
@@ -61,10 +61,16 @@ const ModalReport = (props: ModalReportProps) => {
 				}
 			})
 		}
-
+		const maxItem = 3
 		setFileList((prev) => {
 			const combined = [...prev, ...values]
-			return combined.slice(0, 5)
+			if ((combined || []).length > maxItem) {
+				openConfirm({
+					message: 'You can only upload up to 3 medias',
+					onAccept: () => closeModal(),
+				})
+			}
+			return combined.slice(0, maxItem)
 		})
 	}, 200)
 
@@ -172,6 +178,7 @@ const ModalReport = (props: ModalReportProps) => {
 				<Flex className={classes.chooseImg} vertical>
 					<Flex className={classes.upload}>
 						<CUploadMuti
+							maxCount={0}
 							fileList={fileList.map((i) => i.file)}
 							onChange={({ file: _file, fileList: newList }) => {
 								handleImportImg(newList)

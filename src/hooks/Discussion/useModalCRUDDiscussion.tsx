@@ -149,7 +149,7 @@ export default function useModalCRUDDiscussion({
 			const combined = [...prev, ...values]
 			if ((combined || []).length > maxItem) {
 				openConfirm({
-					message: 'You can only upload up to 5 media',
+					message: 'You can only upload up to 5 medias',
 					onAccept: () => closeModal(),
 				})
 			}
