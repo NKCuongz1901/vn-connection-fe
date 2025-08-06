@@ -44,7 +44,7 @@ const ModalReport = (props: ModalReportProps) => {
 		content: '',
 	})
 	const [dataModal, setDataModal] = useState({
-		topic: topicReportOpt[0],
+		topic: topicReportOpt[0].value,
 		email: '',
 		content: '',
 	})
@@ -126,7 +126,7 @@ const ModalReport = (props: ModalReportProps) => {
 		const { email, topic, content } = dataModal
 		const payload = {
 			email,
-			topic: topic?.value || '',
+			topic: topic || '',
 			content,
 			images: [],
 			...data,
