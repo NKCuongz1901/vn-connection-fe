@@ -96,7 +96,7 @@ const ModalCRUDDiscussion = (props: ModalCRUDDiscussionProps) => {
 							placeholder="Body text"
 							value={description}
 							onChange={onChangeValue('description')}
-							maxLength={500}
+							maxLength={2000}
 							showCount
 							rows={5}
 						/>
