@@ -7,6 +7,7 @@ import {
 	Marker,
 	useLoadScript,
 } from '@react-google-maps/api'
+import { IconMapPinFilled } from '@tabler/icons-react'
 import { Flex } from 'antd'
 import { memo, useEffect, useRef, useState } from 'react'
 
@@ -20,8 +21,6 @@ import CInput from '../CInput'
 import CModal from '../CModal/CModal'
 
 import classes from './CGGMap.module.scss'
-import PinIcon from '@/svg/PinIcon'
-import { IconMapPinFilled } from '@tabler/icons-react'
 
 const libraries: any = ['places']
 
