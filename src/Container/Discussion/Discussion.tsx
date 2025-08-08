@@ -2,11 +2,15 @@
 import { IconChevronRight } from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
-import { memo } from 'react'
+import { memo, useCallback } from 'react'
 
 import { arrayFrom, isArray } from '@/ultis/array.ults'
+import { toJson } from '@/ultis/common.ults'
+import { parseNumberToShort } from '@/ultis/string.ults'
 
+import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
+import CImage from '@/Components/Custom/CImage'
 import CInput from '@/Components/Custom/CInput'
 import ModalReport from '@/Components/Custom/ModalReport'
 import CategoryItem from '@/Components/Discussion/CategoryItem'
@@ -17,6 +21,7 @@ import ModalTopic from '@/Components/Discussion/ModalTopic'
 import ModalMyFriend from '@/Components/Friend/ModalMyFriend'
 import useDiscussion from '@/hooks/Discussion/useDiscussion'
 import NoPostIcon from '@/svg/DiscusstionSvg/NoPostIcon'
+import ImageIcon from '@/svg/ImageIcon'
 import SearchIcon from '@/svg/SearchIcon'
 
 import classes from './Discussion.module.scss'
@@ -39,9 +44,11 @@ const Discussion = () => {
 		title,
 		discussId,
 		titleTopic,
+		category_id,
 		setTitleTopic,
 		setTitle,
 		onJoinCategory,
+		onUnJoinCategory,
 		onGetMenus,
 		onCopy,
 		onShareFriend,
@@ -70,6 +77,64 @@ const Discussion = () => {
 			</Flex>
 		)
 	}
+	const _renderCurrentTopic = useCallback(() => {
+		if (!category_id) return
+		const currentCategory = [...myCategory, ...recommendCategory].find(
+			(i) => i.id === category_id,
+		)
+		const { image, title, amount_of_user, is_liked, id } = currentCategory || {}
+		return (
+			<Flex className={classes.currentCategory}>
+				<Flex className={classes.image}>
+					<CImage src={image} />
+				</Flex>
+				<Flex vertical className={classes.currentCategoryInfo}>
+					<div className={classes.title}>{title}</div>
+					<div className={classes.number}>
+						{parseNumberToShort(amount_of_user)} members
+					</div>
+				</Flex>
+				<Flex className={classes.btn}>
+					<CButton
+						ctype={is_liked ? 'disabled' : 'oranger'}
+						onClick={() => {
+							if (is_liked) {
+								onUnJoinCategory(id)
+							} else {
+								onJoinCategory(id)
+							}
+						}}
+					>
+						{is_liked ? 'Joined' : 'Join'}
+					</CButton>
+				</Flex>
+			</Flex>
+		)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [category_id, toJson({ myCategory, recommendCategory, classes })])
+	const _renderAddNew = () => {
+		if (discussId) return
+		return (
+			<Flex className={classes.addNew} vertical>
+				{_renderCurrentTopic()}
+				<Flex
+					className={classes.addNewBody}
+					onClick={() =>
+						setModal({
+							type: 'addNew',
+							data: category_id ? { category: { id: category_id } } : null,
+						})
+					}
+				>
+					<div>
+						<CAvatar />
+					</div>
+					<Flex className={classes.addNewInput}>What's on your mind?</Flex>
+					<ImageIcon />
+				</Flex>
+			</Flex>
+		)
+	}
 	const _renderLeft = () => {
 		if (discussId) {
 			return (
@@ -83,7 +148,8 @@ const Discussion = () => {
 			)
 		}
 		return (
-			<Flex vertical className={classes.left}>
+			<Flex vertical className={classes.left} onScroll={onScroll}>
+				<div className={classes.addNewLeft}>{_renderAddNew()}</div>
 				<Flex className={classes.searchBar}>
 					<CInput
 						onChange={(e) => setTitle(e.target.value)}
@@ -93,7 +159,7 @@ const Discussion = () => {
 						style={{ borderRadius: 40, height: 40 }}
 					/>
 				</Flex>
-				<Flex className={classes.leftContent} vertical onScroll={onScroll}>
+				<Flex className={classes.leftContent} vertical>
 					{isArray(discuss, 1)
 						? discuss.map((item) => (
 								<DiscussionItem
@@ -184,17 +250,6 @@ const Discussion = () => {
 							),
 					)}
 				</Flex>
-			</Flex>
-		)
-	}
-	const _renderAddNew = () => {
-		if (discussId) return
-		return (
-			<Flex
-				className={classes.addNew}
-				onClick={() => setModal({ type: 'addNew', data: null })}
-			>
-				<div className={classes.addNewIcon}>+</div>
 			</Flex>
 		)
 	}
@@ -304,7 +359,8 @@ const Discussion = () => {
 					<ModalCRUDDiscussion
 						{...propsModal}
 						onSuccess={(item) => onAction({ key: 'addNew', value: item })}
-						topic={myCategory}
+						data={data}
+						topic={[...myCategory, ...recommendCategory]}
 					/>
 				)
 				break
@@ -313,7 +369,7 @@ const Discussion = () => {
 					<ModalCRUDDiscussion
 						{...propsModal}
 						onSuccess={(item) => onAction({ key: 'edit', value: item })}
-						topic={myCategory}
+						topic={[...myCategory, ...recommendCategory]}
 						data={data}
 					/>
 				)
@@ -331,10 +387,10 @@ const Discussion = () => {
 				})}
 				onScroll={onScroll}
 			>
+				<div className={classes.addNewTop}>{_renderAddNew()}</div>
 				{_renderTop()}
 				{_renderLeft()}
 				{_renderRight()}
-				{_renderAddNew()}
 			</Flex>
 			{_renderModal()}
 		</div>

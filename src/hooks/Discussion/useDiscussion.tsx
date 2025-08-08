@@ -101,6 +101,41 @@ export default function useDiscussion({}) {
 			setLoading((prev) => ({ ...prev, recommend: false }))
 		}
 	}
+
+	const handleUnJoinCategory = async (id) => {
+		try {
+			setLoadingJoin(true)
+			toggleLoadingContext(true)
+			const item = cloneDeep(myCategory).find((i) => i.id === id)
+			const res: any = await likeCategory({ id })
+			if (res) {
+				setMyCategory((prev) => {
+					return prev.filter((item) => item.id !== id)
+				})
+				setRecommendCategory((prev) => {
+					return [
+						...prev,
+						{
+							...item,
+							amount_of_user: (item.amount_of_user || 0) - 1,
+							is_liked: false,
+						},
+					]
+				})
+			}
+		} catch (error) {
+			openError(error)
+			setMyCategory((prev) =>
+				prev.map((item) =>
+					item.id === id ? { ...item, loading: false } : item,
+				),
+			)
+		} finally {
+			setLoadingJoin(false)
+			toggleLoadingContext()
+		}
+	}
+
 	const handleJoinCategory = async (id) => {
 		try {
 			setLoadingJoin(true)
@@ -309,7 +344,7 @@ export default function useDiscussion({}) {
 			case 'addNew':
 				{
 					const { category_id: _category_id } = value
-					if (!category_id || category_id !== _category_id) {
+					if (!category_id || category_id === _category_id) {
 						handleGetDiscuss(true)
 					}
 				}
@@ -513,12 +548,14 @@ export default function useDiscussion({}) {
 		setModal,
 		title,
 		discussId,
+		category_id,
 		discussDetail,
 		titleTopic,
 
 		setTitleTopic,
 		setTitle,
 		onJoinCategory: handleJoinCategory,
+		onUnJoinCategory: handleUnJoinCategory,
 		onGetMenus: handleGetMenus,
 		onCopy: handleCopy,
 		onShareFriend: handleShareFriend,

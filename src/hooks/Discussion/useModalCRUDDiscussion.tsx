@@ -35,10 +35,10 @@ export default function useModalCRUDDiscussion({
 		if (data) {
 			const { title, category, description, medias } = data || {}
 			return {
-				title,
+				title: title || '',
 				category_id: category?.id || categoryOption[0].value,
-				description,
-				medias,
+				description: description || '',
+				medias: medias || [],
 			}
 		}
 		return {
