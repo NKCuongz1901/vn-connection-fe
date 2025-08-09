@@ -100,7 +100,7 @@ export default function useHangoutChat({
 			},
 			{
 				key: 'editMettingPoint',
-				label: 'Edit metting point',
+				label: 'Edit meeting point',
 				onClick: () => handleMenusClick({ key: 'editMettingPoint' }),
 			},
 		]
