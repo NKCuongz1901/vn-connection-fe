@@ -48,7 +48,7 @@ const ModalCRUDDiscussion = (props: ModalCRUDDiscussionProps) => {
 		onClose,
 		topic,
 	})
-	const { id } = data || {}
+	const { id, category } = data || {}
 	const { title, category_id, medias, description } = dataSubmit || {}
 	return (
 		<div className={classes.wrapper}>
@@ -77,7 +77,7 @@ const ModalCRUDDiscussion = (props: ModalCRUDDiscussionProps) => {
 				<div className={classes.container}>
 					<Flex className={classes.wrapperModal} vertical>
 						<CSelect
-							disabled={!!id}
+							disabled={!!id || !!category?.id}
 							label="Topic"
 							options={categoryOption}
 							value={category_id}

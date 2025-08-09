@@ -360,7 +360,9 @@ const Discussion = () => {
 						{...propsModal}
 						onSuccess={(item) => onAction({ key: 'addNew', value: item })}
 						data={data}
-						topic={[...myCategory, ...recommendCategory]}
+						topic={
+							category_id ? [...myCategory, ...recommendCategory] : myCategory
+						}
 					/>
 				)
 				break
