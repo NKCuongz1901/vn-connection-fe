@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useModal } from '@/context/ModalContext'
+import { useSocket } from '@/context/SocketContext'
 
 import { getConvPersonal, getConvStranger } from '@/apis/conversationApis'
 
@@ -15,6 +16,7 @@ import { PaginationType } from '@/interface/common/common.interface'
 
 export default function useInbox() {
 	const { openError } = useModal()
+	const { socket } = useSocket()
 	const { onGetQuerry } = useQuery()
 
 	const { id } = onGetQuerry()
@@ -124,6 +126,26 @@ export default function useInbox() {
 		handleLoadMore()
 	}
 
+	const handleParseDataSocket = useCallback((data) => {
+		try {
+			const { conversation_id, created_at_unix_timestamp } = data || {}
+			setListConvPersonal((prev: any[]) => {
+				const newConv = prev.find((item) => item.id === conversation_id)
+				if (newConv) {
+					Object.assign(newConv, {
+						last_message: data,
+						last_time_chat: created_at_unix_timestamp,
+					})
+					const dataShow = uniqueArray([newConv, ...prev], 'id') as any[]
+					return dataShow
+				}
+				return prev
+			})
+		} catch (error) {
+			console.log('error:', error)
+		}
+	}, [])
+
 	useEffect(() => {
 		handleGetConvStranger()
 		handleGetConvPersonal()
@@ -133,6 +155,17 @@ export default function useInbox() {
 		key.current = randomString()
 		setConvId(id)
 	}, [id])
+
+	useEffect(() => {
+		if (!socket) return
+
+		socket.on('message', handleParseDataSocket)
+
+		return () => {
+			socket.off('message', handleParseDataSocket)
+		}
+	}, [handleParseDataSocket, socket])
+
 	return {
 		key,
 		listConvStranger,

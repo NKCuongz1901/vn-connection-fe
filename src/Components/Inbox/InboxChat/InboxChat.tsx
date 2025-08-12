@@ -41,7 +41,6 @@ const InboxChat = ({ convId }) => {
 		onActionMessage,
 		onLoadMore,
 		onGetPinMessage,
-		onGetListMessById,
 		onActionSettingConv,
 	} = useInboxChat({ convId })
 	const userInChat = useMemo(() => {
@@ -84,7 +83,6 @@ const InboxChat = ({ convId }) => {
 						onClose={() => {
 							onGetPinMessage()
 							setModal(null)
-							onGetListMessById(true)
 						}}
 					/>
 				)

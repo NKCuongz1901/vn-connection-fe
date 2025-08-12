@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useModal } from '@/context/ModalContext'
+import { useSocket } from '@/context/SocketContext'
 
 import {
 	deleteMessageById,
@@ -26,6 +27,7 @@ type useHangoutChatProps = {
 }
 export default function useInboxChat({ convId }: useHangoutChatProps) {
 	const { openError } = useModal()
+	const { socket } = useSocket()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const _loadmore = useRef<boolean>(true)
 	const _scrollRef = useRef<HTMLDivElement>(null)
@@ -319,6 +321,37 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 				break
 		}
 	}
+
+	const handleParseDataSocket = useCallback(
+		(data) => {
+			try {
+				const { conversation_id } = data || {}
+				if (conversation_id !== convId) return
+				setMessList((prev: any[]) => {
+					const contents = prev
+					const newData = uniqueArray(
+						[
+							{
+								user_id: data.sender_id,
+								user: data?.sender,
+								...data,
+								...(parent && { parent }),
+							},
+							...contents,
+						],
+						'id',
+					)
+					const dataShow = mappingMessageChat(newData)
+
+					return dataShow
+				})
+			} catch (error) {
+				console.log('error:', error)
+			}
+		},
+		[convId],
+	)
+
 	useEffect(() => {
 		_paginationRefs.current.page = 1
 		handleGetInfoConv()
@@ -327,6 +360,16 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 		handleGetPinMessage()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [convId])
+
+	useEffect(() => {
+		if (!socket) return
+
+		socket.on('message', handleParseDataSocket)
+
+		return () => {
+			socket.off('message', handleParseDataSocket)
+		}
+	}, [convId, handleParseDataSocket, socket])
 
 	return {
 		_scrollRef,

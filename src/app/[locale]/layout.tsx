@@ -6,6 +6,7 @@ import { routing } from '@/i18n/routing'
 
 import { LoadingProvider } from '@/context/LoadingContext'
 import { ModalProvider } from '@/context/ModalContext'
+import { SocketProvider } from '@/context/SocketContext'
 
 import MainLayout from '@/Components/Layout/MainLayout'
 
@@ -31,7 +32,9 @@ export default async function LocaleLayout({
 		<NextIntlClientProvider messages={messages}>
 			<LoadingProvider>
 				<ModalProvider>
-					<MainLayout>{children}</MainLayout>
+					<SocketProvider>
+						<MainLayout>{children}</MainLayout>
+					</SocketProvider>
 				</ModalProvider>
 			</LoadingProvider>
 		</NextIntlClientProvider>
