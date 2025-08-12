@@ -48,6 +48,7 @@ const InboxChat = ({ convId }) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toJson(members)])
 	const _renderPin = () => {
+		const pin = totalPin - 1
 		return (
 			<Flex
 				className={classes.pinMess}
@@ -65,10 +66,12 @@ const InboxChat = ({ convId }) => {
 						</div>
 					</Flex>
 				</Flex>
-				<Flex className={classes.numberPin}>
-					<span className={classes.text}>+ {totalPin}</span>
-					<ArrrowRightIcon />
-				</Flex>
+				{!!pin && (
+					<Flex className={classes.numberPin}>
+						<span className={classes.text}>+ {pin}</span>
+						<ArrrowRightIcon />
+					</Flex>
+				)}
 			</Flex>
 		)
 	}
