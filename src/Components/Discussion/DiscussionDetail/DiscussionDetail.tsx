@@ -1,4 +1,4 @@
-import { IconChevronLeft } from '@tabler/icons-react'
+import { IconChevronLeft, IconCircleXFilled } from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { memo } from 'react'
@@ -7,11 +7,14 @@ import { arrayFrom } from '@/ultis/array.ults'
 
 import CommentItem from '@/Components/Comment/CommentItem'
 import CButton from '@/Components/Custom/CButton'
+import CImage from '@/Components/Custom/CImage'
 import CTextArea from '@/Components/Custom/CTextArea'
+import CUploadMuti from '@/Components/Custom/CUploadMuti'
 import ModalReport from '@/Components/Custom/ModalReport'
 import ModalMyFriend from '@/Components/Friend/ModalMyFriend'
 import useDiscussionDetail from '@/hooks/Discussion/useDiscussionDetail'
 import SendIcon from '@/svg/Event/SendIcon'
+import ImageIcon from '@/svg/ImageIcon'
 import DiscussionItem from '../DiscussionItem'
 import ModalCRUDDiscussion from '../ModalCRUDDiscussion'
 
@@ -35,7 +38,9 @@ const DiscussionDetail = ({
 		commentList,
 		commentContent,
 		deleteLoading,
-
+		fileList,
+		editList,
+		setFileList,
 		setModal,
 		onShareFriend,
 		onCopy,
@@ -48,6 +53,7 @@ const DiscussionDetail = ({
 		onSendComment,
 		onKeyDown,
 		onChangeComment,
+		onImportImg,
 	} = useDiscussionDetail({
 		discussId,
 		onActionProps,
@@ -88,22 +94,54 @@ const DiscussionDetail = ({
 	}
 	const _renderSendCommentBox = () => {
 		return (
-			<Flex className={classes.commentBox}>
-				<CTextArea
-					allowClear={false}
-					placeholder="What's on my mind ?"
-					value={commentContent}
-					autoSize={{ minRows: 3, maxRows: 3 }}
-					onChange={onChangeComment}
-					onKeyDown={onKeyDown}
-				/>
-				<Flex
-					className={clsx(classes.iconSend, {
-						[classes.disabled]: !commentContent.trim(),
-					})}
-					onClick={onSendComment}
-				>
-					<SendIcon fill="#F0F3F9" />
+			<Flex vertical className={classes.commentBoxWrapper}>
+				<Flex className={classes.chooseImgContent}>
+					{fileList.map((i) => (
+						<Flex key={i.imageUrl || i?.url} className={classes.chooseImgItem}>
+							<CImage preview={true} src={i.imageUrl || i?.url} />
+							<Flex
+								className={classes.chooseImgCancel}
+								onClick={() => {
+									setFileList((prev) =>
+										prev.filter((prev) => prev.imageUrl !== i.imageUrl),
+									)
+								}}
+							>
+								<IconCircleXFilled />
+							</Flex>
+						</Flex>
+					))}
+				</Flex>
+				<Flex className={classes.commentBox}>
+					<Flex className={classes.chooseImg} vertical>
+						<Flex className={classes.upload}>
+							<CUploadMuti
+								maxCount={0}
+								fileList={fileList.map((i) => i.file)}
+								onChange={({ file: _file, fileList: newList }) => {
+									onImportImg(newList)
+								}}
+							>
+								<ImageIcon />
+							</CUploadMuti>
+						</Flex>
+					</Flex>
+					<CTextArea
+						allowClear={false}
+						placeholder="What's on my mind ?"
+						value={commentContent}
+						autoSize={{ minRows: 3, maxRows: 3 }}
+						onChange={onChangeComment}
+						onKeyDown={onKeyDown}
+					/>
+					<Flex
+						className={clsx(classes.iconSend, {
+							[classes.disabled]: !commentContent.trim(),
+						})}
+						onClick={onSendComment}
+					>
+						<SendIcon fill="#F0F3F9" />
+					</Flex>
 				</Flex>
 			</Flex>
 		)
@@ -124,6 +162,7 @@ const DiscussionDetail = ({
 						<Flex vertical className={classes.commentList}>
 							{commentList.map((item) => (
 								<CommentItem
+									isEdit={editList.includes(item.id)}
 									item={item}
 									key={item.id}
 									onGetMenus={onGetMenusCommentItem}

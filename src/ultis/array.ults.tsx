@@ -11,6 +11,11 @@ export const isArray = (value: any, minLength?: number) => {
 	return result
 }
 
+export const unique = (arr: any[]) => {
+	if (!isArray(arr)) return arr
+	return _.uniq(arr)
+}
+
 export const uniqueArray = (arr: any[], condition: string) => {
 	if (!isArray(arr) || !condition) return arr
 	return _.uniqBy(arr, condition)

@@ -36,7 +36,7 @@ export const getDiffFromNow = ({
 	const target = dayjs(input)
 	const diffInSeconds = now.diff(target, 'second', true)
 	if (diffInSeconds < 60) {
-		return { value: 'some', unit: 'second' }
+		return { value: 'a few', unit: 'second' }
 	}
 
 	const diffInMinutes = diffInSeconds / 60

@@ -1,4 +1,5 @@
 import { ItemType } from 'antd/es/menu/interface'
+import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
@@ -16,10 +17,12 @@ import {
 	likeComment,
 	sendCommentPost,
 } from '@/apis/postApis'
+import { handleUploadImage } from '@/apis/uploadApis'
 import { blockUser } from '@/apis/userApis'
 
-import { isArray, uniqueArray } from '@/ultis/array.ults'
+import { isArray, unique, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
+import { handleParseFileImg } from '@/ultis/file.utls'
 import { onPushState, useQuery } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 import { copyToClipboard, randomString } from '@/ultis/string.ults'
@@ -34,7 +37,7 @@ export default function useDiscussionDetail({
 	discussId,
 	onActionProps = () => null,
 }: useDiscussionDetailProps) {
-	const { openError, openSuccess, openConfirm } = useModal()
+	const { openError, openSuccess, openConfirm, closeModal } = useModal()
 	const { toggleLoadingContext, loadingContext } = useLoading()
 	const { onGetQuerry } = useQuery()
 	const { category_id } = onGetQuerry()
@@ -54,7 +57,8 @@ export default function useDiscussionDetail({
 	const [commentList, setCommentList] = useState<any[]>([])
 	const [totalComment, setTotalComment] = useState<number>(0)
 	const [discussDetail, setDiscussDetail] = useState<any>(null)
-
+	const [fileList, setFileList] = useState([])
+	const [editList, setEditList] = useState([])
 	const [deleteLoading, setDeleteLoading] = useState<string[]>([])
 
 	const [loading, setLoading] = useState({
@@ -294,6 +298,11 @@ export default function useDiscussionDetail({
 	}
 
 	const handleActionCommentItem = ({ key, value }) => {
+		console.log(
+			'🏖️🏖️🏖️ TrieuNinhHan ~ :301 ~ handleActionCommentItem ~ key, value:',
+			key,
+			value,
+		)
 		switch (key) {
 			case 'like':
 				handleLikeComment(value)
@@ -313,6 +322,32 @@ export default function useDiscussionDetail({
 						return item
 					}),
 				)
+				break
+			case 'edit':
+				setEditList((prev) => unique([...prev, value]))
+				break
+			case 'cancelEdit':
+				setEditList((prev) => prev.filter((i) => i !== value))
+				break
+			case 'updateComment':
+				const { name, avatar, id, is_verified } = getUserInfo()
+				setCommentList((prev) =>
+					(prev || []).map((item) =>
+						item.id === value?.id
+							? {
+									...value,
+									user: {
+										name,
+										avatar,
+										id,
+										is_verified,
+									},
+							  }
+							: item,
+					),
+				)
+				setEditList((prev) => prev.filter((i) => i !== value?.id))
+
 				break
 			default:
 				break
@@ -427,10 +462,15 @@ export default function useDiscussionDetail({
 		const menus: ItemType[] = []
 		if (isMe) {
 			menus.push(
-				// {
-				// 	key: 'edit',
-				// 	label: 'Edit',
-				// },
+				{
+					key: 'edit',
+					label: 'Edit',
+					onClick: () =>
+						handleActionCommentItem({
+							key: 'edit',
+							value: item.id,
+						}),
+				},
 				{
 					key: 'delete',
 					label: 'Delete',
@@ -484,15 +524,44 @@ export default function useDiscussionDetail({
 		const content = e.target.value
 		setCommentContent(content)
 	}
+	const handleParsePayLoad = async () => {
+		const _medias = fileList
+		let medias = []
+
+		if (_medias?.length > 0) {
+			const uploadPromises = _medias.map((media) =>
+				handleUploadImage(media.file, { isAll: true }),
+			)
+			const resList = await Promise.all(uploadPromises)
+
+			medias = (resList || []).map((i) => ({
+				url: i,
+				type: 'IMAGE',
+				fileName: null,
+				width: 692,
+				height: 1500,
+				ratio: 0.4613333333333333,
+				thumbnail: null,
+				duration: 0,
+				...i,
+			}))
+		}
+
+		return {
+			post_id: discussId,
+			content: commentContent,
+			medias: medias,
+		}
+	}
 	const handleSendCommentPost = async () => {
 		if (!commentContent.trim() || loadingContext) {
 			return
 		}
+		const body = await handleParsePayLoad()
 		try {
 			toggleLoadingContext(true)
 			const res: any = await sendCommentPost({
-				post_id: discussId,
-				content: commentContent,
+				...body,
 			})
 			const { code, results } = res || {}
 			if (code === 200) {
@@ -514,6 +583,7 @@ export default function useDiscussionDetail({
 					...prev,
 					amount_of_comment: (prev.amount_of_comment || 0) + 1,
 				}))
+				setFileList([])
 			}
 		} catch (error) {
 			openError(error)
@@ -546,6 +616,29 @@ export default function useDiscussionDetail({
 				break
 		}
 	}
+	const handleImportImg = debounce((_values) => {
+		const values = []
+
+		if (isArray(_values, 1)) {
+			_values.forEach((i) => {
+				const { imageUrl, file } = handleParseFileImg(i?.originFileObj) || {}
+				if (imageUrl) {
+					values.push({ imageUrl, file })
+				}
+			})
+		}
+		const maxItem = 5
+		setFileList((prev) => {
+			const combined = [...prev, ...values]
+			if ((combined || []).length > maxItem) {
+				openConfirm({
+					message: 'You can only upload up to 5 medias',
+					onAccept: () => closeModal(),
+				})
+			}
+			return combined.slice(0, maxItem)
+		})
+	}, 200)
 	useEffect(() => {
 		handleGetDetailDiscuss()
 		handleGetComment()
@@ -564,7 +657,10 @@ export default function useDiscussionDetail({
 		discussDetail,
 		totalComment,
 		commentContent,
-
+		fileList,
+		editList,
+		setEditList,
+		setFileList,
 		onGetMenus: handleGetMenus,
 		onGetMenusCommentItem: handleGetMenusCommentItem,
 		onCopy: handleCopy,
@@ -576,5 +672,6 @@ export default function useDiscussionDetail({
 		onKeyDown: handleKeyDown,
 		onChangeComment: handleChangeComment,
 		onActionCommentItem: handleActionCommentItem,
+		onImportImg: handleImportImg,
 	}
 }

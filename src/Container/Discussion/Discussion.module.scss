@@ -89,7 +89,10 @@
 					}
 					.topicList {
 						gap: 8px;
-						overflow: auto;
+						overflow-y: scroll;
+						&::-webkit-scrollbar {
+							display: none;
+						}
 					}
 				}
 				.join {

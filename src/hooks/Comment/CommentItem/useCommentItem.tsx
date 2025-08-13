@@ -1,16 +1,21 @@
 import { ItemType } from 'antd/es/menu/interface'
+import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 
+import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
 import {
 	deleteCommentPost,
+	editComment,
 	getListCommentById,
 	likeComment,
 } from '@/apis/postApis'
+import { handleUploadImage } from '@/apis/uploadApis'
 
 import { isArray, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay } from '@/ultis/common.ults'
+import { cloneDeep, delay, toJson } from '@/ultis/common.ults'
+import { handleParseFileImg } from '@/ultis/file.utls'
 import { getUserInfo } from '@/ultis/storage.ults'
 
 import { PaginationType } from '@/interface/common/common.interface'
@@ -26,7 +31,8 @@ export default function useCommentItem({
 	onAction = () => null,
 }: useCommentItemProps) {
 	const { post_id, id: parent_id, amount_of_replies } = item || {}
-	const { openError } = useModal()
+	const { toggleLoadingContext } = useLoading()
+	const { openError, openConfirm, closeModal } = useModal()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 
 	const _loadmore = useRef<boolean>(true)
@@ -34,6 +40,9 @@ export default function useCommentItem({
 
 	const [commentList, setCommentList] = useState<any[]>([])
 	const [deleteLoading, setDeleteLoading] = useState<string[]>([])
+
+	const [dataSubmit, setDataSubmit] = useState(item)
+	const [fileList, setFileList] = useState([])
 
 	const [loading, setLoading] = useState({
 		like: false,
@@ -200,7 +209,26 @@ export default function useCommentItem({
 
 		return menus
 	}
-
+	const handleChangeDataSubmit = (key) => (value) => {
+		let _key = key
+		let _value = value
+		switch (key) {
+			case 'content':
+				_value = value.target.value
+				break
+			case 'removeImg':
+				const { medias } = cloneDeep(dataSubmit || {})
+				const _medias = (medias || []).filter(
+					(item) => item?.url !== value?.url,
+				)
+				_key = 'medias'
+				_value = _medias || []
+				break
+			default:
+				break
+		}
+		setDataSubmit((prev) => ({ ...prev, [_key]: _value }))
+	}
 	// const handleChangeComment = (e) => {
 	// 	const content = e.target.value
 	// 	setCommentContent(content)
@@ -255,13 +283,94 @@ export default function useCommentItem({
 	// 			break
 	// 	}
 	// }
+	const handleImportImg = debounce((_values) => {
+		const values = []
+
+		if (isArray(_values, 1)) {
+			_values.forEach((i) => {
+				const { imageUrl, file } = handleParseFileImg(i?.originFileObj) || {}
+				if (imageUrl) {
+					values.push({ imageUrl, file })
+				}
+			})
+		}
+		const maxItem = 5 - (dataSubmit?.medias?.length || 0)
+		setFileList((prev) => {
+			const combined = [...prev, ...values]
+			if ((combined || []).length > maxItem) {
+				openConfirm({
+					message: 'You can only upload up to 5 medias',
+					onAccept: () => closeModal(),
+				})
+			}
+			return combined.slice(0, maxItem)
+		})
+	}, 200)
+	const handleParsePayload = async () => {
+		const { content } = dataSubmit || {}
+		let { medias: _currentMedias } = dataSubmit || {}
+		const _medias = fileList
+		let medias = []
+		_currentMedias = (_currentMedias || []).map((item) => ({
+			url: item?.url,
+			type: 'IMAGE',
+			fileName: null,
+			width: item?.width,
+			height: item?.height,
+			ratio: item?.ratio,
+			thumbnail: null,
+			duration: 0,
+		}))
+		if (_medias?.length > 0) {
+			const uploadPromises = _medias.map((media) =>
+				handleUploadImage(media.file, { isAll: true }),
+			)
+			const resList = await Promise.all(uploadPromises)
+
+			medias = (resList || []).map((i) => ({
+				url: i,
+				type: 'IMAGE',
+				fileName: null,
+				width: 692,
+				height: 1500,
+				ratio: 0.4613333333333333,
+				thumbnail: null,
+				duration: 0,
+				...i,
+			}))
+		}
+
+		return {
+			content,
+			medias: [...(_currentMedias || []), ...(medias || [])],
+		}
+	}
+	const handleEditComment = async () => {
+		toggleLoadingContext(true)
+		try {
+			const body = await handleParsePayload()
+			const res: any = await editComment({ id: parent_id, payload: body })
+			if (res) {
+				const { object } = res?.results || {}
+				onAction({ key: 'updateComment', value: object })
+				setFileList([])
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			toggleLoadingContext()
+		}
+	}
 	useEffect(() => {
 		if (amount_of_replies) {
 			handleGetComment()
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
-
+	useEffect(() => {
+		setDataSubmit(item)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [toJson(item)])
 	return {
 		// loading,
 		// loadingShare,
@@ -270,6 +379,10 @@ export default function useCommentItem({
 		commentList,
 		deleteLoading,
 		modal,
+		dataSubmit,
+		fileList,
+		setFileList,
+		setDataSubmit,
 		setModal,
 		// discussDetail,
 		// totalComment,
@@ -279,5 +392,8 @@ export default function useCommentItem({
 
 		onLoadMore: handleLoadMore,
 		onAction: handleAction,
+		onChangeDataSubmit: handleChangeDataSubmit,
+		onImportImg: handleImportImg,
+		onEditComment: handleEditComment,
 	}
 }

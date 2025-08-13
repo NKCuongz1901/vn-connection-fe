@@ -18,6 +18,16 @@ export const editPost = async ({
 	const url = `${POST_ROUTES.name}/${id}`
 	return await axios.put(url, payload)
 }
+export const editComment = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: any
+}) => {
+	const url = `${POST_ROUTES.comment}/${id}`
+	return await axios.put(url, payload)
+}
 
 export const getListPost = async (_params: any) => {
 	const { type, ...params } = _params || {}
