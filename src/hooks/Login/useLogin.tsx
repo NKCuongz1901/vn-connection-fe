@@ -79,8 +79,34 @@ export default function useLogin() {
 
 			if (res.code === 200) {
 				const { object, refresh_token, token } = res.results || {}
+				const {
+					id,
+					name,
+					avatar,
+					country_code,
+					email,
+					cover,
+					latitude,
+					latitude_local,
+					is_verified,
+				} = object || {}
+				const dataInfo = {
+					id,
+					name,
+					avatar,
+					country_code,
+					email,
+					cover,
+					latitude,
+					latitude_local,
+					is_verified,
+				}
 				if (isRemember) {
-					handleStorageCookie({ key: 'info', data: object, expireInDays: 300 })
+					handleStorageCookie({
+						key: 'info',
+						data: dataInfo,
+						expireInDays: 300,
+					})
 					handleStorageCookie({
 						key: 'refresh_token',
 						data: refresh_token,
@@ -88,7 +114,7 @@ export default function useLogin() {
 					})
 					handleStorageCookie({ key: 'token', data: token, expireInDays: 300 })
 				} else {
-					handleStorageCookie({ key: 'info', data: object })
+					handleStorageCookie({ key: 'info', data: dataInfo })
 					handleStorageCookie({
 						key: 'refresh_token',
 						data: refresh_token,
