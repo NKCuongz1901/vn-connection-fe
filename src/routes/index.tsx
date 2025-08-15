@@ -48,6 +48,8 @@ export const CONVERSATION_ROUTES = {
 	sendMess: 'conversation/send-message',
 	message: 'message',
 	messagePin: 'message/pin',
+	convSearch: 'conversation/search',
+	createConv: 'conversation/create-conversation',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',

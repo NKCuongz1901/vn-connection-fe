@@ -146,3 +146,21 @@ export const getConvMediasById = async ({
 		params: convertParams(params),
 	})
 }
+
+export const getConvList = async ({
+	params = {},
+}: {
+	params?: { [key: string]: any }
+}) => {
+	const url = CONVERSATION_ROUTES.convSearch
+	const { keyword, ..._params } = params || {}
+	return await axios.get(url, {
+		params: { ...convertParams(_params), keyword },
+	})
+}
+
+export const createConv = async (payload: any) => {
+	const url = CONVERSATION_ROUTES.createConv
+
+	return await axios.post(url, payload)
+}

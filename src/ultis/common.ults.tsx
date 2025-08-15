@@ -36,3 +36,13 @@ export const getCurrentLocation = (): Promise<{ lat: number; lng: number }> => {
 		)
 	})
 }
+
+export const handleScrollCallback = (e: any, cb: any) => {
+	const clientHeight = e.target.clientHeight
+	const scrollHeight = e.target.scrollHeight
+	const scrollTop = Math.abs(e.target.scrollTop)
+	const isReachedEnd = scrollTop + clientHeight >= scrollHeight - 50
+	if (!isReachedEnd) return
+
+	cb()
+}
