@@ -31,7 +31,7 @@ export default function useInbox() {
 	const { socket } = useSocket()
 	const { onGetQuerry } = useQuery()
 
-	const { id } = onGetQuerry()
+	const { id, force_id } = onGetQuerry()
 	const key = useRef<string>(randomString())
 
 	const _paginationStranger = useRef<PaginationType>(
@@ -84,6 +84,7 @@ export default function useInbox() {
 				page,
 				limit,
 			})
+			await delay(500)
 			const { rows } = res?.results?.objects || {}
 			if (!isArray(rows, limit)) {
 				loadMore.current.stranger = false
@@ -107,13 +108,16 @@ export default function useInbox() {
 		const { page, limit } = _paginationPersonal.current
 		try {
 			const isNew = page === 1
-
+			if (isNew) {
+				setListConvPersonal([])
+			}
 			const res: any = await getConvPersonal({
 				fields: ['$all'],
 				page,
 				limit,
 			})
 			const { rows } = res?.results?.objects || {}
+			await delay(500)
 			if (!isArray(rows, limit)) {
 				loadMore.current.personal = false
 			}
@@ -195,6 +199,9 @@ export default function useInbox() {
 		try {
 			const { page, limit } = _paginationConv.current
 			const isNew = page === 1
+			if (isNew) {
+				setListConv([])
+			}
 			const params = {
 				fields: ['$all'],
 				keyword: keyword,
@@ -229,6 +236,9 @@ export default function useInbox() {
 		try {
 			const { page, limit } = _paginationFriend.current
 			const isNew = page === 1
+			if (isNew) {
+				setListFriend([])
+			}
 			const params = {
 				type: optionFriends[0].value,
 				fields: ['$all', { user: ['$all'] }, { friend: ['$all'] }],
@@ -339,7 +349,23 @@ export default function useInbox() {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [keyword])
-
+	useEffect(() => {
+		if (force_id) {
+			loadMore.current.friend = true
+			loadMore.current.conv = true
+			loadMore.current.personal = true
+			loadMore.current.stranger = true
+			_paginationFriend.current.page = 1
+			_paginationConv.current.page = 1
+			_paginationStranger.current.page = 1
+			_paginationPersonal.current.page = 1
+			handleSearchConv()
+			handleSearchFriend()
+			handleGetConvStranger()
+			handleGetConvPersonal()
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [force_id])
 	return {
 		key,
 		loadingConv,

@@ -18,6 +18,7 @@ import CInput from '@/Components/Custom/CInput'
 import InboxChat from '@/Components/Inbox/InboxChat'
 import Message3 from '@/svg/Message3'
 import MessageIcon from '@/svg/MessageIcon'
+import NotFound from '@/svg/NotFound'
 import People from '@/svg/People'
 import SearchIcon from '@/svg/SearchIcon'
 
@@ -60,6 +61,16 @@ const Inbox = () => {
 				return <div>{mappingTypeMessage[type] || type}</div>
 		}
 	}, [])
+
+	const _renderNoResultFound = () => {
+		return (
+			<Flex className={classes.notFound} vertical>
+				<NotFound />
+				<div className={classes.title}>No results found</div>
+			</Flex>
+		)
+	}
+
 	const _renderConvItem = useCallback((item) => {
 		const meId = getUserInfo()?.id
 		const {
@@ -139,21 +150,24 @@ const Inbox = () => {
 							{_renderConvItem(conv)}
 						</Flex>
 					))}
+					{loadingConv.personal && (
+						<Flex className={classes.skeletonWrapper} vertical>
+							{arrayFrom(3).map((_, index) => (
+								<Skeleton.Input
+									key={index}
+									active
+									className={classes.skeleton}
+								/>
+							))}
+						</Flex>
+					)}
 				</Flex>
 			</Fragment>
 		)
 	}
 	const _renderListFriend = () => {
 		if (searchType !== 'friend') return
-		if (loadingConv.friend) {
-			return (
-				<Flex className={classes.skeletonWrapper} vertical>
-					{arrayFrom(3).map((_, index) => (
-						<Skeleton.Input key={index} active className={classes.skeleton} />
-					))}
-				</Flex>
-			)
-		}
+
 		return (
 			<Flex vertical className={classes.searchFriend} onScroll={onScrollFriend}>
 				{isArray(listFriend, 1) ? (
@@ -171,23 +185,24 @@ const Inbox = () => {
 							</Flex>
 						)
 					})
-				) : (
+				) : loadingConv.friend ? (
 					<></>
+				) : (
+					_renderNoResultFound()
+				)}
+				{loadingConv.friend && (
+					<Flex className={classes.skeletonWrapper} vertical>
+						{arrayFrom(3).map((_, index) => (
+							<Skeleton.Input key={index} active className={classes.skeleton} />
+						))}
+					</Flex>
 				)}
 			</Flex>
 		)
 	}
 	const _renderListConv = () => {
 		if (searchType !== 'conv') return
-		if (loadingConv.friend) {
-			return (
-				<Flex className={classes.skeletonWrapper} vertical>
-					{arrayFrom(3).map((_, index) => (
-						<Skeleton.Input key={index} active className={classes.skeleton} />
-					))}
-				</Flex>
-			)
-		}
+
 		return (
 			<Flex vertical className={classes.searchFriend} onScroll={onScrollConv}>
 				{isArray(listConv, 1) ? (
@@ -196,8 +211,17 @@ const Inbox = () => {
 							{_renderConvItem(item)}
 						</Flex>
 					))
-				) : (
+				) : loadingConv.conv ? (
 					<></>
+				) : (
+					_renderNoResultFound()
+				)}
+				{loadingConv.conv && (
+					<Flex className={classes.skeletonWrapper} vertical>
+						{arrayFrom(3).map((_, index) => (
+							<Skeleton.Input key={index} active className={classes.skeleton} />
+						))}
+					</Flex>
 				)}
 			</Flex>
 		)

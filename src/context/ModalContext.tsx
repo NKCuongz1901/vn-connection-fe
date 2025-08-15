@@ -21,6 +21,7 @@ interface openConfirmProps {
 	message: string
 	titleLabel?: string
 	onAccept?: any
+	ctype?: string
 	[key: string]: any
 }
 const ModalContext = createContext({

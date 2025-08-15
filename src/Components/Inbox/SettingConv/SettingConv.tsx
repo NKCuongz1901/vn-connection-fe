@@ -41,6 +41,7 @@ const SettingConv = (props: SettingConvProps) => {
 		onUpdateConvMem,
 		onScroll,
 		onLoadMore,
+		onConfirmDelete,
 	} = useSettingConv({
 		convInfo,
 		members,
@@ -72,9 +73,8 @@ const SettingConv = (props: SettingConvProps) => {
 	}
 	const _renderBody1 = () => {
 		const fill = '#7987A4'
-		const { is_accept_notification, user_id } = (members || []).find(
-			(item) => item.user_id === getUserInfo()?.id,
-		)
+		const { is_accept_notification, user_id } =
+			(members || []).find((item) => item.user_id === getUserInfo()?.id) || {}
 		return (
 			<Flex className={classes.body} vertical>
 				{/* {_renderItem({
@@ -118,12 +118,12 @@ const SettingConv = (props: SettingConvProps) => {
 	// 	return <Flex>a</Flex>
 	// }
 	const _renderBody3 = () => {
-		return
 		return (
 			<Flex className={classes.body} vertical>
 				{_renderItem({
 					icon: <TrashIcon fill={'red'} />,
 					text: 'Delete',
+					onClick: () => onConfirmDelete(),
 				})}
 			</Flex>
 		)

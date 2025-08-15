@@ -21,6 +21,7 @@ import { generateCustomUuid, randomString } from '@/ultis/string.ults'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'
+import { onPushState } from '@/ultis/route.ults'
 
 type useHangoutChatProps = {
 	convId: string
@@ -210,6 +211,7 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 			setConvInfo(res?.results?.object)
 		} catch (error) {
 			openError(error)
+			onPushState({})
 		} finally {
 			setLoadingConvInfo(false)
 		}

@@ -13,12 +13,16 @@ const variant = {
 		background: '#EEF3F6',
 	},
 	success: {
-		color: '#EEF3F6 ',
+		color: '#EEF3F6',
 		background: '#006B35',
 	},
 	error: {
 		color: '#F80024',
-		background: '#EEF3F6 ',
+		background: '#EEF3F6',
+	},
+	errorRevert: {
+		color: '#EEF3F6',
+		background: '#F80024',
 	},
 }
 

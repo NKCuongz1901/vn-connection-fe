@@ -1,12 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { getConvMediasById, updateConvMember } from '@/apis/conversationApis'
+import {
+	deleteConvById,
+	getConvMediasById,
+	updateConvMember,
+} from '@/apis/conversationApis'
 
 import { uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
+import { onPushState } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
+import { randomString } from '@/ultis/string.ults'
 
 import { paginationCommon } from '@/Variable/common.variable'
 import { PaginationType } from '@/interface/common/common.interface'
@@ -23,7 +30,8 @@ export default function useSettingConv({
 	members,
 	onAction,
 }: useSettingConvProps) {
-	const { openError } = useModal()
+	const { toggleLoadingContext } = useLoading()
+	const { openError, openConfirm, closeModal } = useModal()
 
 	const [modal, setModal] = useState({ type: '', data: null }) as any
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
@@ -36,9 +44,8 @@ export default function useSettingConv({
 	const handleUpdateConvMem = async () => {
 		setLoading((prev) => ({ ...prev, updateConvMem: true }))
 		const { id } = convInfo || {}
-		const { id: memberId, is_accept_notification } = (members || []).find(
-			(item) => item.user_id === getUserInfo()?.id,
-		)
+		const { id: memberId, is_accept_notification } =
+			(members || []).find((item) => item.user_id === getUserInfo()?.id) || {}
 		try {
 			const res: any = await updateConvMember({
 				id,
@@ -93,6 +100,31 @@ export default function useSettingConv({
 			setLoading((prev) => ({ ...prev, medias: false }))
 		}
 	}
+	const handleDeleteConv = async (id) => {
+		toggleLoadingContext(true)
+		try {
+			const res: any = await deleteConvById({ id })
+			await delay(500)
+			if (res?.code === 200) {
+				onPushState({ force_id: randomString() })
+				closeModal()
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			toggleLoadingContext()
+		}
+	}
+	const handleConfirmDelete = () => {
+		const { id } = convInfo || {}
+
+		openConfirm({
+			message: 'Are you sure want to remove this conversation?',
+			titleLabel: 'Delete this conversation',
+			onAccept: () => handleDeleteConv(id),
+			ctype: 'error',
+		})
+	}
 	const handleLoadMore = async () => {
 		if (!_loadmore.current || !!loading.medias) return
 		const { limit } = _paginationRefs.current
@@ -126,5 +158,6 @@ export default function useSettingConv({
 		onUpdateConvMem: handleUpdateConvMem,
 		onScroll: handleScroll,
 		onLoadMore: handleLoadMore,
+		onConfirmDelete: handleConfirmDelete,
 	}
 }
