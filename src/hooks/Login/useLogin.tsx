@@ -9,9 +9,9 @@ import { loginByPhone } from '@/apis/authApis'
 import { delay, formatPhone, toJson } from '@/ultis/common.ults'
 import { useLocalePath } from '@/ultis/route.ults'
 import { handleStorageCookie, isLogin } from '@/ultis/storage.ults'
+import { randomString } from '@/ultis/string.ults'
 
 import { mainRoutes } from '@/routes/MainRoutes'
-import { io } from 'socket.io-client'
 
 export default function useLogin() {
 	const { toggleLoadingContext } = useLoading()
@@ -23,26 +23,7 @@ export default function useLogin() {
 		isRemember: true,
 		prefix: '+84',
 	})
-	const handleSocket = () => {
-		const _socket = io('http://dev-api.univini.com:9001', {
-			transports: ['websocket'],
-			query: {
-				token:
-					'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwYXlsb2FkIjp7InVzZXJfaWQiOiJlMTEwNDM2MC0wNzIxLTExZjAtYjM4NC0zZDI5ZmM4OWUyMTUiLCJyb2xlIjoiVVNFUiIsInR5cGUiOiJBQ0NFU1NfVE9LRU4iLCJuYW1lIjoiMTEyMyJ9LCJyb2xlIjoiVVNFUiIsImV4cCI6IjIwMjUtMDctMjVUMDA6NTU6NTEuNjQ3WiJ9.AewMq8uNCStuU-ckZSYCxvofYfCivwTEv3wVG9rZlfY',
-				uid: 'e1104360-0721-11f0-b384-3d29fc89e215',
-			},
-		})
-	}
-	// useEffect(() => {
-	// 	const socket = io('http://dev-api.univini.com:9001', {
-	// 		transports: ['websocket'],
-	// 		query: {
-	// 			token:
-	// 				'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwYXlsb2FkIjp7InVzZXJfaWQiOiJlMTEwNDM2MC0wNzIxLTExZjAtYjM4NC0zZDI5ZmM4OWUyMTUiLCJyb2xlIjoiVVNFUiIsInR5cGUiOiJBQ0NFU1NfVE9LRU4iLCJuYW1lIjoiMTEyMyJ9LCJyb2xlIjoiVVNFUiIsImV4cCI6IjIwMjUtMDctMjVUMDA6NTU6NTEuNjQ3WiJ9.AewMq8uNCStuU-ckZSYCxvofYfCivwTEv3wVG9rZlfY',
-	// 			uid: 'e1104360-0721-11f0-b384-3d29fc89e215',
-	// 		},
-	// 	})
-	// }, [])
+
 	const isValidate = useMemo(() => {
 		const { phone, password } = account
 		return phone.length >= 9 && password.length >= 8
@@ -122,7 +103,7 @@ export default function useLogin() {
 					handleStorageCookie({ key: 'token', data: token })
 				}
 				await delay(100)
-				onChangeRoute(mainRoutes.overview)
+				onChangeRoute(`${mainRoutes.overview}?cookie_id=${randomString()}`)
 			}
 		} catch (error: any) {
 			openError(error)
@@ -139,6 +120,5 @@ export default function useLogin() {
 		account,
 		onChange: handleChange,
 		onLogin: handleLogin,
-		handleSocket,
 	}
 }

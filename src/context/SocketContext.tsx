@@ -11,12 +11,16 @@ import {
 import { io, Socket } from 'socket.io-client'
 
 import { getStorageCookie, getUserInfo } from '@/ultis/storage.ults'
+import { useQuery } from '@/ultis/route.ults'
 
 const SocketContext = createContext<{
 	socket: Socket | null
 } | null>(null)
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
+	const { onGetQuerry } = useQuery()
+	const { cookie_id } = onGetQuerry()
+
 	const socketRef = useRef<Socket | null>(null)
 	const [_, setSocket] = useState<Socket | null>(null)
 
@@ -71,13 +75,18 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 		// })
 	}, [])
 	useEffect(() => {
-		handleSocket()
+		const token = getStorageCookie('token')
+		const uid = getUserInfo()?.id
+		console.log('object')
+		if (token && uid) {
+			handleSocket()
+		}
 		return () => {
 			socketRef.current?.removeAllListeners()
 			socketRef.current?.disconnect()
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	}, [cookie_id])
 	return (
 		<SocketContext.Provider value={{ socket: socketRef.current }}>
 			{children}
