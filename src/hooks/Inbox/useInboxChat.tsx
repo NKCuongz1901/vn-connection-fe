@@ -241,6 +241,9 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 			)
 			const res: any = await deleteMessageById({ id })
 			if (res?.results?.object) {
+				if (pinList.some((item) => item.id === id)) {
+					handleGetPinMessage()
+				}
 				setMessList((prev) => {
 					const _data = prev.filter((i) => i.id !== id)
 					return mappingMessageChat(_data)
