@@ -156,7 +156,9 @@ const ChatBox = ({
 			case 'UNPIN':
 				return (
 					<Flex className={classes.memberAccept}>
-						{name} {content}
+						<div className={classes.ellipsisContent}>
+							{name} {content}
+						</div>
 					</Flex>
 				)
 			default:

@@ -167,13 +167,27 @@
 
 			.contentItem {
 				gap: 4px;
+				width: 100%;
 
 				.contentInfo {
+					width: 100%;
 					.content {
+						width: 100%;
 						.memberAccept {
 							color: #135a19;
-							margin-bottom: 8px;
+							width: 100%;
+							margin: 8px 0;
 							text-align: center;
+							justify-content: center;
+							.ellipsisContent {
+								width: calc(100% - 40px);
+								overflow: hidden;
+								text-overflow: ellipsis;
+								white-space: nowrap;
+								// -webkit-box-orient: vertical;
+								// -webkit-line-clamp: 2; /* số dòng tối đa */
+								// display: -webkit-box;
+							}
 						}
 					}
 				}
