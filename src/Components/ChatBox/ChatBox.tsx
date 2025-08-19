@@ -123,7 +123,7 @@ const ChatBox = ({
 				)
 			case 'STICKER':
 				return (
-					<Flex vertical>
+					<Flex vertical className={classes.sticker}>
 						<CImage src={content} />
 						{isLast && (
 							<div className={classes.time}>
@@ -192,17 +192,17 @@ const ChatBox = ({
 						)}
 						<Flex className={classes.content}>
 							{!(isTemp || isMemberAction) && (
-								<Dropdown
-									trigger={['click']}
-									menu={{ items: onGetMenus({ item, isMe }) }}
-									disabled={isTemp || isMemberAction}
-								>
-									<Flex className={classes.moreIconWrapper}>
+								<Flex className={classes.moreIconWrapper}>
+									<Dropdown
+										trigger={['click']}
+										menu={{ items: onGetMenus({ item, isMe }) }}
+										disabled={isTemp || isMemberAction}
+									>
 										<Flex className={classes.moreIcon}>
 											<MoreIcon />
 										</Flex>
-									</Flex>
-								</Dropdown>
+									</Dropdown>
+								</Flex>
 							)}
 							{_renderContentChat(item)}
 						</Flex>
