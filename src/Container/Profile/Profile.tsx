@@ -42,12 +42,13 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		loading,
 		loadingButtonFriend,
 		userData,
+		menus,
 		onOpenEditP,
 		openEditProfile,
 		onCloseEditP,
 		onGetUserProfile,
 		onMenusClick,
-		menus,
+		onOpenInbox,
 	} = useProfile({
 		id,
 	})
@@ -191,7 +192,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 								<CButton
 									ctype="disabled"
 									style={{ height: 40 }}
-									onClick={() => onChangeRoute(mainRoutes.inbox)}
+									onClick={onOpenInbox}
 								>
 									Inbox
 								</CButton>

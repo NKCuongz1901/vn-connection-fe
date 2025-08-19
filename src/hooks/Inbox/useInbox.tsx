@@ -4,7 +4,7 @@ import { useModal } from '@/context/ModalContext'
 import { useSocket } from '@/context/SocketContext'
 
 import {
-	createConv,
+	createConversation,
 	getConvList,
 	getConvPersonal,
 	getConvStranger,
@@ -300,7 +300,7 @@ export default function useInbox() {
 				title: name || '',
 				member_ids: [id],
 			}
-			const res: any = await createConv(payload)
+			const res: any = await createConversation(payload)
 			if (res) {
 				const { id } = res?.results?.object || {}
 				onPushState({ id })

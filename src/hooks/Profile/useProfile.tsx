@@ -4,13 +4,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useModal } from '@/context/ModalContext'
 import useFriendItem from '../Friend/useFriendItem'
 
+import { createConversation } from '@/apis/conversationApis'
 import { getUserProfile } from '@/apis/userApis'
 
 import { delay } from '@/ultis/common.ults'
+import { useLocalePath } from '@/ultis/route.ults'
+import { getUserInfo } from '@/ultis/storage.ults'
+
+import { mainRoutes } from '@/routes/MainRoutes'
 
 export default function useProfile({ id }: { id?: string }) {
 	const { openError } = useModal()
-
+	const { onChangeRoute } = useLocalePath()
 	const {
 		onAccept,
 		onAdd,
@@ -93,6 +98,23 @@ export default function useProfile({ id }: { id?: string }) {
 		},
 		[handleGetUserProfile, id, onAccept, onAdd, onCancel, userData],
 	)
+	const handleOpenInbox = useCallback(async () => {
+		try {
+			const { name } = getUserInfo() || {}
+			const payload = {
+				title: name || '',
+				member_ids: [id],
+			}
+			const res: any = await createConversation(payload)
+			if (res) {
+				const { id } = res?.results?.object || {}
+				onChangeRoute(`${mainRoutes.inbox}?id=${id}`)
+			}
+		} catch (error) {
+			openError(error)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [id])
 	const menus: {
 		responMenus: ItemType[]
 		cancelMenus: ItemType[]
@@ -147,5 +169,6 @@ export default function useProfile({ id }: { id?: string }) {
 		onCloseEditP: handleCloseEditP,
 		onGetUserProfile: handleGetUserProfile,
 		onMenusClick: handleMenusClick,
+		onOpenInbox: handleOpenInbox,
 	}
 }

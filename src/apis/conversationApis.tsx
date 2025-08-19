@@ -159,11 +159,6 @@ export const getConvList = async ({
 	})
 }
 
-export const createConv = async (payload: any) => {
-	const url = CONVERSATION_ROUTES.createConv
-
-	return await axios.post(url, payload)
-}
 export const deleteConvById = async ({ id }: { id: string }) => {
 	const url = `${CONVERSATION_ROUTES.name}/${id}/delete`
 	return await axios.delete(url)
