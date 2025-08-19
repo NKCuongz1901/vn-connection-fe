@@ -9,6 +9,7 @@ import { useLocalePath } from '@/ultis/route.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CImage from '@/Components/Custom/CImage'
+import CTextSpecial from '@/Components/Custom/CTextSpecial'
 import Heart from '@/svg/Heart'
 import MessageMinuIcon from '@/svg/MessageMinuIcon'
 import ShareIconSvg from '@/svg/ShareIconSvg'
@@ -62,7 +63,7 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 				</Flex>
 				<Flex className={classes.bodyText} vertical>
 					<div className={classes.title}>{title}</div>
-					<div className={classes.text}>{description}</div>
+					<CTextSpecial className={classes.text} data={description} />
 				</Flex>
 				<Flex className={classes.medias}>
 					{isArray(medias, 1) ? (
