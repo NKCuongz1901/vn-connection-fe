@@ -80,7 +80,10 @@ export const CATEGORY_ROUTES = {
 	likeCategory: 'category/like',
 	categoryExplore: 'category/explore',
 }
-
+export const NOTIFICATION_ROUTES = {
+	name: 'notifications',
+	read: 'notifications/read',
+}
 export const Menus = [
 	{
 		title: 'Overview',

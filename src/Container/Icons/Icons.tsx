@@ -44,6 +44,7 @@ import NoPostIcon from '@/svg/DiscusstionSvg/NoPostIcon'
 import MessageMinuIcon from '@/svg/MessageMinuIcon'
 import ShareIconSvg from '@/svg/ShareIconSvg'
 import ArrrowRightIcon from '@/svg/ArrrowRightIcon'
+import DoubleHeart from '@/svg/DoubleHeart'
 
 const Icons = () => {
 	const icons = [
@@ -115,6 +116,11 @@ const Icons = () => {
 		{ ICON: ShareIconSvg, name: '@/svg/ShareIconSvg', key: randomString() },
 		{
 			ICON: ArrrowRightIcon,
+			name: '@/svg/ArrrowRightIcon',
+			key: randomString(),
+		},
+		{
+			ICON: DoubleHeart,
 			name: '@/svg/ArrrowRightIcon',
 			key: randomString(),
 		},

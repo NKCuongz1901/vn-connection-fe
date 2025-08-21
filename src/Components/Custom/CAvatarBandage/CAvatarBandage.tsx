@@ -9,15 +9,20 @@ import classes from './CAvatarBandage.module.scss'
 
 interface CAvatarBandageProps {
 	customeBandage?: any
+	classBandage?: any
 }
 const CAvatarBandage = (_props: CAvatarBandageProps & AvatarProps) => {
-	const { customeBandage, ...props } = _props
+	const { customeBandage, classBandage, ...props } = _props
 	const _renderBandage = () => {
 		return (
 			<Flex
-				className={clsx(classes.bandage, {
-					[classes.custom]: !!customeBandage,
-				})}
+				className={clsx(
+					classes.bandage,
+					{
+						[classes.custom]: !!customeBandage,
+					},
+					classBandage,
+				)}
 			>
 				{customeBandage || <HostIcon />}
 			</Flex>

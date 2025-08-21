@@ -168,3 +168,24 @@ export const radiusOpts = [
 		label: 'Under 50km',
 	},
 ]
+
+export const mappingNotiTypes = {
+	PUSH_BY_PERSONAL: 'PUSH_BY_PERSONAL',
+	PUSH_BY_ADMIN: 'PUSH_BY_ADMIN',
+	ALL: 'ALL',
+}
+
+export const NotiTypes = [
+	{
+		value: mappingNotiTypes.ALL,
+		label: 'All',
+	},
+	{
+		value: mappingNotiTypes.PUSH_BY_PERSONAL,
+		label: 'Personal',
+	},
+	{
+		value: mappingNotiTypes.PUSH_BY_ADMIN,
+		label: 'System',
+	},
+]

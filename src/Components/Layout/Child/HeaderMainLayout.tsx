@@ -2,19 +2,20 @@
 import { MenuOutlined, SearchOutlined } from '@ant-design/icons'
 import { IconBellFilled, IconUserCircle } from '@tabler/icons-react'
 import { Dropdown, Flex } from 'antd'
-import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useLocalePath } from '@/ultis/route.ults'
 import { handleRemoveAllCookie, isLogin } from '@/ultis/storage.ults'
 
 import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
+import Notification from '@/Container/Notification'
 import LogoSvg from '@/svg/LogoSvg'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 
-import './HeaderMainLayout.scss'
 import { ItemType } from 'antd/es/menu/interface'
+import './HeaderMainLayout.scss'
 
 interface HeaderMainLayoutProps {
 	onToggleMenus?: () => void
@@ -22,7 +23,11 @@ interface HeaderMainLayoutProps {
 const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 	const { onToggleMenus } = props
 	const { onChangeRoute } = useLocalePath()
+
+	const ref = useRef<HTMLDivElement>(null)
+
 	const [login, setLogin] = useState(false)
+	const [show, setShow] = useState(false)
 	const userMenus: ItemType[] = useMemo(
 		() => [
 			{
@@ -56,6 +61,16 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 	// }
 	useEffect(() => {
 		setLogin(Boolean(isLogin()))
+		const handleClickOutside = (event: MouseEvent) => {
+			if (ref.current && !ref.current.contains(event.target as Node)) {
+				setShow(false)
+			}
+		}
+
+		document.addEventListener('mousedown', handleClickOutside)
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside)
+		}
 	}, [])
 
 	const handleMenusClick = useCallback((type: string) => {
@@ -78,9 +93,11 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 	return (
 		<Flex className="headerMainLayoutWrapper">
 			<Flex className="headerMainLayout">
-				<Flex gap={4} className="homeMainLayout"
+				<Flex
+					gap={4}
+					className="homeMainLayout"
 					onClick={() => onChangeRoute(mainRoutes.home)}
-					>
+				>
 					<LogoSvg />
 					<div>UniVini</div>
 				</Flex>
@@ -95,8 +112,13 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 			<Flex className="headerButton">
 				{login ? (
 					<>
-						<Flex className="headerIcon">
+						<Flex
+							className="headerIcon"
+							ref={ref}
+							onClick={() => setShow((prev) => !prev)}
+						>
 							<IconBellFilled />
+							{show && <Notification />}
 						</Flex>
 
 						<Dropdown menu={{ items: userMenus }} trigger={['click']}>
