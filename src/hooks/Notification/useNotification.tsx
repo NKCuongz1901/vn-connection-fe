@@ -103,7 +103,6 @@ export default function useNotification({ onClose: _ }) {
 		}
 	}
 	const handleClickNoti = (item: NotiItemProp) => {
-		console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :94 ~ handleClickNoti ~ item:', item)
 		const { id, is_read, interacting_type, extra_data } = item || {}
 		const { type, post_id } = extra_data || {}
 		switch (interacting_type) {

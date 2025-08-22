@@ -298,11 +298,6 @@ export default function useDiscussionDetail({
 	}
 
 	const handleActionCommentItem = ({ key, value }) => {
-		console.log(
-			'🏖️🏖️🏖️ TrieuNinhHan ~ :301 ~ handleActionCommentItem ~ key, value:',
-			key,
-			value,
-		)
 		switch (key) {
 			case 'like':
 				handleLikeComment(value)
