@@ -59,7 +59,8 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 			case 'success':
 				content = (
 					<CModalSuccess
-						onCancel={() => {
+						onCancel={(e) => {
+							e.stopPropagation()
 							closeModal()
 							onAccept?.()
 						}}
@@ -70,10 +71,12 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 			case 'confirm':
 				content = (
 					<CModalConfirm
-						onCancel={() => {
+						onCancel={(e) => {
+							e.stopPropagation()
 							closeModal()
 						}}
-						onOk={() => {
+						onOk={(e) => {
+							e.stopPropagation()
 							onAccept?.()
 						}}
 						{...open}

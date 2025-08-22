@@ -6,13 +6,14 @@ export interface NotiItemProp {
 	content: string
 	image: string | null
 
-	interacting_type: 'PUSH_BY_ADMIN'
+	interacting_type: string
 	is_read: boolean
 	extra_data:
 		| {
-				type: 'DISCUSS_IN_TOPIC'
-				post_id: string
-				category_id: string
+				type?: string
+				post_id?: string
+				category_id?: string
+				kind?: string
 		  }
 		| false
 	created_at: string // ISO date

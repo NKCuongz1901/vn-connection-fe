@@ -30,6 +30,7 @@ const CModalError = (_props: CModalProps) => {
 	}
 
 	const onClose = (e: any) => {
+		e.stopPropagation()
 		if (onCancel) {
 			onCancel(e)
 		}

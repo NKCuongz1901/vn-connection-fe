@@ -27,7 +27,7 @@
 		}
 	}
 	.headerButton {
-		gap: 12;
+		gap: 12px;
 		position: relative;
 		.headerMenuOutlined {
 			display: none;
@@ -42,6 +42,17 @@
 			color: #7987a4;
 			cursor: pointer;
 			position: relative;
+			.notificationCount {
+				max-height: 12px;
+				max-width: 12px;
+				min-height: 12px;
+				min-width: 12px;
+				background: #e55a0f;
+				border-radius: 50%;
+				position: absolute;
+				right: 4px;
+				bottom: 4px;
+			}
 		}
 		.menuItemHeaderWrapper {
 			position: absolute;
@@ -72,10 +83,10 @@
 		padding: 0 16px !important;
 
 		.headerMainLayout {
-			gap: 40;
+			gap: 40px;
 		}
 		.headerButton {
-			gap: 12;
+			gap: 12px;
 			.headerMenuOutlined {
 				display: flex;
 				color: #94a3b8;

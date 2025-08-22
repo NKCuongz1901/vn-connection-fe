@@ -1,0 +1,17 @@
+.wrapper {
+}
+.container {
+	gap: 8px;
+	.time {
+		color: #94a3b8;
+		font-size: 12px;
+		font-weight: 600;
+	}
+	.title {
+		font-size: 16px;
+		font-weight: 600;
+	}
+	.content {
+		white-space: pre-wrap;
+	}
+}

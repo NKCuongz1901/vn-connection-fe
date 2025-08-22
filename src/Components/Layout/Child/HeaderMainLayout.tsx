@@ -2,7 +2,10 @@
 import { MenuOutlined, SearchOutlined } from '@ant-design/icons'
 import { IconBellFilled, IconUserCircle } from '@tabler/icons-react'
 import { Dropdown, Flex } from 'antd'
+import { ItemType } from 'antd/es/menu/interface'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+
+import { getNotificationCount } from '@/apis/notificationApis'
 
 import { useLocalePath } from '@/ultis/route.ults'
 import { handleRemoveAllCookie, isLogin } from '@/ultis/storage.ults'
@@ -14,7 +17,6 @@ import LogoSvg from '@/svg/LogoSvg'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 
-import { ItemType } from 'antd/es/menu/interface'
 import './HeaderMainLayout.scss'
 
 interface HeaderMainLayoutProps {
@@ -28,6 +30,8 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 
 	const [login, setLogin] = useState(false)
 	const [show, setShow] = useState(false)
+	const [count, setCount] = useState(0)
+
 	const userMenus: ItemType[] = useMemo(
 		() => [
 			{
@@ -53,24 +57,38 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[],
 	)
-	// const isLogin = () => {
-	// 	if (typeof window !== 'undefined') {
-	// 		return localStorage.getItem('token') || sessionStorage.getItem('token')
-	// 	}
-	// 	return false
-	// }
+
+	const handleGetCount = useCallback(async () => {
+		try {
+			const res: any = await getNotificationCount({})
+			if (res) {
+				setCount(res?.results?.object?.count || 0)
+			}
+		} catch (error) {
+			console.log(error)
+		}
+	}, [])
+	const toggleNoti = (value?: any) => {
+		setShow((prev) => value ?? !prev)
+		if (show) {
+			handleGetCount()
+		}
+	}
+
 	useEffect(() => {
 		setLogin(Boolean(isLogin()))
+		handleGetCount()
 		const handleClickOutside = (event: MouseEvent) => {
 			if (ref.current && !ref.current.contains(event.target as Node)) {
-				setShow(false)
+				toggleNoti(false)
 			}
 		}
 
-		document.addEventListener('mousedown', handleClickOutside)
+		document.addEventListener('click', handleClickOutside)
 		return () => {
-			document.removeEventListener('mousedown', handleClickOutside)
+			document.removeEventListener('click', handleClickOutside)
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	const handleMenusClick = useCallback((type: string) => {
@@ -112,13 +130,10 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 			<Flex className="headerButton">
 				{login ? (
 					<>
-						<Flex
-							className="headerIcon"
-							ref={ref}
-							onClick={() => setShow((prev) => !prev)}
-						>
+						<Flex className="headerIcon" ref={ref} onClick={() => toggleNoti()}>
 							<IconBellFilled />
-							{show && <Notification />}
+							{show && <Notification onClose={() => toggleNoti(false)} />}
+							{!!count && <div className="notificationCount" />}
 						</Flex>
 
 						<Dropdown menu={{ items: userMenus }} trigger={['click']}>

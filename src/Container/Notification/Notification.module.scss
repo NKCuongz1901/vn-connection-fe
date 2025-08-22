@@ -2,7 +2,7 @@
 	color: #0f1729;
 	.container {
 		position: absolute;
-		z-index: 2;
+		z-index: 3;
 		top: 40px;
 		right: 44px;
 		width: 375px;
@@ -126,6 +126,20 @@
 					width: 100%;
 				}
 			}
+		}
+	}
+}
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		color: #0f1729;
+		.container {
+			position: fixed;
+			z-index: 3;
+			top: 56px;
+			right: 16px;
+			max-width: 375px;
+			width: calc(100% - 32px);
 		}
 	}
 }

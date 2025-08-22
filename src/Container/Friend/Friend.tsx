@@ -11,7 +11,7 @@ import { getFriends } from '@/apis/friendApis'
 
 import { isArray, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, isMobile, toJson } from '@/ultis/common.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { useLocalePath, useQuery } from '@/ultis/route.ults'
 
 import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
@@ -20,14 +20,22 @@ import NotFound from '@/svg/NotFound'
 import Profile from '../Profile'
 import classes from './Friend.module.scss'
 
-import { optionFriends, paginationCommon } from '@/Variable/common.variable'
+import {
+	mappingOptionFriends,
+	optionFriends,
+	paginationCommon,
+} from '@/Variable/common.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 const Friend = () => {
 	const _refFirst = useRef(false)
 	const { openError } = useModal()
 	const { onChangeRoute } = useLocalePath()
-	const [activeTab, setActiveTab] = useState(optionFriends[0].value)
+	const { onGetQuerry } = useQuery()
+	const { tab } = onGetQuerry() || {}
+	const [activeTab, setActiveTab] = useState(
+		mappingOptionFriends[tab] || optionFriends[0].value,
+	)
 	const [searchText, setSearchText] = useState('')
 	const [idProfile, setIdProfile] = useState(null)
 	const [friendList, setFriendList] = useState({

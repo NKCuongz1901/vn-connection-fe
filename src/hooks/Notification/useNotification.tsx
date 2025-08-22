@@ -1,23 +1,35 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common.ults'
-
 import { getNotificationList, readNotification } from '@/apis/notificationApis'
 
 import { useModal } from '@/context/ModalContext'
 import { PaginationType } from '@/interface/common/common.interface'
 import { NotiItemProp } from '@/interface/Notification/Notification.interface'
 import { isArray, uniqueArray } from '@/ultis/array.ults'
+import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common.ults'
+import { useLocalePath } from '@/ultis/route.ults'
 
-import { paginationCommon } from '@/Variable/common.variable'
-import { mappingNotiTypes } from '@/Variable/select.variable'
+import { mainRoutes } from '@/routes/MainRoutes'
 
-export default function useNotification() {
+import {
+	mappingOptionFriends,
+	optionFriends,
+	paginationCommon,
+} from '@/Variable/common.variable'
+import {
+	mappingNotiTypes,
+	NotiExtraDataType,
+	NotiInteractingType,
+} from '@/Variable/select.variable'
+
+export default function useNotification({ onClose: _ }) {
 	const { openError } = useModal()
+	const { onChangeRoute } = useLocalePath()
 	const _loadmore = useRef(true)
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 
 	const [type, setType] = useState(mappingNotiTypes.ALL)
+	const [modal, setModal] = useState({ type: '', data: null }) as any
 
 	const [notiList, setNotiList] = useState<any[]>([])
 
@@ -91,9 +103,40 @@ export default function useNotification() {
 		}
 	}
 	const handleClickNoti = (item: NotiItemProp) => {
-		const { id, is_read } = item || {}
-		switch (type) {
-			case '':
+		console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :94 ~ handleClickNoti ~ item:', item)
+		const { id, is_read, interacting_type, extra_data } = item || {}
+		const { type, post_id } = extra_data || {}
+		switch (interacting_type) {
+			case mappingNotiTypes.PUSH_BY_ADMIN:
+				setModal({ type: 'detail', data: item })
+				break
+			case NotiInteractingType.ADD_FRIEND:
+				onChangeRoute(
+					`${mainRoutes.friend}?tab=${
+						mappingOptionFriends[optionFriends[1].value]
+					}`,
+				)
+				break
+			case NotiInteractingType.NEW_POST_CREATED:
+			case NotiInteractingType.CREATE_DISCUSS_IN_CLUB:
+				switch (type) {
+					case NotiExtraDataType.DISCUSS_IN_TOPIC:
+					case NotiExtraDataType.DISCUSS_IN_CLUB:
+						onChangeRoute(`${mainRoutes.discussions}?id=${post_id}`)
+						break
+					default:
+						break
+				}
+				break
+			case NotiInteractingType.NEW_EVENT_CREATE_NEAR_BY_USER:
+				switch (type) {
+					case NotiExtraDataType.EVENT:
+						onChangeRoute(`${mainRoutes.upcomingEvent}/${post_id}`)
+						break
+					default:
+						break
+				}
+				break
 			default:
 				break
 		}
@@ -111,6 +154,8 @@ export default function useNotification() {
 		type,
 		notiList,
 		loading,
+		modal,
+		setModal,
 		setType,
 		onClickNoti: handleClickNoti,
 		onScroll: handleScroll,

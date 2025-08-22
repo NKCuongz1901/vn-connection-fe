@@ -25,6 +25,17 @@ export const readNotification = async ({ id }) => {
 
 	return await axios.post(url)
 }
+export const getNotificationCount = async ({
+	params = {},
+}: {
+	params?: { [key: string]: any }
+}) => {
+	const url = NOTIFICATION_ROUTES.count
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
 // export const getNetworkGroup = async ({
 // 	params = {},
 // }: {

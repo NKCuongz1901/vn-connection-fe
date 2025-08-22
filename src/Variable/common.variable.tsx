@@ -1258,6 +1258,10 @@ export const optionFriends = [
 		label: 'Sent',
 	},
 ]
+export const mappingOptionFriends = optionFriends.reduce(
+	(acc, { value }) => ({ ...acc, [value]: value }),
+	{},
+)
 
 export const daysOfWeek = [
 	{ value: 0, label: 'Monday' },

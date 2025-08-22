@@ -83,6 +83,7 @@ export const CATEGORY_ROUTES = {
 export const NOTIFICATION_ROUTES = {
 	name: 'notifications',
 	read: 'notifications/read',
+	count: 'notifications/count',
 }
 export const Menus = [
 	{
