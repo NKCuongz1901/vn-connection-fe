@@ -3,3 +3,5 @@ node_modules/
 dist/
 build/
 .next/
+/src/config/firebase-messaging-sw.js
+/public/firebase-messaging-sw.js
