@@ -10,7 +10,7 @@
 		"build-cicd": "next build",
 		"start": "next dev --turbo -p 3030",
 		"start:dev": "next start",
-		"start:prod": "next start -p 3030",
+		"start:prod": "next lint && next build && next start -p 3030",
 		"lint": "next lint"
 	},
 	"dependencies": {
