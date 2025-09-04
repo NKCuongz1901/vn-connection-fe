@@ -3,9 +3,14 @@ import { MenuOutlined, SearchOutlined } from '@ant-design/icons'
 import { IconBellFilled, IconUserCircle } from '@tabler/icons-react'
 import { Dropdown, Flex } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
+import { onMessage } from 'firebase/messaging'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { messaging } from '@/config/firebase'
+import { initFCM } from '@/config/firebase-messaging'
+
 import { getNotificationCount } from '@/apis/notificationApis'
+import { updateUserProfile } from '@/apis/userApis'
 
 import { useLocalePath } from '@/ultis/route.ults'
 import { handleRemoveAllCookie, isLogin } from '@/ultis/storage.ults'
@@ -88,6 +93,61 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 		return () => {
 			document.removeEventListener('click', handleClickOutside)
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
+	const handleUpdateProfile = async (token) => {
+		try {
+			await updateUserProfile({ last_token_web: token })
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
+	const handleClick = useCallback((data) => {
+		const { action, post_id } = data || {}
+		switch (action) {
+			case 'COMMENT_ON_DISCUSS_IN_TOPIC':
+				onChangeRoute(`${mainRoutes.discussions}?id=${post_id}`)
+				break
+			case 'NEW_EVENT_CREATE_NEAR_BY_USER':
+			case 'COMMENT_ON_EVENT':
+				onChangeRoute(`${mainRoutes.upcomingEvent}/${post_id}`)
+				break
+			default:
+				onChangeRoute(mainRoutes.overview)
+				break
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
+	useEffect(() => {
+		async function setupFCM() {
+			const token = await initFCM()
+			console.log('🏖️ FCM Token:', token)
+			if (token) {
+				// 🔥 Lưu token về server nếu cần
+				handleUpdateProfile(token)
+			}
+		}
+		setupFCM()
+
+		const handleMessage = (payload: any) => {
+			console.log('📩 Payload nhận foreground:', { payload })
+			const { data, notification } = payload || {}
+			const { title, body, icon } = notification || {}
+			const notif = new (window.Notification as any)(title || 'Notification', {
+				body: body,
+				icon: icon || '/images/univini-logo.png',
+			})
+			notif.onclick = () => {
+				const postId = data?.post_id
+				if (postId) {
+					handleClick(data)
+				}
+				notif.close()
+			}
+		}
+
+		onMessage(messaging, handleMessage)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 

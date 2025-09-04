@@ -18,5 +18,5 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 .vercel
-public/*.js
-public/*.map
+# public/*.js
+# public/*.map

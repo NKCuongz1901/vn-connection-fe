@@ -18,21 +18,46 @@ import Messenger from '@/svg/Messenger'
 import Party from '@/svg/Party'
 import People from '@/svg/People'
 
-import { NotiTypes } from '@/Variable/select.variable'
+import { NOTIFICATION_TYPE, NotiTypes } from '@/Variable/select.variable'
 import { NotiItemProp } from '@/interface/Notification/Notification.interface'
 
 import classes from './Notification.module.scss'
 
 const mappingTypeIcon = {
-	DISCUSS_IN_TOPIC: Message3,
 	EVENT: Event,
+	[NOTIFICATION_TYPE.COMMENT_ON_EVENT]: Event,
+	[NOTIFICATION_TYPE.COMMENT_ON_EVENT_WITH_MENTION]: Event,
+	[NOTIFICATION_TYPE.LIKE_ON_EVENT]: Event,
+	[NOTIFICATION_TYPE.JOIN_EVENT]: Event,
+	[NOTIFICATION_TYPE.NOTIFICATION_EVENT_NEAR_BY_USER]: Event,
+	[NOTIFICATION_TYPE.NEW_EVENT_CREATE_NEAR_BY_USER]: Event,
+	[NOTIFICATION_TYPE.NOTIFICATION_LAST_EVENT_FOR_HOST]: Event,
+	[NOTIFICATION_TYPE.REQUEST_DELETE_ONLY_THIS_EVENT]: Event,
+	[NOTIFICATION_TYPE.REQUEST_DELETE_ALL_REPEAT_EVENT]: Event,
+	[NOTIFICATION_TYPE.UPGRADE_TO_ADMIN_ONLY_THIS_EVENT]: Event,
+	[NOTIFICATION_TYPE.UPGRADE_TO_ADMIN_ALL_REPEAT_EVENT]: Event,
+	[NOTIFICATION_TYPE.EVENT_CANCELED_BY_HOST]: Event,
+
 	DISCUSS_IN_CLUB: People,
+	DISCUSS_IN_CHATROOM: People,
 	CLUB: People,
+
+	[NOTIFICATION_TYPE.COMMENT_ON_DISCUSS_IN_TOPIC]: Message3,
+	[NOTIFICATION_TYPE.NEW_POST_CREATED]: Message3,
+	[NOTIFICATION_TYPE.LIKE_ON_DISCUSS_IN_TOPIC]: Message3,
+	DISCUSS_IN_TOPIC: Message3,
+
+	[NOTIFICATION_TYPE.ADD_FRIEND]: Messenger,
+	[NOTIFICATION_TYPE.ACCEPT_FRIEND]: Messenger,
+
 	MATCH_DATING: DoubleHeart,
 	CRUSH_DATING: DoubleHeart,
-	DISCUSS_IN_CHATROOM: People,
-	REQUEST_JOIN_HANGOUT: Party,
-	ADD_FRIEND: Messenger,
+
+	[NOTIFICATION_TYPE.REQUEST_JOIN_HANGOUT]: Party,
+	[NOTIFICATION_TYPE.ACCEPT_PARTICIPANT]: Party,
+	[NOTIFICATION_TYPE.JOIN_HANGOUT]: Party,
+	[NOTIFICATION_TYPE.NEAR_END_HANGOUT_STATUS]: Party,
+	[NOTIFICATION_TYPE.COMMENT_ON_HANGOUT]: Party,
 }
 const Notification = (props: { onClose?: any }) => {
 	const { onClose } = props || {}
@@ -100,10 +125,12 @@ const Notification = (props: { onClose?: any }) => {
 							'PUSH_BY_ADMIN',
 							'NEAR_END_HANGOUT_STATUS',
 							'INVITEE_MEMBER_JOIN_CLUB',
+							'JOIN_DISCUSSION_IN_CHATROOM',
+							'COMMENT_ON_DISCUSS_IN_CHATROOM',
 						].includes(interacting_type) ? (
 							<div>
 								<CAvatarBandage
-									src={image}
+									src={image || '/images/univini-logo.png'}
 									className={classes.itemAvatar}
 									classBandage={classes.bandage}
 									customeBandage={_renderBandage(

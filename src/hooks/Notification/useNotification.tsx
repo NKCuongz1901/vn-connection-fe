@@ -16,11 +16,7 @@ import {
 	optionFriends,
 	paginationCommon,
 } from '@/Variable/common.variable'
-import {
-	mappingNotiTypes,
-	NotiExtraDataType,
-	NotiInteractingType,
-} from '@/Variable/select.variable'
+import { mappingNotiTypes, NOTIFICATION_TYPE } from '@/Variable/select.variable'
 
 export default function useNotification({ onClose: _ }) {
 	const { openError } = useModal()
@@ -104,36 +100,47 @@ export default function useNotification({ onClose: _ }) {
 	}
 	const handleClickNoti = (item: NotiItemProp) => {
 		const { id, is_read, interacting_type, extra_data } = item || {}
-		const { type, post_id } = extra_data || {}
+		const { post_id } = extra_data || {}
 		switch (interacting_type) {
 			case mappingNotiTypes.PUSH_BY_ADMIN:
 				setModal({ type: 'detail', data: item })
 				break
-			case NotiInteractingType.ADD_FRIEND:
+			case NOTIFICATION_TYPE.ADD_FRIEND:
 				onChangeRoute(
 					`${mainRoutes.friend}?tab=${
 						mappingOptionFriends[optionFriends[1].value]
 					}`,
 				)
 				break
-			case NotiInteractingType.NEW_POST_CREATED:
-			case NotiInteractingType.CREATE_DISCUSS_IN_CLUB:
-				switch (type) {
-					case NotiExtraDataType.DISCUSS_IN_TOPIC:
-					case NotiExtraDataType.DISCUSS_IN_CLUB:
-						onChangeRoute(`${mainRoutes.discussions}?id=${post_id}`)
-						break
-					default:
-						break
+			case NOTIFICATION_TYPE.NEW_POST_CREATED:
+			case NOTIFICATION_TYPE.CREATE_DISCUSS_IN_CLUB:
+			case NOTIFICATION_TYPE.COMMENT_ON_DISCUSS_IN_TOPIC:
+				if (post_id) {
+					onChangeRoute(`${mainRoutes.discussions}?id=${post_id}`)
 				}
 				break
-			case NotiInteractingType.NEW_EVENT_CREATE_NEAR_BY_USER:
-				switch (type) {
-					case NotiExtraDataType.EVENT:
-						onChangeRoute(`${mainRoutes.upcomingEvent}/${post_id}`)
-						break
-					default:
-						break
+			case NOTIFICATION_TYPE.COMMENT_ON_EVENT:
+			case NOTIFICATION_TYPE.COMMENT_ON_EVENT_WITH_MENTION:
+			case NOTIFICATION_TYPE.LIKE_ON_EVENT:
+			case NOTIFICATION_TYPE.JOIN_EVENT:
+			case NOTIFICATION_TYPE.NOTIFICATION_EVENT_NEAR_BY_USER:
+			case NOTIFICATION_TYPE.NEW_EVENT_CREATE_NEAR_BY_USER:
+			case NOTIFICATION_TYPE.NOTIFICATION_LAST_EVENT_FOR_HOST:
+			case NOTIFICATION_TYPE.REQUEST_DELETE_ONLY_THIS_EVENT:
+			case NOTIFICATION_TYPE.REQUEST_DELETE_ALL_REPEAT_EVENT:
+			case NOTIFICATION_TYPE.UPGRADE_TO_ADMIN_ONLY_THIS_EVENT:
+			case NOTIFICATION_TYPE.UPGRADE_TO_ADMIN_ALL_REPEAT_EVENT:
+			case NOTIFICATION_TYPE.EVENT_CANCELED_BY_HOST:
+				if (post_id) {
+					onChangeRoute(`${mainRoutes.upcomingEvent}/${post_id}`)
+				}
+				break
+
+			case NOTIFICATION_TYPE.ACCEPT_PARTICIPANT:
+			case NOTIFICATION_TYPE.JOIN_HANGOUT:
+			case NOTIFICATION_TYPE.REQUEST_JOIN_HANGOUT:
+				if (post_id) {
+					onChangeRoute(`${mainRoutes.hangout}?id=${post_id}`)
 				}
 				break
 			default:
