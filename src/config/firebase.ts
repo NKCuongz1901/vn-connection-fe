@@ -1,5 +1,6 @@
+// firebase.ts
 import { initializeApp } from 'firebase/app'
-import { getMessaging } from 'firebase/messaging'
+import { getMessaging, Messaging } from 'firebase/messaging'
 
 const firebaseConfig = {
 	apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,4 +12,8 @@ const firebaseConfig = {
 }
 
 export const app = initializeApp(firebaseConfig)
-export const messaging = getMessaging(app)
+
+export let messaging: Messaging | null = null
+if (typeof window !== 'undefined' && 'Notification' in window) {
+	messaging = getMessaging(app)
+}
