@@ -6,7 +6,7 @@ import {
 	SelectProps,
 } from 'antd'
 import { TextAreaProps } from 'antd/es/input'
-import { SliderProps, SliderRangeProps } from 'antd/es/slider'
+import { SliderRangeProps } from 'antd/es/slider'
 
 interface CInputOthersProps {
 	label?: string

@@ -1,29 +1,12 @@
-import dayjs from 'dayjs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { useLoading } from '@/context/LoadingContext'
+import { getInappEvent, getInappLocal } from '@/apis/searchApis'
+
 import { useModal } from '@/context/ModalContext'
 
-import { createPost, editPost, getListPost } from '@/apis/postApis'
-import { handleUploadImage } from '@/apis/uploadApis'
+import { useQuery } from '@/ultis/route.ults'
+import { randomString } from '@/ultis/string.ults'
 
-import { isArray } from '@/ultis/array.ults'
-import { cloneDeep } from '@/ultis/common.ults'
-import { handleParseFileImg } from '@/ultis/file.utls'
-import { useLocalePath, useQuery } from '@/ultis/route.ults'
-import {
-	convertStringToNumber,
-	formatNumberString,
-	randomString,
-} from '@/ultis/string.ults'
-
-import { mainRoutes } from '@/routes/MainRoutes'
-import {
-	repeatOpt,
-	ticketEntranceType,
-	ticketEntranceTypeOpt,
-} from '@/Variable/select.variable'
-import { getInappEvent, getInappLocal } from '@/apis/searchApis'
 import { LocalProps, LocalResProps } from '@/interface/Search/Search.interface'
 
 interface useSearchProps {

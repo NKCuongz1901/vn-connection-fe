@@ -1,35 +1,31 @@
 'use client'
-import React, { memo } from 'react'
+import { IconMapPinFilled } from '@tabler/icons-react'
 import { Flex } from 'antd'
+import clsx from 'clsx'
+import { memo } from 'react'
+
+import useSearch from '@/hooks/Search/useSearch'
+
+import { onPushState, useLocalePath } from '@/ultis/route.ults'
+
+import CAvatar from '@/Components/Custom/CAvatar'
+import CImage from '@/Components/Custom/CImage'
+import CInputMap from '@/Components/Custom/CInputMap'
+import EventTitle from '@/Components/Event/EventTitle'
+import Local from '@/Components/Search/Local'
+import SocialEvent from '@/Components/Search/SocialEvent'
+
+import ProfileIcon from '@/svg/ProfileIcon'
+
+import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './Search.module.scss'
-import CInputMap from '@/Components/Custom/CInputMap'
-import useSearch from '@/hooks/Search/useSearch'
-import { IconMapPinFilled } from '@tabler/icons-react'
-import EventTitle from '@/Components/Event/EventTitle'
-import ProfileIcon from '@/svg/ProfileIcon'
-import CAvatar from '@/Components/Custom/CAvatar'
-import { onPushState, useLocalePath } from '@/ultis/route.ults'
-import Local from '@/Components/Search/Local'
-import { mainRoutes } from '@/routes/MainRoutes'
-import Event from '../Event'
-import clsx from 'clsx'
-import CImage from '@/Components/Custom/CImage'
-import SocialEvent from '@/Components/Search/SocialEvent'
+
 const Search = () => {
 	const { onChangeRoute } = useLocalePath()
-	const {
-		loading,
-		user,
-		event,
-		data,
-		total,
-		location,
-		type,
-		setType,
-		onChangeValue,
-	} = useSearch({})
-	console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :30 ~ Search ~ event:', event)
+	const { user, event, data, total, location, type, onChangeValue } = useSearch(
+		{},
+	)
 
 	const { address, longitude, latitude } = location
 	const _renderInputMap = () => {
@@ -115,7 +111,6 @@ const Search = () => {
 		)
 	}
 	const _renderBodyType = () => {
-		console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :64 ~ _renderBodyType ~ type:', type)
 		switch (type) {
 			case 'user':
 				return <Local data={data} />
