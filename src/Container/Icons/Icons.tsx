@@ -5,16 +5,21 @@ import { randomString } from '@/ultis/string.ults'
 
 import classes from './Icons.module.scss'
 
+import ArrrowRightIcon from '@/svg/ArrrowRightIcon'
 import BellIcon from '@/svg/BellIcon'
 import ClockIcon from '@/svg/ClockIcon'
+import NoPostIcon from '@/svg/DiscusstionSvg/NoPostIcon'
+import DoubleHeart from '@/svg/DoubleHeart'
 import Event from '@/svg/Event'
 import BreakLineEvent from '@/svg/Event/BreakLineEvent'
 import FeedbackIcon from '@/svg/FeedbackIcon'
+import FilterIcon from '@/svg/FilterIcon'
 import FlagIcon from '@/svg/FlagIcon'
 import AttachIcon from '@/svg/FriendSvg/AttachIcon'
 import ProfileCancelIcon from '@/svg/FriendSvg/ProfileCancelIcon'
 import ProfileTick from '@/svg/FriendSvg/ProfileTick'
 import ShareIcon from '@/svg/FriendSvg/ShareIcon'
+import GroupIcon from '@/svg/GroupIcon'
 import NoHangout from '@/svg/Hangout/NoHangout'
 import PencilIcon from '@/svg/Hangout/PencilIcon'
 import HappyIcon from '@/svg/HappyIcon'
@@ -23,8 +28,10 @@ import HostIcon from '@/svg/HostIcon'
 import ImageIcon from '@/svg/ImageIcon'
 import LogoSvg from '@/svg/LogoSvg'
 import MapIcon from '@/svg/MapIcon'
+import MarkIcon from '@/svg/MarkIcon'
 import Message3 from '@/svg/Message3'
 import MessageIcon from '@/svg/MessageIcon'
+import MessageMinuIcon from '@/svg/MessageMinuIcon'
 import Messenger from '@/svg/Messenger'
 import MoreIcon from '@/svg/MoreIcon'
 import NotFound from '@/svg/NotFound'
@@ -33,18 +40,15 @@ import Party from '@/svg/Party'
 import People from '@/svg/People'
 import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
 import PinIcon from '@/svg/PinIcon'
+import ProfileIcon from '@/svg/ProfileIcon'
 import ReplyIcon from '@/svg/ReplyIcon'
 import SearchIcon from '@/svg/SearchIcon'
 import SearchNormal from '@/svg/SearchNormal'
 import SendIcon from '@/svg/SendIcon'
+import ShareIconSvg from '@/svg/ShareIconSvg'
 import TrashIcon from '@/svg/TrashIcon'
 import TwoUser from '@/svg/TwoUser'
 import UpcomingEvent from '@/svg/UpcomingEvent'
-import NoPostIcon from '@/svg/DiscusstionSvg/NoPostIcon'
-import MessageMinuIcon from '@/svg/MessageMinuIcon'
-import ShareIconSvg from '@/svg/ShareIconSvg'
-import ArrrowRightIcon from '@/svg/ArrrowRightIcon'
-import DoubleHeart from '@/svg/DoubleHeart'
 
 const Icons = () => {
 	const icons = [
@@ -122,6 +126,26 @@ const Icons = () => {
 		{
 			ICON: DoubleHeart,
 			name: '@/svg/ArrrowRightIcon',
+			key: randomString(),
+		},
+		{
+			ICON: MarkIcon,
+			name: '@/svg/MarkIcon',
+			key: randomString(),
+		},
+		{
+			ICON: ProfileIcon,
+			name: '@/svg/ProfileIcon',
+			key: randomString(),
+		},
+		{
+			ICON: FilterIcon,
+			name: '@/svg/FilterIcon',
+			key: randomString(),
+		},
+		{
+			ICON: GroupIcon,
+			name: '@/svg/GroupIcon',
 			key: randomString(),
 		},
 	]

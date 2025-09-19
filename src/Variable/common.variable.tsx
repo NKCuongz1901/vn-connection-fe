@@ -1239,9 +1239,14 @@ export const paginationCommon: PaginationType = {
 	limit: 20,
 	totalPage: 0,
 }
-export const paginationZero: PaginationType = {
-	page: 0,
+export const paginationMore: PaginationType = {
+	page: 1,
 	limit: 50,
+	totalPage: 0,
+}
+export const paginationVeryMore: PaginationType = {
+	page: 1,
+	limit: 100,
 	totalPage: 0,
 }
 export const optionFriends = [

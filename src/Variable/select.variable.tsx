@@ -169,6 +169,14 @@ export const radiusOpts = [
 	},
 ]
 
+export const radiusAnyOpts = [
+	{
+		value: 'Any',
+		label: 'Any',
+	},
+	...radiusOpts,
+]
+
 export const mappingNotiTypes = {
 	PUSH_BY_PERSONAL: 'PUSH_BY_PERSONAL',
 	PUSH_BY_ADMIN: 'PUSH_BY_ADMIN',
@@ -265,3 +273,19 @@ export enum NOTIFICATION_TYPE {
 	MATCH_DATING = 'MATCH_DATING',
 	CHAT_DATING = 'CHAT_DATING',
 }
+
+export const languages = [
+	{ value: 'Italian', label: 'Italian' },
+	{ value: 'Korean', label: 'Korean' },
+	{ value: 'Japanese', label: 'Japanese' },
+	{ value: 'Russian', label: 'Russian' },
+	{ value: 'Portuguese', label: 'Portuguese' },
+	{ value: 'Spanish', label: 'Spanish' },
+	{ value: 'Thai', label: 'Thai' },
+	{ value: 'Vietnamese', label: 'Vietnamese' },
+	{ value: 'Chinese', label: 'Chinese' },
+	{ value: 'English', label: 'English' },
+	{ value: 'Arabic', label: 'Arabic' },
+	{ value: 'French', label: 'French' },
+	{ value: 'German', label: 'German' },
+]

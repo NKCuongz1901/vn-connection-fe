@@ -17,3 +17,11 @@ export interface selectType {
 	value: any
 	label: any
 }
+
+export interface PaginationProps {
+	total: number
+	current_page: number
+	next_page: number
+	prev_page: number
+	limit: number | string
+}

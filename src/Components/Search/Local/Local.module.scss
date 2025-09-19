@@ -1,0 +1,230 @@
+.wrapper {
+	display: flex;
+	height: 100%;
+
+	.container {
+		gap: 16px;
+		height: 100%;
+		width: 100%;
+		.header {
+			align-items: center;
+			gap: 4px;
+			.iconHeader {
+				cursor: pointer;
+			}
+			.headerLabel {
+				font-size: 18px;
+				font-weight: 600;
+			}
+			.totalUser {
+				height: 20px;
+				padding: 8px;
+				justify-content: center;
+				align-items: center;
+				border-radius: 99px;
+				color: #006b35;
+				text-align: center;
+				font-size: 12px;
+				box-shadow: 0px 0px 16px 0px rgba(0, 58, 111, 0.08);
+				font-weight: 600;
+			}
+		}
+		.filter {
+			gap: 8px;
+			.filterSearch {
+				flex: 1;
+				.filterSearchIcon {
+					color: #7987a4;
+					font-size: 20px;
+				}
+			}
+			.filterGroup {
+				width: 167px;
+				height: 44px;
+				align-items: center;
+				gap: 8px;
+				border-radius: 999px;
+				background: #f4f8fc;
+				justify-content: space-around;
+				cursor: pointer;
+				.filterIcon {
+					display: flex;
+					padding: 4px;
+					align-items: center;
+					gap: 10px;
+					border-radius: 999px;
+					background: #006b35;
+				}
+			}
+		}
+		.notFound {
+			width: 100%;
+			align-items: center;
+			color: #7987a4;
+			justify-content: center;
+			gap: 4px;
+			text-align: center;
+			margin-top: 80px;
+			.title {
+				font-size: 20px;
+				font-weight: 600;
+				text-align: center;
+			}
+		}
+		.userList {
+			gap: 16px;
+			height: fit-content;
+			flex-wrap: wrap;
+			overflow: auto;
+			max-height: 100%;
+			.user {
+				gap: 4px;
+				min-width: 136px;
+				max-width: 136px;
+				align-items: center;
+				cursor: pointer;
+				.userAvatar {
+					height: 120px;
+					width: 120px;
+				}
+				.userName {
+					display: -webkit-box;
+					-webkit-line-clamp: 2; /* số dòng muốn hiển thị */
+					-webkit-box-orient: vertical;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					line-clamp: 2; /* new standard */
+					text-align: center;
+					word-break: break-word;
+				}
+			}
+		}
+		.skeleton {
+			min-width: 136px;
+			gap: 4px;
+			align-items: center;
+			max-width: 136px;
+			.skeletonAva {
+				height: 120px;
+				width: 120px;
+
+				span {
+					height: 120px;
+					width: 120px;
+				}
+			}
+			.skeletonLabel {
+				max-width: 100%;
+				width: 100%;
+				min-width: 100%;
+			}
+		}
+		.loadmore {
+			width: 100%;
+			align-items: center;
+			justify-content: center;
+		}
+	}
+}
+.filterGroupWrapper {
+	.filterGroupContainer {
+		width: 340px;
+		gap: 4px;
+		.title {
+			color: #48546b;
+
+			font-size: 14px;
+			font-weight: 600;
+		}
+		.genderWrapper {
+			gap: 4px;
+			.genders {
+				.gender {
+					width: 33%;
+				}
+			}
+		}
+		.ageWrapper {
+			gap: 16px;
+		}
+		.distanceWrapper {
+			gap: 4px;
+		}
+		.filterButton {
+			align-items: center;
+			justify-content: center;
+			gap: 24px;
+			button {
+				height: 40px;
+			}
+		}
+	}
+}
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		.container {
+			.filter {
+				flex-wrap: wrap;
+				.filterSearch {
+					min-width: 100%;
+					max-width: 100%;
+				}
+				.filterGroup {
+					min-width: calc(50% - 4px);
+					max-width: calc(50% - 4px);
+				}
+			}
+
+			.userList {
+				.user {
+					min-width: calc(25% - 12px);
+					max-width: calc(25% - 12px);
+					.userAvatar {
+						width: 100%;
+						aspect-ratio: 1/1;
+						height: unset;
+					}
+				}
+			}
+			.skeleton {
+				min-width: calc(25% - 12px);
+				max-width: calc(25% - 12px);
+				.skeletonAva {
+					width: 100%;
+					aspect-ratio: 1/1;
+					height: unset;
+					span {
+						width: 100%;
+						aspect-ratio: 1/1;
+						height: unset;
+					}
+				}
+			}
+		}
+	}
+	.filterGroupWrapper {
+		.filterGroupContainer {
+			max-width: 80dvw;
+		}
+	}
+}
+@media (min-width: 0px) and (max-width: 376px) {
+	.wrapper {
+		.container {
+			.filter {
+				.filterGroup {
+					font-size: 12px;
+					height: 32px;
+				}
+			}
+
+			.userList {
+				.user {
+					.userName {
+						font-size: 12px;
+					}
+				}
+			}
+		}
+	}
+}

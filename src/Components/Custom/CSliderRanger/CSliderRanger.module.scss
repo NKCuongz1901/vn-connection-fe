@@ -1,0 +1,30 @@
+.wrapper {
+	:global(.ant-slider-mark-text) {
+		top: -36px;
+	}
+	//006B35
+	:global(.ant-slider) {
+		margin-bottom: 0px;
+		:global(.ant-slider-track) {
+			background-color: #006b35b3;
+		}
+		:global(.ant-slider-handle) {
+			&::after {
+				box-shadow: 0 0 0 2px #006b35b3;
+			}
+		}
+		&:hover {
+			:global(.ant-slider-track) {
+				background-color: #006b35;
+			}
+			:global(.ant-slider-handle) {
+				&::after {
+					box-shadow: 0 0 0 2px #006b35;
+				}
+			}
+		}
+		:global(.ant-slider-handle:focus::after) {
+			box-shadow: 0 0 0 4px #006b35b3;
+		}
+	}
+}

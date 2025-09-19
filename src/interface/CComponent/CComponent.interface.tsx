@@ -1,5 +1,12 @@
-import { DatePickerProps, InputProps, ModalProps, SelectProps } from 'antd'
+import {
+	CheckboxProps,
+	DatePickerProps,
+	InputProps,
+	ModalProps,
+	SelectProps,
+} from 'antd'
 import { TextAreaProps } from 'antd/es/input'
+import { SliderProps, SliderRangeProps } from 'antd/es/slider'
 
 interface CInputOthersProps {
 	label?: string
@@ -36,3 +43,8 @@ interface CSelectOthersProps {
 }
 
 export interface CSelectProps extends CSelectOthersProps, SelectProps {}
+interface ExtendProps {
+	[key: string]: any
+}
+export interface CSliderRangerProps extends ExtendProps, SliderRangeProps {}
+export interface CCheckboxProps extends ExtendProps, CheckboxProps {}

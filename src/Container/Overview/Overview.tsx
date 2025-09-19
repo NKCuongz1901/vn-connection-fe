@@ -1,4 +1,5 @@
 import { Flex, Skeleton } from 'antd'
+import clsx from 'clsx'
 import { memo } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
@@ -8,6 +9,8 @@ import { arrayFrom } from '@/ultis/array.ults'
 import { useLocalePath } from '@/ultis/route.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
+import CDatePickerRanger from '@/Components/Custom/CDatePickerRanger'
+import CSelect from '@/Components/Custom/CSelect'
 import CSwitch from '@/Components/Custom/CSwitch'
 import EventTitle from '@/Components/Event/EventTitle'
 import ItemEvent from '@/Components/Event/ItemEvent'
@@ -16,10 +19,12 @@ import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
 import ModelChooseHangout from '@/Components/Hangout/ModelChooseHangout'
 import EventIcon from '@/svg/Event'
 import PencilIcon from '@/svg/Hangout/PencilIcon'
+import MarkIcon from '@/svg/MarkIcon'
 import Party from '@/svg/Party'
 
-import { mappingEventTitle } from '@/Variable/event.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
+import { mappingEventTitle } from '@/Variable/event.variable'
+import { radiusOpts } from '@/Variable/select.variable'
 
 import classes from './Overview.module.scss'
 
@@ -36,6 +41,8 @@ const Overview = () => {
 		totalMyEvent,
 		totalHangout,
 		hangoutPeople,
+		filters,
+
 		setModal,
 		OnChangeTitleHangout,
 		onUpdateUserInfo,
@@ -48,14 +55,38 @@ const Overview = () => {
 		_parentRef,
 		_childRefUp,
 		onScrollUp,
+		onChangeFilter,
 	} = useOverview()
-
+	const _renderFilter = () => {
+		const { radius, date } = filters
+		return (
+			<Flex className={classes.filter}>
+				<Flex className={classes.distance}>
+					<CSelect
+						disabled={loading}
+						value={radius}
+						options={radiusOpts}
+						placeholder="Choose distance"
+						prefix={<MarkIcon />}
+						onChange={onChangeFilter('radius')}
+					/>
+				</Flex>
+				<Flex>
+					<CDatePickerRanger
+						disabled={loading}
+						value={date}
+						onChange={onChangeFilter('date')}
+					/>
+				</Flex>
+			</Flex>
+		)
+	}
 	const _renderHangout = () => {
 		const { is_open_hangout, title_open_hangout } = userData
 		return (
 			<Flex vertical className={classes.hangout}>
 				<Flex
-					className={classes.titleHangout}
+					className={clsx(classes.titleHangout, classes.titleHangoutHeader)}
 					onClick={() => onChangeRoute(mainRoutes.hangout)}
 				>
 					<Party fill="#006B35" />
@@ -175,6 +206,7 @@ const Overview = () => {
 				ref={_childRefUp}
 				onScroll={onScrollUp}
 			>
+				{_renderFilter()}
 				{_renderHangout()}
 				{_renderMyEvent()}
 				<Flex className={classes.wrapperUp} vertical>

@@ -111,7 +111,7 @@ const CGGMap = (_props: CGGMapProps) => {
 	useEffect(() => {
 		handleGetAddress(marker)
 	}, [marker])
-	if (!isLoaded) return <div>Loading...</div>
+	if (!isLoaded) return <div></div>
 
 	return (
 		<div className={classes.wrapper}>

@@ -1,0 +1,99 @@
+.wrapper {
+	display: flex;
+	width: 100%;
+	padding: 12px 32px;
+	height: 100%;
+	.container {
+		width: 100%;
+		height: 100%;
+		padding: 16px;
+		border-radius: 16px;
+		background: #fff;
+		gap: 16px;
+		.userContainer {
+			gap: 24px;
+			.titleUser {
+				cursor: pointer;
+			}
+			.userList {
+				gap: 16px;
+				overflow: auto;
+				height: fit-content;
+				.user {
+					gap: 4px;
+					min-width: 80px;
+					align-items: center;
+					max-width: 80px;
+					.userAvatar {
+						height: 64px;
+						width: 64px;
+					}
+					.userName {
+						display: -webkit-box;
+						-webkit-line-clamp: 2; /* số dòng muốn hiển thị */
+						-webkit-box-orient: vertical;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						line-clamp: 2; /* new standard */
+						word-break: break-word;
+						text-align: center;
+					}
+				}
+			}
+		}
+		.eventContainer {
+			gap: 24px;
+			.titleEvent {
+				cursor: pointer;
+			}
+			.eventList {
+				gap: 16px;
+				overflow: auto;
+				height: fit-content;
+				.event {
+					cursor: pointer;
+					min-height: 160px;
+					min-width: 160px;
+					max-height: 160px;
+					max-width: 160px;
+					position: relative;
+					img {
+						min-height: 160px;
+						min-width: 160px;
+						max-height: 160px;
+						max-width: 160px;
+						object-fit: cover;
+					}
+					.eventLabel {
+						position: absolute;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+						bottom: 0;
+						background: rgba(0, 0, 0, 0.5);
+						padding: 0 8px;
+						width: 100%;
+						color: white;
+					}
+				}
+			}
+		}
+	}
+}
+.wrapperEvent {
+	padding: 0;
+	width: calc(100% + 4px);
+
+	.containerEvent {
+		padding: 0;
+		border-radius: 0;
+	}
+}
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		padding: 8px;
+		.container {
+			padding: 8px;
+		}
+	}
+}

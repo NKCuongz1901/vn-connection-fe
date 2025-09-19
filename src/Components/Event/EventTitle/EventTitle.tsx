@@ -11,11 +11,12 @@ import classes from './EventTitle.module.scss'
 
 interface EventTitleProps {
 	label: string
-	number: number | null | undefined
+	number?: number | null | undefined
 	icon: any
 	onClick?: any
 	onAddNew?: any
 	hiddenAdd?: boolean
+	hiddenNumber?: boolean
 	[key: string]: any
 }
 const EventTitle = ({
@@ -23,6 +24,7 @@ const EventTitle = ({
 	number,
 	icon,
 	hiddenAdd = false,
+	hiddenNumber = false,
 	onClick,
 	onAddNew,
 }: EventTitleProps) => {
@@ -32,9 +34,11 @@ const EventTitle = ({
 				<Flex className={classes.startIcon}>{icon}</Flex>
 				<Flex className={classes.middle}>
 					<span className={classes.label}>{label}</span>
-					<Flex className={classes.number}>
-						{formatNumberString(String(number))}
-					</Flex>
+					{!hiddenNumber && (
+						<Flex className={classes.number}>
+							{formatNumberString(String(number))}
+						</Flex>
+					)}
 					<Flex className={classes.arrowIcon} onClick={onClick}>
 						<IconChevronRight />
 					</Flex>

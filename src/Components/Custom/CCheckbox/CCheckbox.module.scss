@@ -1,0 +1,23 @@
+.wrapper {
+	:global(.ant-checkbox-checked) {
+		:global(.ant-checkbox-inner) {
+			background-color: #006b35;
+			border-color: #006b35;
+		}
+	}
+	:global(
+			.ant-checkbox-wrapper:not(.ant-checkbox-wrapper-disabled):hover
+				.ant-checkbox-inner
+		) {
+		border-color: #006b35;
+	}
+
+	:global(
+			.ant-checkbox-wrapper:not(.ant-checkbox-wrapper-disabled):hover
+				.ant-checkbox-checked:not(.ant-checkbox-disabled)
+				.ant-checkbox-inner
+		) {
+		background-color: #006b35;
+		border-color: #006b35;
+	}
+}

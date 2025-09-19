@@ -5,7 +5,7 @@ import Messenger from '@/svg/Messenger'
 import OverviewIcon from '@/svg/OverviewIcon'
 import Party from '@/svg/Party'
 // import People from '@/svg/People'
-// import SearchNormal from '@/svg/SearchNormal'
+import SearchNormal from '@/svg/SearchNormal'
 import TwoUser from '@/svg/TwoUser'
 import UpcomingEvent from '@/svg/UpcomingEvent'
 
@@ -85,6 +85,10 @@ export const NOTIFICATION_ROUTES = {
 	read: 'notifications/read',
 	count: 'notifications/count',
 }
+export const SEARCH_ROUTES = {
+	searchLocal: 'search-in-app/local',
+	searchEvent: 'search-in-app/event',
+}
 export const Menus = [
 	{
 		title: 'Overview',
@@ -123,12 +127,12 @@ export const Menus = [
 		child: [],
 	},
 
-	// {
-	// 	title: 'Search',
-	// 	Icon: SearchNormal,
-	// 	path: mainRoutes.search,
-	// 	child: [],
-	// },
+	{
+		title: 'Search',
+		Icon: SearchNormal,
+		path: mainRoutes.search,
+		child: [],
+	},
 	{
 		title: 'Inbox',
 		Icon: Messenger,

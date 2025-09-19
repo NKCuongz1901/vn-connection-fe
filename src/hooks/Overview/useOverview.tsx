@@ -15,6 +15,7 @@ import { getUserInfo } from '@/ultis/storage.ults'
 
 import { paginationCommon } from '@/Variable/common.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
+import dayjs, { Dayjs } from 'dayjs'
 
 type userDataProps = {
 	is_open_hangout: boolean
@@ -22,11 +23,16 @@ type userDataProps = {
 	latitude: null | number
 	longitude: null | number
 }
+type filterProps = {
+	radius: number | null
+	date: [Dayjs, Dayjs] | null
+}
 export default function useOverview() {
 	const { toggleLoadingContext } = useLoading()
 	const { openError } = useModal()
 
 	const _childRef = useRef<HTMLDivElement | null>(null)
+	const _filterRef = useRef<filterProps>({ radius: 50, date: null })
 	const _parentRef = useRef<HTMLDivElement | null>(null)
 	const _childRefUp = useRef<HTMLDivElement | null>(null)
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
@@ -52,21 +58,55 @@ export default function useOverview() {
 	const [total, setTotal] = useState(0)
 
 	const [loadmore, setLoadMore] = useState(true)
+	const [filters, setFilters] = useState<filterProps>({
+		radius: 50,
+		date: null,
+	})
+
+	const handleChangeFilter = (type: string) => (value) => {
+		switch (type) {
+			case 'radius':
+			case 'date':
+				setFilters((prev) => ({ ...prev, [type]: value }))
+				_filterRef.current[type] = value
+				break
+			default:
+				break
+		}
+		setLoadMore(true)
+		_paginationRefs.current.page = 1
+		handleGetListPost()
+		if (userData.is_open_hangout && type === 'radius') {
+			handleGetOpenHangout()
+		}
+	}
 
 	const handleGetListPost = async (isNotLoading = false) => {
 		setLoading(true)
 		try {
 			const { page, limit } = _paginationRefs.current
+			const { radius, date } = _filterRef.current
+			const dates = {}
+			if (date) {
+				Object.assign(dates, {
+					start_time: date[0].startOf('day').valueOf(),
+					end_time: date[0].endOf('day').valueOf(),
+				})
+			}
 			let isNew = page === 1
 			if (isNotLoading) {
 				isNew = false
+			}
+			if (isNew) {
+				setListPost([])
 			}
 			const res: any = await getListPost({
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
 				page: !isNotLoading ? page : 1,
 				limit: !isNotLoading ? limit : 50,
 				type: mainRoutes.upcomingEvent,
-				radius: 20,
+				radius,
+				...dates,
 			})
 			const { code, results } = res || {}
 			await delay(1000)
@@ -227,9 +267,10 @@ export default function useOverview() {
 	}
 	const handleGetOpenHangout = async () => {
 		try {
+			const { radius } = _filterRef.current
 			const res: any = await getUserOpenHangout({
 				fields: ['$all'],
-				radius: 50,
+				radius: radius,
 			})
 			if (res) {
 				const { pagination, results } = res || {}
@@ -295,6 +336,7 @@ export default function useOverview() {
 		_childRef,
 		_parentRef,
 		_childRefUp,
+
 		userData,
 		modal,
 		loadingProfile,
@@ -307,10 +349,13 @@ export default function useOverview() {
 		loading,
 		total,
 		listPost,
+		filters,
+
 		OnChangeTitleHangout: handleOnChangeTitleHangout,
 		onUpdateUserInfo: handleUpdateUserInfo,
 		onCRUDSuccess: handleCRUDSuccess,
 		onScroll: handleScroll,
 		onScrollUp: handleScrollUp,
+		onChangeFilter: handleChangeFilter,
 	}
 }

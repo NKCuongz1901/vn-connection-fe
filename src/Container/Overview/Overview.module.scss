@@ -8,6 +8,16 @@
 		gap: 12px;
 		width: 100%;
 		overflow: overlay;
+		.filter {
+			margin: 0 32px;
+			background: #fff;
+			border-radius: 16px;
+			padding: 16px;
+			gap: 16px;
+			.distance {
+				width: 266px;
+			}
+		}
 		.hangout {
 			padding: 0 32px;
 			gap: 12px;
@@ -19,6 +29,9 @@
 					font-weight: 600;
 					font-size: 18px;
 				}
+			}
+			.titleHangoutHeader {
+				width: 200px;
 			}
 			.contentHangout {
 				background: #fff;
@@ -112,6 +125,17 @@
 @media (min-width: 0px) and (max-width: 769px) {
 	.wrapper {
 		.container {
+			.filter {
+				margin: 0;
+				background: #fff;
+				border-radius: 16px;
+				padding: 12px 16px;
+				gap: 16px;
+				flex-direction: column;
+				.distance {
+					width: 100%;
+				}
+			}
 			.hangout {
 				padding: 0 8px;
 			}

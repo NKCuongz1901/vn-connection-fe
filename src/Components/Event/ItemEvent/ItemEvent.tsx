@@ -7,6 +7,7 @@ import { useLocalePath } from '@/ultis/route.ults'
 import { formatNumberString } from '@/ultis/string.ults'
 
 import CImage from '@/Components/Custom/CImage'
+import GroupIcon from '@/svg/GroupIcon'
 
 import { repeatOpt, ticketEntranceType } from '@/Variable/select.variable'
 
@@ -14,7 +15,7 @@ import classes from './ItemEvent.module.scss'
 
 const ItemEvent = ({ data, type }) => {
 	const { onChangeRoute } = useLocalePath()
-	const { id, thumbnails, start_time, end_time } = data
+	const { id, thumbnails, start_time, end_time, expect_participant } = data
 	const { time: _start_time } = getDateInfo(Number(start_time))
 	const { time: _end_time } = getDateInfo(Number(end_time))
 	const handleShowTime = () => {
@@ -110,6 +111,12 @@ const ItemEvent = ({ data, type }) => {
 					src={thumbnails[0] || '/images/defaultThumbnail.png'}
 					preview={false}
 				/>
+				{!!expect_participant && (
+					<Flex className={classes.expectParticipant}>
+						<GroupIcon />
+						<div>Joining: {formatNumberString(expect_participant)}</div>
+					</Flex>
+				)}
 			</Flex>
 			{_renderSpaceTime()}
 			{_renderInfo()}
