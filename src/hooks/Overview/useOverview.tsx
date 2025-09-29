@@ -139,14 +139,6 @@ export default function useOverview() {
 		setLoading((prev) => ({ ...prev, network: true }))
 		try {
 			const { page, limit } = _paginationNetworkRef.current
-			const { radius, date } = _filterRef.current
-			const dates = {}
-			if (date) {
-				Object.assign(dates, {
-					start_time: date[0].startOf('day').valueOf(),
-					end_time: date[0].endOf('day').valueOf(),
-				})
-			}
 			let isNew = page === 1
 			if (isNotLoading) {
 				isNew = false
