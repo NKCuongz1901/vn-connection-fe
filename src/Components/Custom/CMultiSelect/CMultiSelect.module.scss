@@ -1,0 +1,88 @@
+.wrapper {
+	height: 100%;
+	width: 100%;
+	.container {
+		height: 100%;
+		width: 100%;
+		gap: 4px;
+		.content {
+			height: 44px;
+			background: #f4f8fc;
+			align-items: center;
+			gap: 8px;
+			border-radius: 16px;
+			padding: 11px;
+			border: 1px solid #d9d9d9;
+			justify-content: space-between;
+			.suffixIcon {
+				height: 20px;
+				width: 20px;
+				svg {
+					color: rgba(0, 0, 0, 0.25);
+				}
+			}
+		}
+		.error {
+			border: 1px solid #ff4d4f;
+		}
+		.opacityDown {
+			opacity: 0.5;
+		}
+	}
+}
+
+.chooseCatogoryWrapper {
+	height: 400px;
+	width: 720px;
+	.chooseCatogoryContainer {
+		height: 100%;
+		width: 100%;
+		position: relative;
+		padding: 12px;
+		.chooseContent {
+			height: calc(100% - 50px);
+			width: 100%;
+
+			overflow: auto;
+			flex-wrap: wrap;
+			gap: 16px;
+			.chooseItem {
+				height: 96px;
+				width: 84px;
+				align-items: center;
+				justify-content: center;
+				padding: 12px 8px 4px 8px;
+				border-radius: 12px;
+				background: #eef3f6;
+				cursor: pointer;
+				.chooseItemImg {
+					height: 40px;
+					width: 40px;
+				}
+				.chooseItemLabel {
+					flex: 1;
+					font-size: 12px;
+					text-align: center;
+					display: -webkit-box;
+					-webkit-line-clamp: 2; /* hiển thị tối đa 2 dòng */
+					line-clamp: 2;
+					-webkit-box-orient: vertical;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					width: 100%;
+				}
+			}
+			.active {
+				border: 1px solid #006b35;
+				background: #e7f5e9;
+			}
+		}
+		.button {
+			position: absolute;
+			bottom: 0px;
+			width: 100%;
+			align-items: center;
+			justify-content: center;
+		}
+	}
+}

@@ -17,6 +17,7 @@ import { useLocalePath } from '@/ultis/route.ults'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import { selectType } from '@/interface/common/common.interface'
+import { CategoriFavOptProps } from '@/interface/Network/Network.interface'
 
 interface CRUDNetworkProps {
 	data?: any
@@ -30,11 +31,13 @@ interface DataModalProps {
 	title?: string
 	bio?: string
 	type?: string
-	category?: string
+	category?: CategoriFavOptProps[]
 	about?: string
 	longitude: number
 	latitude: number
 	address?: string
+	is_online: boolean
+	is_offline: boolean
 	// [key: string]: any
 }
 interface ErrorsModalProps {
@@ -46,6 +49,7 @@ interface ErrorsModalProps {
 	category?: string
 	about?: string
 	address?: string
+
 	// [key: string]: any
 }
 export default function useCRUDNetwork({
@@ -60,15 +64,17 @@ export default function useCRUDNetwork({
 	const [dataModal, setDataModal] = useState<DataModalProps>({
 		longitude: 0,
 		latitude: 0,
+		is_online: true,
+		is_offline: false,
 	})
 	const [errors, setErrors] = useState<ErrorsModalProps>({})
 	const [files, setFiles] = useState({
 		thumbnail: null,
 		avatar: null,
 	})
-	const [categoryNetworkOpts, setCategoryNetworkOpts] = useState<selectType[]>(
-		[],
-	)
+	const [categoryNetworkOpts, setCategoryNetworkOpts] = useState<
+		CategoriFavOptProps[]
+	>([])
 	const [stateNetworkOpts, setStateNetworkOpts] = useState<selectType[]>([])
 	const [loadingOpt, setLoadingOpt] = useState(false)
 	const handleGetSelectOpt = async () => {
@@ -78,12 +84,7 @@ export default function useCRUDNetwork({
 				getCategoryList({}),
 				getNetworkGroup({}),
 			])
-			const categoryOpt = (category?.results?.object || []).map(
-				(item: string) => ({
-					value: item,
-					label: item,
-				}),
-			)
+
 			const networkOpt = (network?.results?.object || []).map(
 				({ name }: { name: string }) => ({
 					value: name,
@@ -91,7 +92,8 @@ export default function useCRUDNetwork({
 				}),
 			)
 
-			setCategoryNetworkOpts(categoryOpt)
+			setCategoryNetworkOpts(category?.results?.objects?.rows || [])
+
 			setStateNetworkOpts(networkOpt)
 		} catch (error) {
 			openError(error)
@@ -101,6 +103,10 @@ export default function useCRUDNetwork({
 	}
 
 	const handleChangeData = useCallback((key, _value) => {
+		console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :101 ~ useCRUDNetwork ~ key, _value:', {
+			key,
+			_value,
+		})
 		let value = _value
 		let otherState = {}
 		switch (key) {
@@ -114,7 +120,20 @@ export default function useCRUDNetwork({
 					}
 				}
 				break
-
+			case 'is_online':
+				if (!_value) {
+					otherState = {
+						is_offline: true,
+					}
+				}
+				break
+			case 'is_offline':
+				if (!_value) {
+					otherState = {
+						is_online: true,
+					}
+				}
+				break
 			default:
 				break
 		}
@@ -128,7 +147,8 @@ export default function useCRUDNetwork({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 	const handleValidate = () => {
-		const { title, bio, type, category, address, about } = dataModal || {}
+		const { title, bio, type, category, address, about, is_offline } =
+			dataModal || {}
 		const fields = {
 			title,
 			bio,
@@ -139,8 +159,24 @@ export default function useCRUDNetwork({
 		}
 		const _error = {} as any
 		Object.entries(fields).forEach(([key, value]) => {
-			if (!value) {
-				_error[key] = 'Field is required'
+			switch (key) {
+				case 'category':
+					if (!isArray(category, 1)) {
+						_error[key] = 'Field is required'
+					}
+					break
+				case 'address':
+					if (is_offline) {
+						if (!value) {
+							_error[key] = 'Field is required'
+						}
+					}
+					break
+				default:
+					if (!value) {
+						_error[key] = 'Field is required'
+					}
+					break
 			}
 		})
 		setErrors(_error)
@@ -154,8 +190,17 @@ export default function useCRUDNetwork({
 	const handleCreateNetwork = async () => {
 		toggleLoadingContext(true)
 		try {
-			const { bio, type, category, title, about, longitude, latitude } =
-				dataModal || {}
+			const {
+				bio,
+				type,
+				category,
+				title,
+				about,
+				longitude,
+				latitude,
+				is_online,
+				is_offline,
+			} = dataModal || {}
 			const [thumbnail, avatar] = await Promise.all([
 				handleUploadImage(files.thumbnail),
 				handleUploadImage(files.avatar),
@@ -164,7 +209,10 @@ export default function useCRUDNetwork({
 			const payload = {
 				title,
 				type,
-				category,
+				category: category.join(', '),
+				category_list: category.map((i) => i.id),
+				is_online,
+				is_offline,
 				bio,
 				about,
 				latitude,

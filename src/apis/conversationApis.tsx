@@ -13,7 +13,7 @@ export const getCategoryList = async ({
 }: {
 	params?: { [key: string]: any }
 }) => {
-	const url = CONVERSATION_ROUTES.categoryList
+	const url = CONVERSATION_ROUTES.categoryFav
 
 	return await axios.get(url, {
 		params: convertParams(params),
@@ -38,6 +38,13 @@ export const createConversation = async (payload: any) => {
 
 export const getConvStranger = async (params: { [key: string]: any } = {}) => {
 	const url = CONVERSATION_ROUTES.stranger
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+export const getCateFav = async (params: { [key: string]: any } = {}) => {
+	const url = CONVERSATION_ROUTES.categoryFav
 
 	return await axios.get(url, {
 		params: convertParams(params),

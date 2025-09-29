@@ -1,4 +1,8 @@
-import { IconCameraFilled, IconMapPinFilled } from '@tabler/icons-react'
+import {
+	IconCameraFilled,
+	IconChevronDown,
+	IconMapPinFilled,
+} from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
 import { memo, useCallback } from 'react'
 
@@ -13,7 +17,9 @@ import CImage from '@/Components/Custom/CImage'
 import CInput from '@/Components/Custom/CInput'
 import CInputMap from '@/Components/Custom/CInputMap'
 import CModal from '@/Components/Custom/CModal/CModal'
+import CMultiSelect from '@/Components/Custom/CMultiSelect'
 import CSelect from '@/Components/Custom/CSelect'
+import CSwitch from '@/Components/Custom/CSwitch'
 import CTextArea from '@/Components/Custom/CTextArea'
 import CUpload from '@/Components/Custom/CUpload'
 import HappyIcon from '@/svg/HappyIcon'
@@ -100,8 +106,16 @@ const ModalCRUDNetwork = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toJson(dataModal), toJson(errors), loadingOpt])
 	const _renderLeft = () => {
-		const { bio, type, category, longitude, latitude, address } =
-			dataModal || {}
+		const {
+			bio,
+			type,
+			category,
+			longitude,
+			latitude,
+			address,
+			is_online,
+			is_offline,
+		} = dataModal || {}
 		return (
 			<Flex className={classes.left} vertical>
 				<CInput
@@ -129,31 +143,50 @@ const ModalCRUDNetwork = ({
 					/>
 				</Flex>
 				<Flex className={classes.item}>
-					<CSelect
+					<CMultiSelect
 						isRequired
-						showCount
-						value={category}
-						options={categoryNetworkOpts}
-						error={errors.category}
+						max={3}
+						suffixIcon={<IconChevronDown />}
 						label="Category"
-						placeholder="Which category fits you best?"
+						options={categoryNetworkOpts}
+						value={category}
+						error={errors.category}
 						onChange={(e) => onChangeData('category', e)}
-						prefix={<HappyIcon />}
 					/>
 				</Flex>
 				<Flex className={classes.item}>
-					<CInputMap
-						value={address}
-						error={errors.address}
-						isRequired
-						label="Location"
-						placeholder="Enter your location"
-						longitude={longitude}
-						latitude={latitude}
-						onSubmitModal={(e) => onChangeData('address', e)}
-						prefix={<IconMapPinFilled style={{ color: '#7987A4' }} />}
+					<span className={classes.title}>This is an Online Community ?</span>
+
+					<CSwitch
+						ctype="success"
+						checked={is_online}
+						onChange={(e) => onChangeData('is_online', e)}
 					/>
 				</Flex>
+				<Flex className={classes.item}>
+					<span className={classes.title}>This is an Offline Community ?</span>
+
+					<CSwitch
+						ctype="success"
+						checked={is_offline}
+						onChange={(e) => onChangeData('is_offline', e)}
+					/>
+				</Flex>
+				{is_offline && (
+					<Flex className={classes.item}>
+						<CInputMap
+							value={address}
+							error={errors.address}
+							isRequired
+							label="Location"
+							placeholder="Enter your location"
+							longitude={longitude}
+							latitude={latitude}
+							onSubmitModal={(e) => onChangeData('address', e)}
+							prefix={<IconMapPinFilled style={{ color: '#7987A4' }} />}
+						/>
+					</Flex>
+				)}
 			</Flex>
 		)
 	}

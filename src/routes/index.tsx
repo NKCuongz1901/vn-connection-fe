@@ -4,7 +4,7 @@ import Message3 from '@/svg/Message3'
 import Messenger from '@/svg/Messenger'
 import OverviewIcon from '@/svg/OverviewIcon'
 import Party from '@/svg/Party'
-// import People from '@/svg/People'
+import People from '@/svg/People'
 import SearchNormal from '@/svg/SearchNormal'
 import TwoUser from '@/svg/TwoUser'
 import UpcomingEvent from '@/svg/UpcomingEvent'
@@ -49,7 +49,7 @@ export const CONVERSATION_ROUTES = {
 	message: 'message',
 	messagePin: 'message/pin',
 	convSearch: 'conversation/search',
-	createConv: 'conversation/create-conversation',
+	categoryFav: 'category/favorites',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',
@@ -102,12 +102,12 @@ export const Menus = [
 		path: mainRoutes.hangout,
 		child: [],
 	},
-	// {
-	// 	title: 'My networks',
-	// 	Icon: People,
-	// 	path: mainRoutes.network,
-	// 	child: [],
-	// },
+	{
+		title: 'My Community',
+		Icon: People,
+		path: mainRoutes.network,
+		child: [],
+	},
 	{
 		title: 'My Events',
 		Icon: Event,

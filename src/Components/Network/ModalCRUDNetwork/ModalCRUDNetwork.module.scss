@@ -76,6 +76,10 @@
 				width: 50%;
 				gap: 12px;
 				padding: 16px;
+				.item {
+					justify-content: space-between;
+					align-items: center;
+				}
 			}
 			.right {
 				padding: 16px;
