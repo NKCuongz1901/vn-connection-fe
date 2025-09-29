@@ -50,6 +50,7 @@ export const CONVERSATION_ROUTES = {
 	messagePin: 'message/pin',
 	convSearch: 'conversation/search',
 	categoryFav: 'category/favorites',
+	convClub: 'conversation/club',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',

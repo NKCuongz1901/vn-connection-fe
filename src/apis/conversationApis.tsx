@@ -166,6 +166,14 @@ export const getConvList = async ({
 	})
 }
 
+export const getConvClubList = async (params?: { [key: string]: any }) => {
+	const url = CONVERSATION_ROUTES.convClub
+	const { keyword, ..._params } = params || {}
+	return await axios.get(url, {
+		params: { ...convertParams(_params), keyword },
+	})
+}
+
 export const deleteConvById = async ({ id }: { id: string }) => {
 	const url = `${CONVERSATION_ROUTES.name}/${id}/delete`
 	return await axios.delete(url)

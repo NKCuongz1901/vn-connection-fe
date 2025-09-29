@@ -1,10 +1,11 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
 import { Dayjs } from 'dayjs'
+import { useEffect, useRef, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
+import { getConvClubList } from '@/apis/conversationApis'
 import { getUserOpenHangout } from '@/apis/hangoutApi'
 import { getListPost, getmyEventInHome } from '@/apis/postApis'
 import { getUserProfile, updateUserProfile } from '@/apis/userApis'
@@ -16,6 +17,8 @@ import { getUserInfo } from '@/ultis/storage.ults'
 
 import { paginationCommon } from '@/Variable/common.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
+
+import { NetworkItemProps } from '@/interface/Network/Network.interface'
 
 type userDataProps = {
 	is_open_hangout: boolean
@@ -36,8 +39,11 @@ export default function useOverview() {
 	const _parentRef = useRef<HTMLDivElement | null>(null)
 	const _childRefUp = useRef<HTMLDivElement | null>(null)
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
+	const _paginationNetworkRef = useRef<PaginationType>(
+		cloneDeep(paginationCommon),
+	)
 
-	const _loadmore = useRef(true)
+	const _loadmore = useRef({ myevent: true, network: true })
 	const [modal, setModal] = useState({ type: '', data: null }) as any
 	const [userData, setUserData] = useState<userDataProps>({
 		is_open_hangout: false,
@@ -51,11 +57,12 @@ export default function useOverview() {
 	const [listMyEvent, setListMyEvent] = useState<any[]>([])
 	const [totalMyEvent, setTotalMyEvent] = useState(0)
 	const [listPost, setListPost] = useState([]) as any[]
+	const [listNetwork, setListNetwork] = useState<NetworkItemProps[]>([])
 
 	const [loadingProfile, setLoadingProfile] = useState<boolean>(false)
 	const [loadingMyEvent, setLoadingMyEvent] = useState<boolean>(false)
-	const [loading, setLoading] = useState(false)
-	const [total, setTotal] = useState(0)
+	const [loading, setLoading] = useState({ event: false, network: false })
+	const [total, setTotal] = useState({ event: 0, network: 0 })
 
 	const [loadmore, setLoadMore] = useState(true)
 	const [filters, setFilters] = useState<filterProps>({
@@ -82,7 +89,7 @@ export default function useOverview() {
 	}
 
 	const handleGetListPost = async (isNotLoading = false) => {
-		setLoading(true)
+		setLoading((prev) => ({ ...prev, event: true }))
 		try {
 			const { page, limit } = _paginationRefs.current
 			const { radius, date } = _filterRef.current
@@ -120,15 +127,58 @@ export default function useOverview() {
 					const dataShow = uniqueArray([...contents, ...rows], 'id') as any[]
 					return dataShow
 				})
-				setTotal(count)
+				setTotal((prev) => ({ ...prev, event: count }))
 			}
 		} catch (error) {
 			openError(error)
 		} finally {
-			setLoading(false)
+			setLoading((prev) => ({ ...prev, event: false }))
 		}
 	}
-
+	const handleGetListNetwork = async (isNotLoading = false) => {
+		setLoading((prev) => ({ ...prev, network: true }))
+		try {
+			const { page, limit } = _paginationNetworkRef.current
+			const { radius, date } = _filterRef.current
+			const dates = {}
+			if (date) {
+				Object.assign(dates, {
+					start_time: date[0].startOf('day').valueOf(),
+					end_time: date[0].endOf('day').valueOf(),
+				})
+			}
+			let isNew = page === 1
+			if (isNotLoading) {
+				isNew = false
+			}
+			if (isNew) {
+				setListNetwork([])
+			}
+			const res: any = await getConvClubList({
+				fields: ['$all'],
+				page: !isNotLoading ? page : 1,
+				limit: !isNotLoading ? limit : 50,
+			})
+			const { code, results } = res || {}
+			await delay(1000)
+			if (code === 200) {
+				const { rows, count } = results?.objects || {}
+				if (!isNotLoading) {
+					_loadmore.current.network = false
+				}
+				setListNetwork((prev: any[]) => {
+					const contents = isNew && !isNotLoading ? [] : prev
+					const dataShow = uniqueArray([...contents, ...rows], 'id') as any[]
+					return dataShow
+				})
+				setTotal((prev) => ({ ...prev, network: count }))
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoading((prev) => ({ ...prev, network: false }))
+		}
+	}
 	const handleGetUserProfile = async () => {
 		const id = getUserInfo('id')
 		setLoadingProfile(true)
@@ -198,6 +248,10 @@ export default function useOverview() {
 				setListMyEvent((prev) => [value, ...prev])
 				setTotalMyEvent((prev) => prev + 1)
 				break
+			case 'createNetwork':
+				setListNetwork((prev) => [value, ...prev])
+				setTotal((prev) => ({ ...prev, network: prev.network + 1 }))
+				break
 			default:
 				break
 		}
@@ -226,7 +280,7 @@ export default function useOverview() {
 			if (code === 200) {
 				const { rows: _rows } = results?.objects || {}
 				if (!isNoLoading && _rows.length < limit) {
-					_loadmore.current = false
+					_loadmore.current.myevent = false
 				}
 				setTotalMyEvent(pagination?.total || 0)
 				setListMyEvent((prev: any[]) => {
@@ -250,7 +304,7 @@ export default function useOverview() {
 	}
 
 	const handleLoadMore = async () => {
-		if (!_loadmore.current || loadingMyEvent) return
+		if (!_loadmore.current.myevent || loadingMyEvent) return
 		const { limit } = _paginationRefs.current
 		const currentPage = Math.trunc((listMyEvent || []).length / limit)
 		_paginationRefs.current.page = currentPage + 1
@@ -287,7 +341,7 @@ export default function useOverview() {
 	const handleLoadMoreUp = async () => {
 		const { limit } = _paginationRefs.current
 
-		if (!loadmore || loading) return
+		if (!loadmore || loading.event) return
 		_paginationRefs.current.page =
 			Math.trunc((listPost || []).length / limit) + 1
 		await handleGetListPost()
@@ -315,6 +369,7 @@ export default function useOverview() {
 		handleGetUserProfile()
 		handleGetMyEvent()
 		handleGetListPost()
+		handleGetListNetwork()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -350,6 +405,7 @@ export default function useOverview() {
 		total,
 		listPost,
 		filters,
+		listNetwork,
 
 		OnChangeTitleHangout: handleOnChangeTitleHangout,
 		onUpdateUserInfo: handleUpdateUserInfo,

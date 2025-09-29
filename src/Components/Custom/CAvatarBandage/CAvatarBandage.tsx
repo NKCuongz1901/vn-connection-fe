@@ -10,9 +10,10 @@ import classes from './CAvatarBandage.module.scss'
 interface CAvatarBandageProps {
 	customeBandage?: any
 	classBandage?: any
+	isHidden?: boolean
 }
 const CAvatarBandage = (_props: CAvatarBandageProps & AvatarProps) => {
-	const { customeBandage, classBandage, ...props } = _props
+	const { customeBandage, classBandage, isHidden = false, ...props } = _props
 	const _renderBandage = () => {
 		return (
 			<Flex
@@ -32,7 +33,7 @@ const CAvatarBandage = (_props: CAvatarBandageProps & AvatarProps) => {
 	return (
 		<div className={classes.wrapper}>
 			<CAvatar {...props} />
-			{_renderBandage()}
+			{!isHidden && _renderBandage()}
 		</div>
 	)
 }

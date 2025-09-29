@@ -5,10 +5,11 @@ import { memo } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import useOverview from '@/hooks/Overview/useOverview'
 
-import { arrayFrom } from '@/ultis/array.ults'
+import { arrayFrom, isArray } from '@/ultis/array.ults'
 import { useLocalePath } from '@/ultis/route.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
+import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
 import CDatePickerRanger from '@/Components/Custom/CDatePickerRanger'
 import CSelect from '@/Components/Custom/CSelect'
 import CSwitch from '@/Components/Custom/CSwitch'
@@ -17,10 +18,12 @@ import ItemEvent from '@/Components/Event/ItemEvent'
 import ItemEventTicket from '@/Components/Event/ItemEventTicket'
 import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
 import ModelChooseHangout from '@/Components/Hangout/ModelChooseHangout'
+import ModalCRUDNetwork from '@/Components/Network/ModalCRUDNetwork'
 import EventIcon from '@/svg/Event'
 import PencilIcon from '@/svg/Hangout/PencilIcon'
 import MarkIcon from '@/svg/MarkIcon'
 import Party from '@/svg/Party'
+import SearchIcon from '@/svg/SearchIcon'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import { mappingEventTitle } from '@/Variable/event.variable'
@@ -42,6 +45,7 @@ const Overview = () => {
 		totalHangout,
 		hangoutPeople,
 		filters,
+		listNetwork,
 
 		setModal,
 		OnChangeTitleHangout,
@@ -63,7 +67,7 @@ const Overview = () => {
 			<Flex className={classes.filter}>
 				<Flex className={classes.distance}>
 					<CSelect
-						disabled={loading}
+						disabled={loading.event}
 						value={radius}
 						options={radiusOpts}
 						placeholder="Choose distance"
@@ -73,7 +77,7 @@ const Overview = () => {
 				</Flex>
 				<Flex>
 					<CDatePickerRanger
-						disabled={loading}
+						disabled={loading.event}
 						value={date}
 						onChange={onChangeFilter('date')}
 					/>
@@ -172,6 +176,74 @@ const Overview = () => {
 			</Flex>
 		)
 	}
+	const _renderMyCommunity = () => {
+		return (
+			<Flex vertical className={classes.myCommunityWrapper}>
+				<Flex
+					className={classes.title}
+					onClick={() => onChangeRoute(mainRoutes.network)}
+				>
+					<EventTitle
+						label="My community"
+						number={total.network}
+						icon={<EventIcon />}
+						onAddNew={(e) => {
+							e?.stopPropagation?.()
+							setModal({ type: 'network', data: null })
+						}}
+					/>
+				</Flex>
+				<Flex vertical className={classes.myCommunity}>
+					<Flex className={classes.communityText}>
+						<div>Explore people and communities by interests</div>
+						<div>
+							<SearchIcon fill="#006B35" />
+						</div>
+					</Flex>
+					<Flex className={classes.communityList}>
+						{loading.network ? (
+							arrayFrom(3).map((_, index) => (
+								<Flex key={index} vertical className={classes.communityItem}>
+									<Skeleton.Avatar
+										active
+										className={classes.contentSkeletonAva}
+									/>
+									<Skeleton.Input
+										active
+										className={classes.contentSkeletonInput}
+									/>
+								</Flex>
+							))
+						) : isArray(listNetwork, 1) ? (
+							listNetwork.map((i) => {
+								const { id, avatar, userRole, title } = i || {}
+								return (
+									<Flex
+										key={id}
+										vertical
+										className={classes.communityItem}
+										onClick={() => onChangeRoute(`${mainRoutes.network}/${id}`)}
+									>
+										<div>
+											<CAvatarBandage
+												isHidden={userRole !== 'OWNER'}
+												src={avatar}
+												className={classes.communityAva}
+												classBandage={classes.communityBandage}
+											/>
+										</div>
+										<div className={classes.communityLabel}>{title}</div>
+									</Flex>
+								)
+							})
+						) : (
+							<Flex className={classes.notData}>Not Community</Flex>
+						)}
+					</Flex>
+				</Flex>
+			</Flex>
+		)
+	}
 	const _renderModal = () => {
 		const { type, data } = modal || {}
 		let Content = <></>
@@ -183,6 +255,16 @@ const Overview = () => {
 		switch (type) {
 			case 'event':
 				Content = <ModalCRUDEvent {...propsModal} />
+				break
+			case 'network':
+				Content = (
+					<ModalCRUDNetwork
+						{...propsModal}
+						onSuccess={(item) =>
+							onCRUDSuccess({ key: 'createNetwork', value: item })
+						}
+					/>
+				)
 				break
 			case 'choose':
 				Content = (
@@ -209,6 +291,7 @@ const Overview = () => {
 				{_renderFilter()}
 				{_renderHangout()}
 				{_renderMyEvent()}
+				{_renderMyCommunity()}
 				<Flex className={classes.wrapperUp} vertical>
 					<Flex
 						className={classes.title}
@@ -217,7 +300,7 @@ const Overview = () => {
 						<EventTitle
 							hiddenAdd
 							label={mappingEventTitle[mainRoutes.upcomingEvent]}
-							number={total}
+							number={total.event}
 							icon={<EventIcon />}
 						/>
 					</Flex>
@@ -229,7 +312,7 @@ const Overview = () => {
 								type={mainRoutes.upcomingEvent}
 							/>
 						))}
-						{loading &&
+						{loading.event &&
 							arrayFrom(3).map((_, index) => (
 								<Skeleton.Input
 									key={index}
