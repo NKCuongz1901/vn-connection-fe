@@ -49,6 +49,7 @@ import ShareIconSvg from '@/svg/ShareIconSvg'
 import TrashIcon from '@/svg/TrashIcon'
 import TwoUser from '@/svg/TwoUser'
 import UpcomingEvent from '@/svg/UpcomingEvent'
+import PeopleSmileIcon from '@/svg/PeopleSmileIcon'
 
 const Icons = () => {
 	const icons = [
@@ -146,6 +147,11 @@ const Icons = () => {
 		{
 			ICON: GroupIcon,
 			name: '@/svg/GroupIcon',
+			key: randomString(),
+		},
+		{
+			ICON: PeopleSmileIcon,
+			name: '@/svg/PeopleSmileIcon',
 			key: randomString(),
 		},
 	]

@@ -103,10 +103,6 @@ export default function useCRUDNetwork({
 	}
 
 	const handleChangeData = useCallback((key, _value) => {
-		console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :101 ~ useCRUDNetwork ~ key, _value:', {
-			key,
-			_value,
-		})
 		let value = _value
 		let otherState = {}
 		switch (key) {

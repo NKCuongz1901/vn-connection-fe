@@ -51,6 +51,7 @@ export const CONVERSATION_ROUTES = {
 	convSearch: 'conversation/search',
 	categoryFav: 'category/favorites',
 	convClub: 'conversation/club',
+	convSuggest: 'conversation/suggest',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',

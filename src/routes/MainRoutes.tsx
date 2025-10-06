@@ -14,4 +14,5 @@ export const mainRoutes = {
 	friend: 'friend',
 	dating: 'dating',
 	profile: 'profile',
+	exploreInterest: 'explore-interest ',
 }
