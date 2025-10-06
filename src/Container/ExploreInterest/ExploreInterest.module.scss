@@ -1,0 +1,459 @@
+.wrapper {
+	height: 100%;
+	width: 100%;
+
+	.container {
+		padding: 24px;
+		height: 100%;
+		width: 100%;
+		gap: 12px;
+		.header {
+			gap: 8px;
+			align-items: center;
+			color: #0f1729;
+			font-size: 18px;
+			font-weight: 600;
+			cursor: pointer;
+		}
+		.content {
+			flex: 1;
+			padding: 12px 16px;
+			background: #fff;
+			border-radius: 16px;
+			height: 100%;
+			gap: 12px;
+			.search {
+				width: 100%;
+				gap: 12px;
+				.mapIcon {
+					min-width: 44px;
+					min-height: 44px;
+					padding: 10px;
+					border-radius: 99px;
+					background: #f0f3f9;
+					svg {
+						width: 24px;
+						height: 24px;
+					}
+				}
+				.distance {
+					width: 266px;
+				}
+			}
+			.tabBntWrapper {
+				width: 100%;
+				.tabBnt {
+					flex: 1;
+					align-items: center;
+					justify-content: center;
+					padding: 12px 16px;
+					font-size: 16px;
+					color: #94a3b8;
+					border-bottom: 1px solid #edf3f5;
+					cursor: pointer;
+					text-align: center;
+				}
+				.activeTab {
+					font-weight: 600;
+					color: #006b35;
+					border-bottom: 2px solid #006b35;
+				}
+			}
+			.dataWrapper {
+				flex-wrap: wrap;
+				gap: 12px;
+				.itemWrapper {
+					width: 80px;
+					height: 96px;
+					position: relative;
+					cursor: pointer;
+					display: flex;
+					padding: 20px 4px 0 4px;
+					align-items: center;
+					gap: 4px;
+
+					border-radius: 12px;
+					background: #eef3f6;
+					overflow: hidden;
+					.count {
+						position: absolute;
+						left: 0px;
+						top: 0px;
+
+						border-radius: 0 0 8px 0;
+						background: #dfe5ec;
+						padding: 4px 6px 2px 8px;
+						color: #006b35;
+						font-weight: 600;
+						font-size: 10px;
+					}
+					.itemImg {
+						height: 40px;
+						width: 40px;
+					}
+					.itemLable {
+						font-size: 12px;
+						text-align: center;
+						display: -webkit-box;
+						-webkit-line-clamp: 2; /* hiển thị tối đa 2 dòng */
+						line-clamp: 2;
+						-webkit-box-orient: vertical;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						width: 100%;
+					}
+				}
+				.itemSelected {
+					background: #e7f5e9;
+					border: 1px solid #006b35;
+				}
+			}
+			.matching {
+				justify-content: flex-end;
+				button {
+					height: 40px;
+				}
+			}
+			.matchingClub {
+				gap: 16px;
+				height: 100%;
+
+				.matchingClubStatus {
+					gap: 8px;
+					.matchingClubBtn {
+						padding: 6px 12px;
+						justify-content: center;
+						align-items: center;
+						border-radius: 999px;
+						box-shadow: 1px 2px 12px 0 rgba(17, 24, 39, 0.03);
+						background: #dfe5ec;
+						cursor: pointer;
+					}
+					.matchingClubBtnSelected {
+						background: #e7f5e9;
+						color: #006b35;
+						font-weight: 600;
+					}
+				}
+				.matchingClubList {
+					gap: 8px;
+					overflow: auto;
+					height: calc(100% - 100px);
+					.matchingClubWrapper {
+						justify-content: space-between;
+						height: 76px;
+						align-items: center;
+						.matchingClubInfoLeft {
+							gap: 8px;
+							width: calc(100% - 200px);
+							.infoAva {
+								min-height: 48px;
+								min-width: 48px;
+							}
+							.matchingClubInfo {
+								max-width: 100%;
+								gap: 4px;
+								.matchingClubInfoLabel {
+									overflow: hidden;
+									white-space: nowrap;
+									text-overflow: ellipsis;
+								}
+								.matchingClubInfoCate {
+									overflow: hidden;
+									white-space: nowrap;
+									text-overflow: ellipsis;
+									font-size: 12px;
+									font-weight: 400;
+									max-width: 100%;
+								}
+								.otherInfo {
+									gap: 8px;
+									overflow: hidden;
+									white-space: nowrap;
+									text-overflow: ellipsis;
+									.otherInfoItem {
+										align-items: center;
+										gap: 4px;
+										font-weight: 600;
+										font-size: 10px;
+
+										svg {
+											height: 12px;
+											width: 12px;
+										}
+									}
+								}
+							}
+						}
+						.matchingClubInfoRight {
+							button {
+								height: 40px;
+								min-width: 80px;
+							}
+						}
+					}
+				}
+				.matchingUserAll {
+					justify-content: space-between;
+					align-items: center;
+					.matchingUserAllTitle {
+						font-size: 14px;
+						font-weight: 600;
+					}
+					button {
+						height: 40px;
+					}
+				}
+				.gender {
+					height: 16px;
+				}
+			}
+		}
+		.noData {
+			font-weight: 600;
+			font-size: 18px;
+			width: 100%;
+			height: 100%;
+			align-items: center;
+			justify-content: center;
+		}
+		.title {
+			font-weight: 600;
+			font-size: 18px;
+		}
+		.note {
+			color: #48546b;
+		}
+		.skeletonWrapper {
+			gap: 12px;
+			flex-wrap: wrap;
+			.skeleton {
+				width: 80px;
+				height: 96px;
+				span {
+					min-height: 100%;
+					min-width: 100%;
+				}
+			}
+		}
+		.loadingMatching {
+			gap: 8px;
+			.skeletonMatching {
+				width: 100%;
+				height: 56px;
+			}
+		}
+	}
+}
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		.container {
+			.header {
+			}
+			.content {
+				.search {
+					.mapIcon {
+						svg {
+						}
+					}
+					.distance {
+					}
+				}
+				.tabBntWrapper {
+					.tabBnt {
+					}
+					.activeTab {
+					}
+				}
+				.dataWrapper {
+					.itemWrapper {
+						.count {
+						}
+						.itemImg {
+						}
+						.itemLable {
+						}
+					}
+					.itemSelected {
+					}
+				}
+				.matching {
+					button {
+					}
+				}
+				.matchingClub {
+					.matchingClubStatus {
+						.matchingClubBtn {
+						}
+						.matchingClubBtnSelected {
+						}
+					}
+					.matchingClubList {
+						.matchingClubWrapper {
+							.matchingClubInfoLeft {
+								.infoAva {
+								}
+								.matchingClubInfo {
+									.matchingClubInfoLabel {
+									}
+									.matchingClubInfoCate {
+									}
+									.otherInfo {
+										.otherInfoItem {
+											svg {
+											}
+										}
+									}
+								}
+							}
+							.matchingClubInfoRight {
+								button {
+								}
+							}
+						}
+					}
+					.matchingUserAll {
+						.matchingUserAllTitle {
+						}
+						button {
+						}
+					}
+				}
+			}
+			.noData {
+			}
+			.title {
+			}
+			.note {
+			}
+			.skeletonWrapper {
+				.skeleton {
+					span {
+					}
+				}
+			}
+			.loadingMatching {
+				.skeletonMatching {
+				}
+			}
+		}
+	}
+}
+
+@media (min-width: 0px) and (max-width: 376px) {
+	.wrapper {
+		.container {
+			padding: 4px;
+			.header {
+			}
+			.content {
+				.search {
+					.mapIcon {
+						svg {
+						}
+					}
+					.distance {
+					}
+				}
+				.tabBntWrapper {
+					.tabBnt {
+						font-size: 12px;
+					}
+					.activeTab {
+					}
+				}
+				.dataWrapper {
+					.itemWrapper {
+						.count {
+						}
+						.itemImg {
+						}
+						.itemLable {
+						}
+					}
+					.itemSelected {
+					}
+				}
+				.matching {
+					button {
+					}
+				}
+				.matchingClub {
+					.matchingClubStatus {
+						.matchingClubBtn {
+						}
+						.matchingClubBtnSelected {
+						}
+					}
+					.matchingClubList {
+						.matchingClubWrapper {
+							height: unset;
+							.matchingClubInfoLeft {
+								width: calc(100% - 80px);
+								align-items: center;
+								.infoAva {
+									min-width: 20px;
+									min-height: 20px;
+								}
+								.matchingClubInfo {
+									.matchingClubInfoLabel {
+										font-size: 12px;
+									}
+									.matchingClubInfoCate {
+										font-size: 8px;
+									}
+									.otherInfo {
+										.otherInfoItem {
+											font-size: 8px;
+
+											svg {
+											}
+										}
+									}
+								}
+							}
+							.matchingClubInfoRight {
+								button {
+									height: 28px;
+									font-size: 12px;
+									min-width: 60px;
+									padding: 4px;
+								}
+							}
+						}
+					}
+					.matchingUserAll {
+						.matchingUserAllTitle {
+						}
+						button {
+							height: 28px;
+							font-size: 12px;
+							min-width: 60px;
+							padding: 4px;
+						}
+					}
+					.gender {
+						height: 12px;
+					}
+				}
+			}
+			.noData {
+			}
+			.title {
+			}
+			.note {
+			}
+			.skeletonWrapper {
+				.skeleton {
+					span {
+					}
+				}
+			}
+			.loadingMatching {
+				.skeletonMatching {
+				}
+			}
+		}
+	}
+}

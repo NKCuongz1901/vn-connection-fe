@@ -52,6 +52,8 @@ export const CONVERSATION_ROUTES = {
 	categoryFav: 'category/favorites',
 	convClub: 'conversation/club',
 	convSuggest: 'conversation/suggest',
+	joinConversation: 'request-join-conversation',
+	leave: 'leave',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',
@@ -90,6 +92,10 @@ export const NOTIFICATION_ROUTES = {
 export const SEARCH_ROUTES = {
 	searchLocal: 'search-in-app/local',
 	searchEvent: 'search-in-app/event',
+	searchCategoryUser: 'search-in-app/category-user',
+	searchCategoryClub: 'search-in-app/category-club',
+	searchCategoryClubMatching: 'search-in-app/club-matching-categories',
+	searchCategoryUserMatching: 'search-in-app/user-matching-categories',
 }
 export const Menus = [
 	{
@@ -114,6 +120,12 @@ export const Menus = [
 		title: 'My Events',
 		Icon: Event,
 		path: mainRoutes.event,
+		child: [],
+	},
+	{
+		title: 'Explore By Interest',
+		Icon: People,
+		path: mainRoutes.exploreInterest,
 		child: [],
 	},
 	{

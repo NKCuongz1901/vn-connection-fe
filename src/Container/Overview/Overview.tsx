@@ -194,7 +194,10 @@ const Overview = () => {
 					/>
 				</Flex>
 				<Flex vertical className={classes.myCommunity}>
-					<Flex className={classes.communityText}>
+					<Flex
+						className={classes.communityText}
+						onClick={() => onChangeRoute(mainRoutes.exploreInterest)}
+					>
 						<div>Explore people and communities by interests</div>
 						<div>
 							<SearchIcon fill="#006B35" />

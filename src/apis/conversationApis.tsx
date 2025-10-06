@@ -187,3 +187,16 @@ export const deleteConvById = async ({ id }: { id: string }) => {
 	const url = `${CONVERSATION_ROUTES.name}/${id}/delete`
 	return await axios.delete(url)
 }
+
+export const joinConversation = async (_payload: any) => {
+	const { id, ...payload } = _payload || {}
+	const url = `${CONVERSATION_ROUTES.name}/${id}/${CONVERSATION_ROUTES.joinConversation}`
+
+	return await axios.post(url, payload)
+}
+export const leaveConversation = async (_payload: any) => {
+	const { id, ...payload } = _payload || {}
+	const url = `${CONVERSATION_ROUTES.name}/${id}/${CONVERSATION_ROUTES.leave}`
+
+	return await axios.post(url, payload)
+}

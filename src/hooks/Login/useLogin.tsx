@@ -68,7 +68,7 @@ export default function useLogin() {
 					email,
 					cover,
 					latitude,
-					latitude_local,
+					longitude,
 					is_verified,
 				} = object || {}
 				const dataInfo = {
@@ -79,7 +79,7 @@ export default function useLogin() {
 					email,
 					cover,
 					latitude,
-					latitude_local,
+					longitude,
 					is_verified,
 				}
 				if (isRemember) {

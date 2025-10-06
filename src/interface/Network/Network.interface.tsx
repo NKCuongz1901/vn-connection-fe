@@ -74,3 +74,43 @@ export interface NetworkClubSuggestProps {
 	avatar: string
 	created_at: string // ISO date string
 }
+
+export interface NetworkClubSearchInAppProps {
+	id: string
+	title: string
+	image: string
+	count: number
+}
+
+export interface MatchingClubProps {
+	id: string
+	title: string
+	avatar: string
+	category: string // ví dụ: "Language exchange, Workshop, Camping"
+	category_list: string[] // mảng ID của category
+	address: string
+	amount_of_user: number
+	is_offline: boolean
+	is_online: boolean
+	longitude: number
+	latitude: number
+	users_in_conversation: UserInConversationProps[] | any[]
+	membership_type: string // ví dụ: "OWNER"
+	away: number // khoảng cách, đơn vị có thể là km
+}
+
+export interface MatchingUserProps {
+	id: string
+	name: string
+	avatar: string
+	phone: string
+	longitude_local: number
+	latitude_local: number
+	address_local: string
+	gender: 'MALE' | 'FEMALE' | 'OTHER'
+	language: string // mã ngôn ngữ, ví dụ: 'jp', 'en', 'vi'
+	age: number
+	languages_can_speak_array: string[]
+	online_time: string // timestamp dạng string (epoch)
+	i_am_interested_in: string // ví dụ: "Language exchange"
+}

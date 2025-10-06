@@ -17,6 +17,34 @@ export const getInappEvent = async (params) => {
 		params: { ...convertParams(_params), keyword },
 	})
 }
+export const getInappCategoryUser = async (params) => {
+	const url = SEARCH_ROUTES.searchCategoryUser
+	const { keyword, ..._params } = params || {}
+	return await axios.get(url, {
+		params: { ...convertParams(_params), keyword },
+	})
+}
+export const getInappCategoryClub = async (params) => {
+	const url = SEARCH_ROUTES.searchCategoryClub
+	const { keyword, ..._params } = params || {}
+	return await axios.get(url, {
+		params: { ...convertParams(_params), keyword },
+	})
+}
+export const getInappCategoryClubMatching = async (params) => {
+	const url = SEARCH_ROUTES.searchCategoryClubMatching
+	const { keyword, ..._params } = params || {}
+	return await axios.get(url, {
+		params: { ...convertParams(_params), keyword },
+	})
+}
+export const getInappCategoryUserMatching = async (params) => {
+	const url = SEARCH_ROUTES.searchCategoryUserMatching
+	const { keyword, ..._params } = params || {}
+	return await axios.get(url, {
+		params: { ...convertParams(_params), keyword },
+	})
+}
 // export const getDiscussDetail = async (params: {
 // 	id: string
 // 	[key: string]: any
