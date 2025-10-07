@@ -22,7 +22,7 @@ import {
 	MatchingClubProps,
 	MatchingUserProps,
 	NetworkClubSearchInAppProps,
-} from '@/interface/Network/Network.interface'
+} from '@/interface/Community/Community.interface'
 
 const tabs = [
 	{

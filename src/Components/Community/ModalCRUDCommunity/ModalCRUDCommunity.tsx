@@ -7,7 +7,7 @@ import { Flex, Skeleton } from 'antd'
 import { memo, useCallback } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
-import useCRUDNetwork from '@/hooks/Network/useCRUDNetwork'
+import useCRUDCommunity from '@/hooks/Community/useCRUDCommunity'
 
 import { toJson } from '@/ultis/common.ults'
 
@@ -25,19 +25,19 @@ import CUpload from '@/Components/Custom/CUpload'
 import HappyIcon from '@/svg/HappyIcon'
 import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
 
-import classes from './ModalCRUDNetwork.module.scss'
+import classes from './ModalCRUDCommunity.module.scss'
 
-interface ModalCRUDNetworkProps {
+interface ModalCRUDCommunityProps {
 	data?: any
 	onClose: () => void
 	onSuccess?: (data: any) => void
 }
 
-const ModalCRUDNetwork = ({
+const ModalCRUDCommunity = ({
 	data,
 	onClose,
 	onSuccess,
-}: ModalCRUDNetworkProps) => {
+}: ModalCRUDCommunityProps) => {
 	const { loadingContext } = useLoading()
 	const {
 		loadingOpt,
@@ -48,7 +48,7 @@ const ModalCRUDNetwork = ({
 		onChangeData,
 		onCheckImage,
 		onSubmit,
-	} = useCRUDNetwork({
+	} = useCRUDCommunity({
 		data,
 		onSuccess,
 		onClose,
@@ -251,4 +251,4 @@ const ModalCRUDNetwork = ({
 	)
 }
 
-export default memo(ModalCRUDNetwork)
+export default memo(ModalCRUDCommunity)

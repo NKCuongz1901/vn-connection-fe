@@ -18,7 +18,7 @@ import { getUserInfo } from '@/ultis/storage.ults'
 import { paginationCommon } from '@/Variable/common.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
-import { NetworkItemProps } from '@/interface/Network/Network.interface'
+import { NetworkItemProps } from '@/interface/Community/Community.interface'
 
 type userDataProps = {
 	is_open_hangout: boolean

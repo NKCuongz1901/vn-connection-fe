@@ -2,7 +2,7 @@
 import { Flex, Skeleton } from 'antd'
 import { memo } from 'react'
 
-import useNetwork from '@/hooks/Network/useNetwork'
+import useCommunity from '@/hooks/Community/useCommunity'
 
 import { arrayFrom, isArray } from '@/ultis/array.ults'
 import { useLocalePath } from '@/ultis/route.ults'
@@ -16,9 +16,9 @@ import SearchIcon from '@/svg/SearchIcon'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 
-import classes from './Network.module.scss'
+import classes from './Community.module.scss'
 
-const Network = () => {
+const Community = () => {
 	const { onChangeRoute } = useLocalePath()
 
 	const {
@@ -28,7 +28,7 @@ const Network = () => {
 		networkSuggest,
 		keyword,
 		setKeyword,
-	} = useNetwork({})
+	} = useCommunity({})
 	const _renderSearch = () => {
 		return (
 			<Flex className={classes.search}>
@@ -76,7 +76,7 @@ const Network = () => {
 												vertical
 												className={classes.communityItem}
 												onClick={() =>
-													onChangeRoute(`${mainRoutes.network}/${id}`)
+													onChangeRoute(`${mainRoutes.community}/${id}`)
 												}
 											>
 												<div>
@@ -135,7 +135,9 @@ const Network = () => {
 										key={id}
 										vertical
 										className={classes.communityItem}
-										onClick={() => onChangeRoute(`${mainRoutes.network}/${id}`)}
+										onClick={() =>
+											onChangeRoute(`${mainRoutes.community}/${id}`)
+										}
 									>
 										<div>
 											<CAvatarBandage
@@ -186,4 +188,4 @@ const Network = () => {
 	)
 }
 
-export default memo(Network)
+export default memo(Community)

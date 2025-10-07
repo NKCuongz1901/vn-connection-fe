@@ -18,7 +18,7 @@ import ItemEvent from '@/Components/Event/ItemEvent'
 import ItemEventTicket from '@/Components/Event/ItemEventTicket'
 import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
 import ModelChooseHangout from '@/Components/Hangout/ModelChooseHangout'
-import ModalCRUDNetwork from '@/Components/Network/ModalCRUDNetwork'
+import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
 import EventIcon from '@/svg/Event'
 import PencilIcon from '@/svg/Hangout/PencilIcon'
 import MarkIcon from '@/svg/MarkIcon'
@@ -181,7 +181,7 @@ const Overview = () => {
 			<Flex vertical className={classes.myCommunityWrapper}>
 				<Flex
 					className={classes.title}
-					onClick={() => onChangeRoute(mainRoutes.network)}
+					onClick={() => onChangeRoute(mainRoutes.community)}
 				>
 					<EventTitle
 						label="My community"
@@ -225,7 +225,9 @@ const Overview = () => {
 										key={id}
 										vertical
 										className={classes.communityItem}
-										onClick={() => onChangeRoute(`${mainRoutes.network}/${id}`)}
+										onClick={() =>
+											onChangeRoute(`${mainRoutes.community}/${id}`)
+										}
 									>
 										<div>
 											<CAvatarBandage
@@ -261,7 +263,7 @@ const Overview = () => {
 				break
 			case 'network':
 				Content = (
-					<ModalCRUDNetwork
+					<ModalCRUDCommunity
 						{...propsModal}
 						onSuccess={(item) =>
 							onCRUDSuccess({ key: 'createNetwork', value: item })

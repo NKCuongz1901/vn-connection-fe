@@ -17,9 +17,9 @@ import { useLocalePath } from '@/ultis/route.ults'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import { selectType } from '@/interface/common/common.interface'
-import { CategoriFavOptProps } from '@/interface/Network/Network.interface'
+import { CategoriFavOptProps } from '@/interface/Community/Community.interface'
 
-interface CRUDNetworkProps {
+interface CRUDCommunityProps {
 	data?: any
 	onSuccess?: (data: any) => void
 	onClose: () => void
@@ -52,11 +52,11 @@ interface ErrorsModalProps {
 
 	// [key: string]: any
 }
-export default function useCRUDNetwork({
+export default function useCRUDCommunity({
 	data,
 	onSuccess,
 	onClose,
-}: CRUDNetworkProps) {
+}: CRUDCommunityProps) {
 	const { id } = data || {}
 	const { onChangeRoute } = useLocalePath()
 	const { toggleLoadingContext } = useLoading()
@@ -229,7 +229,7 @@ export default function useCRUDNetwork({
 						if (onSuccess) {
 							onSuccess?.(results?.object)
 						} else {
-							onChangeRoute(`${mainRoutes.network}/${results?.object?.id}`)
+							onChangeRoute(`${mainRoutes.community}/${results?.object?.id}`)
 						}
 						onClose()
 					},

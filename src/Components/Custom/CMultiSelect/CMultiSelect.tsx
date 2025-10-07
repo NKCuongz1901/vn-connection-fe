@@ -7,7 +7,7 @@ import { isArray } from '@/ultis/array.ults'
 import CButton from '../CButton'
 import CImage from '../CImage'
 
-import { CategoriFavOptProps } from '@/interface/Network/Network.interface'
+import { CategoriFavOptProps } from '@/interface/Community/Community.interface'
 
 import classes from './CMultiSelect.module.scss'
 interface CMultiSelectProps {

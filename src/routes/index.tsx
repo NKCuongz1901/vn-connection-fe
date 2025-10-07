@@ -113,7 +113,7 @@ export const Menus = [
 	{
 		title: 'My Community',
 		Icon: People,
-		path: mainRoutes.network,
+		path: mainRoutes.community,
 		child: [],
 	},
 	{

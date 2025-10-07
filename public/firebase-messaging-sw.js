@@ -23,7 +23,7 @@ const mainRoutes = {
 	forgetPassword: 'forget-password',
 	register: 'register',
 	hangout: 'hangout',
-	network: 'network',
+	community: 'community',
 	event: 'event',
 	upcomingEvent: 'upcoming-event',
 	discussions: 'discussion',

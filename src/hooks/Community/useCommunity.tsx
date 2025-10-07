@@ -15,13 +15,13 @@ import {
 	NetworkClubProps,
 	NetworkClubSuggestProps,
 	NetworkOptProps,
-} from '@/interface/Network/Network.interface'
+} from '@/interface/Community/Community.interface'
 
-interface useNetworkProps {
+interface useCommunityProps {
 	[key: string]: any
 }
 
-export default function useNetwork(_props: useNetworkProps) {
+export default function useCommunity(_props: useCommunityProps) {
 	const { openError } = useModal()
 
 	const [keyword, setKeyword] = useState('')
