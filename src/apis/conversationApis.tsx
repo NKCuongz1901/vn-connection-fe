@@ -200,3 +200,26 @@ export const leaveConversation = async (_payload: any) => {
 
 	return await axios.post(url, payload)
 }
+
+export const getAnnouListById = async ({
+	params = {},
+}: {
+	params?: { [key: string]: any }
+}) => {
+	const url = CONVERSATION_ROUTES.anouncement
+	const { keyword, ..._params } = params || {}
+	return await axios.get(url, {
+		params: { ...convertParams(_params), keyword },
+	})
+}
+
+export const likeAnnoun = async ({ id }) => {
+	const url = CONVERSATION_ROUTES.anouncementLike + `/${id}`
+
+	return await axios.post(url)
+}
+
+export const createAnnoun = async (payload) => {
+	const url = CONVERSATION_ROUTES.anouncement
+	return await axios.post(url, payload)
+}

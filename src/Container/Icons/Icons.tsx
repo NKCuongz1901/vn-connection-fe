@@ -51,6 +51,8 @@ import TwoUser from '@/svg/TwoUser'
 import UpcomingEvent from '@/svg/UpcomingEvent'
 import PeopleSmileIcon from '@/svg/PeopleSmileIcon'
 import ArrrowLeftIcon from '@/svg/ArrrowLeftIcon'
+import TopicIcon from '@/svg/TopicIcon'
+import ChatIcon from '@/svg/ChatIcon'
 
 const Icons = () => {
 	const icons = [
@@ -158,6 +160,16 @@ const Icons = () => {
 		{
 			ICON: ArrrowLeftIcon,
 			name: '@/svg/ArrrowLeftIcon',
+			key: randomString(),
+		},
+		{
+			ICON: TopicIcon,
+			name: '@/svg/TopicIcon',
+			key: randomString(),
+		},
+		{
+			ICON: ChatIcon,
+			name: '@/svg/ChatIcon',
 			key: randomString(),
 		},
 	]

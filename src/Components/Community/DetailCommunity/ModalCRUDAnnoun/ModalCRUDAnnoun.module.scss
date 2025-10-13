@@ -1,0 +1,62 @@
+.container {
+	.wrapperModal {
+		padding: 16px;
+		gap: 8px;
+		flex-direction: column;
+		.chooseImg {
+			// display: none;
+			margin-top: 16px;
+			gap: 4px;
+			.upload {
+				width: fit-content;
+				cursor: pointer;
+				font-size: 14px;
+				font-weight: 600;
+			}
+		}
+		.chooseImgContent {
+			gap: 8px;
+			overflow-x: auto;
+			width: 100%;
+			.chooseImgItem {
+				position: relative;
+			}
+			.chooseImgCancel {
+				width: 20px;
+				height: 20px;
+				position: absolute;
+				right: 4px;
+				top: 4px;
+				color: #fff;
+				cursor: pointer;
+			}
+			:global(.ant-image) {
+				width: 100%;
+				height: auto;
+				border-radius: 16px;
+				overflow: hidden;
+			}
+			img {
+				object-fit: cover;
+			}
+		}
+	}
+	.title {
+		font-weight: 600;
+	}
+}
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.container {
+		.wrapperModal {
+			flex-direction: column;
+		}
+	}
+}
+
+@media (min-width: 0px) and (max-width: 376px) {
+	.container {
+		.wrapperModal {
+		}
+	}
+}

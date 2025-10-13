@@ -54,6 +54,8 @@ export const CONVERSATION_ROUTES = {
 	convSuggest: 'conversation/suggest',
 	joinConversation: 'request-join-conversation',
 	leave: 'leave',
+	anouncement: 'anouncement',
+	anouncementLike: 'anouncement/like',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',
