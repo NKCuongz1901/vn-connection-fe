@@ -18,6 +18,7 @@ import classes from './ModalCRUDDiscussion.module.scss'
 
 interface ModalCRUDDiscussionProps {
 	open: boolean
+	conversation_id?: string
 	topic?: any[]
 	data?: any
 	onClose: any
@@ -26,12 +27,7 @@ interface ModalCRUDDiscussionProps {
 }
 const ModalCRUDDiscussion = (props: ModalCRUDDiscussionProps) => {
 	const { loadingContext } = useLoading()
-	const {
-		data,
-		topic,
-		onClose = () => null,
-		onSuccess = () => null,
-	} = props || {}
+	const { conversation_id, data, onClose = () => null } = props || {}
 
 	const {
 		dataSubmit,
@@ -42,12 +38,7 @@ const ModalCRUDDiscussion = (props: ModalCRUDDiscussionProps) => {
 		onSubmit,
 		onChangeValue,
 		onImportImg,
-	} = useModalCRUDDiscussion({
-		data,
-		onSuccess,
-		onClose,
-		topic,
-	})
+	} = useModalCRUDDiscussion(props)
 	const { id, category } = data || {}
 	const { title, category_id, medias, description } = dataSubmit || {}
 	return (
@@ -76,13 +67,15 @@ const ModalCRUDDiscussion = (props: ModalCRUDDiscussionProps) => {
 			>
 				<div className={classes.container}>
 					<Flex className={classes.wrapperModal} vertical>
-						<CSelect
-							disabled={!!id || !!category?.id}
-							label="Topic"
-							options={categoryOption}
-							value={category_id}
-							onChange={onChangeValue('category_id')}
-						/>
+						{!conversation_id && (
+							<CSelect
+								disabled={!!id || !!category?.id}
+								label="Topic"
+								options={categoryOption}
+								value={category_id}
+								onChange={onChangeValue('category_id')}
+							/>
+						)}
 						<CInput
 							isRequired
 							label="Title"

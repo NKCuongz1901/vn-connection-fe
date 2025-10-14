@@ -1,7 +1,7 @@
 import { IconChevronLeft, IconCircleXFilled } from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
-import { memo } from 'react'
+import { forwardRef } from 'react'
 
 import { arrayFrom } from '@/ultis/array.ults'
 
@@ -21,14 +21,19 @@ import ModalCRUDDiscussion from '../ModalCRUDDiscussion'
 import classes from './DiscussionDetail.module.scss'
 interface DiscussionDetailProps {
 	discussId: string
+	conversation_id?: string
 	topic?: any
 	onAction?: any
 }
-const DiscussionDetail = ({
-	discussId,
-	topic,
-	onAction: onActionProps = () => null,
-}: DiscussionDetailProps) => {
+const DiscussionDetail = (
+	{
+		discussId,
+		topic,
+		conversation_id,
+		onAction: onActionProps = () => null,
+	}: DiscussionDetailProps,
+	ref,
+) => {
 	const {
 		loadingShare,
 		loading,
@@ -54,10 +59,13 @@ const DiscussionDetail = ({
 		onKeyDown,
 		onChangeComment,
 		onImportImg,
-	} = useDiscussionDetail({
-		discussId,
-		onActionProps,
-	})
+	} = useDiscussionDetail(
+		{
+			discussId,
+			onActionProps,
+		},
+		ref,
+	)
 
 	const _renderMyFriendComp = (data) => {
 		const { friend } = data || {}
@@ -188,6 +196,7 @@ const DiscussionDetail = ({
 		const { type, data } = modal || {}
 		let Content = <></>
 		const propsModal = {
+			conversation_id: conversation_id,
 			open: true,
 			onCancel: () => setModal({}),
 			onClose: () => setModal({}),
@@ -263,4 +272,4 @@ const DiscussionDetail = ({
 	)
 }
 
-export default memo(DiscussionDetail)
+export default forwardRef(DiscussionDetail)

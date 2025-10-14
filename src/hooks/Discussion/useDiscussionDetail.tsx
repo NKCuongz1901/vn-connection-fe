@@ -1,6 +1,12 @@
 import { ItemType } from 'antd/es/menu/interface'
 import { debounce } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
+import {
+	useCallback,
+	useEffect,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
@@ -33,10 +39,10 @@ interface useDiscussionDetailProps {
 	discussId: string
 	onActionProps?: any
 }
-export default function useDiscussionDetail({
-	discussId,
-	onActionProps = () => null,
-}: useDiscussionDetailProps) {
+export default function useDiscussionDetail(
+	{ discussId, onActionProps = () => null }: useDiscussionDetailProps,
+	ref,
+) {
 	const { openError, openSuccess, openConfirm, closeModal } = useModal()
 	const { toggleLoadingContext, loadingContext } = useLoading()
 	const { onGetQuerry } = useQuery()
@@ -157,13 +163,14 @@ export default function useDiscussionDetail({
 		}
 	}
 
-	const handleLoadMore = async () => {
+	const handleLoadMore = useCallback(async () => {
 		if (!_loadmore.current || loading.commentList) return
 		const { limit } = _paginationRefs.current
 		const currentPage = Math.trunc((commentList || []).length / limit)
 		_paginationRefs.current.page = currentPage + 1
 		await handleGetComment()
-	}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [JSON.stringify(commentList), loading.commentList])
 	const handleScroll = (e: any) => {
 		const clientHeight = e.target.clientHeight
 		const scrollHeight = e.target.scrollHeight
@@ -600,6 +607,7 @@ export default function useDiscussionDetail({
 				onPushState({
 					...(category_id && { category_id, force_id: randomString() }),
 				})
+				onActionProps({ key: 'back' })
 				break
 			case 'backForce':
 				onPushState({
@@ -634,6 +642,17 @@ export default function useDiscussionDetail({
 			return combined.slice(0, maxItem)
 		})
 	}, 200)
+
+	useImperativeHandle(
+		ref,
+		() => ({
+			...(ref.current || {}),
+			onLoadMore: handleLoadMore,
+		}),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[handleLoadMore],
+	)
+
 	useEffect(() => {
 		handleGetDetailDiscuss()
 		handleGetComment()

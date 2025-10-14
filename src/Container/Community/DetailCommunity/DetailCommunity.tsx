@@ -18,11 +18,18 @@ import People from '@/svg/People'
 import TopicIcon from '@/svg/TopicIcon'
 
 import classes from './DetailCommunity.module.scss'
+import DetailCommunityDiscussion from '@/Components/Community/DetailCommunity/DetailCommunityDiscussion'
+
+const mappingTabsBtnTop = {
+	member: 'member',
+	topic: 'topic',
+	chat: 'chat',
+}
 
 const tabsBtn = [
-	{ value: 'member', label: 'Members' },
-	{ value: 'topic', label: 'Topic' },
-	{ value: 'chat', label: 'Chat' },
+	{ value: mappingTabsBtnTop.member, label: 'Members' },
+	{ value: mappingTabsBtnTop.topic, label: 'Discussion' },
+	{ value: mappingTabsBtnTop.chat, label: 'Chat' },
 ]
 
 const mappingAboutTabsBtn = {
@@ -46,6 +53,7 @@ interface DetailCommunityProps {
 const DetailCommunity = (props: DetailCommunityProps) => {
 	const { id } = props
 	const {
+		discussionRef,
 		// loadingConvInfo,
 		loadingAnnou,
 		convInfo,
@@ -55,6 +63,9 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		modal,
 		loadingShare,
 		shareList,
+		tabTop,
+
+		setTabTop,
 		setModal,
 		setShareList,
 		setTabMiddle,
@@ -64,6 +75,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		onShareFriend,
 		onGetMenus,
 	} = useDetailCommunity(props)
+
 	// const { join } = convInfo || {}
 
 	const _renderAction = () => {
@@ -144,11 +156,12 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 					const Icon = icons[value] || icons.member
 					return (
 						<Flex
-							className={clsx(classes.tab, {
-								[classes.tabActive]: value === tabMiddle,
-							})}
-							key={value}
 							vertical
+							key={value}
+							className={clsx(classes.tab, {
+								[classes.tabActive]: value === tabTop,
+							})}
+							onClick={() => setTabTop(value)}
 						>
 							<Flex className={classes.tabIcon}>
 								<Icon />
@@ -280,7 +293,6 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 	}
 	const _renderModal = () => {
 		const { type, data } = modal || {}
-		console.log('🏖️🏖️🏖️ TrieuNinhHan ~ :279 ~ _renderModal ~ type:', modal)
 		let Content = <></>
 		const propsModal = {
 			open: true,
@@ -332,13 +344,42 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		}
 		return Content
 	}
-
+	const _renderTopic = () => {
+		return (
+			<div>
+				<DetailCommunityDiscussion id={id} ref={discussionRef} />
+			</div>
+		)
+	}
+	const _renderTab = () => {
+		switch (tabTop) {
+			case mappingTabsBtnTop.topic:
+				return _renderTopic()
+			default:
+				return (
+					<>
+						{_renderMiddle()}
+						{_renderFollowAbout()}
+					</>
+				)
+		}
+	}
 	return (
 		<div className={classes.wrapper}>
-			<Flex className={classes.container} vertical onScroll={onScroll}>
+			<Flex
+				className={classes.container}
+				vertical
+				onScroll={(e) => {
+					switch (tabTop) {
+						case mappingTabsBtnTop.topic:
+							return discussionRef.current?.onLoadMore?.(e)
+						default:
+							onScroll(e)
+					}
+				}}
+			>
 				{_renderTop()}
-				{_renderMiddle()}
-				{_renderFollowAbout()}
+				{_renderTab()}
 				{_renderModal()}
 			</Flex>
 		</div>

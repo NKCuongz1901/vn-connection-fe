@@ -45,6 +45,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 
 	const _loadmore = useRef(true)
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
+	const discussionRef = useRef<{ [key: string]: any }>({})
 
 	const [modal, setModal] = useState({ type: '', data: null }) as any
 
@@ -57,6 +58,8 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	const [annouList, setAnnouList] = useState<AnnouncementProps[]>([])
 	const [loadIds, setLoadingIds] = useState<string[]>([])
 	const [shareList, setShareList] = useState([]) as any
+
+	const [tabTop, setTabTop] = useState<string>('topic')
 
 	const [tabMiddle, setTabMiddle] = useState(mappingAboutTabsBtn.about)
 
@@ -169,6 +172,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 			setLoadingIds((prev) => prev.filter((item) => item !== id))
 		}
 	}
+
 	const handleShareFriend = async (id) => {
 		setLoadingShare((prev: any) => ({ ...prev, [id]: true }))
 
@@ -194,6 +198,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 			setLoadingShare((prev: any) => ({ ...prev, [id]: false }))
 		}
 	}
+
 	const handleBlockUser = async (id: string) => {
 		toggleLoadingContext(true)
 		try {
@@ -249,6 +254,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 				break
 		}
 	}
+
 	const handleGetMenus = ({
 		id,
 		user_id,
@@ -308,6 +314,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 
 		return menus
 	}
+
 	useEffect(() => {
 		handleGetInfoConv()
 		handleGetListAnnou()
@@ -315,6 +322,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	}, [id])
 
 	return {
+		discussionRef,
 		loadingConvInfo,
 		loadingAnnou,
 		convInfo,
@@ -324,6 +332,9 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		modal,
 		loadingShare,
 		shareList,
+		tabTop,
+
+		setTabTop,
 		setModal,
 		setShareList,
 		setTabMiddle,

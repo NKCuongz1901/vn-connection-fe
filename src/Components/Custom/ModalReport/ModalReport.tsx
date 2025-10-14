@@ -24,6 +24,7 @@ import CUploadMuti from '../CUploadMuti'
 import { topicReportOpt } from '@/Variable/select.variable'
 
 import classes from './ModalReport.module.scss'
+import { getUserInfo } from '@/ultis/storage.ults'
 
 interface ModalReportProps {
 	open: boolean
@@ -38,6 +39,7 @@ const ModalReport = (props: ModalReportProps) => {
 	const { onClose, open, data, message, title } = props
 	const { loadingContext, toggleLoadingContext } = useLoading()
 	const { openConfirm, openError, openSuccess, closeModal } = useModal()
+	const { email } = getUserInfo()
 	const [errors, setErrors] = useState({
 		topic: '',
 		email: '',
@@ -45,7 +47,7 @@ const ModalReport = (props: ModalReportProps) => {
 	})
 	const [dataModal, setDataModal] = useState({
 		topic: topicReportOpt[0].value,
-		email: '',
+		email: email || '',
 		content: '',
 	})
 	const [fileList, setFileList] = useState([])

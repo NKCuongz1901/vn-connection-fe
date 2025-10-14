@@ -1,6 +1,7 @@
 import { IconDots } from '@tabler/icons-react'
 import { Dropdown, Flex } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
+import clsx from 'clsx'
 import { memo } from 'react'
 
 import { isArray } from '@/ultis/array.ults'
@@ -23,16 +24,18 @@ interface DiscussionItemProps {
 	onGetMenus: any
 	onAction?: any
 	onChangeUrl?: any
+	noRadius?: boolean
 	[key: string]: any
 }
 const DiscussionItem = (props: DiscussionItemProps) => {
 	const { onChangeRoute } = useLocalePath()
 	const {
 		item,
+		noRadius,
 		onGetMenus,
 		onAction = () => null,
 		onChangeUrl = () => null,
-	} = props || {}
+	} = props
 	const {
 		user,
 		category,
@@ -131,15 +134,19 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 	return (
 		<div className={classes.wrapper}>
 			<Flex
-				className={classes.container}
+				className={clsx(classes.container, {
+					[classes.containerNoRadius]: noRadius,
+				})}
 				vertical
 				onClick={() => onChangeUrl({ key: 'id', value: item })}
 			>
-				<Flex className={classes.header}>
-					<CAvatar src={imageCategory} className={classes.avatar} />
-					<span>Posted on</span>
-					<span className={classes.title}> {titleCategory}</span>
-				</Flex>
+				{titleCategory && (
+					<Flex className={classes.header}>
+						<CAvatar src={imageCategory} className={classes.avatar} />
+						<span>Posted on</span>
+						<span className={classes.title}> {titleCategory}</span>
+					</Flex>
+				)}
 				{_renderBody()}
 				{_renderFooter()}
 			</Flex>

@@ -12,6 +12,7 @@ import { cloneDeep } from '@/ultis/common.ults'
 import { handleParseFileImg } from '@/ultis/file.utls'
 
 interface useModalCRUDDiscussionProps {
+	conversation_id?: string
 	data?: any
 	onClose: any
 	onSuccess?: any
@@ -19,6 +20,7 @@ interface useModalCRUDDiscussionProps {
 }
 
 export default function useModalCRUDDiscussion({
+	conversation_id,
 	data,
 	onSuccess,
 	onClose,
@@ -36,13 +38,13 @@ export default function useModalCRUDDiscussion({
 			const { title, category, description, medias } = data || {}
 			return {
 				title: title || '',
-				category_id: category?.id || categoryOption[0].value,
 				description: description || '',
 				medias: medias || [],
+				category_id: category?.id || categoryOption?.[0]?.value,
 			}
 		}
 		return {
-			category_id: categoryOption[0].value,
+			category_id: categoryOption?.[0]?.value,
 			title: '',
 			medias: [],
 			description: '',
@@ -116,12 +118,6 @@ export default function useModalCRUDDiscussion({
 			medias = (resList || []).map((i) => ({
 				url: i,
 				type: 'IMAGE',
-				fileName: null,
-				width: 692,
-				height: 1500,
-				ratio: 0.4613333333333333,
-				thumbnail: null,
-				duration: 0,
 				...i,
 			}))
 		}
@@ -130,7 +126,7 @@ export default function useModalCRUDDiscussion({
 			title,
 			description,
 			medias: [...(_currentMedias || []), ...(medias || [])],
-			category_id,
+			...(conversation_id ? { conversation_id } : { category_id }),
 		}
 	}
 	const handleImportImg = debounce((_values) => {
