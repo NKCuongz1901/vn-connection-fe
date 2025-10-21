@@ -5,6 +5,8 @@ import clsx from 'clsx'
 
 import DetailCommunityAdmin from '@/Components/Community/DetailCommunity/DetailCommunityAdmin'
 import DetailCommunityAnnou from '@/Components/Community/DetailCommunity/DetailCommunityAnnou'
+import DetailCommunityDiscussion from '@/Components/Community/DetailCommunity/DetailCommunityDiscussion'
+import DetailCommunityMember from '@/Components/Community/DetailCommunity/DetailCommunityMember'
 import ModalCRUDAnnoun from '@/Components/Community/DetailCommunity/ModalCRUDAnnoun'
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
@@ -18,7 +20,6 @@ import People from '@/svg/People'
 import TopicIcon from '@/svg/TopicIcon'
 
 import classes from './DetailCommunity.module.scss'
-import DetailCommunityDiscussion from '@/Components/Community/DetailCommunity/DetailCommunityDiscussion'
 
 const mappingTabsBtnTop = {
 	member: 'member',
@@ -74,6 +75,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		onCopy,
 		onShareFriend,
 		onGetMenus,
+		onBack,
 	} = useDetailCommunity(props)
 
 	// const { join } = convInfo || {}
@@ -81,10 +83,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 	const _renderAction = () => {
 		return (
 			<Flex className={classes.action}>
-				<Flex
-					className={classes.icon}
-					// onClick={() => goBackOrPush(type || mainRoutes.event)}
-				>
+				<Flex className={classes.icon} onClick={onBack}>
 					<ArrrowLeftIcon />
 				</Flex>
 				<Flex className={classes.icon}>
@@ -344,6 +343,15 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		}
 		return Content
 	}
+
+	const _renderMember = () => {
+		return (
+			<div>
+				<DetailCommunityMember id={id} ref={discussionRef} info={convInfo} />
+			</div>
+		)
+	}
+
 	const _renderTopic = () => {
 		return (
 			<div>
@@ -353,6 +361,8 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 	}
 	const _renderTab = () => {
 		switch (tabTop) {
+			case mappingTabsBtnTop.member:
+				return _renderMember()
 			case mappingTabsBtnTop.topic:
 				return _renderTopic()
 			default:

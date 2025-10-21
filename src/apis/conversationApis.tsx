@@ -85,14 +85,25 @@ export const getConvMembersById = async (params: {
 	id: string
 	[key: string]: any
 }) => {
-	const { id, ..._params } = params || {}
+	const { id, name, ..._params } = params
 	const url = CONVERSATION_ROUTES.name + '/' + id + '/members'
 
 	return await axios.get(url, {
-		params: convertParams(params),
+		params: { ...convertParams(_params), name },
 	})
 }
 
+export const getConvMembersNotAdmById = async (params: {
+	id: string
+	[key: string]: any
+}) => {
+	const { id, name, ..._params } = params
+	const url = CONVERSATION_ROUTES.name + '/' + id + '/members_not_admin'
+
+	return await axios.get(url, {
+		params: { ...convertParams(_params), name },
+	})
+}
 export const sendMessage = async (payload: any) => {
 	const url = CONVERSATION_ROUTES.sendMess
 
@@ -221,5 +232,15 @@ export const likeAnnoun = async ({ id }) => {
 
 export const createAnnoun = async (payload) => {
 	const url = CONVERSATION_ROUTES.anouncement
+	return await axios.post(url, payload)
+}
+
+export const updateRoleUser = async ({ id, payload }) => {
+	const url = CONVERSATION_ROUTES.name + '/' + id + '/add_role'
+	return await axios.post(url, payload)
+}
+
+export const deleteMember = async ({ id, payload }) => {
+	const url = CONVERSATION_ROUTES.name + '/' + id + '/delete_member'
 	return await axios.post(url, payload)
 }

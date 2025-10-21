@@ -59,7 +59,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	const [loadIds, setLoadingIds] = useState<string[]>([])
 	const [shareList, setShareList] = useState([]) as any
 
-	const [tabTop, setTabTop] = useState<string>('topic')
+	const [tabTop, setTabTop] = useState<string>('')
 
 	const [tabMiddle, setTabMiddle] = useState(mappingAboutTabsBtn.about)
 
@@ -314,6 +314,11 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 
 		return menus
 	}
+	const handleBack = () => {
+		if (tabTop) {
+			return setTabTop('')
+		}
+	}
 
 	useEffect(() => {
 		handleGetInfoConv()
@@ -343,5 +348,6 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		onCopy: handleCopy,
 		onShareFriend: handleShareFriend,
 		onGetMenus: handleGetMenus,
+		onBack: handleBack,
 	}
 }
