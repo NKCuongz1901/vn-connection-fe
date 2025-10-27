@@ -1,0 +1,83 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+	background: #fff;
+	.container {
+		width: 100%;
+		height: 100%;
+		gap: 16px;
+		.search {
+			width: 100%;
+		}
+		.desc {
+			gap: 8px;
+			align-items: center;
+			background: #f1f5f8;
+			border-radius: 20px;
+			padding: 12px;
+			// .iconDesc {
+			// }
+		}
+		.friendListWrapper {
+			width: 100%;
+			min-height: 300px;
+			max-height: 300px;
+			gap: 12px;
+			.friendList {
+				overflow: auto;
+				gap: 12px;
+				overflow-x: hidden;
+				padding: 12px 0;
+				.friendItem {
+					gap: 12px;
+
+					.left {
+						max-width: calc(100% - 80px);
+						align-items: center;
+						flex: 1;
+						gap: 12px;
+						.name {
+							max-width: 100%;
+							overflow: hidden;
+							text-overflow: ellipsis;
+							white-space: nowrap;
+						}
+					}
+				}
+				.notFound {
+					width: 100%;
+					align-items: center;
+					color: #7987a4;
+					justify-content: center;
+					gap: 4px;
+					text-align: center;
+					margin-top: 80px;
+					.title {
+						font-size: 20px;
+						font-weight: 600;
+						text-align: center;
+					}
+					.exploreButton {
+						margin-top: 16px;
+						& > :global(.ant-btn) {
+							width: 160px;
+						}
+					}
+				}
+			}
+			.contentBody {
+				width: 100%;
+				& > :global(.ant-skeleton-input) {
+					width: 100%;
+					height: 32px;
+					border-radius: 16px;
+				}
+			}
+		}
+		.title {
+			font-weight: 600;
+		}
+	}
+}

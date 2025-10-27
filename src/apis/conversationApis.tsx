@@ -244,3 +244,14 @@ export const deleteMember = async ({ id, payload }) => {
 	const url = CONVERSATION_ROUTES.name + '/' + id + '/delete_member'
 	return await axios.post(url, payload)
 }
+
+export const inviteJoinConv = async ({ id, payload }) => {
+	const url = `${CONVERSATION_ROUTES.name}/${id}/${CONVERSATION_ROUTES.invite}`
+	return await axios.post(url, payload)
+}
+export const inviteAllJoinConv = async ({ id, payload, params = {} }) => {
+	const url = `${CONVERSATION_ROUTES.name}/${id}/${CONVERSATION_ROUTES.inviteAll}`
+	return await axios.post(url, payload, {
+		params: convertParams(params),
+	})
+}

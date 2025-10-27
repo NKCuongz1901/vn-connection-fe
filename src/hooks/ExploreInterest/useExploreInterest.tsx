@@ -6,7 +6,12 @@ import { isArray, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 
-import { joinConversation, leaveConversation } from '@/apis/conversationApis'
+import {
+	inviteAllJoinConv,
+	inviteJoinConv,
+	joinConversation,
+	leaveConversation,
+} from '@/apis/conversationApis'
 import {
 	getInappCategoryClub,
 	getInappCategoryClubMatching,
@@ -60,11 +65,16 @@ export default function useExploreInterest({}: any) {
 		is_offline: true,
 	})
 
+	const [modal, setModal] = useState({ type: '', data: null }) as any
+
 	const [loading, setLoading] = useState(true)
 	const [loadingMatching, setLoadingMatching] = useState({
 		club: true,
 		user: true,
 	})
+	const [loadingInvite, setLoadingInvite] = useState({})
+	const [invited, setInvited] = useState({})
+
 	const [loadingJoin, setLoadingJoin] = useState([])
 	const [selects, setSelects] = useState([])
 	const [matchingClub, setMatchingClub] = useState<MatchingClubProps[]>([])
@@ -330,6 +340,36 @@ export default function useExploreInterest({}: any) {
 	const handleScrollUser = (e: any) => {
 		handleScrollCallback(e, handleLoadMoreUser)
 	}
+	const handleInviteUser = async (id) => {
+		const { data } = modal || {}
+		setLoadingInvite((prev) => ({ ...prev, [id]: true }))
+		try {
+			let res: any
+			if (data) {
+				res = await inviteJoinConv({
+					id: id,
+					payload: {
+						user_id: data,
+					},
+				})
+			} else {
+				res = await inviteAllJoinConv({
+					id: id,
+					payload: {},
+					params: {
+						category_list: selects,
+					},
+				})
+			}
+			if (res) {
+				setInvited((prev) => ({ ...prev, [id]: true }))
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoadingInvite((prev) => ({ ...prev, [id]: false }))
+		}
+	}
 	useEffect(() => {
 		handleGetCategoryClubUser()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -343,6 +383,8 @@ export default function useExploreInterest({}: any) {
 	}, [JSON.stringify(statusClub)])
 
 	return {
+		loadingInvite,
+		invited,
 		selects,
 		activeTab,
 		filters,
@@ -354,6 +396,9 @@ export default function useExploreInterest({}: any) {
 		matchingClub,
 		matchingUser,
 		loadingJoin,
+		modal,
+		setModal,
+		setInvited,
 		setMatching,
 		onChangeTab: handleChangeTab,
 		onChangeFilter: handleChangeFilter,
@@ -364,5 +409,6 @@ export default function useExploreInterest({}: any) {
 		onJoinLeave: handleLeaveConv,
 		onScrollClub: handleScrollClub,
 		onScrollUser: handleScrollUser,
+		onInviteUser: handleInviteUser,
 	}
 }

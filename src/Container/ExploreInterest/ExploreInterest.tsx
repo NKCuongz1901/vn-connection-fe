@@ -17,6 +17,7 @@ import CButton from '@/Components/Custom/CButton'
 import CImage from '@/Components/Custom/CImage'
 import CInputMap from '@/Components/Custom/CInputMap'
 import CSelect from '@/Components/Custom/CSelect'
+import ModalInviteCommunity from '@/Components/ExploreInterest/ModalInviteCommunity'
 import ArrrowLeftIcon from '@/svg/ArrrowLeftIcon'
 import MapIcon from '@/svg/MapIcon'
 import MarkIcon from '@/svg/MarkIcon'
@@ -63,6 +64,9 @@ const GENDER = {
 }
 const ExploreInterest = () => {
 	const {
+		loadingInvite,
+		invited,
+		modal,
 		selects,
 		filters,
 		tabsData,
@@ -74,6 +78,9 @@ const ExploreInterest = () => {
 		matching,
 		statusClub,
 		loadingJoin,
+
+		setModal,
+		setInvited,
 		setMatching,
 		onSetStatus,
 		onChangeTab,
@@ -84,6 +91,7 @@ const ExploreInterest = () => {
 		onJoinLeave,
 		onScrollClub,
 		onScrollUser,
+		onInviteUser,
 	} = useExploreInterest({})
 
 	const _renderNoData = () => {
@@ -298,7 +306,6 @@ const ExploreInterest = () => {
 					? matchingUser.map((item) => {
 							const { id, name, age, avatar, i_am_interested_in, gender } =
 								item || {}
-							const isInvite = true
 							return (
 								<Flex key={id} className={classes.matchingClubWrapper}>
 									<Flex className={classes.matchingClubInfoLeft}>
@@ -321,15 +328,12 @@ const ExploreInterest = () => {
 									</Flex>
 									<Flex className={classes.matchingClubInfoRight}>
 										<CButton
-											ctype={isInvite ? 'disabled' : 'oranger'}
+											ctype="success"
 											onClick={() => {
-												if (isInvite) {
-												} else {
-													onJoinConv(id)
-												}
+												setModal({ type: 'invite', data: id })
 											}}
 										>
-											{isInvite ? 'Invited' : 'Invite'}
+											Invite
 										</CButton>
 									</Flex>
 								</Flex>
@@ -347,7 +351,12 @@ const ExploreInterest = () => {
 					<div className={classes.matchingUserAllTitle}>
 						Send invitation to all
 					</div>
-					<CButton ctype="oranger">Invite all</CButton>
+					<CButton
+						ctype="oranger"
+						onClick={() => setModal({ type: 'invite', data: null })}
+					>
+						Invite all
+					</CButton>
 				</Flex>
 				{_renderMatchingUserList()}
 			</Flex>
@@ -361,6 +370,54 @@ const ExploreInterest = () => {
 			case 'user':
 				return _renderMatchingItemUser()
 		}
+	}
+	const _renderMyFriendComp = (data) => {
+		const { inviteeRole, id } = data || {}
+
+		const isInvite = inviteeRole !== 'MEMBER' && !invited[id]
+		return (
+			<div className={classes.btnShareFriend}>
+				<CButton
+					ctype="success"
+					onClick={() => onInviteUser(id)}
+					loading={loadingInvite[id]}
+					disabled={!isInvite || loadingInvite[id]}
+				>
+					{isInvite ? 'Send' : 'Sent'}
+				</CButton>
+			</div>
+		)
+	}
+	const _renderModal = () => {
+		const { type, data } = modal || {}
+		let Content = <></>
+		const propsModal = {
+			open: true,
+			data,
+			onCancel: () => {
+				setModal({})
+			},
+			onClose: () => {
+				setModal({})
+				setInvited({})
+			},
+		}
+		switch (type) {
+			case 'invite':
+				Content = (
+					<ModalInviteCommunity
+						title="Share friend"
+						id={data}
+						{...propsModal}
+						customComp={_renderMyFriendComp}
+					/>
+				)
+				break
+
+			default:
+				break
+		}
+		return Content
 	}
 	return (
 		<div className={classes.wrapper}>
@@ -383,6 +440,7 @@ const ExploreInterest = () => {
 					)}
 				</Flex>
 			</Flex>
+			{_renderModal()}
 		</div>
 	)
 }
