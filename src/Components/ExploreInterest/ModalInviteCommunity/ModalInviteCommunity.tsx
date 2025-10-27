@@ -4,9 +4,8 @@ import { memo } from 'react'
 import CModal from '@/Components/Custom/CModal/CModal'
 import AttachIcon from '@/svg/FriendSvg/AttachIcon'
 
-import classes from './ModalInviteCommunity.module.scss'
-import MyFriend from '@/Components/Friend/MyFriend'
 import ConversationClub from '../ConversationClub'
+import classes from './ModalInviteCommunity.module.scss'
 
 interface ModalInviteCommunityProps {
 	title: string
