@@ -161,3 +161,25 @@
 		}
 	}
 }
+@media (min-width: 0px) and (max-width: 376px) {
+	.wrapper {
+		.container {
+			height: calc(100% - 20px);
+			gap: 8px;
+			.body {
+				height: calc(100dvh - 100px);
+			}
+			.back {
+				align-items: center;
+				cursor: pointer;
+				.title {
+					color: #48546b;
+					text-align: center;
+
+					font-size: 14px;
+					font-weight: 600;
+				}
+			}
+		}
+	}
+}

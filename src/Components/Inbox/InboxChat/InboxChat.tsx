@@ -22,8 +22,12 @@ const mappingType = {
 	MEDIAS: 'Pin a image',
 	STICKER: 'Pin a sticker',
 }
-
-const InboxChat = ({ convId }) => {
+interface InboxChatProps {
+	convId: string
+	isNoHeader?: boolean
+}
+const InboxChat = (props: InboxChatProps) => {
+	const { convId, isNoHeader } = props
 	const {
 		_scrollRef,
 		messList,
@@ -47,6 +51,41 @@ const InboxChat = ({ convId }) => {
 		return (members || []).find((i) => i.user_id !== getUserInfo()?.id)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toJson(members)])
+	const _renderHeader = () => {
+		if (!!isNoHeader) return
+		return (
+			<Flex className={classes.header}>
+				{loadingPage ? (
+					<Skeleton.Input className={classes.skeletonHeader} />
+				) : (
+					<>
+						<Flex className={classes.userInChat}>
+							<CAvatar src={userInChat?.user?.avatar || ''} />
+							<span>{userInChat?.user?.name}</span>
+						</Flex>
+						<Flex className={classes.action}>
+							<Flex
+								className={classes.iconMore}
+								onClick={() => {
+									setOpenSetting((pre) => !pre)
+								}}
+							>
+								<MoreIcon />
+							</Flex>
+							<Flex
+								className={classes.iconClose}
+								onClick={() => {
+									onPushState({})
+								}}
+							>
+								X
+							</Flex>
+						</Flex>
+					</>
+				)}
+			</Flex>
+		)
+	}
 	const _renderPin = () => {
 		const pin = totalPin - 1
 		return (
@@ -102,36 +141,7 @@ const InboxChat = ({ convId }) => {
 				className={clsx(classes.chatContainer, { [classes.mini]: openSetting })}
 				vertical
 			>
-				<Flex className={classes.header}>
-					{loadingPage ? (
-						<Skeleton.Input className={classes.skeletonHeader} />
-					) : (
-						<>
-							<Flex className={classes.userInChat}>
-								<CAvatar src={userInChat?.user?.avatar || ''} />
-								<span>{userInChat?.user?.name}</span>
-							</Flex>
-							<Flex className={classes.action}>
-								<Flex
-									className={classes.iconMore}
-									onClick={() => {
-										setOpenSetting((pre) => !pre)
-									}}
-								>
-									<MoreIcon />
-								</Flex>
-								<Flex
-									className={classes.iconClose}
-									onClick={() => {
-										onPushState({})
-									}}
-								>
-									X
-								</Flex>
-							</Flex>
-						</>
-					)}
-				</Flex>
+				{_renderHeader()}
 				{isArray(pinList, 1) && _renderPin()}
 				<Flex className={classes.chatBox}>
 					<ChatBox

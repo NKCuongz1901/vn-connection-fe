@@ -204,6 +204,9 @@
 				}
 			}
 		}
+		.renderChat {
+			height: 100%;
+		}
 		.renderFollowAbout {
 			gap: 12px;
 		}
@@ -236,5 +239,225 @@
 .btnShareFriend {
 	button {
 		height: 40px !important;
+	}
+}
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		.container {
+			padding: 0;
+			.top {
+				.action {
+					.icon {
+						svg {
+						}
+					}
+				}
+				.image {
+					:global(.ant-image) {
+						img {
+						}
+					}
+				}
+				.infoWrapper {
+					.info {
+						.avatarWrapper {
+							.avatar {
+							}
+							.type {
+							}
+						}
+						.commonInfo {
+							.name {
+							}
+							.address {
+							}
+						}
+					}
+					.endButton {
+						.buttonFriend {
+						}
+					}
+				}
+				.renderTabsBtn {
+					.tab {
+						.tabIcon {
+							svg {
+							}
+						}
+						.tabLabel {
+						}
+					}
+					.tabActive {
+						.tabIcon {
+							svg {
+								path {
+								}
+							}
+						}
+						.tabLabel {
+						}
+					}
+				}
+			}
+			.renderMiddle {
+				.renderTabsBtn {
+					.tab {
+						.tabIcon {
+							svg {
+							}
+						}
+						.tabLabel {
+						}
+					}
+					.tabActive {
+						.tabIcon {
+							svg {
+								path {
+								}
+							}
+						}
+						.tabLabel {
+						}
+					}
+				}
+				.renderAbout {
+				}
+				.renderDetailCommunityAnnou {
+					.addNewAnnou {
+					}
+				}
+			}
+			.renderChat {
+			}
+			.renderFollowAbout {
+			}
+			.followAboutHidden {
+			}
+			.category {
+				.categoryInfo {
+				}
+			}
+			.title {
+			}
+		}
+	}
+	.btnShareFriend {
+		button {
+		}
+	}
+}
+@media (min-width: 0px) and (max-width: 376px) {
+	.wrapper {
+		.container {
+			padding: 0;
+			.top {
+				.action {
+					padding: 0;
+
+					.icon {
+						svg {
+						}
+					}
+				}
+				.image {
+					height: 76px;
+					:global(.ant-image) {
+						img {
+						}
+					}
+				}
+				.infoWrapper {
+					padding: 4px 8px;
+
+					.info {
+						.avatarWrapper {
+							.avatar {
+								bottom: 36px;
+								min-height: 64px;
+								min-width: 64px;
+							}
+							.type {
+							}
+						}
+						.commonInfo {
+							.name {
+							}
+							.address {
+							}
+						}
+					}
+					.endButton {
+						.buttonFriend {
+						}
+					}
+				}
+				.renderTabsBtn {
+					padding: 4px 8px;
+
+					.tab {
+						.tabIcon {
+							svg {
+							}
+						}
+						.tabLabel {
+						}
+					}
+					.tabActive {
+						.tabIcon {
+							svg {
+								path {
+								}
+							}
+						}
+						.tabLabel {
+						}
+					}
+				}
+			}
+			.renderMiddle {
+				.renderTabsBtn {
+					.tab {
+						.tabIcon {
+							svg {
+							}
+						}
+						.tabLabel {
+						}
+					}
+					.tabActive {
+						.tabIcon {
+							svg {
+								path {
+								}
+							}
+						}
+						.tabLabel {
+						}
+					}
+				}
+				.renderAbout {
+				}
+				.renderDetailCommunityAnnou {
+					.addNewAnnou {
+					}
+				}
+			}
+			.renderChat {
+			}
+			.renderFollowAbout {
+			}
+			.followAboutHidden {
+			}
+			.category {
+				.categoryInfo {
+				}
+			}
+			.title {
+			}
+		}
+	}
+	.btnShareFriend {
+		button {
+		}
 	}
 }

@@ -151,6 +151,7 @@ const ChatBox = ({
 			case 'TITLE_CHANGE':
 			case 'ADDRESS':
 			case 'MEMBER_LEAVE':
+			case 'MEMBER_JOIN':
 				return <Flex className={classes.memberAccept}>{content}</Flex>
 			case 'PIN':
 			case 'UNPIN':

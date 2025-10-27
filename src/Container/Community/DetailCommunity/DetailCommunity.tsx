@@ -20,6 +20,7 @@ import People from '@/svg/People'
 import TopicIcon from '@/svg/TopicIcon'
 
 import classes from './DetailCommunity.module.scss'
+import InboxChat from '@/Components/Inbox/InboxChat'
 
 const mappingTabsBtnTop = {
 	member: 'member',
@@ -101,7 +102,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 			<Flex className={classes.infoWrapper}>
 				<Flex className={classes.info}>
 					<Flex vertical className={classes.avatarWrapper}>
-						<CAvatar className={classes.avatar} size={96} src={avatar} />
+						<CAvatar className={classes.avatar} src={avatar} />
 						<Flex className={classes.type}>{type} </Flex>
 					</Flex>
 					<Flex className={classes.commonInfo} vertical>
@@ -359,12 +360,22 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 			</div>
 		)
 	}
+
+	const _renderChat = () => {
+		return (
+			<div className={classes.renderChat}>
+				<InboxChat convId={id} isNoHeader />
+			</div>
+		)
+	}
 	const _renderTab = () => {
 		switch (tabTop) {
 			case mappingTabsBtnTop.member:
 				return _renderMember()
 			case mappingTabsBtnTop.topic:
 				return _renderTopic()
+			case mappingTabsBtnTop.chat:
+				return _renderChat()
 			default:
 				return (
 					<>

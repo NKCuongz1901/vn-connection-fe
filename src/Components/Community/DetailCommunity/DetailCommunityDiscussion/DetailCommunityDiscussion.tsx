@@ -76,23 +76,25 @@ const DetailCommunityDiscussion = (
 	const _renderAddNew = () => {
 		if (discussId) return
 		return (
-			<Flex className={classes.addNew} vertical>
-				<Flex
-					className={classes.addNewBody}
-					onClick={() =>
-						setModal({
-							type: 'addNew',
-							data: null,
-						})
-					}
-				>
-					<div>
-						<CAvatar />
-					</div>
-					<Flex className={classes.addNewInput}>What's on your mind?</Flex>
-					<ImageIcon />
+			<div className={classes.addNewTop}>
+				<Flex className={classes.addNew} vertical>
+					<Flex
+						className={classes.addNewBody}
+						onClick={() =>
+							setModal({
+								type: 'addNew',
+								data: null,
+							})
+						}
+					>
+						<div>
+							<CAvatar />
+						</div>
+						<Flex className={classes.addNewInput}>What's on your mind?</Flex>
+						<ImageIcon />
+					</Flex>
 				</Flex>
-			</Flex>
+			</div>
 		)
 	}
 	const _renderLeft = () => {
@@ -217,7 +219,7 @@ const DetailCommunityDiscussion = (
 				})}
 				onScroll={onScroll}
 			>
-				<div className={classes.addNewTop}>{_renderAddNew()}</div>
+				{_renderAddNew()}
 				{_renderLeft()}
 				{_renderModal()}
 			</Flex>

@@ -1285,6 +1285,7 @@ export const specialTypeMessage = [
 	'MEMBER_LEAVE',
 	'PIN',
 	'UNPIN',
+	'MEMBER_JOIN',
 ]
 
 export const mappingTypeMessage = {

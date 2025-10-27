@@ -59,7 +59,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	const [loadIds, setLoadingIds] = useState<string[]>([])
 	const [shareList, setShareList] = useState([]) as any
 
-	const [tabTop, setTabTop] = useState<string>('')
+	const [tabTop, setTabTop] = useState<string>('chat')
 
 	const [tabMiddle, setTabMiddle] = useState(mappingAboutTabsBtn.about)
 
