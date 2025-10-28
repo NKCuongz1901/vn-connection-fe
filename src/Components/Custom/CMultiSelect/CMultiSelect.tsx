@@ -59,6 +59,7 @@ const CMultiSelect = (props: CMultiSelectProps) => {
 				}
 			})
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[max, options],
 	)
 	const toggle = (val) => {
