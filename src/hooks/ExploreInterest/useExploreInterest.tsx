@@ -66,7 +66,7 @@ export default function useExploreInterest({}: any) {
 	})
 
 	const [statusClub, setStatusClub] = useState({
-		is_online: true,
+		is_online: false,
 		is_offline: true,
 	})
 
@@ -108,6 +108,13 @@ export default function useExploreInterest({}: any) {
 		}
 	}
 	const handleSetStatus = (item) => {
+		const { is_offline, is_online } = statusClub
+		if (
+			(item === 'is_offline' && is_offline && !is_online) ||
+			(item === 'is_online' && is_online && !is_offline)
+		) {
+			return
+		}
 		_paginationRefs.current.club.page = 1
 		_loadmore.current.club = true
 		setStatusClub((prev) => ({ ...prev, [item]: !prev[item] }))
