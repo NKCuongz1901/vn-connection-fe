@@ -254,7 +254,7 @@ const ExploreInterest = () => {
 									<Flex className={classes.matchingClubInfoRight}>
 										<CButton
 											disabled={isOwner || isLoading}
-											ctype={isJoin ? 'disabled' : 'oranger'}
+											ctype={isJoin ? 'disabled' : 'success'}
 											onClick={() => {
 												if (isJoin) {
 													onJoinLeave(id)
