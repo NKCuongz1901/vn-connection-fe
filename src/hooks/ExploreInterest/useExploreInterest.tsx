@@ -3,7 +3,12 @@ import { useEffect, useRef, useState } from 'react'
 import { useModal } from '@/context/ModalContext'
 
 import { isArray, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common.ults'
+import {
+	cloneDeep,
+	delay,
+	getCurrentLocation,
+	handleScrollCallback,
+} from '@/ultis/common.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 
 import {
@@ -127,15 +132,29 @@ export default function useExploreInterest({}: any) {
 
 		setFilters((prev) => ({ ...prev, [key]: value, ...other }))
 	}
-	const handleGetCategoryClubUser = async () => {
+	const handleGetCategoryClubUserLocation = async () => {
+		const res = await handleGetLocation()
+		handleGetCategoryClubUser(res)
+	}
+	const handleGetLocation = async () => {
+		let res: any
+		try {
+			res = await getCurrentLocation()
+		} catch (error) {
+			console.log(' error:', error)
+		} finally {
+			return res
+		}
+	}
+	const handleGetCategoryClubUser = async ({ lat, lng }: any = {}) => {
 		setLoading(true)
 		try {
 			const { latitude: _latitude, longitude: _longitude } = getUserInfo() || {}
 			const { latitude, longitude, radius } = filters || {}
 			const payload = {
 				fields: ['$all'],
-				latitude: latitude ?? (_latitude || 0),
-				longitude: longitude ?? (_longitude || 0),
+				latitude: latitude ?? lat ?? (_latitude || 0),
+				longitude: longitude ?? lng ?? (_longitude || 0),
 				radius,
 			}
 			setTabsData({
@@ -371,7 +390,7 @@ export default function useExploreInterest({}: any) {
 		}
 	}
 	useEffect(() => {
-		handleGetCategoryClubUser()
+		handleGetCategoryClubUserLocation()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [JSON.stringify(filters)])
 
