@@ -86,9 +86,9 @@ const ModalCRUDCommunity = ({
 					<CInput
 						value={title}
 						error={errors.title}
-						label="Network name"
+						label="Community name"
 						isRequired
-						placeholder="Network name"
+						placeholder="Community name"
 						onChange={(e) => onChangeData('title', e.target.value)}
 					/>
 				</Flex>
@@ -198,7 +198,7 @@ const ModalCRUDCommunity = ({
 					isRequired
 					showCount
 					label="About"
-					placeholder="Describe the network"
+					placeholder="Describe the community"
 					value={about}
 					error={errors.about}
 					maxLength={1000}
@@ -215,7 +215,7 @@ const ModalCRUDCommunity = ({
 			<CModal
 				onClose={onClose}
 				onCancel={onClose}
-				title={id ? 'Edit network' : 'Create network'}
+				title={id ? 'Edit community' : 'Create community'}
 				styles={{
 					content: {
 						width: 800,
@@ -229,7 +229,7 @@ const ModalCRUDCommunity = ({
 							ctype="oranger"
 							style={{ width: 200 }}
 						>
-							{id ? 'Edit network' : 'Create network'}
+							{id ? 'Edit community' : 'Create community'}
 						</CButton>
 					</Flex>,
 				]}

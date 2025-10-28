@@ -223,8 +223,8 @@ export default function useCRUDCommunity({
 			if (code === 200) {
 				openSuccess({
 					message: id
-						? 'Edit network successfully'
-						: 'Create network successfully',
+						? 'Edit community successfully'
+						: 'Create community successfully',
 					onAccept: () => {
 						if (onSuccess) {
 							onSuccess?.(results?.object)
@@ -247,8 +247,8 @@ export default function useCRUDCommunity({
 		}
 		openConfirm({
 			message: id
-				? 'Do you want edit this network ?'
-				: 'Do you want create network ?',
+				? 'Do you want edit this community ?'
+				: 'Do you want create community ?',
 			onAccept: handleCreateNetwork,
 		})
 	}
