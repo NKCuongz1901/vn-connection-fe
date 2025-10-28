@@ -20,7 +20,7 @@ import axios from '../axios'
 // 		})
 // 		return res?.data || res || null
 // 	} catch (error) {
-// 		console.error('Nominatim error:', error)
+// 		console.error('Nominatim error1:', error)
 // 		return null
 // 	}
 // }
