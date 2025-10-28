@@ -25,7 +25,7 @@ import {
 } from '@/apis/searchApis'
 
 import { paginationCommon } from '@/Variable/common.variable'
-import { radiusOpts } from '@/Variable/select.variable'
+import { radiusOptsV2 } from '@/Variable/select.variable'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import {
@@ -62,7 +62,7 @@ export default function useExploreInterest({}: any) {
 		address: '',
 		latitude: null,
 		longitude: null,
-		radius: radiusOpts[5].value,
+		radius: radiusOptsV2[3].value,
 	})
 
 	const [statusClub, setStatusClub] = useState({

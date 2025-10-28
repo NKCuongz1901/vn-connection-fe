@@ -24,7 +24,7 @@ import MapIcon from '@/svg/MapIcon'
 import MarkIcon from '@/svg/MarkIcon'
 import People from '@/svg/People'
 
-import { radiusOpts } from '@/Variable/select.variable'
+import { radiusOptsV2 } from '@/Variable/select.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './ExploreInterest.module.scss'
@@ -136,7 +136,7 @@ const ExploreInterest = () => {
 					<CSelect
 						disabled={loading}
 						value={radius}
-						options={radiusOpts}
+						options={radiusOptsV2}
 						placeholder="Choose distance"
 						prefix={<MarkIcon />}
 						onChange={onChangeFilter('radius')}
