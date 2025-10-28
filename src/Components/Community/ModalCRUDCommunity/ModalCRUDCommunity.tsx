@@ -85,8 +85,10 @@ const ModalCRUDCommunity = ({
 				</Flex>
 				<Flex className={classes.name}>
 					<CInput
+						showCount
 						value={title}
 						error={errors.title}
+						maxLength={30}
 						label="Community name"
 						isRequired
 						placeholder="Community name"
