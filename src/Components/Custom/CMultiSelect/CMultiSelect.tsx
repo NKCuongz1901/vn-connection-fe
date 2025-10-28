@@ -44,12 +44,17 @@ const CMultiSelect = (props: CMultiSelectProps) => {
 					if (max && isArray(prev, max)) {
 						return prev
 					} else {
-						return [...prev, data]
+						const updated = [...prev, data]
+						return updated.sort((a, b) => {
+							const orderA = options.find((o) => o.id === a.id)?.order || 9999
+							const orderB = options.find((o) => o.id === b.id)?.order || 9999
+							return orderA - orderB
+						})
 					}
 				}
 			})
 		},
-		[max],
+		[max, options],
 	)
 	const toggle = (val) => {
 		if (!val) {
