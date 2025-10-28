@@ -16,6 +16,7 @@ import { blockUser } from '@/apis/userApis'
 
 import { isArray, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common.ults'
+import { useSafeBack } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 import { copyToClipboard } from '@/ultis/string.ults'
 
@@ -40,7 +41,7 @@ interface useDetailCommunityProps {
 export default function useDetailCommunity(props: useDetailCommunityProps) {
 	const { openError, openSuccess, openConfirm } = useModal()
 	const { toggleLoadingContext } = useLoading()
-
+	const { goBackOrPush } = useSafeBack()
 	const { id } = props
 
 	const _loadmore = useRef(true)
@@ -317,6 +318,8 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	const handleBack = () => {
 		if (tabTop) {
 			return setTabTop('')
+		} else {
+			goBackOrPush()
 		}
 	}
 

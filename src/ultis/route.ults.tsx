@@ -34,7 +34,9 @@ export function useLocalePath() {
 export const useSafeBack = () => {
 	const router = useRouter()
 	const { onChangeRoute } = useLocalePath()
-	const goBackOrPush = (fallbackUrl: string) => {
+	const goBackOrPush = (fallbackUrl?: string) => {
+		router.back()
+		return
 		const referrer = document.referrer
 		const currentOrigin = window.location.origin
 		if (referrer && referrer.startsWith(currentOrigin)) {

@@ -149,10 +149,12 @@
 							.infoAva {
 								min-height: 48px;
 								min-width: 48px;
+								cursor: pointer;
 							}
 							.matchingClubInfo {
 								max-width: 100%;
 								gap: 4px;
+								cursor: pointer;
 								.matchingClubInfoLabel {
 									overflow: hidden;
 									white-space: nowrap;

@@ -11,6 +11,7 @@ import { memo } from 'react'
 import useExploreInterest from '@/hooks/ExploreInterest/useExploreInterest'
 
 import { arrayFrom, isArray } from '@/ultis/array.ults'
+import { useLocalePath } from '@/ultis/route.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
@@ -24,6 +25,7 @@ import MarkIcon from '@/svg/MarkIcon'
 import People from '@/svg/People'
 
 import { radiusOpts } from '@/Variable/select.variable'
+import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './ExploreInterest.module.scss'
 
@@ -63,6 +65,7 @@ const GENDER = {
 	),
 }
 const ExploreInterest = () => {
+	const { onChangeRoute } = useLocalePath()
 	const {
 		loadingInvite,
 		invited,
@@ -230,9 +233,21 @@ const ExploreInterest = () => {
 							return (
 								<Flex key={id} className={classes.matchingClubWrapper}>
 									<Flex className={classes.matchingClubInfoLeft}>
-										<CAvatar src={avatar} className={classes.infoAva} />
+										<CAvatar
+											src={avatar}
+											className={classes.infoAva}
+											onClick={() =>
+												onChangeRoute(`${mainRoutes.community}/${id}`)
+											}
+										/>
 
-										<Flex vertical className={classes.matchingClubInfo}>
+										<Flex
+											vertical
+											className={classes.matchingClubInfo}
+											onClick={() =>
+												onChangeRoute(`${mainRoutes.community}/${id}`)
+											}
+										>
 											<div className={classes.matchingClubInfoLabel}>
 												{title}
 											</div>
