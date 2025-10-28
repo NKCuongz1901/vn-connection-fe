@@ -187,7 +187,6 @@ const ExploreInterest = () => {
 			<Flex className={classes.dataWrapper}>
 				{(datas || []).map((data) => {
 					const { id, image, title, count } = data || {}
-					console.log('object', selects.includes(id))
 					return (
 						<Flex
 							vertical
