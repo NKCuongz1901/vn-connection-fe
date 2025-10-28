@@ -98,6 +98,7 @@ const CGGMap = (_props: CGGMapProps) => {
 			const res = await getCurrentLocation()
 			const { lat, lng } = res
 			setDefaultCenter({ lat, lng })
+			setMarker({ lat, lng })
 		} catch (error) {
 			console.log('error:', error)
 		}
@@ -109,7 +110,9 @@ const CGGMap = (_props: CGGMapProps) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 	useEffect(() => {
-		handleGetAddress(marker)
+		if (marker.lat !== null && marker.lng !== null) {
+			handleGetAddress(marker)
+		}
 	}, [marker])
 	if (!isLoaded) return <div></div>
 

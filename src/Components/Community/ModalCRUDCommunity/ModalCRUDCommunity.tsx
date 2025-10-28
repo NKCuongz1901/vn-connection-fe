@@ -44,7 +44,6 @@ const ModalCRUDCommunity = ({
 	const {
 		loadingOpt,
 		categoryNetworkOpts,
-		stateNetworkOpts,
 		dataModal,
 		errors,
 		onChangeData,
