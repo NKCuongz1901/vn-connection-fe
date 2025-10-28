@@ -202,7 +202,7 @@ const ModalCRUDCommunity = ({
 					placeholder="Describe the community"
 					value={about}
 					error={errors.about}
-					maxLength={1000}
+					maxLength={2000}
 					onChange={(e) => onChangeData('about', e.target.value)}
 				/>
 			</Flex>
