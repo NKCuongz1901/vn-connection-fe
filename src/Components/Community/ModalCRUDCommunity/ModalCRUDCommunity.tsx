@@ -25,6 +25,8 @@ import CUpload from '@/Components/Custom/CUpload'
 import HappyIcon from '@/svg/HappyIcon'
 import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
 
+import { typeCommunity } from '@/Variable/select.variable'
+
 import classes from './ModalCRUDCommunity.module.scss'
 
 interface ModalCRUDCommunityProps {
@@ -134,7 +136,7 @@ const ModalCRUDCommunity = ({
 						isRequired
 						showCount
 						value={type}
-						options={stateNetworkOpts}
+						options={typeCommunity}
 						error={errors.type}
 						label="State"
 						placeholder="Choose your state"

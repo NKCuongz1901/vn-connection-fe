@@ -205,7 +205,7 @@ export default function useCRUDCommunity({
 			const payload = {
 				title,
 				type,
-				category: category.join(', '),
+				category: category.map((i) => i.title).join(', '),
 				category_list: category.map((i) => i.id),
 				is_online,
 				is_offline,

@@ -289,3 +289,12 @@ export const languages = [
 	{ value: 'French', label: 'French' },
 	{ value: 'German', label: 'German' },
 ]
+export const typeCommunity = [
+	{ value: 'Business', label: 'Business' },
+	{ value: 'Community', label: 'Community' },
+	{ value: 'Club', label: 'Club' },
+	{ value: 'Work Shop', label: 'Work Shop' },
+	{ value: 'Charity', label: 'Charity' },
+	{ value: 'Class', label: 'Class' },
+	{ value: 'Restaurant', label: 'Restaurant' },
+]
