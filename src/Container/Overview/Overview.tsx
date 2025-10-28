@@ -295,8 +295,8 @@ const Overview = () => {
 			>
 				{_renderFilter()}
 				{_renderHangout()}
-				{_renderMyEvent()}
 				{_renderMyCommunity()}
+				{_renderMyEvent()}
 				<Flex className={classes.wrapperUp} vertical>
 					<Flex
 						className={classes.title}
