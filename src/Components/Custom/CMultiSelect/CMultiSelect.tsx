@@ -1,6 +1,9 @@
+import { IconCircleXFilled } from '@tabler/icons-react'
 import { Flex, Popover } from 'antd'
 import clsx from 'clsx'
 import React, { memo, useCallback, useState } from 'react'
+
+import { useModal } from '@/context/ModalContext'
 
 import { isArray } from '@/ultis/array.ults'
 
@@ -33,6 +36,7 @@ const CMultiSelect = (props: CMultiSelectProps) => {
 		max,
 		onChange,
 	} = props
+	const { openError } = useModal()
 	const [shows, setShows] = useState(false)
 	const [choose, setChoose] = useState<CategoriFavOptProps[]>([])
 	const handleChoose = useCallback(
@@ -42,6 +46,7 @@ const CMultiSelect = (props: CMultiSelectProps) => {
 					return prev.filter((i) => i.id !== data.id)
 				} else {
 					if (max && isArray(prev, max)) {
+						openError('You can only select up to 3 categories')
 						return prev
 					} else {
 						const updated = [...prev, data]
@@ -66,6 +71,10 @@ const CMultiSelect = (props: CMultiSelectProps) => {
 		return (
 			<div className={classes.chooseCatogoryWrapper}>
 				<Flex className={classes.chooseCatogoryContainer}>
+					<IconCircleXFilled
+						className={classes.closeCategory}
+						onClick={() => toggle(false)}
+					/>
 					<Flex className={classes.chooseContent}>
 						{(options || []).map((opt) => {
 							const { id, title, image } = opt || {}
@@ -113,12 +122,15 @@ const CMultiSelect = (props: CMultiSelectProps) => {
 				)}
 				<Popover
 					placement="bottom"
-					trigger="click"
+					trigger={null}
 					open={shows}
-					onOpenChange={toggle}
 					content={_renderChooseCatogory}
+					zIndex={1000}
 				>
-					<Flex className={clsx(classes.content, { [classes.error]: !!error })}>
+					<Flex
+						className={clsx(classes.content, { [classes.error]: !!error })}
+						onClick={() => toggle(!shows)}
+					>
 						<div
 							className={clsx({
 								[classes.opacityDown]: !isArray(choose, 1),
