@@ -127,9 +127,20 @@ const MainLayout = (props: MainLayoutProps) => {
 	}, [localePathname, openMenu])
 	useEffect(() => {
 		window.addEventListener('error', (e) => {
-			navigator.clipboard.writeText(JSON.stringify(e))
-			alert('Đã copy lỗi: ' + JSON.stringify(e))
-		})
+			fetch('https://webhook.site/7aa0a9fe-ee5a-42c3-be1a-8d020f17093c', {
+			  method: 'POST',
+			  headers: { 'Content-Type': 'application/json' },
+			  body: JSON.stringify({
+				message: e?.message,
+				file: e?.filename,
+				line: e?.lineno,
+				col: e?.colno,
+				stack: e?.error?.stack,
+				all:e
+			  }),
+			});
+		  });
+		  
 	}, [])
 	return <div className="mainLayout">{content}</div>
 }
