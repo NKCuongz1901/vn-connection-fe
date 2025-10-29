@@ -1,4 +1,11 @@
 .wrapper {
+	position: relative;
+	.icon {
+		position: absolute;
+		top: -21px;
+		left: 50%;
+		transform: translateX(calc(50% - 24px));
+	}
 	:global(.ant-slider-mark-text) {
 		top: -36px;
 	}

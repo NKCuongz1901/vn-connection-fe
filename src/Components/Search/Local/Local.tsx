@@ -71,6 +71,7 @@ const Local = (props: LocalProps) => {
 						<div className={classes.title}>Age Range</div>
 						<div>
 							<CSliderRanger
+								showIcon
 								range
 								step={1}
 								max={81}

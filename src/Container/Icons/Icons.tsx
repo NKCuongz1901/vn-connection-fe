@@ -53,6 +53,7 @@ import PeopleSmileIcon from '@/svg/PeopleSmileIcon'
 import ArrrowLeftIcon from '@/svg/ArrrowLeftIcon'
 import TopicIcon from '@/svg/TopicIcon'
 import ChatIcon from '@/svg/ChatIcon'
+import ArrowRightIcon from '@/svg/ArrowRightIcon'
 
 const Icons = () => {
 	const icons = [
@@ -170,6 +171,11 @@ const Icons = () => {
 		{
 			ICON: ChatIcon,
 			name: '@/svg/ChatIcon',
+			key: randomString(),
+		},
+		{
+			ICON: ArrowRightIcon,
+			name: '@/svg/ArrowRightIcon',
 			key: randomString(),
 		},
 	]
