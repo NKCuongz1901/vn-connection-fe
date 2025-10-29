@@ -527,6 +527,7 @@ export default function useDiscussionDetail(
 		setCommentContent(content)
 	}
 	const handleParsePayLoad = async () => {
+		toggleLoadingContext(true)
 		const _medias = fileList
 		let medias = []
 
@@ -556,12 +557,11 @@ export default function useDiscussionDetail(
 		}
 	}
 	const handleSendCommentPost = async () => {
-		if (!commentContent.trim() || loadingContext) {
+		if ((!commentContent.trim() && !isArray(fileList, 1)) || loadingContext) {
 			return
 		}
 		const body = await handleParsePayLoad()
 		try {
-			toggleLoadingContext(true)
 			const res: any = await sendCommentPost({
 				...body,
 			})

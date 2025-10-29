@@ -3,7 +3,7 @@ import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { forwardRef } from 'react'
 
-import { arrayFrom } from '@/ultis/array.ults'
+import { arrayFrom, isArray } from '@/ultis/array.ults'
 
 import CommentItem from '@/Components/Comment/CommentItem'
 import CButton from '@/Components/Custom/CButton'
@@ -144,7 +144,8 @@ const DiscussionDetail = (
 					/>
 					<Flex
 						className={clsx(classes.iconSend, {
-							[classes.disabled]: !commentContent.trim(),
+							[classes.disabled]:
+								!commentContent.trim() && !isArray(fileList, 1),
 						})}
 						onClick={onSendComment}
 					>
