@@ -3,8 +3,12 @@
 		top: -36px;
 	}
 	//006B35
+	:global(.ant-slider-horizontal.ant-slider-with-marks) {
+		margin-bottom: 8px;
+	}
 	:global(.ant-slider) {
 		margin-bottom: 0px;
+
 		:global(.ant-slider-track) {
 			background-color: #006b35b3;
 		}
