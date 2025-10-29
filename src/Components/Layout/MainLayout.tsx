@@ -125,7 +125,12 @@ const MainLayout = (props: MainLayoutProps) => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [localePathname, openMenu])
-
+	useEffect(() => {
+		window.addEventListener('error', (e) => {
+			navigator.clipboard.writeText(JSON.stringify(e))
+			alert('Đã copy lỗi: ' + JSON.stringify(e))
+		})
+	}, [])
 	return <div className="mainLayout">{content}</div>
 }
 
