@@ -225,6 +225,8 @@ const ExploreInterest = () => {
 								category,
 								users_in_conversation,
 								membership_type,
+								is_offline,
+								is_online,
 							} = item || {}
 							const isOwner = membership_type === 'OWNER'
 							const isJoin = isArray(users_in_conversation, 1) || isOwner
@@ -258,10 +260,12 @@ const ExploreInterest = () => {
 													<People fill="#006b35" />
 													<div>{amount_of_user} members</div>
 												</Flex>
-												<Flex className={classes.otherInfoItem}>
-													<MapIcon fill="#006b35" />
-													<div>{away} km</div>
-												</Flex>
+												{is_offline && statusClub.is_offline && (
+													<Flex className={classes.otherInfoItem}>
+														<MapIcon fill="#006b35" />
+														<div>{away} km</div>
+													</Flex>
+												)}
 											</Flex>
 										</Flex>
 									</Flex>
