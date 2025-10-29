@@ -141,7 +141,7 @@ const Local = (props: LocalProps) => {
 			<Flex className={classes.filter}>
 				<div className={classes.filterSearch}>
 					<CInput
-						placeholder="Location by city, district"
+						placeholder="Search by keyword"
 						style={{ borderRadius: 40, height: 40 }}
 						prefix={<SearchOutlined className={classes.filterSearchIcon} />}
 						onChange={onChangeValue('keyword')}

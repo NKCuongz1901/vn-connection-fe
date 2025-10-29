@@ -49,7 +49,7 @@ const Local = (props: EventInAppProps) => {
 				<div className={classes.filterSearch}>
 					<CInput
 						disabled={loading}
-						placeholder="Location by city, district"
+						placeholder="Search by keyword"
 						style={{ borderRadius: 40, height: 40 }}
 						prefix={<SearchOutlined className={classes.filterSearchIcon} />}
 						onChange={onChangeValue('keyword')}
