@@ -104,6 +104,8 @@ export default function useExploreInterest({}: any) {
 		} else {
 			if (!isArray(selects, 3)) {
 				setSelects((prev) => [...prev, id])
+			} else {
+				openError('You can only select up to 3 communities')
 			}
 		}
 	}
