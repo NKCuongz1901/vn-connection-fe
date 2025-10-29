@@ -125,22 +125,33 @@ const MainLayout = (props: MainLayoutProps) => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [localePathname, openMenu])
+	// KHÔNG dùng JSON, dùng URLSearchParams để gửi form data
 	useEffect(() => {
 		window.addEventListener('error', (e) => {
+			const bodyData = new URLSearchParams()
+
+			// Thông tin cơ bản
+			bodyData.append('message', e?.message || 'N/A')
+			bodyData.append('file', e?.filename || 'N/A')
+			bodyData.append('line', String(e?.lineno))
+			bodyData.append('col', String(e?.colno))
+
+			// Stack trace là quan trọng nhất, chuyển nó thành chuỗi
+			bodyData.append('stack', e?.error?.stack || 'No Stack Trace')
+
+			// Thêm thông tin môi trường để dễ debug
+			bodyData.append('userAgent', navigator.userAgent)
+			bodyData.append('time', new Date().toISOString())
+
 			fetch('https://webhook.site/7aa0a9fe-ee5a-42c3-be1a-8d020f17093c', {
-			  method: 'POST',
-			  headers: { 'Content-Type': 'application/json' },
-			  body: JSON.stringify({
-				message: e?.message,
-				file: e?.filename,
-				line: e?.lineno,
-				col: e?.colno,
-				stack: e?.error?.stack,
-				all:e
-			  }),
-			});
-		  });
-		  
+				method: 'POST',
+				// Bỏ headers để trình duyệt tự đặt 'application/x-www-form-urlencoded'
+				body: bodyData,
+			}).catch((err) => {
+				// Lỗi xảy ra nếu fetch thất bại (mất mạng, DNS lỗi, etc.)
+				console.error('Error sending log to webhook:', err)
+			})
+		})
 	}, [])
 	return <div className="mainLayout">{content}</div>
 }
