@@ -120,34 +120,78 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 	useEffect(() => {
-		async function setupFCM() {
-			const token = await initFCM()
-			console.log('🏖️ FCM Token:', token)
-			if (token) {
-				// 🔥 Lưu token về server nếu cần
-				handleUpdateProfile(token)
-			}
-		}
-		setupFCM()
-
-		const handleMessage = (payload: any) => {
-			console.log('📩 Payload nhận foreground:', { payload })
-			const { data, notification } = payload || {}
-			const { title, body, icon } = notification || {}
-			const notif = new (window.Notification as any)(title || 'Notification', {
-				body: body,
-				icon: icon || '/images/univini-logo.png',
-			})
-			notif.onclick = () => {
-				const postId = data?.post_id
-				if (postId) {
-					handleClick(data)
+		// Sử dụng khối try...catch bên ngoài để bắt các lỗi đồng bộ
+		// xảy ra ngay lập tức trong quá trình khởi tạo hook.
+		try {
+			// Sửa lỗi TS1252: Chuyển Function Declaration thành Arrow Function Expression.
+			const setupFCM = async () => {
+				// Bọc logic bất đồng bộ trong try...catch để bắt lỗi mạng hoặc lỗi Firebase.
+				try {
+					// Tắt console.log() sau khi debug
+					const token = await initFCM()
+					console.log('🏖️ FCM Token:', token)
+					if (token) {
+						// 🔥 Lưu token về server nếu cần
+						handleUpdateProfile(token)
+					}
+				} catch (error) {
+					console.error(
+						'🔥 Lỗi trong quá trình khởi tạo FCM (initFCM/handleUpdateProfile):',
+						error,
+					)
+					// TODO: Log lỗi này lên webhook nếu cần
 				}
-				notif.close()
 			}
+			setupFCM()
+
+			const handleMessage = (payload: any) => {
+				// Bọc logic xử lý tin nhắn trong foreground để ngăn lỗi làm hỏng listener.
+				try {
+					console.log('📩 Payload nhận foreground:', { payload })
+					const { data, notification } = payload || {}
+					const { title, body, icon } = notification || {}
+
+					// Chỉ hiển thị notification nếu trình duyệt cho phép
+					if (
+						window.Notification &&
+						window.Notification.permission === 'granted'
+					) {
+						const notif = new (window.Notification as any)(
+							title || 'Notification',
+							{
+								body: body,
+								icon: icon || '/images/univini-logo.png',
+							},
+						)
+
+						notif.onclick = () => {
+							const postId = data?.post_id
+							if (postId) {
+								// Gọi hàm xử lý click tùy chỉnh (chuyển hướng, mở modal,...)
+								handleClick(data)
+							}
+							notif.close()
+						}
+					} else {
+						console.warn('Quyền hiển thị Notification chưa được cấp.')
+					}
+				} catch (error) {
+					console.error(
+						'🔥 Lỗi khi xử lý tin nhắn Foreground (handleMessage):',
+						error,
+					)
+				}
+			}
+
+			// Gắn listener onMessage
+			onMessage(messaging, handleMessage)
+		} catch (outerError) {
+			console.error(
+				'🔥 Lỗi Đồng Bộ Cấp Cao trong useEffect (Lỗi nghiêm trọng):',
+				outerError,
+			)
 		}
 
-		onMessage(messaging, handleMessage)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
