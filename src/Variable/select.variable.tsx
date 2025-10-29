@@ -290,6 +290,8 @@ export enum NOTIFICATION_TYPE {
 	CRUSH_DATING = 'CRUSH_DATING',
 	MATCH_DATING = 'MATCH_DATING',
 	CHAT_DATING = 'CHAT_DATING',
+
+	MINI_CHAT = 'MINI_CHAT',
 }
 
 export const languages = [

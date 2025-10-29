@@ -45,10 +45,12 @@ const mappingTypeIcon = {
 	[NOTIFICATION_TYPE.COMMENT_ON_DISCUSS_IN_TOPIC]: Message3,
 	[NOTIFICATION_TYPE.NEW_POST_CREATED]: Message3,
 	[NOTIFICATION_TYPE.LIKE_ON_DISCUSS_IN_TOPIC]: Message3,
+	[NOTIFICATION_TYPE.COMMENT_ON_DISCUSS_IN_CHATROOM]: Message3,
 	DISCUSS_IN_TOPIC: Message3,
 
 	[NOTIFICATION_TYPE.ADD_FRIEND]: Messenger,
 	[NOTIFICATION_TYPE.ACCEPT_FRIEND]: Messenger,
+	[NOTIFICATION_TYPE.MINI_CHAT]: Messenger,
 
 	MATCH_DATING: DoubleHeart,
 	CRUSH_DATING: DoubleHeart,
@@ -126,7 +128,6 @@ const Notification = (props: { onClose?: any }) => {
 							'NEAR_END_HANGOUT_STATUS',
 							'INVITEE_MEMBER_JOIN_CLUB',
 							'JOIN_DISCUSSION_IN_CHATROOM',
-							'COMMENT_ON_DISCUSS_IN_CHATROOM',
 						].includes(interacting_type) ? (
 							<div>
 								<CAvatarBandage
