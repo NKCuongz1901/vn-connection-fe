@@ -158,10 +158,12 @@ const Local = (props: LocalProps) => {
 					content={_renderFilterGroup}
 				>
 					<Flex className={classes.filterGroup}>
-						<div className={classes.filterIcon}>
-							<FilterIcon />
-						</div>
-						<div>Filter</div>
+						<Flex align="center" gap={12}>
+							<div className={classes.filterIcon}>
+								<FilterIcon />
+							</div>
+							<div>Filter</div>
+						</Flex>
 						<IconChevronDown />
 					</Flex>
 				</Popover>
@@ -175,10 +177,12 @@ const Local = (props: LocalProps) => {
 					content={_renderFilterLanguage}
 				>
 					<Flex className={classes.filterGroup}>
-						<div className={classes.filterIcon}>
-							<CalendarFilled style={{ color: 'white' }} />
-						</div>
-						<div>Languages</div>
+						<Flex align="center" gap={12}>
+							<div className={classes.filterIcon}>
+								<CalendarFilled style={{ color: 'white' }} />
+							</div>
+							<div>Languages</div>
+						</Flex>
 						<IconChevronDown />
 					</Flex>
 				</Popover>
