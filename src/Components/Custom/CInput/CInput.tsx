@@ -8,12 +8,12 @@ import { CInputProps } from '@/interface/CComponent/CComponent.interface'
 import classes from './Input.module.scss'
 
 const CInput = forwardRef((_props: CInputProps, ref: any) => {
-	const { error, label, isRequired, style, ...props } = _props
+	const { isNotBold, error, label, isRequired, style, ...props } = _props
 	const status = error ? 'error' : ''
 	return (
 		<Flex vertical gap={4} className={classes.layout}>
 			{label && (
-				<span className="bold">
+				<span className={isNotBold ? '' : 'bold'}>
 					{label} {isRequired && <span className="error">*</span>}
 				</span>
 			)}

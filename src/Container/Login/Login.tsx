@@ -82,6 +82,8 @@ const Login = () => {
 							Sign In
 						</Flex>
 						<CInputPhone
+							isNotBold
+							isRequired
 							label="Phone number"
 							prefix={prefix}
 							value={phone}
@@ -92,7 +94,7 @@ const Login = () => {
 						/>
 						<CInputPassword
 							isRequired
-							label="Password:"
+							label="Password"
 							value={password}
 							onChange={(e) => onChange('password')(e.target.value)}
 							placeholder="Password"

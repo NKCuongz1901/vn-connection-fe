@@ -12,6 +12,7 @@ interface CInputOthersProps {
 	label?: string
 	error?: string
 	isRequired?: boolean
+	isNotBold?: boolean
 	[key: string]: any
 }
 
