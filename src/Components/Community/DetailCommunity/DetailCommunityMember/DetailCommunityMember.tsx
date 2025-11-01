@@ -23,7 +23,7 @@ interface DetailCommunityMemberProp {
 	info?: ConversationProps
 	[key: string]: any
 }
-const DetailCommunityMember = (props: DetailCommunityMemberProp) => {
+const DetailCommunityMember = (props: DetailCommunityMemberProp, ref) => {
 	const { id, info } = props
 	const { host_id } = info || {}
 	const isMe = getUserInfo('id') === host_id
@@ -41,7 +41,7 @@ const DetailCommunityMember = (props: DetailCommunityMemberProp) => {
 		onGetMenus,
 		onSuccess,
 		onScroll,
-	} = useDetailCommunityMember(props)
+	} = useDetailCommunityMember(props, ref)
 	const _renderAdmin = () => {
 		return (
 			<Flex vertical className={classes.renderAdmin}>

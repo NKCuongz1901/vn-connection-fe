@@ -1,5 +1,5 @@
 import { ItemType } from 'antd/es/menu/interface'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useImperativeHandle, useRef, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
@@ -20,7 +20,7 @@ import { ClubMemberProps } from '@/interface/Community/Community.interface'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { paginationCommon } from '@/Variable/common.variable'
 
-export default function useDetailCommunityMember(props) {
+export default function useDetailCommunityMember(props, ref) {
 	const { id } = props
 	const { toggleLoadingContext } = useLoading()
 	const { openError, openConfirm, openSuccess } = useModal()
@@ -60,14 +60,19 @@ export default function useDetailCommunityMember(props) {
 		}
 	}
 
-	const handleGetMember = async () => {
+	const handleGetMember = async (isNotLoading = false) => {
 		setLoading((prev) => ({ ...prev, member: true }))
 
 		try {
 			const { page, limit } = _paginationRefs.current
-			const isNew = page === 1
-			if (isNew) {
-				setMembers([])
+
+			let isNew = page === 1
+			if (isNotLoading) {
+				isNew = false
+			} else {
+				if (isNew) {
+					setMembers([])
+				}
 			}
 			const payload = {
 				id: id,
@@ -76,15 +81,18 @@ export default function useDetailCommunityMember(props) {
 				...(name && { name }),
 			}
 			const res: any = await getConvMembersById(payload)
-			await delay(500)
+			if (!isNotLoading) {
+				await delay(500)
+			}
 			const { rows, count } = res?.results?.objects || {}
 
 			_loadmore.current = isArray(rows, limit)
 			setMembers((prev: ClubMemberProps[]) => {
 				const contents = isNew ? [] : prev
-				const dataShow = uniqueArray(
-					[...contents, ...rows],
-					'id',
+				const dataShow = (
+					!isNotLoading
+						? uniqueArray([...contents, ...rows], 'id')
+						: uniqueArray([...rows, ...contents], 'id')
 				) as ClubMemberProps[]
 				return dataShow
 			})
@@ -240,6 +248,16 @@ export default function useDetailCommunityMember(props) {
 	const handleScroll = (e) => {
 		handleScrollCallback(e, handleLoadMore)
 	}
+
+	useImperativeHandle(
+		ref,
+		() => ({
+			...(ref.current || {}),
+			onGetMember: handleGetMember,
+		}),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[id],
+	)
 	useEffect(() => {
 		handleGetAdmin()
 		// eslint-disable-next-line react-hooks/exhaustive-deps

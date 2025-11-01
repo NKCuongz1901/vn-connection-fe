@@ -1,6 +1,6 @@
 'use client'
 import { IconDots } from '@tabler/icons-react'
-import { Dropdown, Flex } from 'antd'
+import { Dropdown, Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 
 import DetailCommunityAdmin from '@/Components/Community/DetailCommunity/DetailCommunityAdmin'
@@ -13,6 +13,7 @@ import CButton from '@/Components/Custom/CButton'
 import CImage from '@/Components/Custom/CImage'
 import ModalReport from '@/Components/Custom/ModalReport'
 import ModalMyFriend from '@/Components/Friend/ModalMyFriend'
+import InboxChat from '@/Components/Inbox/InboxChat'
 import useDetailCommunity from '@/hooks/Community/useDetailCommunity'
 import ArrrowLeftIcon from '@/svg/ArrrowLeftIcon'
 import ChatIcon from '@/svg/ChatIcon'
@@ -20,7 +21,6 @@ import People from '@/svg/People'
 import TopicIcon from '@/svg/TopicIcon'
 
 import classes from './DetailCommunity.module.scss'
-import InboxChat from '@/Components/Inbox/InboxChat'
 
 const mappingTabsBtnTop = {
 	member: 'member',
@@ -56,8 +56,11 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 	const { id } = props
 	const {
 		discussionRef,
-		// loadingConvInfo,
+		memberRef,
+		loadingConvInfo,
+		loadingApi,
 		loadingAnnou,
+
 		convInfo,
 		tabMiddle,
 		annouList,
@@ -77,9 +80,10 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		onShareFriend,
 		onGetMenus,
 		onBack,
+		onJoinConv,
 	} = useDetailCommunity(props)
 
-	// const { join } = convInfo || {}
+	const { join } = convInfo || {}
 
 	const _renderAction = () => {
 		return (
@@ -111,40 +115,38 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 						<Flex className={classes.address}>{address}</Flex>
 					</Flex>
 				</Flex>
-				{/* <Flex className={classes.endButton}>
-						{isMe ? (
-							<>
+				<Flex className={classes.endButton}>
+					{true ? (
+						<>
+							<CButton
+								ctype="disabled"
+								onClick={() => onAction({ key: 'share', value: convInfo })}
+							>
+								<span>Invite friends</span>
+							</CButton>
+							{!join && (
 								<CButton
+									disabled={!!loadingApi.join}
 									ctype="oranger"
-									style={{ height: 40 }}
-									onClick={() => onChangeRoute(mainRoutes.search)}
+									onClick={() => onJoinConv(id)}
 								>
-									<Flex>
-										<ShareIcon />
-									</Flex>
-									<span>Invite friend</span>
+									Join
 								</CButton>
-								<CButton
-									ctype="disabled"
-									style={{ height: 40 }}
-									onClick={onOpenEditP}
-								>
-									Edit Profile
-								</CButton>
-							</>
-						) : (
-							<>
-								{!isMinimize && _renderButtonFriend()}
-								<CButton
-									ctype="disabled"
-									style={{ height: 40 }}
-									onClick={onOpenInbox}
-								>
-									Inbox
-								</CButton>
-							</>
-						)}
-					</Flex> */}
+							)}
+						</>
+					) : (
+						<>
+							{/* {!isMinimize && _renderButtonFriend()} */}
+							<CButton
+								ctype="disabled"
+								style={{ height: 40 }}
+								// onClick={onOpenInbox}
+							>
+								Inbox
+							</CButton>
+						</>
+					)}
+				</Flex>
 			</Flex>
 		)
 	}
@@ -175,7 +177,13 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 	}
 	const _renderTop = () => {
 		const { thumbnail } = convInfo || {}
-
+		if (loadingConvInfo) {
+			return (
+				<Flex className={classes.skeletonInfo}>
+					<Skeleton.Input active className={classes.skeletonInput} />
+				</Flex>
+			)
+		}
 		return (
 			<Flex className={classes.top} vertical>
 				{_renderAction()}
@@ -348,7 +356,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 	const _renderMember = () => {
 		return (
 			<div>
-				<DetailCommunityMember id={id} ref={discussionRef} info={convInfo} />
+				<DetailCommunityMember id={id} ref={memberRef} info={convInfo} />
 			</div>
 		)
 	}

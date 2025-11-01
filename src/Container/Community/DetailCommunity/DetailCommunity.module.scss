@@ -8,10 +8,20 @@
 		width: 100%;
 		gap: 12px;
 		overflow: auto;
+		.skeletonInfo {
+			width: 100%;
+			height: 354px;
+			div,
+			span {
+				width: 100%;
+				height: 100%;
+			}
+		}
 		.top {
 			width: 100%;
 
 			position: relative;
+
 			.action {
 				position: absolute;
 				z-index: 1;
@@ -98,8 +108,8 @@
 				}
 				.endButton {
 					gap: 12px;
-					.buttonFriend {
-						visibility: hidden;
+					button {
+						height: 40px !important;
 					}
 				}
 			}
@@ -259,6 +269,10 @@
 					}
 				}
 				.infoWrapper {
+					flex-direction: column;
+					min-height: 100px;
+					max-height: none;
+
 					.info {
 						.avatarWrapper {
 							.avatar {

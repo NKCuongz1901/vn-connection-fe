@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import {
 	getAnnouListById,
 	getConvInfoById,
+	joinConversation,
 	likeAnnoun,
 	sendMessageById,
 } from '@/apis/conversationApis'
@@ -47,12 +48,14 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	const _loadmore = useRef(true)
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const discussionRef = useRef<{ [key: string]: any }>({})
+	const memberRef = useRef<{ [key: string]: any }>({})
 
 	const [modal, setModal] = useState({ type: '', data: null }) as any
 
 	const [loadingAnnou, setLoadingAnnou] = useState(true)
 	const [loadingConvInfo, setLoadingConvInfo] = useState(true)
 	const [loadingShare, setLoadingShare] = useState({}) as any
+	const [loadingApi, setLoadingApi] = useState({}) as any
 
 	const [convInfo, setConvInfo] = useState<ConversationProps>()
 	const [total, setTotal] = useState({ annount: 0 })
@@ -64,8 +67,10 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 
 	const [tabMiddle, setTabMiddle] = useState(mappingAboutTabsBtn.about)
 
-	const handleGetInfoConv = async () => {
-		setLoadingConvInfo(true)
+	const handleGetInfoConv = async (isNotLoading = false) => {
+		if (!isNotLoading) {
+			setLoadingConvInfo(true)
+		}
 		try {
 			const res: any = await getConvInfoById({
 				id: id,
@@ -271,7 +276,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 				key: 'share',
 				label: 'Share',
 				onClick: () =>
-					handleAction({ key: 'share', value: { id, user_id, props } }),
+					handleAction({ key: 'share', value: { ...props, id, user_id } }),
 			},
 		]
 		if (isMe) {
@@ -323,6 +328,21 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		}
 	}
 
+	const handleJoinConv = async (id) => {
+		try {
+			setLoadingApi((prev) => ({ ...prev, join: true }))
+			await joinConversation({ id, status: true })
+			handleGetInfoConv(true)
+			if (memberRef.current.onGetMember) {
+				memberRef.current.onGetMember(true)
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoadingApi((prev) => ({ ...prev, join: false }))
+		}
+	}
+
 	useEffect(() => {
 		handleGetInfoConv()
 		handleGetListAnnou()
@@ -331,8 +351,12 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 
 	return {
 		discussionRef,
+		memberRef,
+
+		loadingApi,
 		loadingConvInfo,
 		loadingAnnou,
+
 		convInfo,
 		tabMiddle,
 		annouList,
@@ -352,5 +376,6 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		onShareFriend: handleShareFriend,
 		onGetMenus: handleGetMenus,
 		onBack: handleBack,
+		onJoinConv: handleJoinConv,
 	}
 }
