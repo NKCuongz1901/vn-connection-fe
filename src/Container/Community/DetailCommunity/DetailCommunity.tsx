@@ -8,6 +8,7 @@ import DetailCommunityAnnou from '@/Components/Community/DetailCommunity/DetailC
 import DetailCommunityDiscussion from '@/Components/Community/DetailCommunity/DetailCommunityDiscussion'
 import DetailCommunityMember from '@/Components/Community/DetailCommunity/DetailCommunityMember'
 import ModalCRUDAnnoun from '@/Components/Community/DetailCommunity/ModalCRUDAnnoun'
+import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
 import CImage from '@/Components/Custom/CImage'
@@ -70,6 +71,8 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		shareList,
 		tabTop,
 
+		menus,
+
 		setTabTop,
 		setModal,
 		setShareList,
@@ -92,7 +95,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 					<ArrrowLeftIcon />
 				</Flex>
 				<Flex className={classes.icon}>
-					<Dropdown trigger={['click']} menu={{ items: [] }}>
+					<Dropdown trigger={['click']} menu={{ items: menus }}>
 						<IconDots style={{ cursor: 'pointer' }} />
 					</Dropdown>
 				</Flex>
@@ -300,7 +303,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		)
 	}
 	const _renderModal = () => {
-		const { type, data } = modal || {}
+		const { type, data, title } = modal || {}
 		let Content = <></>
 		const propsModal = {
 			open: true,
@@ -333,7 +336,18 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 						{...propsModal}
 						data={{ discuss_id: data?.id }}
 						title={'Report'}
-						message={'You want to report this announcement ?'}
+						message={title || 'You want to report this announcement ?'}
+					/>
+				)
+				break
+			case 'reportCommunity':
+				Content = (
+					<ModalReport
+						open
+						{...propsModal}
+						data={{ conversation_id: data?.id }}
+						title={'Report'}
+						message={title || 'You want to report this community?'}
 					/>
 				)
 				break
@@ -341,6 +355,15 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 			case 'editAnnou':
 				Content = (
 					<ModalCRUDAnnoun
+						{...propsModal}
+						onSuccess={(item) => onAction({ key: type, value: item })}
+						data={data}
+					/>
+				)
+				break
+			case 'editCommunity':
+				Content = (
+					<ModalCRUDCommunity
 						{...propsModal}
 						onSuccess={(item) => onAction({ key: type, value: item })}
 						data={data}

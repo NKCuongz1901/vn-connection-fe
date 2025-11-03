@@ -1,7 +1,7 @@
 import { IconCircleXFilled } from '@tabler/icons-react'
 import { Flex, Popover } from 'antd'
 import clsx from 'clsx'
-import React, { memo, useCallback, useState } from 'react'
+import React, { memo, useCallback, useEffect, useState } from 'react'
 
 import { useModal } from '@/context/ModalContext'
 
@@ -68,6 +68,10 @@ const CMultiSelect = (props: CMultiSelectProps) => {
 		}
 		setShows(val)
 	}
+	useEffect(() => {
+		setChoose(value || [])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [JSON.stringify(value)])
 	const _renderChooseCatogory = () => {
 		return (
 			<div className={classes.chooseCatogoryWrapper}>

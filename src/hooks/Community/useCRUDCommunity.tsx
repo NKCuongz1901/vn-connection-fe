@@ -7,6 +7,7 @@ import {
 	createConversation,
 	getCategoryList,
 	getNetworkGroup,
+	updateConversation,
 } from '@/apis/conversationApis'
 import { handleUploadImage } from '@/apis/uploadApis'
 
@@ -17,10 +18,13 @@ import { useLocalePath } from '@/ultis/route.ults'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import { selectType } from '@/interface/common/common.interface'
-import { CategoriFavOptProps } from '@/interface/Community/Community.interface'
+import {
+	CategoriFavOptProps,
+	ConversationProps,
+} from '@/interface/Community/Community.interface'
 
 interface CRUDCommunityProps {
-	data?: any
+	data?: ConversationProps
 	onSuccess?: (data: any) => void
 	onClose: () => void
 }
@@ -38,7 +42,7 @@ interface DataModalProps {
 	address?: string
 	is_online: boolean
 	is_offline: boolean
-	// [key: string]: any
+	[key: string]: any
 }
 interface ErrorsModalProps {
 	thumbnail?: string
@@ -52,6 +56,49 @@ interface ErrorsModalProps {
 
 	// [key: string]: any
 }
+const handleParseData = (data: ConversationProps) => {
+	const {
+		thumbnail,
+		avatar,
+		title,
+		bio,
+		type,
+		category,
+		category_list,
+		about,
+		longitude,
+		latitude,
+		address,
+		is_online,
+		is_offline,
+	} = data
+	if (data) {
+		const categoryTitle = category.split(',')
+		return {
+			thumbnail,
+			avatar,
+			title,
+			bio,
+			type,
+			category: category_list.map((i, index) => ({
+				id: i,
+				title: categoryTitle[index],
+			})),
+			about,
+			longitude,
+			latitude,
+			address,
+			is_online,
+			is_offline,
+		}
+	}
+	return {
+		longitude: 0,
+		latitude: 0,
+		is_online: true,
+		is_offline: false,
+	}
+}
 export default function useCRUDCommunity({
 	data,
 	onSuccess,
@@ -61,12 +108,9 @@ export default function useCRUDCommunity({
 	const { onChangeRoute } = useLocalePath()
 	const { toggleLoadingContext } = useLoading()
 	const { openConfirm, openError, openSuccess } = useModal()
-	const [dataModal, setDataModal] = useState<DataModalProps>({
-		longitude: 0,
-		latitude: 0,
-		is_online: true,
-		is_offline: false,
-	})
+	const [dataModal, setDataModal] = useState<DataModalProps>(
+		handleParseData(data),
+	)
 	const [errors, setErrors] = useState<ErrorsModalProps>({})
 	const [files, setFiles] = useState({
 		thumbnail: null,
@@ -196,6 +240,8 @@ export default function useCRUDCommunity({
 				latitude,
 				is_online,
 				is_offline,
+				avatar: _avatar,
+				thumbnail: _thumbnail,
 			} = dataModal || {}
 			const [thumbnail, avatar] = await Promise.all([
 				handleUploadImage(files.thumbnail),
@@ -205,7 +251,7 @@ export default function useCRUDCommunity({
 			const payload = {
 				title,
 				type,
-				category: category.map((i) => i.title).join(', '),
+				category: category.map((i) => i.title.trim()).join(', '),
 				category_list: category.map((i) => i.id),
 				is_online,
 				is_offline,
@@ -213,11 +259,11 @@ export default function useCRUDCommunity({
 				about,
 				latitude,
 				longitude,
-				thumbnail,
-				avatar,
+				thumbnail: thumbnail || _thumbnail,
+				avatar: avatar || _avatar,
 			}
 			const res: any = id
-				? await createConversation({ id, payload })
+				? await updateConversation({ id, payload })
 				: await createConversation(payload)
 			const { code, results } = res || {}
 			if (code === 200) {

@@ -35,6 +35,11 @@ export const createConversation = async (payload: any) => {
 
 	return await axios.post(url, payload)
 }
+export const updateConversation = async ({ id, payload }) => {
+	const url = `${CONVERSATION_ROUTES.name}/${id}`
+
+	return await axios.put(url, payload)
+}
 
 export const getConvStranger = async (params: { [key: string]: any } = {}) => {
 	const url = CONVERSATION_ROUTES.stranger

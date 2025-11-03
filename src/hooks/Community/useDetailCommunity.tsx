@@ -1,12 +1,15 @@
 import { ItemType } from 'antd/es/menu/interface'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
+	deleteConvById,
 	getAnnouListById,
 	getConvInfoById,
 	joinConversation,
+	leaveConversation,
 	likeAnnoun,
 	sendMessageById,
+	updateConvMember,
 } from '@/apis/conversationApis'
 
 import { useModal } from '@/context/ModalContext'
@@ -17,17 +20,20 @@ import { blockUser } from '@/apis/userApis'
 
 import { isArray, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common.ults'
-import { useSafeBack } from '@/ultis/route.ults'
+import { useLocalePath, useSafeBack } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 import { copyToClipboard } from '@/ultis/string.ults'
 
 import { paginationCommon } from '@/Variable/common.variable'
 
+import CSwitch from '@/Components/Custom/CSwitch'
 import { PaginationType } from '@/interface/common/common.interface'
 import {
 	AnnouncementProps,
 	ConversationProps,
 } from '@/interface/Community/Community.interface'
+import { mainRoutes } from '@/routes/MainRoutes'
+import { Flex } from 'antd'
 
 const mappingAboutTabsBtn = {
 	about: 'about',
@@ -42,6 +48,7 @@ interface useDetailCommunityProps {
 export default function useDetailCommunity(props: useDetailCommunityProps) {
 	const { openError, openSuccess, openConfirm } = useModal()
 	const { toggleLoadingContext } = useLoading()
+	const { onChangeRoute } = useLocalePath()
 	const { goBackOrPush } = useSafeBack()
 	const { id } = props
 
@@ -50,7 +57,11 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	const discussionRef = useRef<{ [key: string]: any }>({})
 	const memberRef = useRef<{ [key: string]: any }>({})
 
-	const [modal, setModal] = useState({ type: '', data: null }) as any
+	const [modal, setModal] = useState({
+		type: '',
+		data: null,
+		title: null,
+	}) as any
 
 	const [loadingAnnou, setLoadingAnnou] = useState(true)
 	const [loadingConvInfo, setLoadingConvInfo] = useState(true)
@@ -66,6 +77,26 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	const [tabTop, setTabTop] = useState<string>('')
 
 	const [tabMiddle, setTabMiddle] = useState(mappingAboutTabsBtn.about)
+
+	const handleUpdateNoti = async () => {
+		try {
+			setLoadingApi((prev) => ({ ...prev, noti: true }))
+			const { id, join } = convInfo || {}
+			const { id: memberId, is_accept_notification } = join || {}
+			const res: any = await updateConvMember({
+				id,
+				memberId,
+				payload: { is_accept_notification: !is_accept_notification },
+			})
+			if (res) {
+				handleGetInfoConv(true)
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoadingApi((prev) => ({ ...prev, noti: false }))
+		}
+	}
 
 	const handleGetInfoConv = async (isNotLoading = false) => {
 		if (!isNotLoading) {
@@ -256,6 +287,9 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 					}
 				}
 				break
+			case 'editCommunity':
+				handleGetInfoConv(true)
+				break
 			default:
 				break
 		}
@@ -343,6 +377,133 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		}
 	}
 
+	const handleLeaveConv = async () => {
+		try {
+			setLoadingApi((prev) => ({ ...prev, join: true }))
+			await leaveConversation({ id })
+			handleGetInfoConv(true)
+			openSuccess({ message: 'You leave community successfull' })
+			if (memberRef.current.onGetMember) {
+				memberRef.current.onGetMember(true)
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoadingApi((prev) => ({ ...prev, join: false }))
+		}
+	}
+	const handleDeleteConv = async (id) => {
+		toggleLoadingContext(true)
+		try {
+			const res: any = await deleteConvById({ id })
+			await delay(500)
+			if (res?.code === 200) {
+				openConfirm({
+					message: `Delete community successfull`,
+					onAccept: () => onChangeRoute(mainRoutes.community),
+				})
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			toggleLoadingContext()
+		}
+	}
+	const handleConfirmDelete = () => {
+		const { id } = convInfo || {}
+
+		openConfirm({
+			message: 'Are you sure want to remove this conversation?',
+			titleLabel: 'Delete this conversation',
+			onAccept: () => handleDeleteConv(id),
+			ctype: 'error',
+		})
+	}
+	const menus: ItemType[] = useMemo(() => {
+		const { host_id, join } = convInfo || {}
+		const { is_accept_notification } = join || {}
+		const isMe = getUserInfo('id') === host_id
+
+		const returnData: ItemType[] = [
+			{
+				key: 'share',
+				label: 'Share community',
+				onClick: () => handleAction({ key: 'share', value: convInfo }),
+			},
+
+			...(!isMe
+				? [
+						{
+							key: 'reportCommunity',
+							label: 'Report an issue',
+							onClick: () =>
+								setModal({
+									type: 'reportCommunity',
+									data: { id, user_id: host_id },
+									title: 'You want to report this community?',
+								}),
+						},
+				  ]
+				: [
+						{
+							key: 'edit',
+							label: 'Edit',
+							onClick: () =>
+								setModal({
+									type: 'editCommunity',
+									data: cloneDeep(convInfo),
+								}),
+						},
+				  ]),
+			...(!!join
+				? [
+						{
+							key: 'Mute notification',
+							label: (
+								<Flex gap={8} align="center">
+									<div>Mute notification</div>
+									<CSwitch
+										disabled={!!loadingApi.noti}
+										checked={!is_accept_notification}
+										ctype="success"
+										onChange={handleUpdateNoti}
+									/>
+								</Flex>
+							),
+						},
+				  ]
+				: []),
+			...(isMe
+				? [
+						{
+							key: 'delete',
+							label: 'Delete community',
+							style: { color: '#F80024' },
+							onClick: handleConfirmDelete,
+						},
+				  ]
+				: []),
+			...(!!join && !isMe
+				? [
+						{
+							key: 'leave',
+							style: { color: '#F80024' },
+							label: 'Leave community',
+							onClick: handleLeaveConv,
+						},
+				  ]
+				: []),
+
+			// {
+			// 	key: 'editMettingPoint',
+			// 	label: 'Edit meeting point',
+			// 	onClick: () => handleMenusClick({ key: 'editMettingPoint' }),
+			// },
+		]
+		return returnData
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [convInfo, loadingApi.noti])
+
 	useEffect(() => {
 		handleGetInfoConv()
 		handleGetListAnnou()
@@ -366,6 +527,8 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		shareList,
 		tabTop,
 
+		menus,
+
 		setTabTop,
 		setModal,
 		setShareList,
@@ -377,5 +540,6 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		onGetMenus: handleGetMenus,
 		onBack: handleBack,
 		onJoinConv: handleJoinConv,
+		onLeaveConv: handleLeaveConv,
 	}
 }
