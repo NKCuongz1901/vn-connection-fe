@@ -31,7 +31,7 @@ const mappingTabsBtnTop = {
 
 const tabsBtn = [
 	{ value: mappingTabsBtnTop.member, label: 'Members' },
-	{ value: mappingTabsBtnTop.topic, label: 'Discussion' },
+	{ value: mappingTabsBtnTop.topic, label: 'Topic' },
 	{ value: mappingTabsBtnTop.chat, label: 'Chat' },
 ]
 

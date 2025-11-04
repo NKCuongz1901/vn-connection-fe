@@ -24,6 +24,7 @@ interface DiscussionDetailProps {
 	conversation_id?: string
 	topic?: any
 	onAction?: any
+	title?: string
 }
 const DiscussionDetail = (
 	{
@@ -31,6 +32,7 @@ const DiscussionDetail = (
 		topic,
 		conversation_id,
 		onAction: onActionProps = () => null,
+		title,
 	}: DiscussionDetailProps,
 	ref,
 ) => {
@@ -261,7 +263,7 @@ const DiscussionDetail = (
 					onClick={() => onChangeUrl({ key: 'back', value: null })}
 				>
 					<IconChevronLeft />
-					<div className={classes.title}>Discussion</div>
+					<div className={classes.title}>{title || 'Discussion'}</div>
 				</Flex>
 				<Flex vertical className={classes.body} onScroll={onScroll}>
 					{_renderContent()}

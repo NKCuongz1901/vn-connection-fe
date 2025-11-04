@@ -49,7 +49,7 @@ const DetailCommunityDiscussion = (
 	const _renderTop = () => {
 		return (
 			<Flex className={classes.renderTop}>
-				<div className={classes.renderTopLabel}>Discussions</div>
+				<div className={classes.renderTopLabel}>Topic</div>
 				<div className={classes.renderTopCount}>{totalDiscuss}</div>
 			</Flex>
 		)
@@ -102,8 +102,9 @@ const DetailCommunityDiscussion = (
 					<DiscussionDetail
 						conversation_id={id}
 						discussId={discussId}
-						onAction={onAction}
 						ref={ref}
+						onAction={onAction}
+						title="Topic"
 					/>
 				</Flex>
 			)
