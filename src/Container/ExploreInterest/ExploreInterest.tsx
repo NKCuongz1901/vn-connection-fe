@@ -49,7 +49,10 @@ const status = [
 		label: 'Offline',
 	},
 ]
-
+const mappingTabMatching = {
+	club: 'Matching Communities',
+	user: 'Matching People',
+}
 const GENDER = {
 	FEMALE: (
 		<IconGenderFemale style={{ color: '#ED5DCD' }} className={classes.gender} />
@@ -105,7 +108,7 @@ const ExploreInterest = () => {
 			return (
 				<Flex className={classes.header} onClick={() => setMatching(false)}>
 					<ArrrowLeftIcon />
-					<div>Matching Communities</div>
+					<div>{mappingTabMatching[activeTab]}</div>
 				</Flex>
 			)
 		}
