@@ -119,7 +119,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 					</Flex>
 				</Flex>
 				<Flex className={classes.endButton}>
-					{true ? (
+					{!(tabMiddle === mappingAboutTabsBtn.annou && !tabTop) ? (
 						<>
 							<CButton
 								ctype="disabled"
@@ -138,16 +138,21 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 							)}
 						</>
 					) : (
-						<>
-							{/* {!isMinimize && _renderButtonFriend()} */}
+						<Flex>
 							<CButton
-								ctype="disabled"
-								style={{ height: 40 }}
-								// onClick={onOpenInbox}
+								ctype="oranger"
+								onClick={() =>
+									setModal({
+										type: 'addNewAnnou',
+										data: {
+											conversation_id: id,
+										},
+									})
+								}
 							>
-								Inbox
+								+ Create announcement
 							</CButton>
-						</>
+						</Flex>
 					)}
 				</Flex>
 			</Flex>
@@ -240,19 +245,6 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 					onGetMenus={onGetMenus}
 					onAction={onAction}
 				/>
-				<Flex
-					className={classes.addNewAnnou}
-					onClick={() =>
-						setModal({
-							type: 'addNewAnnou',
-							data: {
-								conversation_id: id,
-							},
-						})
-					}
-				>
-					+
-				</Flex>
 			</div>
 		)
 	}
