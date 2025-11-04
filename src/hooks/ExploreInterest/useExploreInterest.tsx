@@ -152,9 +152,9 @@ export default function useExploreInterest({}: any) {
 	}
 	const handleGetCategoryClubUserLocation = async ({ lat, lng }) => {
 		let res
-		firstTime.current = false
-		if (!!lat && !!lng) {
+		if (firstTime.current) {
 			res = await handleGetLocation({ lat, lng })
+			firstTime.current = false
 		}
 		handleGetCategoryClubUser(res)
 	}
@@ -191,6 +191,9 @@ export default function useExploreInterest({}: any) {
 				res = handleGetAddress({ lat, lng })
 			} else {
 				res = await getCurrentLocation()
+				if (res) {
+					res = await handleGetAddress(res)
+				}
 			}
 		} catch (error) {
 			console.log(' error:', error)
