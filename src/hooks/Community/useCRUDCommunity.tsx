@@ -57,22 +57,22 @@ interface ErrorsModalProps {
 	// [key: string]: any
 }
 const handleParseData = (data: ConversationProps) => {
-	const {
-		thumbnail,
-		avatar,
-		title,
-		bio,
-		type,
-		category,
-		category_list,
-		about,
-		longitude,
-		latitude,
-		address,
-		is_online,
-		is_offline,
-	} = data
 	if (data) {
+		const {
+			thumbnail,
+			avatar,
+			title,
+			bio,
+			type,
+			category,
+			category_list,
+			about,
+			longitude,
+			latitude,
+			address,
+			is_online,
+			is_offline,
+		} = data
 		const categoryTitle = category.split(',')
 		return {
 			thumbnail,
