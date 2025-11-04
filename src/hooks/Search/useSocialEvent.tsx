@@ -38,6 +38,7 @@ export default function useSocialEvent({ data }: useSocialEventProps) {
 		date: null,
 		radius: 20,
 		keyword: '',
+		is_free: false,
 	})
 
 	const [loading, setLoading] = useState(true)
@@ -62,7 +63,7 @@ export default function useSocialEvent({ data }: useSocialEventProps) {
 		let _total = 0
 		try {
 			const { page, limit } = _paginationRefs.current
-			const { radius, keyword, date } = filter
+			const { radius, keyword, date, is_free } = filter
 			let isNew = false
 			if (page === 1) {
 				setUser([])
@@ -75,6 +76,7 @@ export default function useSocialEvent({ data }: useSocialEventProps) {
 					end_time: date[1].endOf('day').valueOf(),
 				}),
 				keyword,
+				...(is_free && { is_free }),
 			}
 			if (
 				Number(latitude) &&

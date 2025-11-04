@@ -12,6 +12,7 @@ import CButton from '@/Components/Custom/CButton'
 import CDatePickerRanger from '@/Components/Custom/CDatePickerRanger'
 import CInput from '@/Components/Custom/CInput'
 import CSelect from '@/Components/Custom/CSelect'
+import CSwitch from '@/Components/Custom/CSwitch'
 import ItemEvent from '@/Components/Event/ItemEvent'
 import MarkIcon from '@/svg/MarkIcon'
 import NotFound from '@/svg/NotFound'
@@ -43,7 +44,7 @@ const Local = (props: EventInAppProps) => {
 	} = useSocialEvent(props)
 
 	const _renderFilter = () => {
-		const { keyword, radius, date } = filter
+		const { keyword, radius, date, is_free } = filter
 		return (
 			<Flex className={classes.filter}>
 				<div className={classes.filterSearch}>
@@ -56,6 +57,15 @@ const Local = (props: EventInAppProps) => {
 						value={keyword}
 					/>
 				</div>
+				<Flex className={classes.free}>
+					<CSwitch
+						disabled={loading}
+						ctype="success"
+						checked={is_free}
+						onChange={onChangeValue('is_free')}
+					/>
+					<span>Free</span>
+				</Flex>
 				<Flex className={classes.distance}>
 					<CSelect
 						disabled={loading}
