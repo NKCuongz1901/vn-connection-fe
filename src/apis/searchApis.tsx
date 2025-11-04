@@ -17,6 +17,13 @@ export const getInappEvent = async (params) => {
 		params: { ...convertParams(_params), keyword },
 	})
 }
+export const getInappClub = async (params) => {
+	const url = SEARCH_ROUTES.searchClub
+	const { keyword, ..._params } = params || {}
+	return await axios.get(url, {
+		params: { ...convertParams(_params), keyword },
+	})
+}
 export const getInappCategoryUser = async (params) => {
 	const url = SEARCH_ROUTES.searchCategoryUser
 	const { keyword, ..._params } = params || {}

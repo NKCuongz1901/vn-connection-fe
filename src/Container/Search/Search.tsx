@@ -23,9 +23,8 @@ import classes from './Search.module.scss'
 
 const Search = () => {
 	const { onChangeRoute } = useLocalePath()
-	const { user, event, data, total, location, type, onChangeValue } = useSearch(
-		{},
-	)
+	const { user, event, club, data, total, location, type, onChangeValue } =
+		useSearch({})
 
 	const { address, longitude, latitude } = location
 	const _renderInputMap = () => {
@@ -110,6 +109,43 @@ const Search = () => {
 			</Flex>
 		)
 	}
+	const _renderClub = () => {
+		if (type) return
+		return (
+			<Flex className={classes.eventContainer} vertical>
+				<div
+					className={classes.titleEvent}
+					onClick={() =>
+						onChangeRoute(
+							`${mainRoutes.exploreInterest}?lat=${latitude}&lng=${longitude}`,
+						)
+					}
+				>
+					<EventTitle
+						hiddenNumber
+						hiddenAdd
+						label={`${total.club} Community ${address ? `in ${address}` : ''}`}
+						icon={<ProfileIcon />}
+					/>
+				</div>
+				<Flex className={classes.eventList}>
+					{(club || []).map((item) => (
+						<Flex
+							key={item.id}
+							vertical
+							className={classes.event}
+							onClick={() =>
+								onChangeRoute(`${mainRoutes.community}/${item.id}`)
+							}
+						>
+							<CImage src={item.avatar} />
+							<div className={classes.eventLabel}>{item.title}</div>
+						</Flex>
+					))}
+				</Flex>
+			</Flex>
+		)
+	}
 	const _renderBodyType = () => {
 		switch (type) {
 			case 'user':
@@ -126,6 +162,7 @@ const Search = () => {
 				{_renderInputMap()}
 				{_renderUser()}
 				{_renderEvent()}
+				{_renderClub()}
 				{_renderBodyType()}
 			</Flex>
 		</div>

@@ -17,12 +17,15 @@ import {
 	joinConversation,
 	leaveConversation,
 } from '@/apis/conversationApis'
+import { getFullAddressFromLatLng } from '@/apis/ggApis'
 import {
 	getInappCategoryClub,
 	getInappCategoryClubMatching,
 	getInappCategoryUser,
 	getInappCategoryUserMatching,
 } from '@/apis/searchApis'
+
+import { useQuery } from '@/ultis/route.ults'
 
 import { paginationCommon } from '@/Variable/common.variable'
 import { radiusOptsV2 } from '@/Variable/select.variable'
@@ -48,6 +51,10 @@ const tabs = [
 export default function useExploreInterest({}: any) {
 	const { openError } = useModal()
 	const [activeTab, setActiveTab] = useState('club')
+	const { onGetQuerry } = useQuery()
+	const { lat, lng } = onGetQuerry()
+
+	const firstTime = useRef(true)
 
 	const _paginationRefs = useRef<{ [key: string]: PaginationType }>({
 		club: cloneDeep(paginationCommon),
@@ -60,8 +67,8 @@ export default function useExploreInterest({}: any) {
 
 	const [filters, setFilters] = useState({
 		address: '',
-		latitude: null,
-		longitude: null,
+		latitude: Number(lat) || null,
+		longitude: Number(lng) || null,
 		radius: radiusOptsV2[3].value,
 	})
 
@@ -109,6 +116,7 @@ export default function useExploreInterest({}: any) {
 			}
 		}
 	}
+
 	const handleSetStatus = (item) => {
 		const { is_offline, is_online } = statusClub
 		if (
@@ -121,6 +129,7 @@ export default function useExploreInterest({}: any) {
 		_loadmore.current.club = true
 		setStatusClub((prev) => ({ ...prev, [item]: !prev[item] }))
 	}
+
 	const handleChangeFilter = (_key) => (_value) => {
 		let key = _key
 		let value = _value
@@ -141,14 +150,48 @@ export default function useExploreInterest({}: any) {
 
 		setFilters((prev) => ({ ...prev, [key]: value, ...other }))
 	}
-	const handleGetCategoryClubUserLocation = async () => {
-		const res = await handleGetLocation()
+	const handleGetCategoryClubUserLocation = async ({ lat, lng }) => {
+		let res
+		firstTime.current = false
+		if (!!lat && !!lng) {
+			res = await handleGetLocation({ lat, lng })
+		}
 		handleGetCategoryClubUser(res)
 	}
-	const handleGetLocation = async () => {
+
+	const handleGetAddress = async (marker) => {
+		try {
+			const res: any = await getFullAddressFromLatLng({
+				lat: Number(marker?.lat) || null,
+				lng: Number(marker?.lng) || null,
+			})
+			const { code, results } = res || {}
+			if (code === 200) {
+				const { formatted_address, geometry } =
+					results?.object?.results?.[0] || {}
+				setFilters((prev) => ({
+					...prev,
+					address: formatted_address,
+				}))
+				return {
+					display_name: formatted_address || '',
+					lat: geometry?.location?.lat || marker?.lat,
+					lng: geometry?.location?.lng || marker?.lng,
+				}
+			}
+		} catch (error) {
+			console.log('error:', error)
+		}
+	}
+
+	const handleGetLocation = async ({ lat, lng }) => {
 		let res: any
 		try {
-			res = await getCurrentLocation()
+			if (!!lat && !!Number(lat) && !!lng && !!Number(lng)) {
+				res = handleGetAddress({ lat, lng })
+			} else {
+				res = await getCurrentLocation()
+			}
 		} catch (error) {
 			console.log(' error:', error)
 		} finally {
@@ -398,10 +441,18 @@ export default function useExploreInterest({}: any) {
 			setLoadingInvite((prev) => ({ ...prev, [id]: false }))
 		}
 	}
+
 	useEffect(() => {
-		handleGetCategoryClubUserLocation()
+		handleGetCategoryClubUserLocation({ lat, lng })
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [JSON.stringify(filters)])
+	}, [])
+
+	useEffect(() => {
+		if (!firstTime.current) {
+			handleGetCategoryClubUserLocation({ lat, lng })
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [filters.latitude, filters.longitude, filters.radius])
 
 	useEffect(() => {
 		if (matching) {

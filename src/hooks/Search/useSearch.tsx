@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 
-import { getInappEvent, getInappLocal } from '@/apis/searchApis'
+import { getInappClub, getInappEvent, getInappLocal } from '@/apis/searchApis'
 
 import { useModal } from '@/context/ModalContext'
 
 import { useQuery } from '@/ultis/route.ults'
 import { randomString } from '@/ultis/string.ults'
 
+import { NetworkItemProps } from '@/interface/Community/Community.interface'
 import { LocalProps, LocalResProps } from '@/interface/Search/Search.interface'
 
 interface useSearchProps {
@@ -30,9 +31,10 @@ export default function useSearch({}: useSearchProps) {
 
 	const [user, setUser] = useState<LocalProps[]>([])
 	const [event, setEvent] = useState<any[]>([])
+	const [club, setClub] = useState<NetworkItemProps[]>([])
 
 	const [loading, setLoading] = useState({ user: false })
-	const [total, setTotal] = useState({ user: 0, event: 0 })
+	const [total, setTotal] = useState({ user: 0, event: 0, club: 0 })
 	const [apiId, setApiId] = useState<string>('')
 
 	const [type, setType] = useState(searchType[t] || '')
@@ -77,6 +79,7 @@ export default function useSearch({}: useSearchProps) {
 			setTotal((prev) => ({ ...prev, user: _total }))
 		}
 	}
+
 	const handleGetUpcommingEvent = async () => {
 		if (type) return
 		setLoading((prev) => ({ ...prev, event: true }))
@@ -102,9 +105,35 @@ export default function useSearch({}: useSearchProps) {
 		}
 	}
 
+	const handleGetInAppClub = async () => {
+		if (type) return
+		setLoading((prev) => ({ ...prev, club: true }))
+		let _total = 0
+		try {
+			const { latitude, longitude } = location
+			const res: any = (await getInappClub({
+				fields: ['$all'],
+				...(latitude && longitude && { latitude, longitude }),
+				page: 1,
+				limit: 20,
+			})) as any
+			const { results } = res || {}
+			if (res) {
+				setClub(results.objects.rows)
+				_total = results.objects.count
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoading((prev) => ({ ...prev, club: false }))
+			setTotal((prev) => ({ ...prev, club: _total }))
+		}
+	}
+
 	useEffect(() => {
 		handleGetInAppLocal()
 		handleGetUpcommingEvent()
+		handleGetInAppClub()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [apiId])
 
@@ -116,6 +145,7 @@ export default function useSearch({}: useSearchProps) {
 		loading,
 		user,
 		event,
+		club,
 		total,
 		location,
 		type,

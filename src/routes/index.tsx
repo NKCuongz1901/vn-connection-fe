@@ -96,6 +96,7 @@ export const NOTIFICATION_ROUTES = {
 export const SEARCH_ROUTES = {
 	searchLocal: 'search-in-app/local',
 	searchEvent: 'search-in-app/event',
+	searchClub: 'search-in-app/club',
 	searchCategoryUser: 'search-in-app/category-user',
 	searchCategoryClub: 'search-in-app/category-club',
 	searchCategoryClubMatching: 'search-in-app/club-matching-categories',
