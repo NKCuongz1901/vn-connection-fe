@@ -169,24 +169,6 @@ export const radiusOpts = [
 	},
 ]
 
-export const radiusOptsV2 = [
-	{
-		value: 2,
-		label: 'Under 2km',
-	},
-	{
-		value: 5,
-		label: 'Under 5km',
-	},
-	{
-		value: 10,
-		label: 'Under 10km',
-	},
-	{
-		value: 20,
-		label: 'Under 20km',
-	},
-]
 export const radiusAnyOpts = [
 	{
 		value: 'Any',

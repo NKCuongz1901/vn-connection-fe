@@ -28,7 +28,7 @@ import {
 import { useQuery } from '@/ultis/route.ults'
 
 import { paginationCommon } from '@/Variable/common.variable'
-import { radiusOptsV2 } from '@/Variable/select.variable'
+import { radiusOpts } from '@/Variable/select.variable'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import {
@@ -69,7 +69,7 @@ export default function useExploreInterest({}: any) {
 		address: '',
 		latitude: Number(lat) || null,
 		longitude: Number(lng) || null,
-		radius: radiusOptsV2[3].value,
+		radius: radiusOpts[radiusOpts.length - 1].value,
 	})
 
 	const [statusClub, setStatusClub] = useState({
