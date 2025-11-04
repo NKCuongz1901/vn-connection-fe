@@ -19,6 +19,9 @@ export function useLocalePath() {
 	const handleChangeRoute = (path: string) => {
 		router.push(handleGetPath(path))
 	}
+	const handleOpenNewRoute = (path: string) => {
+		window.open(handleGetPath(path), '_blank')
+	}
 	const handleGetParam = () => {
 		return params || []
 	}
@@ -28,6 +31,7 @@ export function useLocalePath() {
 		onGetPath: handleGetPath,
 		onChangeRoute: handleChangeRoute,
 		onGetParam: handleGetParam,
+		onOpenNewRoute: handleOpenNewRoute,
 	}
 }
 

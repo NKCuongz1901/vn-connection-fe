@@ -68,7 +68,7 @@ const GENDER = {
 	),
 }
 const ExploreInterest = () => {
-	const { onChangeRoute } = useLocalePath()
+	const { onChangeRoute, onOpenNewRoute } = useLocalePath()
 	const {
 		loadingInvite,
 		invited,
@@ -328,7 +328,12 @@ const ExploreInterest = () => {
 								item || {}
 							return (
 								<Flex key={id} className={classes.matchingClubWrapper}>
-									<Flex className={classes.matchingClubInfoLeft}>
+									<Flex
+										className={classes.matchingClubInfoLeft}
+										onClick={() =>
+											onOpenNewRoute(`${mainRoutes.profile}/${id}`)
+										}
+									>
 										<CAvatar src={avatar} className={classes.infoAva} />
 
 										<Flex vertical className={classes.matchingClubInfo}>
