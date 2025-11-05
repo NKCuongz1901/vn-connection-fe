@@ -62,10 +62,11 @@ export default function useSearch({}: useSearchProps) {
 		setLoading((prev) => ({ ...prev, user: true }))
 		let _total = 0
 		try {
-			const { latitude, longitude } = location
+			const { latitude, longitude, address } = location
 			const res: LocalResProps = (await getInappLocal({
 				fields: ['$all'],
 				...(latitude && longitude && { latitude, longitude }),
+				...(address && { google_title: address }),
 				page: 1,
 				limit: 20,
 			})) as any
@@ -87,10 +88,11 @@ export default function useSearch({}: useSearchProps) {
 		setLoading((prev) => ({ ...prev, event: true }))
 		let _total = 0
 		try {
-			const { latitude, longitude } = location
+			const { latitude, longitude, address } = location
 			const res: any = (await getInappEvent({
 				fields: ['$all'],
 				...(latitude && longitude && { latitude, longitude }),
+				...(address && { google_title: address }),
 				page: 1,
 				limit: 20,
 			})) as any
@@ -112,10 +114,11 @@ export default function useSearch({}: useSearchProps) {
 		setLoading((prev) => ({ ...prev, club: true }))
 		let _total = 0
 		try {
-			const { latitude, longitude } = location
+			const { latitude, longitude, address } = location
 			const res: any = (await getInappClub({
 				fields: ['$all'],
 				...(latitude && longitude && { latitude, longitude }),
+				...(address && { google_title: address }),
 				page: 1,
 				limit: 20,
 			})) as any

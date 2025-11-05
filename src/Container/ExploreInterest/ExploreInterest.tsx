@@ -68,7 +68,6 @@ const GENDER = {
 	),
 }
 const ExploreInterest = () => {
-	console.log('a')
 	const { onChangeRoute } = useLocalePath()
 	const {
 		loadingInvite,
