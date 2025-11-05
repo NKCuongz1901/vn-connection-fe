@@ -313,11 +313,25 @@ export default function useExploreInterest({}: any) {
 				await delay(1000)
 			}
 			if (code === 200) {
-				const { rows } = results?.objects || {}
+				let { rows } = results?.objects || {}
 				if (!isNotLoading) {
 					_loadmore.current.club = isArray(rows, limit)
 				}
 				setMatchingClub((prev: any[]) => {
+					rows = (rows || []).map((i) => {
+						const { category, category_list } = i || {}
+						const cates = (category || '').split(', ')
+						const newCate = (category_list || [])
+							.reduce((arr: string[], item, index) => {
+								if (selects.includes(item)) {
+									arr.push(cates[index])
+								}
+								return arr
+							}, [])
+							.join(', ')
+
+						return { ...i, category: newCate }
+					})
 					const contents = isNew && !isNotLoading ? [] : prev
 					const dataShow = (
 						!isNotLoading
@@ -362,11 +376,30 @@ export default function useExploreInterest({}: any) {
 				await delay(1000)
 			}
 			if (code === 200) {
-				const { rows } = results?.objects || {}
+				let { rows } = results?.objects || {}
 				if (!isNotLoading) {
 					_loadmore.current.user = isArray(rows, limit)
 				}
+				const mappingData = (selects || []).reduce((arr, item) => {
+					const data = (tabsData.user || []).find((i) => i.id === item)
+					arr.push(data.title)
+					return arr
+				}, [])
 				setMatchingUser((prev: any[]) => {
+					rows = (rows || []).map((i) => {
+						const { i_am_interested_in } = i || {}
+						const cates = (i_am_interested_in || '').split(', ')
+						const newCate = (mappingData || [])
+							.reduce((arr: string[], item) => {
+								if (cates.includes(item)) {
+									arr.push(item)
+								}
+								return arr
+							}, [])
+							.join(', ')
+
+						return { ...i, i_am_interested_in: newCate }
+					})
 					const contents = isNew && !isNotLoading ? [] : prev
 					const dataShow = (
 						!isNotLoading
