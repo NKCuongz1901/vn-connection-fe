@@ -65,6 +65,7 @@ const DiscussionDetail = (
 		{
 			discussId,
 			onActionProps,
+			conversation_id,
 		},
 		ref,
 	)
