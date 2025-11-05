@@ -368,7 +368,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 			await joinConversation({ id, status: true })
 			handleGetInfoConv(true)
 			if (memberRef.current?.onGetMember) {
-				memberRef.current.onGetMember(true)
+				memberRef.current.onGetMember()
 			}
 		} catch (error) {
 			openError(error)
@@ -384,7 +384,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 			handleGetInfoConv(true)
 			openSuccess({ message: 'You leave community successfull' })
 			if (memberRef.current?.onGetMember) {
-				memberRef.current.onGetMember(true)
+				memberRef.current.onGetMember()
 			}
 		} catch (error) {
 			openError(error)
