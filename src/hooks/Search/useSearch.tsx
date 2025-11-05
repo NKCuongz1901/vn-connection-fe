@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 
 import { getInappClub, getInappEvent, getInappLocal } from '@/apis/searchApis'
+import { getFullAddressFromLatLng } from '@/apis/ggApis'
 
 import { useModal } from '@/context/ModalContext'
 
 import { useQuery } from '@/ultis/route.ults'
 import { randomString } from '@/ultis/string.ults'
+import { getCurrentLocation } from '@/ultis/common.ults'
 
 import { NetworkItemProps } from '@/interface/Community/Community.interface'
 import { LocalProps, LocalResProps } from '@/interface/Search/Search.interface'
@@ -129,11 +131,48 @@ export default function useSearch({}: useSearchProps) {
 			setTotal((prev) => ({ ...prev, club: _total }))
 		}
 	}
+	const handleGetAddress = async (marker) => {
+		try {
+			const res: any = await getFullAddressFromLatLng({
+				lat: Number(marker?.lat) || null,
+				lng: Number(marker?.lng) || null,
+			})
+			const { code, results } = res || {}
+			if (code === 200) {
+				const { formatted_address, geometry } =
+					results?.object?.results?.[0] || {}
+				handleChangeValue('location')({
+					display_name: formatted_address,
+					lat: geometry?.location?.lat || marker?.lat,
+					lng: geometry?.location?.lng || marker?.lng,
+				})
+			}
+		} catch (error) {
+			console.log('error:', error)
+		}
+	}
 
+	const handleGetLocation = async () => {
+		let res: any
+		try {
+			res = await getCurrentLocation()
+			if (res) {
+				res = await handleGetAddress(res)
+			}
+		} catch (error) {
+			console.log(' error:', error)
+		} finally {
+			return res
+		}
+	}
 	useEffect(() => {
-		handleGetInAppLocal()
-		handleGetUpcommingEvent()
-		handleGetInAppClub()
+		if (apiId) {
+			handleGetInAppLocal()
+			handleGetUpcommingEvent()
+			handleGetInAppClub()
+		} else {
+			handleGetLocation()
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [apiId])
 
