@@ -235,6 +235,8 @@ export default function useDetailCommunityDiscussion(props, ref) {
 				break
 			case 'edit':
 				{
+					const { id } = value
+
 					handleReplace(id)
 				}
 				break
