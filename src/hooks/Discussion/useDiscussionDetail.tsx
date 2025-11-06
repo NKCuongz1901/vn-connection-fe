@@ -38,9 +38,14 @@ import { paginationCommon } from '@/Variable/common.variable'
 interface useDiscussionDetailProps {
 	discussId: string
 	onActionProps?: any
+	conversation_id?: string
 }
 export default function useDiscussionDetail(
-	{ discussId, onActionProps = () => null }: useDiscussionDetailProps,
+	{
+		discussId,
+		conversation_id,
+		onActionProps = () => null,
+	}: useDiscussionDetailProps,
 	ref,
 ) {
 	const { openError, openSuccess, openConfirm, closeModal } = useModal()
@@ -228,7 +233,7 @@ export default function useDiscussionDetail(
 			if (res) {
 				openSuccess({
 					message: 'You have successfully deleted this discuss',
-					onAccept: () => handleChangeUrl({ key: 'backForce', value: null }),
+					onAccept: () => handleChangeUrl({ key: 'backForce', value: id }),
 				})
 			}
 		} catch (error) {
@@ -614,6 +619,9 @@ export default function useDiscussionDetail(
 					...(category_id && { category_id }),
 					force_id: randomString(),
 				})
+				if (conversation_id) {
+					onActionProps({ key: 'back' })
+				}
 				break
 			default:
 				break

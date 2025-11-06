@@ -75,10 +75,23 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 				setMessList((prev: any[]) => {
 					const contents = isNew ? [] : prev
 					const mappingRow = _rows.map((i) => {
+						const { type, sender } = i || {}
+						const { name } = sender || {}
+						let { content, content_en } = i || {}
+						switch (type) {
+							case 'MEMBER_JOIN':
+								content = content.replace('$name', name)
+								content_en = content_en.replace('$name', name)
+								break
+							default:
+								break
+						}
 						return {
 							...i,
 							user_id: i?.sender_id,
 							user: i?.sender,
+							content,
+							content_en,
 							parent: {
 								...i?.parent,
 								user_id: i?.parent?.sender_id,
