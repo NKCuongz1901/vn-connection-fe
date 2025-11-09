@@ -30,6 +30,7 @@ npm run dev
 1. Id, key
 2. Boolean
 3. Common type
+
 4. Function
 
 ## Rule commit code
