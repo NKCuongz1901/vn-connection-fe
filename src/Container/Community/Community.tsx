@@ -17,6 +17,8 @@ import SearchIcon from '@/svg/SearchIcon'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './Community.module.scss'
+import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
+import { IconSquareRoundedPlusFilled } from '@tabler/icons-react'
 
 const Community = () => {
 	const { onChangeRoute } = useLocalePath()
@@ -27,7 +29,10 @@ const Community = () => {
 		networkClub,
 		networkSuggest,
 		keyword,
+		modal,
+		setModal,
 		setKeyword,
+		onGetNetwork,
 	} = useCommunity({})
 	const _renderSearch = () => {
 		return (
@@ -171,12 +176,46 @@ const Community = () => {
 			</Flex>
 		)
 	}
+
+	const _renderModal = () => {
+		const { type } = modal || {}
+		let Content = <></>
+		const propsModal = {
+			open: true,
+			onClose: () => setModal({ type: null, data: null }),
+			// onSuccess: (item) => onCRUDSuccess({ key: 'create', value: item }),
+		}
+		switch (type) {
+			case 'network':
+				Content = (
+					<ModalCRUDCommunity
+						{...propsModal}
+						onSuccess={() => onGetNetwork(true)}
+					/>
+				)
+				break
+			default:
+				break
+		}
+		return Content
+	}
 	return (
 		<div className={classes.wrapper}>
 			<Flex vertical className={classes.container}>
 				<Flex className={classes.header}>
-					<People fill="#1E9037" />
-					<div>My Community</div>
+					<Flex>
+						<People fill="#1E9037" />
+						<div>My Community</div>
+					</Flex>
+					<div className={classes.bntAdd}>
+						<CButton ctype="oranger">+ Create community</CButton>
+					</div>
+					<Flex
+						className={classes.buttonAdd}
+						onClick={() => setModal({ type: 'network', data: null })}
+					>
+						<IconSquareRoundedPlusFilled />
+					</Flex>
 				</Flex>
 				<Flex className={classes.content} vertical>
 					{_renderSearch()}
@@ -184,6 +223,7 @@ const Community = () => {
 					{_renderNetworkSuggest()}
 				</Flex>
 			</Flex>
+			{_renderModal()}
 		</div>
 	)
 }

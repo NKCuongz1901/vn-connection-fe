@@ -8,11 +8,21 @@
 		width: 100%;
 		gap: 12px;
 		.header {
+			justify-content: space-between;
 			gap: 8px;
 			align-items: center;
 			color: #0f1729;
 			font-size: 18px;
 			font-weight: 600;
+			button {
+				height: 32px;
+				padding: 0 16px;
+			}
+			.buttonAdd {
+				display: none;
+				color: #e55a0f;
+				cursor: pointer;
+			}
 		}
 		.content {
 			flex: 1;
@@ -112,6 +122,22 @@
 		}
 		.note {
 			color: #48546b;
+		}
+	}
+}
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		.container {
+			padding: 8px;
+			.header {
+				.bntAdd {
+					display: none;
+				}
+				.buttonAdd {
+					display: flex;
+				}
+			}
 		}
 	}
 }

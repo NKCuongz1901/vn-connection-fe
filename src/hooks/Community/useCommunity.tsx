@@ -36,6 +36,8 @@ export default function useCommunity(_props: useCommunityProps) {
 	const [loading, setLoading] = useState(true)
 	const [loadingClub, setLoadingClub] = useState(true)
 
+	const [modal, setModal] = useState({ type: '', data: null }) as any
+
 	const handleGetSelectOpt = async () => {
 		setLoading(true)
 		try {
@@ -49,8 +51,8 @@ export default function useCommunity(_props: useCommunityProps) {
 		}
 	}
 
-	const handleGetNetwork = async () => {
-		setLoadingClub(true)
+	const handleGetNetwork = async (notLoading = false) => {
+		if (!notLoading) setLoadingClub(true)
 		try {
 			const networkClubApis = networkOpts.map((item) =>
 				getConvClubList({
@@ -113,6 +115,9 @@ export default function useCommunity(_props: useCommunityProps) {
 		networkClub,
 		networkSuggest,
 		keyword,
+		modal,
+		setModal,
 		setKeyword,
+		onGetNetwork: handleGetNetwork,
 	}
 }
