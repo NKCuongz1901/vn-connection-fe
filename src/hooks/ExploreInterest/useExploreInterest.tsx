@@ -317,14 +317,18 @@ export default function useExploreInterest({}: any) {
 				if (!isNotLoading) {
 					_loadmore.current.club = isArray(rows, limit)
 				}
+				const mappingData = (selects || []).reduce((obj, item) => {
+					const data = (tabsData.club || []).find((i) => i.id === item)
+					obj[data.id] = data
+					return obj
+				}, {})
 				setMatchingClub((prev: any[]) => {
 					rows = (rows || []).map((i) => {
-						const { category, category_list } = i || {}
-						const cates = (category || '').split(', ')
+						const { category_list } = i || {}
 						const newCate = (category_list || [])
-							.reduce((arr: string[], item, index) => {
-								if (selects.includes(item)) {
-									arr.push(cates[index])
+							.reduce((arr: any[], item: any) => {
+								if (mappingData[item]) {
+									arr.push(mappingData[item]?.title)
 								}
 								return arr
 							}, [])
