@@ -336,7 +336,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 				{
 					Content = (
 						<ModalMyFriend
-							title="Share friend"
+							title="Invite friends"
 							{...propsModal}
 							customComp={_renderMyFriendComp}
 						/>

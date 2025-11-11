@@ -56,7 +56,7 @@ const MyFriend = (_props: MyFriendProps) => {
 					</Flex>
 				)}
 				<Flex className={classes.friendListWrapper} vertical ref={_parentRef}>
-					<span className={classes.title}>Friend list</span>
+					<span className={classes.title}>Friend list suggestion</span>
 					<Flex
 						vertical
 						className={classes.friendList}
