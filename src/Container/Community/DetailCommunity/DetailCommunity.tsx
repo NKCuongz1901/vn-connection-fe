@@ -87,8 +87,6 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		onJoinConv,
 	} = useDetailCommunity(props)
 
-	const { join } = convInfo || {}
-
 	const _renderAction = () => {
 		return (
 			<Flex className={classes.action}>
