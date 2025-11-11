@@ -22,6 +22,7 @@ import People from '@/svg/People'
 import TopicIcon from '@/svg/TopicIcon'
 
 import classes from './DetailCommunity.module.scss'
+import { getUserInfo } from '@/ultis/storage.ults'
 
 const mappingTabsBtnTop = {
 	member: 'member',
@@ -103,7 +104,10 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		)
 	}
 	const _renderInfo = () => {
-		const { type, avatar, title, bio, address } = convInfo || {}
+		const { type, avatar, title, bio, address, host_id, join } = convInfo || {}
+		const { type: typeJoin } = join || {}
+
+		const isCreateAnnou = getUserInfo('id') === host_id || typeJoin === 'ADMIN'
 
 		return (
 			<Flex className={classes.infoWrapper}>
@@ -137,7 +141,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 								</CButton>
 							)}
 						</>
-					) : (
+					) : isCreateAnnou ? (
 						<Flex>
 							<CButton
 								ctype="oranger"
@@ -153,6 +157,24 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 								+ Create announcement
 							</CButton>
 						</Flex>
+					) : (
+						<>
+							<CButton
+								ctype="disabled"
+								onClick={() => onAction({ key: 'share', value: convInfo })}
+							>
+								<span>Invite friends</span>
+							</CButton>
+							{!join && (
+								<CButton
+									disabled={!!loadingApi.join}
+									ctype="oranger"
+									onClick={() => onJoinConv(id)}
+								>
+									Join
+								</CButton>
+							)}
+						</>
 					)}
 				</Flex>
 			</Flex>
