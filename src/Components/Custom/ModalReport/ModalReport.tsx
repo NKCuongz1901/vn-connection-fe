@@ -25,6 +25,7 @@ import { topicReportOpt } from '@/Variable/select.variable'
 
 import classes from './ModalReport.module.scss'
 import { getUserInfo } from '@/ultis/storage.ults'
+import CTextArea from '../CTextArea'
 
 interface ModalReportProps {
 	open: boolean
@@ -43,7 +44,6 @@ const ModalReport = (props: ModalReportProps) => {
 	const [errors, setErrors] = useState({
 		topic: '',
 		email: '',
-		content: '',
 	})
 	const [dataModal, setDataModal] = useState({
 		topic: topicReportOpt[0].value,
@@ -151,7 +151,7 @@ const ModalReport = (props: ModalReportProps) => {
 	}
 
 	const _renderMiddle = () => {
-		const { topic, email } = dataModal
+		const { topic, email, content } = dataModal
 		return (
 			<Flex className={classes.middle} vertical>
 				<Flex className={classes.email}>
@@ -176,7 +176,16 @@ const ModalReport = (props: ModalReportProps) => {
 						onChange={(e) => handleOnChangeData('topic', e)}
 					/>
 				</Flex>
-
+				<Flex className={classes.content}>
+					<CTextArea
+						showCount
+						label="Content"
+						placeholder="Describe your problems"
+						value={content}
+						maxLength={1000}
+						onChange={(e) => handleOnChangeData('content', e.target.value)}
+					/>
+				</Flex>
 				<Flex className={classes.chooseImg} vertical>
 					<Flex className={classes.upload}>
 						<CUploadMuti
