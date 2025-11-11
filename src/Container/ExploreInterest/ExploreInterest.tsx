@@ -429,7 +429,7 @@ const ExploreInterest = () => {
 			case 'invite':
 				Content = (
 					<ModalInviteCommunity
-						title="Share friend"
+						title="Send invitation to my communities"
 						id={data}
 						{...propsModal}
 						customComp={_renderMyFriendComp}
