@@ -15,15 +15,16 @@ import { PaginationType } from '@/interface/common/common.interface'
 
 interface useLocalProps {
 	data: {
-		longitude: number | string
-		latitude: number | string
+		longitude?: number | string
+		latitude?: number | string
+		address?: string
 	}
 	[key: string]: any
 }
 
 export default function useLocal({ data }: useLocalProps) {
 	const { openError } = useModal()
-	const { longitude, latitude } = data || {}
+	const { longitude, latitude, address } = data || {}
 
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationMore))
 	const _loadmore = useRef<boolean>(true)
@@ -139,9 +140,10 @@ export default function useLocal({ data }: useLocalProps) {
 				!isNaN(Number(longitude)) &&
 				!isNaN(Number(latitude))
 			) {
-				Object.apply(body, {
+				Object.assign(body, {
 					latitude: Number(latitude),
 					longitude: Number(longitude),
+					google_title: address || '',
 				})
 			}
 			const res: LocalResProps = (await getInappLocal({

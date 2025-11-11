@@ -25,8 +25,9 @@ import classes from './SocialEvent.module.scss'
 
 interface EventInAppProps {
 	data: {
-		longitude: number | string
-		latitude: number | string
+		longitude?: number | string
+		latitude?: number | string
+		address?: string
 	}
 	[key: string]: any
 }

@@ -47,7 +47,9 @@ const Search = () => {
 			<Flex className={classes.userContainer} vertical>
 				<div
 					className={classes.titleUser}
-					onClick={() => onPushState({ t: 'user', longitude, latitude })}
+					onClick={() =>
+						onPushState({ t: 'user', longitude, latitude, address })
+					}
 				>
 					<EventTitle
 						hiddenNumber
@@ -80,7 +82,9 @@ const Search = () => {
 			<Flex className={classes.eventContainer} vertical>
 				<div
 					className={classes.titleEvent}
-					onClick={() => onPushState({ t: 'event', longitude, latitude })}
+					onClick={() =>
+						onPushState({ t: 'event', longitude, latitude, address })
+					}
 				>
 					<EventTitle
 						hiddenNumber

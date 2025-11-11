@@ -24,7 +24,7 @@ const searchType = {
 export default function useSearch({}: useSearchProps) {
 	const { openError } = useModal()
 	const { onGetQuerry } = useQuery()
-	const { t, longitude, latitude } = onGetQuerry()
+	const { t, longitude, latitude, address } = onGetQuerry()
 	const [location, setLocation] = useState({
 		address: '',
 		longitude: 0,
@@ -194,6 +194,7 @@ export default function useSearch({}: useSearchProps) {
 		data: {
 			longitude,
 			latitude,
+			address,
 		},
 		setType,
 		onChangeValue: handleChangeValue,

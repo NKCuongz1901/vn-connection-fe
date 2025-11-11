@@ -26,8 +26,9 @@ import classes from './Local.module.scss'
 
 interface LocalProps {
 	data: {
-		longitude: number | string
-		latitude: number | string
+		longitude?: number | string
+		latitude?: number | string
+		address?: string
 	}
 	[key: string]: any
 }
