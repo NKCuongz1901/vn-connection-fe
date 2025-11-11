@@ -343,10 +343,20 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 	const handleParseDataSocket = useCallback(
 		(data) => {
 			try {
-				const { conversation_id } = data || {}
+				const { conversation_id, type, sender } = data || {}
+				let { content, content_en } = data || {}
 				if (conversation_id !== convId) return
 				setMessList((prev: any[]) => {
 					const contents = prev
+					switch (type) {
+						case 'MEMBER_JOIN':
+							const { name } = sender || {}
+							content = content.replace('$name', name)
+							content_en = content_en.replace('$name', name)
+							break
+						default:
+							break
+					}
 					const newData = uniqueArray(
 						[
 							{
@@ -354,6 +364,8 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 								user: data?.sender,
 								...data,
 								...(parent && { parent }),
+								content,
+								content_en,
 							},
 							...contents,
 						],
