@@ -102,7 +102,7 @@ const Community = () => {
 										</div>
 										<CButton
 											ctype="oranger"
-											onClick={() => onChangeRoute(mainRoutes.exploreInterest)}
+											onClick={() => onChangeRoute(mainRoutes.search)}
 										>
 											Explore now
 										</CButton>
@@ -160,7 +160,7 @@ const Community = () => {
 								</div>
 								<CButton
 									ctype="oranger"
-									onClick={() => onChangeRoute(mainRoutes.exploreInterest)}
+									onClick={() => onChangeRoute(mainRoutes.search)}
 								>
 									Explore now
 								</CButton>
