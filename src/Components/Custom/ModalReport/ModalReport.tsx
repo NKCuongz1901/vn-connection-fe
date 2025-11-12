@@ -182,6 +182,7 @@ const ModalReport = (props: ModalReportProps) => {
 						label="Content"
 						placeholder="Describe your problems"
 						value={content}
+						rows={4}
 						maxLength={1000}
 						onChange={(e) => handleOnChangeData('content', e.target.value)}
 					/>

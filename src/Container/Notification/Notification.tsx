@@ -41,6 +41,7 @@ const mappingTypeIcon = {
 	DISCUSS_IN_CLUB: People,
 	DISCUSS_IN_CHATROOM: People,
 	CLUB: People,
+	[NOTIFICATION_TYPE.CHAT_ROOM]: People,
 
 	[NOTIFICATION_TYPE.COMMENT_ON_DISCUSS_IN_TOPIC]: Message3,
 	[NOTIFICATION_TYPE.NEW_POST_CREATED]: Message3,
@@ -102,7 +103,7 @@ const Notification = (props: { onClose?: any }) => {
 		const Icon = mappingTypeIcon[type]
 		return (
 			<Flex className={classes.bandageIcon}>
-				{Icon ? <Icon fill={'#fff'} /> : type}
+				{Icon && <Icon fill={'#fff'} />}
 			</Flex>
 		)
 	}
@@ -129,6 +130,7 @@ const Notification = (props: { onClose?: any }) => {
 							'NEAR_END_HANGOUT_STATUS',
 							'INVITEE_MEMBER_JOIN_CLUB',
 							'JOIN_DISCUSSION_IN_CHATROOM',
+							'FRIEND_JOINED_TALKROOM',
 						].includes(interacting_type) ? (
 							<div>
 								<CAvatarBandage

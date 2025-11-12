@@ -83,13 +83,13 @@ const MyFriend = (_props: MyFriendProps) => {
 									<Flex className={classes.notFound} vertical>
 										<NotFound />
 										<div className={classes.title}>No results found</div>
-										<span>Do you want to explore more friends?</span>
+										{/* <span>Do you want to explore more friends?</span>
 										<Flex
 											className={classes.exploreButton}
 											onClick={() => onChangeRoute(mainRoutes.search)}
 										>
 											<CButton ctype="oranger">Explore now</CButton>
-										</Flex>
+										</Flex> */}
 									</Flex>
 							  )}
 						{loading &&

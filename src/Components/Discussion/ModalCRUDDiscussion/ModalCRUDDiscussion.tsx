@@ -41,12 +41,13 @@ const ModalCRUDDiscussion = (props: ModalCRUDDiscussionProps) => {
 	} = useModalCRUDDiscussion(props)
 	const { id, category } = data || {}
 	const { title, category_id, medias, description } = dataSubmit || {}
+	const label = conversation_id ? 'topic' : 'discussion'
 	return (
 		<div className={classes.wrapper}>
 			<CModal
 				onClose={onClose}
 				onCancel={onClose}
-				title={id ? 'Edit discussion' : 'Create discussion'}
+				title={id ? `Edit ${label}` : `Create ${label}`}
 				styles={{
 					content: {
 						width: 800,
@@ -60,7 +61,7 @@ const ModalCRUDDiscussion = (props: ModalCRUDDiscussionProps) => {
 							ctype="oranger"
 							style={{ width: 200 }}
 						>
-							{id ? 'Edit discussion' : 'Create discussion'}
+							{id ? `Edit ${label}` : `Create ${label}`}
 						</CButton>
 					</Flex>,
 				]}

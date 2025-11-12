@@ -28,6 +28,7 @@ export default function useModalCRUDDiscussion({
 }: useModalCRUDDiscussionProps) {
 	const { openConfirm, openError, openSuccess, closeModal } = useModal()
 	const { toggleLoadingContext } = useLoading()
+	const label = conversation_id ? 'topic' : 'discussion'
 
 	const categoryOption = useMemo(() => {
 		return (topic || []).map((item) => ({ value: item.id, label: item.title }))
@@ -166,8 +167,8 @@ export default function useModalCRUDDiscussion({
 				}
 				openSuccess({
 					message: id
-						? 'Edit discussion successfully'
-						: 'Create discussion successfully',
+						? `Edit ${label} successfull`
+						: `Create ${label} successfully`,
 					onAccept: () => {
 						onClose()
 					},

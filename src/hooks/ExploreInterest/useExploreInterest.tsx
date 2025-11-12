@@ -392,7 +392,7 @@ export default function useExploreInterest({}: any) {
 				setMatchingUser((prev: any[]) => {
 					rows = (rows || []).map((i) => {
 						const { i_am_interested_in } = i || {}
-						const cates = (i_am_interested_in || '').split(', ')
+						const cates = (i_am_interested_in || '').split(',')
 						const newCate = (mappingData || [])
 							.reduce((arr: string[], item) => {
 								if (cates.includes(item)) {

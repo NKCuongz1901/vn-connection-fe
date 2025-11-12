@@ -274,6 +274,9 @@ export enum NOTIFICATION_TYPE {
 	CHAT_DATING = 'CHAT_DATING',
 
 	MINI_CHAT = 'MINI_CHAT',
+
+	//CHAT_ROOM
+	CHAT_ROOM = 'CHAT_ROOM',
 }
 
 export const languages = [

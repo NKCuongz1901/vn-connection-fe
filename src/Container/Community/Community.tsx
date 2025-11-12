@@ -203,12 +203,17 @@ const Community = () => {
 		<div className={classes.wrapper}>
 			<Flex vertical className={classes.container}>
 				<Flex className={classes.header}>
-					<Flex>
+					<Flex gap={8}>
 						<People fill="#1E9037" />
 						<div>My Community</div>
 					</Flex>
 					<div className={classes.bntAdd}>
-						<CButton ctype="oranger">+ Create community</CButton>
+						<CButton
+							ctype="oranger"
+							onClick={() => setModal({ type: 'network', data: null })}
+						>
+							+ Create community
+						</CButton>
 					</div>
 					<Flex
 						className={classes.buttonAdd}
