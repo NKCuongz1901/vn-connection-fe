@@ -5,7 +5,6 @@ import { memo } from 'react'
 import useMyFriend from '@/hooks/Friend/useMyFriend'
 
 import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { useLocalePath } from '@/ultis/route.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CInput from '@/Components/Custom/CInput'
@@ -24,7 +23,6 @@ interface MyFriendProps {
 const MyFriend = (_props: MyFriendProps) => {
 	const { customComp, desc, onCopy } = _props
 	const { icon, label } = desc || {}
-	const { onChangeRoute } = useLocalePath()
 	const {
 		loading,
 		searchText,

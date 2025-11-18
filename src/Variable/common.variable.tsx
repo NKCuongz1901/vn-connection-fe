@@ -1320,6 +1320,11 @@ export const mappingTypeMessage = {
 	IMAGE: 'Send a image',
 }
 
+export const mappingLevelOptions = {
+	BEGINNER: 'Beginner',
+	INTERMEDIATE: 'Intermediate',
+	ADVANCED: 'Advanced',
+}
 export const levelOptions = [
 	{ value: 'BEGINNER', label: 'Beginner' },
 	{ value: 'INTERMEDIATE', label: 'Intermediate' },

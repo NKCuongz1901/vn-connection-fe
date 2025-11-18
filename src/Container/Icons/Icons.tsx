@@ -5,13 +5,18 @@ import { randomString } from '@/ultis/string.ults'
 
 import classes from './Icons.module.scss'
 
+import AddIcon from '@/svg/AddIcon'
+import ArrowRightIcon from '@/svg/ArrowRightIcon'
+import ArrrowLeftIcon from '@/svg/ArrrowLeftIcon'
 import ArrrowRightIcon from '@/svg/ArrrowRightIcon'
 import BellIcon from '@/svg/BellIcon'
+import ChatIcon from '@/svg/ChatIcon'
 import ClockIcon from '@/svg/ClockIcon'
 import NoPostIcon from '@/svg/DiscusstionSvg/NoPostIcon'
 import DoubleHeart from '@/svg/DoubleHeart'
 import Event from '@/svg/Event'
 import BreakLineEvent from '@/svg/Event/BreakLineEvent'
+import FavoriteIcon from '@/svg/FavoriteIcon'
 import FeedbackIcon from '@/svg/FeedbackIcon'
 import FilterIcon from '@/svg/FilterIcon'
 import FlagIcon from '@/svg/FlagIcon'
@@ -39,6 +44,7 @@ import OverviewIcon from '@/svg/OverviewIcon'
 import Party from '@/svg/Party'
 import People from '@/svg/People'
 import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
+import PeopleSmileIcon from '@/svg/PeopleSmileIcon'
 import PinIcon from '@/svg/PinIcon'
 import ProfileIcon from '@/svg/ProfileIcon'
 import ReplyIcon from '@/svg/ReplyIcon'
@@ -46,15 +52,11 @@ import SearchIcon from '@/svg/SearchIcon'
 import SearchNormal from '@/svg/SearchNormal'
 import SendIcon from '@/svg/SendIcon'
 import ShareIconSvg from '@/svg/ShareIconSvg'
+import TopicIcon from '@/svg/TopicIcon'
 import TrashIcon from '@/svg/TrashIcon'
 import TwoUser from '@/svg/TwoUser'
 import UpcomingEvent from '@/svg/UpcomingEvent'
-import PeopleSmileIcon from '@/svg/PeopleSmileIcon'
-import ArrrowLeftIcon from '@/svg/ArrrowLeftIcon'
-import TopicIcon from '@/svg/TopicIcon'
-import ChatIcon from '@/svg/ChatIcon'
-import ArrowRightIcon from '@/svg/ArrowRightIcon'
-import AddIcon from '@/svg/AddIcon'
+import ArmHeartIcon from '@/svg/ArmHeartIcon'
 
 const Icons = () => {
 	const icons = [
@@ -182,6 +184,16 @@ const Icons = () => {
 		{
 			ICON: AddIcon,
 			name: '@/svg/AddIcon',
+			key: randomString(),
+		},
+		{
+			ICON: FavoriteIcon,
+			name: '@/svg/FavoriteIcon',
+			key: randomString(),
+		},
+		{
+			ICON: ArmHeartIcon,
+			name: '@/svg/ArmHeartIcon',
 			key: randomString(),
 		},
 	]

@@ -22,10 +22,15 @@ import { mainRoutes } from '@/routes/MainRoutes'
 import {
 	formatDate,
 	mappingGender,
+	mappingLevelOptions,
 	stateFriends,
 } from '@/Variable/common.variable'
 
 import classes from './Profile.module.scss'
+import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
+import FavoriteIcon from '@/svg/FavoriteIcon'
+import ArmHeartIcon from '@/svg/ArmHeartIcon'
+import clsx from 'clsx'
 
 const skeletonItems = [
 	{ id: '2', value: 220 },
@@ -213,28 +218,39 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 				label: 'I am',
 				value: who_i_am,
 				id: 1,
+				Icon: PeopleHexagonIcon,
 			},
 			{
 				label: 'I’m looking for',
 				value: looking_for,
 				id: 2,
+				Icon: FavoriteIcon,
 			},
 			{
 				label: 'I can offer',
 				value: i_can_offer,
 				id: 3,
+				Icon: ArmHeartIcon,
 			},
 		]
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>Message for you:</div>
-					{content.map((item) => (
-						<Flex key={item.id} vertical>
-							<div className={classes.label}>{item.label}</div>
-							<div>{item.value}</div>
-						</Flex>
-					))}
+					<div className={classes.title}>
+						Message for you <span className="error"> *</span>
+					</div>
+					{content.map((item) => {
+						const { id, label, value, Icon } = item || {}
+						return (
+							<Flex key={id} gap={8}>
+								<Flex>{Icon ? <Icon fill="#006B35" /> : null}</Flex>
+								<Flex vertical>
+									<div className={classes.label}>{label}</div>
+									<div>{value}</div>
+								</Flex>
+							</Flex>
+						)
+					})}
 				</Flex>
 			</Flex>
 		)
@@ -246,8 +262,53 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>About me</div>
+					<div className={classes.title}>
+						About me <span className="error"> *</span>
+					</div>
 					<div>{about_me}</div>
+				</Flex>
+			</Flex>
+		)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [toJson(userData)])
+
+	const _renderLanguages = useCallback(() => {
+		const { user_languages, languages_can_speak } = userData || {}
+		return (
+			<Flex className={classes.contentBody}>
+				<Flex className={classes.content} vertical>
+					<div className={classes.title}>
+						Languages <span className="error"> *</span>
+					</div>
+					<Flex vertical gap={12}>
+						<Flex className={classes.languageName}>
+							<div>{languages_can_speak}</div>
+							<div
+								className={clsx(
+									classes.proficiencyLevel,
+									classes.languagesCanSpeak,
+								)}
+							>
+								Native
+							</div>
+						</Flex>
+						{(user_languages || []).map((item) => {
+							const { language_name, proficiency_level } = item || {}
+							return (
+								<Flex key={language_name} className={classes.languageName}>
+									<div>{language_name}</div>
+									<div
+										className={clsx(classes.proficiencyLevel, {
+											[classes[mappingLevelOptions[proficiency_level]]]:
+												!!proficiency_level,
+										})}
+									>
+										{mappingLevelOptions[proficiency_level]}
+									</div>
+								</Flex>
+							)
+						})}
+					</Flex>
 				</Flex>
 			</Flex>
 		)
@@ -281,7 +342,9 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>Summary</div>
+					<div className={classes.title}>
+						Summary <span className="error"> *</span>
+					</div>
 					{content.map((item) => (
 						<Flex key={item.id} vertical>
 							<div className={classes.label}>{item.label}</div>
@@ -319,7 +382,9 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>Specialties</div>
+					<div className={classes.title}>
+						Specialties <span className="error"> *</span>
+					</div>
 					{content.map((item) => (
 						<Flex key={item.id} vertical>
 							<div className={classes.label}>{item.label}</div>
@@ -354,6 +419,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 			{_renderTotalInfo()}
 			{_renderMessageForU()}
 			{_renderAbout()}
+			{_renderLanguages()}
 			{_renderSumary()}
 			{_renderSpecial()}
 			{openEditProfile && (
