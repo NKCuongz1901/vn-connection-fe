@@ -8,17 +8,50 @@ import {
 	isPersistCookie,
 } from '@/ultis/storage.ults'
 
+import { getFid } from '@/config/firebase'
+
+let cachedBuildInfo: { version: number } | null = null
+
+const getBuildInfo = async (): Promise<{ version: number }> => {
+	if (cachedBuildInfo) return cachedBuildInfo
+
+	try {
+		const jsonModule = await import('@/build-info.json')
+		cachedBuildInfo = jsonModule.default
+		return cachedBuildInfo
+	} catch {
+		console.warn('build-info.json not found, fallback to Date.now()')
+		cachedBuildInfo = { version: Date.now() }
+		return cachedBuildInfo
+	}
+}
+
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL
 let isRefreshing = false
 let refreshSubscribers = [] as any
 let refreshTokenPromise = null as any
+
+let cachedFid: string | null = null
+
 axios.interceptors.request.use(
-	(config) => {
+	async (config) => {
+		// platform
 		config.headers['platform'] = 'WEB'
+		const info = await getBuildInfo()
+
+		// build version
+		config.headers['version'] = info.version || ''
+
+		// FID (device ID)
+		if (!cachedFid) cachedFid = await getFid()
+		if (cachedFid) config.headers['firebase-device-id'] = cachedFid
+
+		// Authorization token
 		const accessToken = getStorageCookie('token')
 		if (accessToken && !config.headers['Authorization']) {
-			config.headers['Authorization'] = 'Bearer ' + (accessToken ?? '')
+			config.headers['Authorization'] = 'Bearer ' + accessToken
 		}
+
 		return config
 	},
 	(error) => Promise.reject(error),

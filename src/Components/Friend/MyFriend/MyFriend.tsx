@@ -8,11 +8,8 @@ import { arrayFrom, isArray } from '@/ultis/array.ults'
 import { useLocalePath } from '@/ultis/route.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
-import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
 import NotFound from '@/svg/NotFound'
-
-import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './MyFriend.module.scss'
 interface MyFriendProps {
