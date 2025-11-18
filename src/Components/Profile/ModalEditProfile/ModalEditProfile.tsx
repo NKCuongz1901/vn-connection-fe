@@ -2,7 +2,6 @@ import {
 	IconCameraFilled,
 	IconChevronDown,
 	IconGenderBigender,
-	IconHeartFilled,
 	IconHeartPin,
 	IconMapPinFilled,
 	IconMoodSmileFilled,
@@ -37,12 +36,12 @@ import {
 	modOpts,
 } from '@/Variable/common.variable'
 
-import classes from './ModalEditProfile.module.scss'
+import CMultiSelect from '@/Components/Custom/CMultiSelect'
 import AddIcon from '@/svg/AddIcon'
 import TrashIcon from '@/svg/TrashIcon'
 import { isArray } from '@/ultis/array.ults'
-import CMultiSelect from '@/Components/Custom/CMultiSelect'
 import { CountriesOptions } from '@/Variable/countryVariable'
+import classes from './ModalEditProfile.module.scss'
 
 interface ModalEditProfileProps {
 	open: boolean
@@ -124,7 +123,6 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 			who_i_am,
 			looking_for,
 			i_can_offer,
-			i_am_interested_in,
 			languages_can_speak,
 			country_visited,
 			country_lived,
@@ -293,20 +291,11 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					<CMultiSelect
 						isRequired
 						suffixIcon={<IconChevronDown />}
-						label="Category"
+						label="Interested in"
 						options={categoryNetworkOpts}
 						value={category_list || []}
-						// error={errors.category}
+						error={errors.category_list}
 						onChange={(e) => onChangeData('category_list', e)}
-					/>
-					<CInput
-						isRequired
-						error={errors.i_am_interested_in}
-						value={i_am_interested_in}
-						label="Interested in"
-						placeholder="Enter your interest"
-						prefix={<IconHeartFilled />}
-						onChange={(e) => onChangeData('i_am_interested_in', e.target.value)}
 					/>
 					<Flex>
 						<CSelectMuti

@@ -54,7 +54,7 @@ const handleParseToData = (data, categoryNetworkOpts) => {
 		mode: modOpts.find((i) => i.value === mode),
 		i_am_interested_in,
 		languages_can_speak: languages_can_speak_array,
-		country_visited: country_visited.split(', '),
+		country_visited: (country_visited || '').split(', '),
 		who_i_am,
 		looking_for,
 		i_can_offer,
@@ -65,7 +65,7 @@ const handleParseToData = (data, categoryNetworkOpts) => {
 		category_list: (category_list || []).map(
 			(i) => mappingCategoryNetworkOpts[i],
 		),
-		country_lived: country_lived.split(', '),
+		country_lived: (country_lived || '').split(', '),
 	}
 	return returnData
 }
@@ -91,7 +91,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 
 	const [errors, setErrors] = useState({
 		about_me: '',
-		i_am_interested_in: '',
+		category_list: '',
 		languages_can_speak: '',
 		country_visited: '',
 		country_lived: '',
@@ -103,6 +103,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 		who_i_am: '',
 		looking_for: '',
 		i_can_offer: '',
+		category: '',
 	})
 	const [userLanguageOpts, setUserLanguageOpts] = useState(
 		cloneDeep(languageOpts),
@@ -187,13 +188,14 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 				who_i_am: 'Please enter your role',
 				looking_for: 'Please specify what you are looking for',
 				i_can_offer: 'Please specify what you can offer',
-				i_am_interested_in: 'Please provide your areas of interest',
+				category_list: 'Please provide your areas of interest',
 				country_visited: 'Please enter the countries visited',
 				country_lived: 'Please enter the countries lived',
 			}).filter(([key]) => {
 				switch (key) {
 					case 'country_visited':
 					case 'country_lived':
+					case 'category_list':
 						return !isArray(data?.[key], 1)
 					default:
 						return !data?.[key]
@@ -261,7 +263,6 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 			birthday,
 			gender,
 			mode,
-			i_am_interested_in,
 			languages_can_speak,
 			country_visited,
 			country_lived,
@@ -280,7 +281,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 			about_me,
 			name,
 			address,
-			i_am_interested_in,
+			i_am_interested_in: (category_list || []).map((i) => i.title).join(', '),
 			country_visited: (country_visited || []).join(', '),
 			country_lived: (country_lived || []).join(', '),
 			who_i_am,
