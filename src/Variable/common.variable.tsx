@@ -1146,7 +1146,7 @@ export const countryCodes = [
 		code: 'ZW',
 		dial_code: '+263',
 	},
-]
+].map((i) => ({ ...i, label: i.name || '', value: i.code || '' }))
 
 export enum OTP_TYPE {
 	REGISTER = 'REGISTER',
@@ -1214,19 +1214,45 @@ export const mappingLanguage = {
 	Chinese: 'Chinese',
 	Vietnamese: 'Vietnamese',
 	Thai: 'Thai',
+	Spanish: 'Spanish',
+	Russian: 'Russian',
+	Portuguese: 'Portuguese',
+	Hindi: 'Hindi',
+	Indonesian: 'Indonesian',
 }
-
+export const mappingLanguageCode = {
+	German: 'de',
+	French: 'fr',
+	Arabic: 'ar',
+	Italian: 'it',
+	Korean: 'ko',
+	Japanese: 'ja',
+	English: 'en',
+	Chinese: 'zh',
+	Vietnamese: 'vi',
+	Thai: 'th',
+	Spanish: 'es',
+	Russian: 'ru',
+	Portuguese: 'pt',
+	Hindi: 'hi',
+	Indonesian: 'id',
+}
 export const languageOpts = [
-	{ value: 'German', label: mappingLanguage.German },
-	{ value: 'French', label: mappingLanguage.French },
-	{ value: 'Arabic', label: mappingLanguage.Arabic },
-	{ value: 'Italian', label: mappingLanguage.Italian },
-	{ value: 'Korean', label: mappingLanguage.Korean },
-	{ value: 'Japanese', label: mappingLanguage.Japanese },
+	{ value: 'Vietnamese', label: mappingLanguage.Vietnamese },
 	{ value: 'English', label: mappingLanguage.English },
 	{ value: 'Chinese', label: mappingLanguage.Chinese },
-	{ value: 'Vietnamese', label: mappingLanguage.Vietnamese },
+	{ value: 'Spanish', label: mappingLanguage.Spanish },
+	{ value: 'French', label: mappingLanguage.French },
+	{ value: 'German', label: mappingLanguage.German },
+	{ value: 'Japanese', label: mappingLanguage.Japanese },
+	{ value: 'Korean', label: mappingLanguage.Korean },
+	{ value: 'Russian', label: mappingLanguage.Russian },
+	{ value: 'Arabic', label: mappingLanguage.Arabic },
+	{ value: 'Portuguese', label: mappingLanguage.Portuguese },
+	{ value: 'Hindi', label: mappingLanguage.Hindi },
+	{ value: 'Italian', label: mappingLanguage.Italian },
 	{ value: 'Thai', label: mappingLanguage.Thai },
+	{ value: 'Indonesian', label: mappingLanguage.Indonesian },
 ]
 
 export const stateFriends = {
@@ -1293,3 +1319,9 @@ export const mappingTypeMessage = {
 	MEDIAS: 'Send a media',
 	IMAGE: 'Send a image',
 }
+
+export const levelOptions = [
+	{ value: 'BEGINNER', label: 'Beginner' },
+	{ value: 'INTERMEDIATE', label: 'Intermediate' },
+	{ value: 'ADVANCED', label: 'Advanced' },
+]

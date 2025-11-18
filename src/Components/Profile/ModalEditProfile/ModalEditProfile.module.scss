@@ -72,6 +72,26 @@
 					color: #7987a4;
 				}
 			}
+			.removeBtn {
+				cursor: pointer;
+				align-items: center;
+				gap: 4px;
+
+				svg {
+					height: 16px;
+					width: 16;
+				}
+			}
+			.divider {
+				height: 1px;
+				width: 100%;
+				background: #edf0f5;
+			}
+			.bntAddMoreLan {
+				button {
+					height: 32px;
+				}
+			}
 		}
 	}
 }

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useModal } from '@/context/ModalContext'
 import useFriendItem from '../Friend/useFriendItem'
 
-import { createConversation } from '@/apis/conversationApis'
+import { createConversation, getCategoryList } from '@/apis/conversationApis'
 import { getUserProfile } from '@/apis/userApis'
 
 import { delay } from '@/ultis/common.ults'
@@ -12,6 +12,7 @@ import { useLocalePath } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 
 import { mainRoutes } from '@/routes/MainRoutes'
+import { CategoriFavOptProps } from '@/interface/Community/Community.interface'
 
 export default function useProfile({ id }: { id?: string }) {
 	const { openError } = useModal()
@@ -25,6 +26,9 @@ export default function useProfile({ id }: { id?: string }) {
 	const [userData, setUserData] = useState({}) as any
 	const [openEditProfile, setOpenEditProfile] = useState(false)
 	const [loading, setLoading] = useState(false)
+	const [categoryNetworkOpts, setCategoryNetworkOpts] = useState<
+		CategoriFavOptProps[]
+	>([])
 	const handleGetUserProfile = useCallback(
 		async ({
 			id,
@@ -55,6 +59,14 @@ export default function useProfile({ id }: { id?: string }) {
 		},
 		[openError],
 	)
+	const handleGetCategory = async () => {
+		try {
+			const category: any = await getCategoryList({})
+			setCategoryNetworkOpts(category?.results?.objects?.rows || [])
+		} catch (error) {
+			openError(error)
+		}
+	}
 
 	const handleOpenEditP = useCallback(() => {
 		setOpenEditProfile(true)
@@ -158,13 +170,17 @@ export default function useProfile({ id }: { id?: string }) {
 		handleGetUserProfile({ id })
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id])
-
+	useEffect(() => {
+		handleGetCategory()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 	return {
 		loading,
 		loadingButtonFriend,
 		userData,
 		menus: menus,
 		openEditProfile,
+		categoryNetworkOpts,
 		onOpenEditP: handleOpenEditP,
 		onCloseEditP: handleCloseEditP,
 		onGetUserProfile: handleGetUserProfile,

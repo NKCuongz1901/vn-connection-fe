@@ -1,5 +1,6 @@
 import {
 	IconCameraFilled,
+	IconChevronDown,
 	IconGenderBigender,
 	IconHeartFilled,
 	IconHeartPin,
@@ -28,27 +29,41 @@ import CTextArea from '@/Components/Custom/CTextArea'
 import CUpload from '@/Components/Custom/CUpload'
 
 import {
+	countryCodes,
 	formatDate,
 	genderOpts,
 	languageOpts,
+	levelOptions,
 	modOpts,
 } from '@/Variable/common.variable'
 
 import classes from './ModalEditProfile.module.scss'
+import AddIcon from '@/svg/AddIcon'
+import TrashIcon from '@/svg/TrashIcon'
+import { isArray } from '@/ultis/array.ults'
+import CMultiSelect from '@/Components/Custom/CMultiSelect'
+import { CountriesOptions } from '@/Variable/countryVariable'
 
 interface ModalEditProfileProps {
 	open: boolean
 	onClose: any
 	data?: any
 	onGetUserProfile?: any
+	categoryNetworkOpts?: any
 	[key: string]: any
 }
 
 const ModalEditProfile = (props: ModalEditProfileProps) => {
-	const { onClose, open } = props
+	const { onClose, open, categoryNetworkOpts } = props
 	const { loadingContext } = useLoading()
-	const { dataModal, errors, onSubmit, onCheckImage, onChangeData } =
-		useEditProfile(props)
+	const {
+		dataModal,
+		userLanguageOpts,
+		errors,
+		onSubmit,
+		onCheckImage,
+		onChangeData,
+	} = useEditProfile(props)
 
 	const _renderTop = () => {
 		const { avatar, cover } = dataModal || {}
@@ -112,8 +127,12 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 			i_am_interested_in,
 			languages_can_speak,
 			country_visited,
+			country_lived,
 			longitude,
 			latitude,
+			user_languages,
+			i_am_from,
+			category_list,
 		} = dataModal
 		return (
 			<Flex className={classes.bottom}>
@@ -188,7 +207,98 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					/>
 				</Flex>
 				<Flex className={classes.bottomItem}>
+					<Flex>
+						<CSelectMuti
+							isRequired
+							error={errors.languages_can_speak}
+							value={languages_can_speak}
+							label="Native languages"
+							placeholder="Select your languages"
+							options={languageOpts}
+							prefix={<IconWorld />}
+							onChange={(e) => onChangeData('languages_can_speak', e)}
+						/>
+					</Flex>
+					<Flex vertical gap={4}>
+						<b>Practicing languages</b>
+						<Flex vertical gap={12}>
+							{user_languages.map((item, index) => {
+								const { language_name, proficiency_level } = item || {}
+								return (
+									<>
+										<Flex gap={12}>
+											<CSelect
+												placeholder="Language"
+												options={userLanguageOpts}
+												value={language_name || undefined}
+												onChange={(e) =>
+													onChangeData('user_languages', {
+														value: e,
+														index,
+														id: 'language_name',
+													})
+												}
+											/>
+											<CSelect
+												placeholder="Level"
+												options={levelOptions}
+												value={proficiency_level}
+												onChange={(e) =>
+													onChangeData('user_languages', {
+														value: e,
+														index,
+														id: 'proficiency_level',
+													})
+												}
+											/>
+										</Flex>
+										{!!index && (
+											<Flex
+												className={classes.removeBtn}
+												onClick={() =>
+													onChangeData('user_languages_remove', index)
+												}
+											>
+												<TrashIcon fill="#000" />
+												Remove
+											</Flex>
+										)}
+										<div className={classes.divider} />
+									</>
+								)
+							})}
+							{!isArray(user_languages, 3) && (
+								<Flex className={classes.bntAddMoreLan}>
+									<CButton
+										ctype="disabled"
+										onClick={() => onChangeData('user_languages_add', 1)}
+									>
+										<AddIcon />
+										Add more languages
+									</CButton>
+								</Flex>
+							)}
+						</Flex>
+					</Flex>
 					<span className={classes.title}>Specialties</span>
+					<CSelect
+						showSearch
+						isRequired
+						label="I am from"
+						placeholder="Enter name of countries"
+						value={i_am_from || undefined}
+						options={countryCodes}
+						onChange={(e) => onChangeData('i_am_from', e)}
+					/>
+					<CMultiSelect
+						isRequired
+						suffixIcon={<IconChevronDown />}
+						label="Category"
+						options={categoryNetworkOpts}
+						value={category_list || []}
+						// error={errors.category}
+						onChange={(e) => onChangeData('category_list', e)}
+					/>
 					<CInput
 						isRequired
 						error={errors.i_am_interested_in}
@@ -201,25 +311,27 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					<Flex>
 						<CSelectMuti
 							isRequired
-							error={errors.languages_can_speak}
-							value={languages_can_speak}
-							label="Languages I can speak"
+							error={errors.country_lived}
+							value={country_lived}
+							label="Countries I've lived in"
 							placeholder="Select your languages"
-							options={languageOpts}
+							options={CountriesOptions}
 							prefix={<IconWorld />}
-							onChange={(e) => onChangeData('languages_can_speak', e)}
+							onChange={(e) => onChangeData('country_lived', e)}
 						/>
 					</Flex>
-					<CTextArea
-						showCount
-						isRequired
-						label="Countries I've visited"
-						placeholder="Enter name of countries "
-						error={errors.country_visited}
-						value={country_visited}
-						maxLength={200}
-						onChange={(e) => onChangeData('country_visited', e.target.value)}
-					/>
+					<Flex>
+						<CSelectMuti
+							isRequired
+							error={errors.country_visited}
+							value={country_visited}
+							label="Countries I've visited"
+							placeholder="Select your languages"
+							options={CountriesOptions}
+							prefix={<IconWorld />}
+							onChange={(e) => onChangeData('country_visited', e)}
+						/>
+					</Flex>
 				</Flex>
 			</Flex>
 		)

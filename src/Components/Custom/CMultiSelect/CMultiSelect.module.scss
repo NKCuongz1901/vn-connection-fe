@@ -8,12 +8,18 @@
 		.content {
 			height: 44px;
 			background: #f4f8fc;
-			align-items: center;
+			// align-items: center;
 			gap: 8px;
 			border-radius: 16px;
 			padding: 11px;
 			border: 1px solid #d9d9d9;
 			justify-content: space-between;
+			.label {
+				overflow: auto;
+				::-webkit-scrollbar {
+					display: none;
+				}
+			}
 			.suffixIcon {
 				height: 20px;
 				width: 20px;

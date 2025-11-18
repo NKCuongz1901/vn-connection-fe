@@ -43,8 +43,9 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		loadingButtonFriend,
 		userData,
 		menus,
-		onOpenEditP,
 		openEditProfile,
+		categoryNetworkOpts,
+		onOpenEditP,
 		onCloseEditP,
 		onGetUserProfile,
 		onMenusClick,
@@ -357,6 +358,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 			{_renderSpecial()}
 			{openEditProfile && (
 				<ModalEditProfile
+					categoryNetworkOpts={categoryNetworkOpts}
 					open={openEditProfile}
 					onClose={onCloseEditP}
 					data={userData}

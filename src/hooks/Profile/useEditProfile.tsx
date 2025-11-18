@@ -11,9 +11,9 @@ import { isArray } from '@/ultis/array.ults'
 import { cloneDeep, toJson } from '@/ultis/common.ults'
 import { handleParseFileImg } from '@/ultis/file.utls'
 
-import { genderOpts, modOpts } from '@/Variable/common.variable'
+import { genderOpts, languageOpts, modOpts } from '@/Variable/common.variable'
 
-const handleParseToData = (data) => {
+const handleParseToData = (data, categoryNetworkOpts) => {
 	const {
 		avatar,
 		cover,
@@ -31,7 +31,18 @@ const handleParseToData = (data) => {
 		i_can_offer,
 		longitude,
 		latitude,
+		user_languages,
+		i_am_from,
+		category_list,
+		country_lived,
 	} = cloneDeep(data)
+	const mappingCategoryNetworkOpts = (categoryNetworkOpts || []).reduce(
+		(obj, item) => {
+			obj[item.id] = item
+			return obj
+		},
+		{},
+	)
 	const returnData = {
 		avatar,
 		cover,
@@ -43,12 +54,18 @@ const handleParseToData = (data) => {
 		mode: modOpts.find((i) => i.value === mode),
 		i_am_interested_in,
 		languages_can_speak: languages_can_speak_array,
-		country_visited,
+		country_visited: country_visited.split(', '),
 		who_i_am,
 		looking_for,
 		i_can_offer,
 		longitude,
 		latitude,
+		user_languages: user_languages || [],
+		i_am_from,
+		category_list: (category_list || []).map(
+			(i) => mappingCategoryNetworkOpts[i],
+		),
+		country_lived: country_lived.split(', '),
 	}
 	return returnData
 }
@@ -61,19 +78,23 @@ interface ModalEditProfileProps {
 }
 
 export default function useEditProfile(props: ModalEditProfileProps) {
-	const { onClose, data, onGetUserProfile } = props
+	const { onClose, data, categoryNetworkOpts, onGetUserProfile } = props
 	const { toggleLoadingContext } = useLoading()
 	const { openConfirm, openError, openSuccess } = useModal()
-	const [dataModal, setDataModal] = useState(handleParseToData(data))
+	const [dataModal, setDataModal] = useState(
+		handleParseToData(data, categoryNetworkOpts),
+	)
 	const [files, setFiles] = useState({
 		cover: null,
 		avatar: null,
 	})
+
 	const [errors, setErrors] = useState({
 		about_me: '',
 		i_am_interested_in: '',
 		languages_can_speak: '',
 		country_visited: '',
+		country_lived: '',
 		name: '',
 		birthday: '',
 		gender: '',
@@ -83,28 +104,76 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 		looking_for: '',
 		i_can_offer: '',
 	})
-	const handleChangeData = useCallback((key, _value) => {
-		let value = _value
-		let otherState = {}
-		switch (key) {
-			case 'birthday':
-				value = _value?.date
-				break
-			case 'address':
-				const {} = _value || {}
-				const { lng, lat, display_name } = _value || {}
-				value = display_name
-				otherState = {
-					longitude: lng,
-					latitude: lat,
-				}
-				break
-			default:
-				break
-		}
-		setErrors((prev) => ({ ...prev, [key]: '' }))
-		setDataModal((prev) => ({ ...prev, [key]: value, ...otherState }))
-	}, [])
+	const [userLanguageOpts, setUserLanguageOpts] = useState(
+		cloneDeep(languageOpts),
+	)
+	const handleChangeData = useCallback(
+		(key, _value) => {
+			let value = _value
+			let otherState = {}
+			switch (key) {
+				case 'birthday':
+					value = _value?.date
+					break
+				case 'address':
+					const {} = _value || {}
+					const { lng, lat, display_name } = _value || {}
+					value = display_name
+					otherState = {
+						longitude: lng,
+						latitude: lat,
+					}
+					break
+				case 'user_languages':
+					{
+						const { index, value: valueData, id } = _value || {}
+						const { user_languages } = cloneDeep(dataModal || {})
+						user_languages[index][id] = valueData
+						value = user_languages
+					}
+					break
+				case 'user_languages_add':
+					{
+						let { user_languages } = cloneDeep(dataModal || {})
+						if (isArray(user_languages, 1)) {
+							user_languages.push({
+								language_name: '',
+								proficiency_level: 'BEGINNER',
+							})
+						} else {
+							user_languages = [
+								{
+									language_name: '',
+									proficiency_level: 'BEGINNER',
+								},
+							]
+						}
+						key = 'user_languages'
+						value = user_languages
+					}
+					break
+
+				case 'user_languages_remove':
+					{
+						let { user_languages } = cloneDeep(dataModal || {})
+						user_languages = (user_languages || []).filter(
+							(_, index) => index !== _value,
+						)
+						key = 'user_languages'
+						value = user_languages
+					}
+					break
+				default:
+					break
+			}
+			if (key) {
+				setErrors((prev) => ({ ...prev, [key]: '' }))
+				setDataModal((prev) => ({ ...prev, [key]: value, ...otherState }))
+			}
+		},
+		[dataModal],
+	)
+
 	const handleValidate = useCallback((data) => {
 		const { languages_can_speak } = data || {}
 		const _errors: any = Object.fromEntries(
@@ -120,7 +189,16 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 				i_can_offer: 'Please specify what you can offer',
 				i_am_interested_in: 'Please provide your areas of interest',
 				country_visited: 'Please enter the countries visited',
-			}).filter(([key]) => !data?.[key]),
+				country_lived: 'Please enter the countries lived',
+			}).filter(([key]) => {
+				switch (key) {
+					case 'country_visited':
+					case 'country_lived':
+						return !isArray(data?.[key], 1)
+					default:
+						return !data?.[key]
+				}
+			}),
 		)
 
 		if (!isArray(languages_can_speak, 1)) {
@@ -186,11 +264,14 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 			i_am_interested_in,
 			languages_can_speak,
 			country_visited,
+			country_lived,
 			who_i_am,
 			looking_for,
 			i_can_offer,
 			longitude,
 			latitude,
+			user_languages,
+			category_list,
 		} = dataModal
 		const payload = {
 			id: data.id,
@@ -200,7 +281,8 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 			name,
 			address,
 			i_am_interested_in,
-			country_visited,
+			country_visited: (country_visited || []).join(', '),
+			country_lived: (country_lived || []).join(', '),
 			who_i_am,
 			looking_for,
 			i_can_offer,
@@ -210,6 +292,10 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 			birthday: dayjs(birthday).toISOString(),
 			longitude,
 			latitude,
+			user_languages: (user_languages || []).filter(
+				(i) => i.language_name && i.proficiency_level,
+			),
+			category_list: (category_list || []).map((i) => i.id),
 		}
 		openConfirm({
 			message: 'Do you want to update profile ?',
@@ -217,14 +303,33 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toJson(dataModal)])
+
+	useEffect(
+		() => {
+			const user_languages = (dataModal.user_languages || []).map(
+				(i) => i.language_name,
+			)
+			setUserLanguageOpts(
+				languageOpts.map((i) =>
+					(user_languages || []).includes(i.value)
+						? { ...i, disabled: true }
+						: i,
+				),
+			)
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[JSON.stringify(dataModal.user_languages)],
+	)
 	useEffect(() => {
-		const _data = handleParseToData(data)
+		const _data = handleParseToData(data, categoryNetworkOpts)
 		setDataModal(_data)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toJson(data)])
+
 	return {
 		dataModal: dataModal,
 		errors: errors,
+		userLanguageOpts,
 		onChangeData: handleChangeData,
 		onCheckImage: handleCheckImage,
 		onSubmit: handleSubmit,

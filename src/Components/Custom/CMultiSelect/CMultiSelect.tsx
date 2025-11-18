@@ -137,7 +137,7 @@ const CMultiSelect = (props: CMultiSelectProps) => {
 						onClick={() => toggle(!shows)}
 					>
 						<div
-							className={clsx({
+							className={clsx(classes.label, {
 								[classes.opacityDown]: !isArray(choose, 1),
 							})}
 						>
