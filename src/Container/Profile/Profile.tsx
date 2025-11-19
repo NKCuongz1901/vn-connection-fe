@@ -41,6 +41,7 @@ import WorldIcon from '@/svg/WorldIcon'
 import { getAge } from '@/ultis/date.ults'
 import { mappingCountriesOptions } from '@/Variable/countryVariable'
 import classes from './Profile.module.scss'
+import CCounter from '@/Components/Custom/CCounter'
 
 const skeletonItems = [
 	{ id: '2', value: 220 },
@@ -406,6 +407,8 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 				value: country_visited,
 				id: 3,
 				Icon: PinTickIcon,
+				count: (country_visited || '').split(',')?.length,
+				isCount: true,
 			},
 		]
 		return (
@@ -415,12 +418,14 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 						Specialties <span className="error"> *</span>
 					</div>
 					{content.map((item) => {
-						const { id, label, value, Icon } = item || {}
+						const { id, label, value, Icon, isCount, count } = item || {}
 						return (
 							<Flex key={id} gap={8}>
 								<Flex>{Icon ? <Icon fill="#006B35" /> : null}</Flex>
 								<Flex vertical>
-									<div className={classes.label}>{label}</div>
+									<Flex className={classes.label}>
+										{label} &nbsp;{!!isCount && <CCounter number={count} />}
+									</Flex>
 									<div>{value}</div>
 								</Flex>
 							</Flex>
