@@ -1721,7 +1721,15 @@ export const CountriesOptions = [
 		label: 'Åland Islands',
 		value: 'Åland Islands',
 	},
-]
+].map((i) => ({
+	...i,
+	label: (
+		<div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+			<span className={`flag:${i.code}`}></span>
+			<span>{i.name}</span>
+		</div>
+	),
+}))
 export const mappingCountriesOptions = CountriesOptions.reduce((obj, item) => {
 	obj[item.code] = item
 	return obj

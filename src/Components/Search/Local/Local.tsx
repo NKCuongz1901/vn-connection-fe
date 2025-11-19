@@ -23,7 +23,15 @@ import { languages, radiusOpts } from '@/Variable/select.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './Local.module.scss'
+import clsx from 'clsx'
+import DotIcon from '@/svg/DotIcon'
+import MaleIcon from '@/svg/MaleIcon'
+import FeMaleIcon from '@/svg/FeMaleIcon'
 
+const genderIcon = {
+	MALE: MaleIcon,
+	FEMALE: FeMaleIcon,
+}
 interface LocalProps {
 	data: {
 		longitude?: number | string
@@ -214,15 +222,28 @@ const Local = (props: LocalProps) => {
 		return (
 			<Flex className={classes.userList} onScroll={onScroll}>
 				{user.map((item) => {
-					const { id, avatar, name } = item || {}
+					const { id, avatar, name, country_code, age, gender } = item || {}
+					const IconGender = genderIcon[gender]
 					return (
 						<Flex key={id} vertical className={classes.user}>
-							<CAvatar
-								src={avatar}
-								className={classes.userAvatar}
-								onClick={() => onChangeRoute(`${mainRoutes.profile}/${id}`)}
-							/>
+							<Flex className={classes.userAvatarWrapper}>
+								<CAvatar
+									src={avatar}
+									className={classes.userAvatar}
+									onClick={() => onChangeRoute(`${mainRoutes.profile}/${id}`)}
+								/>
+								<div className={clsx(`flag:${country_code}`, classes.flag)} />
+							</Flex>
 							<div className={classes.userName}> {name}</div>
+							<Flex align="center" gap={4}>
+								{!!age && (
+									<>
+										<div className={classes.userOtherInfo}> {age} yrs</div>
+										<DotIcon />
+									</>
+								)}
+								{!!IconGender && <IconGender />}
+							</Flex>
 						</Flex>
 					)
 				})}

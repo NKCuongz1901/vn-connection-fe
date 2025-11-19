@@ -83,9 +83,20 @@
 				max-width: 136px;
 				align-items: center;
 				cursor: pointer;
-				.userAvatar {
-					height: 120px;
-					width: 120px;
+				.userAvatarWrapper {
+					position: relative;
+
+					.userAvatar {
+						height: 64px;
+						width: 64px;
+					}
+					.flag {
+						position: absolute;
+						right: -4px;
+						bottom: 4px;
+						height: 16px;
+						width: 24px;
+					}
 				}
 				.userName {
 					display: -webkit-box;
@@ -96,6 +107,13 @@
 					line-clamp: 2; /* new standard */
 					text-align: center;
 					word-break: break-word;
+					font-weight: 600;
+					font-size: 12px;
+				}
+				.userOtherInfo {
+					color: #48546b;
+					font-size: 12px;
+					font-weight: 500;
 				}
 			}
 		}
@@ -105,12 +123,12 @@
 			align-items: center;
 			max-width: 136px;
 			.skeletonAva {
-				height: 120px;
-				width: 120px;
+				height: 64px;
+				width: 64px;
 
 				span {
-					height: 120px;
-					width: 120px;
+					height: 64px;
+					width: 64px;
 				}
 			}
 			.skeletonLabel {

@@ -9,6 +9,7 @@ import { ModalProvider } from '@/context/ModalContext'
 import { SocketProvider } from '@/context/SocketContext'
 
 import MainLayout from '@/Components/Layout/MainLayout'
+import 'country-flag-icons/3x2/flags.css'
 
 export default async function LocaleLayout({
 	children,
