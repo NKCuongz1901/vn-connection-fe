@@ -1722,3 +1722,7 @@ export const CountriesOptions = [
 		value: 'Åland Islands',
 	},
 ]
+export const mappingCountriesOptions = CountriesOptions.reduce((obj, item) => {
+	obj[item.code] = item
+	return obj
+}, {})

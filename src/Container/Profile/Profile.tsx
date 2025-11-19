@@ -2,6 +2,7 @@
 import { IconChevronLeft } from '@tabler/icons-react'
 import { Dropdown, Flex, Skeleton } from 'antd'
 import dayjs from 'dayjs'
+import clsx from 'clsx'
 import { memo, useCallback } from 'react'
 
 import useProfile from '@/hooks/Profile/useProfile'
@@ -26,11 +27,20 @@ import {
 	stateFriends,
 } from '@/Variable/common.variable'
 
-import classes from './Profile.module.scss'
-import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
-import FavoriteIcon from '@/svg/FavoriteIcon'
 import ArmHeartIcon from '@/svg/ArmHeartIcon'
-import clsx from 'clsx'
+import ClockIconDivideTopIcon from '@/svg/ClockIconDivideTopIcon'
+import FavoriteIcon from '@/svg/FavoriteIcon'
+import GenderIcon from '@/svg/GenderIcon'
+import Heart from '@/svg/Heart'
+import HouseIcon from '@/svg/HouseIcon'
+import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
+import PinTickIcon from '@/svg/PinTickIcon'
+import ProfileCircleIcon from '@/svg/ProfileCircleIcon'
+import TwoUser from '@/svg/TwoUser'
+import WorldIcon from '@/svg/WorldIcon'
+import { getAge } from '@/ultis/date.ults'
+import { mappingCountriesOptions } from '@/Variable/countryVariable'
+import classes from './Profile.module.scss'
 
 const skeletonItems = [
 	{ id: '2', value: 220 },
@@ -127,7 +137,8 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 	}, [userData, menus, loadingButtonFriend, onMenusClick])
 
 	const _renderTotalInfo = useCallback(() => {
-		const { avatar, cover, name, address, id, is_friend } = userData || {}
+		const { avatar, cover, name, address, id, is_friend, i_am_from } =
+			userData || {}
 		const isMe = id === getUserInfo('id')
 		return (
 			<Flex className={classes.totalInfo} vertical>
@@ -167,6 +178,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 						</Flex>
 						<Flex className={classes.commonInfo} vertical>
 							<div className={classes.name}>{name}</div>
+							<div>{mappingCountriesOptions[i_am_from]?.name}</div>
 							<div className={classes.address}>{address || ''}</div>
 							<Flex className={classes.status}>Available</Flex>
 						</Flex>
@@ -316,27 +328,31 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 	}, [toJson(userData)])
 
 	const _renderSumary = useCallback(() => {
-		const { amount_of_friend, gender, age, birthday } = userData || {}
+		const { amount_of_friend, gender, birthday } = userData || {}
 		const content = [
 			{
 				label: 'Friends',
 				value: (amount_of_friend || 0) + ' friends',
 				id: 1,
+				Icon: TwoUser,
 			},
 			{
 				label: 'Gender',
 				value: mappingGender[gender],
 				id: 2,
+				Icon: GenderIcon,
 			},
 			{
 				label: 'Age',
-				value: age,
+				value: getAge(birthday),
 				id: 3,
+				Icon: ProfileCircleIcon,
 			},
 			{
 				label: 'Member since',
 				value: birthday ? dayjs(birthday).format(formatDate.dmy) : '',
 				id: 4,
+				Icon: ClockIconDivideTopIcon,
 			},
 		]
 		return (
@@ -345,14 +361,18 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 					<div className={classes.title}>
 						Summary <span className="error"> *</span>
 					</div>
-					{content.map((item) => (
-						<Flex key={item.id} vertical>
-							<div className={classes.label}>{item.label}</div>
-							<div className={item.id === 1 ? classes.friend : ''}>
-								{item.value}
-							</div>
-						</Flex>
-					))}
+					{content.map((item) => {
+						const { id, label, value, Icon } = item || {}
+						return (
+							<Flex key={id} gap={8}>
+								<Flex>{Icon ? <Icon fill="#006B35" /> : null}</Flex>
+								<Flex vertical>
+									<div className={classes.label}>{label}</div>
+									<div className={id === 1 ? classes.friend : ''}>{value}</div>
+								</Flex>
+							</Flex>
+						)
+					})}
 				</Flex>
 			</Flex>
 		)
@@ -360,23 +380,32 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 	}, [toJson(userData)])
 
 	const _renderSpecial = useCallback(() => {
-		const { i_am_interested_in, languages_can_speak, country_visited } =
+		const { i_am_from, i_am_interested_in, country_lived, country_visited } =
 			userData || {}
 		const content = [
+			{
+				label: 'I am from',
+				value: mappingCountriesOptions[i_am_from]?.name,
+				id: 4,
+				Icon: WorldIcon,
+			},
 			{
 				label: 'Intersted in',
 				value: i_am_interested_in,
 				id: 1,
+				Icon: Heart,
 			},
 			{
-				label: 'Languages I can speak',
-				value: languages_can_speak,
+				label: "Countries I've lived in",
+				value: country_lived,
 				id: 2,
+				Icon: HouseIcon,
 			},
 			{
 				label: "Countries I've visited",
 				value: country_visited,
 				id: 3,
+				Icon: PinTickIcon,
 			},
 		]
 		return (
@@ -385,12 +414,18 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 					<div className={classes.title}>
 						Specialties <span className="error"> *</span>
 					</div>
-					{content.map((item) => (
-						<Flex key={item.id} vertical>
-							<div className={classes.label}>{item.label}</div>
-							<div>{item.value}</div>
-						</Flex>
-					))}
+					{content.map((item) => {
+						const { id, label, value, Icon } = item || {}
+						return (
+							<Flex key={id} gap={8}>
+								<Flex>{Icon ? <Icon fill="#006B35" /> : null}</Flex>
+								<Flex vertical>
+									<div className={classes.label}>{label}</div>
+									<div>{value}</div>
+								</Flex>
+							</Flex>
+						)
+					})}
 				</Flex>
 			</Flex>
 		)

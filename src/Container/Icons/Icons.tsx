@@ -57,6 +57,12 @@ import TrashIcon from '@/svg/TrashIcon'
 import TwoUser from '@/svg/TwoUser'
 import UpcomingEvent from '@/svg/UpcomingEvent'
 import ArmHeartIcon from '@/svg/ArmHeartIcon'
+import GenderIcon from '@/svg/GenderIcon'
+import ProfileCircleIcon from '@/svg/ProfileCircleIcon'
+import ClockIconDivideTopIcon from '@/svg/ClockIconDivideTopIcon'
+import WorldIcon from '@/svg/WorldIcon'
+import HouseIcon from '@/svg/HouseIcon'
+import PinTickIcon from '@/svg/PinTickIcon'
 
 const Icons = () => {
 	const icons = [
@@ -194,6 +200,31 @@ const Icons = () => {
 		{
 			ICON: ArmHeartIcon,
 			name: '@/svg/ArmHeartIcon',
+			key: randomString(),
+		},
+		{
+			ICON: GenderIcon,
+			name: '@/svg/GenderIcon',
+			key: randomString(),
+		},
+		{
+			ICON: ProfileCircleIcon,
+			name: '@/svg/ProfileCircleIcon',
+			key: randomString(),
+		},
+		{
+			ICON: WorldIcon,
+			name: '@/svg/WorldIcon',
+			key: randomString(),
+		},
+		{
+			ICON: HouseIcon,
+			name: '@/svg/HouseIcon',
+			key: randomString(),
+		},
+		{
+			ICON: PinTickIcon,
+			name: '@/svg/PinTickIcon',
 			key: randomString(),
 		},
 	]

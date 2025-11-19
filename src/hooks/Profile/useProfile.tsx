@@ -29,6 +29,13 @@ export default function useProfile({ id }: { id?: string }) {
 	const [categoryNetworkOpts, setCategoryNetworkOpts] = useState<
 		CategoriFavOptProps[]
 	>([])
+	const sortLanguages = (arr) => {
+		const order = { ADVANCED: 1, INTERMEDIATE: 2, BEGINNER: 3 }
+		return arr.sort(
+			(a, b) => order[a.proficiency_level] - order[b.proficiency_level],
+		)
+	}
+
 	const handleGetUserProfile = useCallback(
 		async ({
 			id,
@@ -47,7 +54,9 @@ export default function useProfile({ id }: { id?: string }) {
 				})
 				const { code, results } = res || {}
 				if (code === 200) {
-					setUserData(results?.object || {})
+					const { user_languages } = results?.object || {}
+					sortLanguages(user_languages)
+					setUserData({ ...(results?.object || {}), user_languages })
 				}
 			} catch (error) {
 				console.error('error:', error)
