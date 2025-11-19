@@ -8,6 +8,7 @@ import useOverview from '@/hooks/Overview/useOverview'
 import { arrayFrom, isArray } from '@/ultis/array.ults'
 import { useLocalePath } from '@/ultis/route.ults'
 
+import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
 import CAvatar from '@/Components/Custom/CAvatar'
 import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
 import CDatePickerRanger from '@/Components/Custom/CDatePickerRanger'
@@ -18,7 +19,6 @@ import ItemEvent from '@/Components/Event/ItemEvent'
 import ItemEventTicket from '@/Components/Event/ItemEventTicket'
 import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
 import ModelChooseHangout from '@/Components/Hangout/ModelChooseHangout'
-import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
 import EventIcon from '@/svg/Event'
 import PencilIcon from '@/svg/Hangout/PencilIcon'
 import MarkIcon from '@/svg/MarkIcon'
@@ -27,12 +27,14 @@ import SearchIcon from '@/svg/SearchIcon'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import { mappingEventTitle } from '@/Variable/event.variable'
-import { radiusOpts } from '@/Variable/select.variable'
+import { radiusOpts, typeEvent } from '@/Variable/select.variable'
 
-import classes from './Overview.module.scss'
+import CButton from '@/Components/Custom/CButton'
+import CInput from '@/Components/Custom/CInput'
+import NotFound from '@/svg/NotFound'
 import People from '@/svg/People'
 import PeopleSmileIcon from '@/svg/PeopleSmileIcon'
-import CButton from '@/Components/Custom/CButton'
+import classes from './Overview.module.scss'
 
 const Overview = () => {
 	const { loadingContext } = useLoading()
@@ -63,13 +65,35 @@ const Overview = () => {
 		_childRefUp,
 		onScrollUp,
 		onChangeFilter,
+		onChangeKeyword,
 	} = useOverview()
 	const _renderFilter = () => {
-		const { radius, date } = filters
+		const { radius, date, categories, title } = filters
 		return (
 			<Flex className={classes.filter}>
+				<Flex className={classes.search}>
+					<CInput
+						value={title}
+						placeholder="Search by keywords"
+						style={{ background: '#fff', borderRadius: 40, height: 44 }}
+						prefix={<SearchIcon />}
+						onChange={onChangeKeyword}
+					/>
+				</Flex>
+				<Flex>
+					<CDatePickerRanger
+						isWhite
+						style={{ background: '#fff', borderRadius: 40 }}
+						disabled={loading.event}
+						value={date}
+						onChange={onChangeFilter('date')}
+					/>
+				</Flex>
 				<Flex className={classes.distance}>
 					<CSelect
+						isMaxRadius
+						isWhite
+						style={{ background: '#fff', borderRadius: 40 }}
 						disabled={loading.event}
 						value={radius}
 						options={radiusOpts}
@@ -78,11 +102,17 @@ const Overview = () => {
 						onChange={onChangeFilter('radius')}
 					/>
 				</Flex>
-				<Flex>
-					<CDatePickerRanger
+				<Flex className={classes.distance}>
+					<CSelect
+						isMaxRadius
+						isWhite
+						style={{ background: '#fff', borderRadius: 40 }}
 						disabled={loading.event}
-						value={date}
-						onChange={onChangeFilter('date')}
+						value={categories}
+						options={typeEvent}
+						placeholder="Choose categories"
+						prefix={<MarkIcon />}
+						onChange={onChangeFilter('categories')}
 					/>
 				</Flex>
 			</Flex>
@@ -315,7 +345,6 @@ const Overview = () => {
 				ref={_childRefUp}
 				onScroll={onScrollUp}
 			>
-				{_renderFilter()}
 				{_renderHangout()}
 				{_renderMyCommunity()}
 				{_renderMyEvent()}
@@ -331,6 +360,8 @@ const Overview = () => {
 							icon={<EventIcon />}
 						/>
 					</Flex>
+					{_renderFilter()}
+
 					<Flex className={classes.wrapperItemUp}>
 						{listPost.map((data) => (
 							<ItemEvent
@@ -347,6 +378,18 @@ const Overview = () => {
 									className={classes.contentBody}
 								/>
 							))}
+						{!loading.event && !isArray(listPost, 1) && (
+							<Flex className={classes.eventNotFound} vertical>
+								<NotFound />
+								<span className={classes.eventNotFoundTitle}>
+									No events here yet
+								</span>
+								<span className={classes.eventNotFoundLabel}>
+									Try another location or create a meetup to bring people
+									together.
+								</span>
+							</Flex>
+						)}
 					</Flex>
 					{_renderModal()}
 				</Flex>

@@ -29,20 +29,27 @@ type userDataProps = {
 type filterProps = {
 	radius: number | null
 	date: [Dayjs, Dayjs] | null
+	categories: string[] | null
+	title: string | null
 }
 export default function useOverview() {
 	const { toggleLoadingContext } = useLoading()
 	const { openError } = useModal()
 
 	const _childRef = useRef<HTMLDivElement | null>(null)
-	const _filterRef = useRef<filterProps>({ radius: 50, date: null })
+	const _filterRef = useRef<filterProps>({
+		radius: 50,
+		date: null,
+		categories: null,
+		title: '',
+	})
 	const _parentRef = useRef<HTMLDivElement | null>(null)
 	const _childRefUp = useRef<HTMLDivElement | null>(null)
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const _paginationNetworkRef = useRef<PaginationType>(
 		cloneDeep(paginationCommon),
 	)
-
+	const timeoutRef = useRef<any>()
 	const _loadmore = useRef({ myevent: true, network: true })
 	const [modal, setModal] = useState({ type: '', data: null }) as any
 	const [userData, setUserData] = useState<userDataProps>({
@@ -68,12 +75,15 @@ export default function useOverview() {
 	const [filters, setFilters] = useState<filterProps>({
 		radius: 50,
 		date: null,
+		categories: null,
+		title: '',
 	})
 
 	const handleChangeFilter = (type: string) => (value) => {
 		switch (type) {
 			case 'radius':
 			case 'date':
+			case 'categories':
 				setFilters((prev) => ({ ...prev, [type]: value }))
 				_filterRef.current[type] = value
 				break
@@ -88,11 +98,25 @@ export default function useOverview() {
 		}
 	}
 
+	const handleChangeKeyword = (e) => {
+		const value = e.target.value
+		setFilters((prev) => ({ ...prev, title: value }))
+		_filterRef.current.title = value
+		if (timeoutRef) {
+			clearTimeout(timeoutRef.current)
+		}
+		timeoutRef.current = setTimeout(() => {
+			setLoadMore(true)
+			_paginationRefs.current.page = 1
+			handleGetListPost()
+		}, 1000)
+	}
+
 	const handleGetListPost = async (isNotLoading = false) => {
 		setLoading((prev) => ({ ...prev, event: true }))
 		try {
 			const { page, limit } = _paginationRefs.current
-			const { radius, date } = _filterRef.current
+			const { radius, date, categories, title } = _filterRef.current
 			const dates = {}
 			if (date) {
 				Object.assign(dates, {
@@ -113,6 +137,8 @@ export default function useOverview() {
 				limit: !isNotLoading ? limit : 50,
 				type: mainRoutes.upcomingEvent,
 				radius,
+				...(categories && { categories: [categories] }),
+				title,
 				...dates,
 			})
 			const { code, results } = res || {}
@@ -405,5 +431,6 @@ export default function useOverview() {
 		onScroll: handleScroll,
 		onScrollUp: handleScrollUp,
 		onChangeFilter: handleChangeFilter,
+		onChangeKeyword: handleChangeKeyword,
 	}
 }

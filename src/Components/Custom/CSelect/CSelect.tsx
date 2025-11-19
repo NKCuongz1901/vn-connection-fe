@@ -7,23 +7,32 @@ import { IconChevronDown } from '@tabler/icons-react'
 import { CSelectProps } from '@/interface/CComponent/CComponent.interface'
 
 import classes from './CSelect.module.scss'
+import clsx from 'clsx'
 
 const CSelect = (_props: CSelectProps) => {
-	const { error, label, isRequired, style, ...props } = _props
+	const { isWhite, isMaxRadius, error, label, isRequired, style, ...props } =
+		_props
 	const status = error ? 'error' : ''
 	return (
-		<Flex vertical gap={4} className={classes.layout}>
+		<Flex
+			vertical
+			gap={4}
+			className={clsx(classes.layout, {
+				[classes.layoutWhite]: isWhite,
+			})}
+		>
 			{label && (
 				<span className="bold">
 					{label} {isRequired && <span className="error">*</span>}
 				</span>
 			)}
 			<Select
-				className={classes.wrapper}
+				className={clsx(classes.wrapper, {
+					[classes.wrapperRadius]: isMaxRadius,
+				})}
 				suffixIcon={<IconChevronDown />}
 				style={{
 					// borderRadius: 16,
-					// background: '#f4f8fc',
 					// height: 44,
 					...style,
 				}}

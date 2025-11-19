@@ -9,22 +9,23 @@
 			align-items: center;
 		}
 	}
+	.wrapper :global(.ant-input) {
+		padding: 8px 16px;
+		border-radius: 16px;
+		background: #f4f8fc;
+		height: 44px;
+	}
+	.wrapper :global(.ant-input-group-addon) {
+		padding: 8px 16px;
+		background: #f4f8fc;
+		border-radius: 16px 0 0 16px !important;
+	}
+	.wrapper :global(.ant-input-affix-wrapper) {
+		border-radius: 16px;
+		padding: 0px 16px;
+	}
 }
-.wrapper :global(.ant-input) {
-	padding: 8px 16px;
-	border-radius: 16px;
-	background: #f4f8fc;
-	height: 44px;
-}
-.wrapper :global(.ant-input-group-addon) {
-	padding: 8px 16px;
-	background: #f4f8fc;
-	border-radius: 16px 0 0 16px !important;
-}
-.wrapper :global(.ant-input-affix-wrapper) {
-	border-radius: 16px;
-	padding: 0px 16px;
-}
+
 .wrapper {
 	input {
 		padding: 12px 16px;
@@ -45,5 +46,13 @@
 		button {
 			height: 36px;
 		}
+	}
+}
+.layoutWhite {
+	.wrapper :global(.ant-input) {
+		background: #fff;
+	}
+	.wrapper :global(.ant-input-group-addon) {
+		background: #fff;
 	}
 }

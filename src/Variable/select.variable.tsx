@@ -303,3 +303,21 @@ export const typeCommunity = [
 	{ value: 'Class', label: 'Class' },
 	{ value: 'Restaurant', label: 'Restaurant' },
 ]
+
+export const typeEvent = [
+	{ value: 'Dating', label: 'Dating' },
+	{ value: 'Travel', label: 'Travel' },
+	{ value: 'Sport', label: 'Sport' },
+	{ value: 'Business', label: 'Business' },
+	{ value: 'Tech', label: 'Tech' },
+	{ value: 'Digital Nomad', label: 'Digital Nomad' },
+	{ value: 'Art', label: 'Art' },
+	{ value: 'Dancing', label: 'Dancing' },
+	{ value: 'Music', label: 'Music' },
+	{ value: 'Game', label: 'Game' },
+	{ value: 'Lifestyle', label: 'Lifestyle' },
+	{ value: 'Social', label: 'Social' },
+	{ value: 'Workshop', label: 'Workshop' },
+	{ value: 'Language Exchange', label: 'Language Exchange' },
+	{ value: 'Business', label: 'Business' },
+]

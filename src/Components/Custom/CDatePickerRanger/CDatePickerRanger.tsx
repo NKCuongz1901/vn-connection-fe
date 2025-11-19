@@ -10,6 +10,7 @@ import { memo } from 'react'
 import CButton from '../CButton'
 
 import classes from './CDatePickerRanger.module.scss'
+import clsx from 'clsx'
 
 const { RangePicker } = DatePicker
 
@@ -17,6 +18,7 @@ interface CDatePickerOthersProps {
 	label?: string
 	error?: string
 	isRequired?: boolean
+	isWhite?: boolean
 }
 const arr = [
 	{ value: 'today', label: 'Today', active: 'isToday' },
@@ -34,7 +36,7 @@ interface CDatePickerRangerProps
 	extends CDatePickerOthersProps,
 		RangePickerProps {}
 const CDatePickerRanger = (_props: CDatePickerRangerProps) => {
-	const { error, label, isRequired, style, value, ...props } = _props
+	const { error, label, isWhite, isRequired, style, value, ...props } = _props
 	const status = error ? 'error' : ''
 	const today = dayjs().startOf('day')
 	const tomorrow = today.add(1, 'day')
@@ -80,7 +82,13 @@ const CDatePickerRanger = (_props: CDatePickerRangerProps) => {
 		}
 	}
 	return (
-		<Flex vertical gap={4} className={classes.layout}>
+		<Flex
+			vertical
+			gap={4}
+			className={clsx(classes.layout, {
+				[classes.layoutWhite]: isWhite,
+			})}
+		>
 			{label && (
 				<span>
 					{label} {isRequired && <span className="error">*</span>}
