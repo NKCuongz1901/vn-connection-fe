@@ -180,14 +180,26 @@
 				}
 			}
 		}
-		.title {
-			cursor: pointer;
-		}
 		.notData {
+			padding: 16px 0;
 			align-items: center;
 			justify-content: center;
 			width: 100%;
-			height: 100%;
+			gap: 12;
+			.labelNoData {
+				font-weight: 500;
+			}
+			svg {
+				height: 32px;
+				width: 32px;
+			}
+			button {
+				font-size: 12px;
+				height: 32px;
+			}
+		}
+		.title {
+			cursor: pointer;
 		}
 	}
 }

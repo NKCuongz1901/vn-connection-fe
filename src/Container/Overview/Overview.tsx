@@ -30,6 +30,9 @@ import { mappingEventTitle } from '@/Variable/event.variable'
 import { radiusOpts } from '@/Variable/select.variable'
 
 import classes from './Overview.module.scss'
+import People from '@/svg/People'
+import PeopleSmileIcon from '@/svg/PeopleSmileIcon'
+import CButton from '@/Components/Custom/CButton'
 
 const Overview = () => {
 	const { loadingContext } = useLoading()
@@ -186,7 +189,7 @@ const Overview = () => {
 					<EventTitle
 						label="My community"
 						number={total.network}
-						icon={<EventIcon />}
+						icon={<People />}
 						onAddNew={(e) => {
 							e?.stopPropagation?.()
 							setModal({ type: 'network', data: null })
@@ -194,57 +197,76 @@ const Overview = () => {
 					/>
 				</Flex>
 				<Flex vertical className={classes.myCommunity}>
-					<Flex
-						className={classes.communityText}
-						onClick={() => onChangeRoute(mainRoutes.exploreInterest)}
-					>
-						<div>Explore people and communities by interests</div>
-						<div>
-							<SearchIcon fill="#006B35" />
-						</div>
-					</Flex>
-					<Flex className={classes.communityList}>
-						{loading.network ? (
-							arrayFrom(3).map((_, index) => (
-								<Flex key={index} vertical className={classes.communityItem}>
-									<Skeleton.Avatar
-										active
-										className={classes.contentSkeletonAva}
-									/>
-									<Skeleton.Input
-										active
-										className={classes.contentSkeletonInput}
-									/>
-								</Flex>
-							))
-						) : isArray(listNetwork, 1) ? (
-							listNetwork.map((i) => {
-								const { id, avatar, userRole, title } = i || {}
-								return (
-									<Flex
-										key={id}
-										vertical
-										className={classes.communityItem}
-										onClick={() =>
-											onChangeRoute(`${mainRoutes.community}/${id}`)
-										}
-									>
-										<div>
-											<CAvatarBandage
-												isHidden={userRole !== 'OWNER'}
-												src={avatar}
-												className={classes.communityAva}
-												classBandage={classes.communityBandage}
-											/>
-										</div>
-										<div className={classes.communityLabel}>{title}</div>
-									</Flex>
-								)
-							})
-						) : (
-							<Flex className={classes.notData}>Not Community</Flex>
-						)}
-					</Flex>
+					{!(!loading.network && !isArray(listNetwork, 1)) && (
+						<>
+							<Flex
+								className={classes.communityText}
+								onClick={() => onChangeRoute(mainRoutes.exploreInterest)}
+							>
+								<div>Explore people and communities by interests</div>
+								<div>
+									<SearchIcon fill="#006B35" />
+								</div>
+							</Flex>
+							<Flex className={classes.communityList}>
+								{loading.network
+									? arrayFrom(3).map((_, index) => (
+											<Flex
+												key={index}
+												vertical
+												className={classes.communityItem}
+											>
+												<Skeleton.Avatar
+													active
+													className={classes.contentSkeletonAva}
+												/>
+												<Skeleton.Input
+													active
+													className={classes.contentSkeletonInput}
+												/>
+											</Flex>
+									  ))
+									: isArray(listNetwork, 1) &&
+									  listNetwork.map((i) => {
+											const { id, avatar, userRole, title } = i || {}
+											return (
+												<Flex
+													key={id}
+													vertical
+													className={classes.communityItem}
+													onClick={() =>
+														onChangeRoute(`${mainRoutes.community}/${id}`)
+													}
+												>
+													<div>
+														<CAvatarBandage
+															isHidden={userRole !== 'OWNER'}
+															src={avatar}
+															className={classes.communityAva}
+															classBandage={classes.communityBandage}
+														/>
+													</div>
+													<div className={classes.communityLabel}>{title}</div>
+												</Flex>
+											)
+									  })}
+							</Flex>
+						</>
+					)}
+					{!loading.network && !isArray(listNetwork, 1) && (
+						<Flex className={classes.notData} vertical>
+							<PeopleSmileIcon />
+							<span className={classes.labelNoData}>
+								Find your first network !
+							</span>
+							<CButton
+								ctype="oranger"
+								onClick={() => onChangeRoute(`${mainRoutes.search}`)}
+							>
+								Explore now
+							</CButton>
+						</Flex>
+					)}
 				</Flex>
 			</Flex>
 		)
