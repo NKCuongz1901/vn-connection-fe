@@ -67,6 +67,7 @@ import CalenderIcon from '@/svg/CalenderIcon'
 import MaleIcon from '@/svg/MaleIcon'
 import FeMaleIcon from '@/svg/FeMaleIcon'
 import DotIcon from '@/svg/DotIcon'
+import Message2Icon from '@/svg/Message2Icon'
 
 const Icons = () => {
 	const icons = [
@@ -249,6 +250,15 @@ const Icons = () => {
 		{
 			ICON: DotIcon,
 			name: '@/svg/DotIcon',
+			key: randomString(),
+		},
+		{
+			ICON: Message2Icon,
+			name: '@/svg/Message2Icon',
+			key: randomString(),
+		},{
+			ICON: ClockIconDivideTopIcon,
+			name: '@/svg/ClockIconDivideTopIcon',
 			key: randomString(),
 		},
 	]

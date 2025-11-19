@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { getConvClubList } from '@/apis/conversationApis'
+import { getChatRoomList, getConvClubList } from '@/apis/conversationApis'
 import { getUserOpenHangout } from '@/apis/hangoutApi'
 import { getListPost, getmyEventInHome } from '@/apis/postApis'
 import { getUserProfile, updateUserProfile } from '@/apis/userApis'
@@ -19,6 +19,7 @@ import { paginationCommon } from '@/Variable/common.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import { NetworkItemProps } from '@/interface/Community/Community.interface'
+import { ConversationChatRoomProps } from '@/interface/Conversation/Conversation.interface'
 
 type userDataProps = {
 	is_open_hangout: boolean
@@ -64,12 +65,19 @@ export default function useOverview() {
 	const [listMyEvent, setListMyEvent] = useState<any[]>([])
 	const [totalMyEvent, setTotalMyEvent] = useState(0)
 	const [listPost, setListPost] = useState([]) as any[]
+	const [listChatRoom, setListChatRoom] = useState<ConversationChatRoomProps[]>(
+		[],
+	)
 	const [listNetwork, setListNetwork] = useState<NetworkItemProps[]>([])
 
 	const [loadingProfile, setLoadingProfile] = useState<boolean>(false)
 	const [loadingMyEvent, setLoadingMyEvent] = useState<boolean>(false)
-	const [loading, setLoading] = useState({ event: false, network: false })
-	const [total, setTotal] = useState({ event: 0, network: 0 })
+	const [loading, setLoading] = useState({
+		event: false,
+		network: false,
+		chatroom: false,
+	})
+	const [total, setTotal] = useState({ event: 0, network: 0, chatroom: 0 })
 
 	const [loadmore, setLoadMore] = useState(true)
 	const [filters, setFilters] = useState<filterProps>({
@@ -159,6 +167,40 @@ export default function useOverview() {
 			openError(error)
 		} finally {
 			setLoading((prev) => ({ ...prev, event: false }))
+		}
+	}
+	const handleGetListChatRoom = async (isNotLoading = false) => {
+		setLoading((prev) => ({ ...prev, chatroom: true }))
+		try {
+			const { page, limit } = _paginationRefs.current
+			let isNew = page === 1
+			if (isNotLoading) {
+				isNew = false
+			}
+			if (isNew) {
+				setListChatRoom([])
+			}
+			const res: any = await getChatRoomList({
+				fields: ['$all'],
+				page: !isNotLoading ? page : 1,
+				limit: !isNotLoading ? limit : 50,
+				order: [['created_at', 'desc']],
+			})
+			const { code, results } = res || {}
+			await delay(500)
+			if (code === 200) {
+				const { rows, count } = results?.objects || {}
+				setListChatRoom((prev: ConversationChatRoomProps[]) => {
+					const contents = isNew && !isNotLoading ? [] : prev
+					const dataShow = uniqueArray([...contents, ...rows], 'id') as any[]
+					return dataShow
+				})
+				setTotal((prev) => ({ ...prev, chatroom: count }))
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoading((prev) => ({ ...prev, chatroom: false }))
 		}
 	}
 	const handleGetListNetwork = async (isNotLoading = false) => {
@@ -388,6 +430,7 @@ export default function useOverview() {
 		handleGetMyEvent()
 		handleGetListPost()
 		handleGetListNetwork()
+		handleGetListChatRoom()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -424,7 +467,7 @@ export default function useOverview() {
 		listPost,
 		filters,
 		listNetwork,
-
+		listChatRoom,
 		OnChangeTitleHangout: handleOnChangeTitleHangout,
 		onUpdateUserInfo: handleUpdateUserInfo,
 		onCRUDSuccess: handleCRUDSuccess,

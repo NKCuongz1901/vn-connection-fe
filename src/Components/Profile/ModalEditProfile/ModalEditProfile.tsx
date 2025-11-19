@@ -1,15 +1,4 @@
-import {
-	IconCameraFilled,
-	IconChevronDown,
-	IconGenderBigender,
-	IconHeartPin,
-	IconMapPinFilled,
-	IconMoodSmileFilled,
-	IconUserCog,
-	IconUserFilled,
-	IconUserHeart,
-	IconWorld,
-} from '@tabler/icons-react'
+import { IconCameraFilled, IconChevronDown } from '@tabler/icons-react'
 import { Flex, Image } from 'antd'
 import dayjs from 'dayjs'
 
@@ -36,22 +25,22 @@ import {
 	modOpts,
 } from '@/Variable/common.variable'
 
+import CCheckRadio from '@/Components/Custom/CCheckRadio'
 import CMultiSelect from '@/Components/Custom/CMultiSelect'
 import AddIcon from '@/svg/AddIcon'
+import ArmHeartIcon from '@/svg/ArmHeartIcon'
+import FavoriteIcon from '@/svg/FavoriteIcon'
+import GenderIcon from '@/svg/GenderIcon'
+import HappyIcon from '@/svg/HappyIcon'
+import Heart from '@/svg/Heart'
+import MarkIcon from '@/svg/MarkIcon'
+import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
+import ProfileIcon from '@/svg/ProfileIcon'
 import TrashIcon from '@/svg/TrashIcon'
+import WorldIcon from '@/svg/WorldIcon'
 import { isArray } from '@/ultis/array.ults'
 import { CountriesOptions } from '@/Variable/countryVariable'
 import classes from './ModalEditProfile.module.scss'
-import CCheckRadio from '@/Components/Custom/CCheckRadio'
-import ProfileIcon from '@/svg/ProfileIcon'
-import GenderIcon from '@/svg/GenderIcon'
-import MarkIcon from '@/svg/MarkIcon'
-import HappyIcon from '@/svg/HappyIcon'
-import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
-import ArmHeartIcon from '@/svg/ArmHeartIcon'
-import FavoriteIcon from '@/svg/FavoriteIcon'
-import WorldIcon from '@/svg/WorldIcon'
-import Heart from '@/svg/Heart'
 
 interface ModalEditProfileProps {
 	open: boolean

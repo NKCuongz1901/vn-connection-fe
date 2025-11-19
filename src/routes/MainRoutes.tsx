@@ -15,4 +15,5 @@ export const mainRoutes = {
 	dating: 'dating',
 	profile: 'profile',
 	exploreInterest: 'explore-interest',
+	chatRoom: 'chat-room',
 }

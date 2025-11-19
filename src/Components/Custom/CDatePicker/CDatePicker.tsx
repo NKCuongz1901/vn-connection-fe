@@ -1,11 +1,11 @@
 'use client'
 
-import { IconCalendarWeekFilled, IconChevronDown } from '@tabler/icons-react'
+import { IconChevronDown } from '@tabler/icons-react'
 import { DatePicker, DatePickerProps, Flex } from 'antd'
 import { memo } from 'react'
 
-import classes from './CDatePicker.module.scss'
 import CalenderIcon from '@/svg/CalenderIcon'
+import classes from './CDatePicker.module.scss'
 interface CDatePickerOthersProps {
 	label?: string
 	error?: string

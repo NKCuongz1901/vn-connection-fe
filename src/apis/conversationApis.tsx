@@ -260,3 +260,10 @@ export const inviteAllJoinConv = async ({ id, payload, params = {} }) => {
 		params: convertParams(params),
 	})
 }
+export const getChatRoomList = async (params) => {
+	const url = CONVERSATION_ROUTES.convChatRoom
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}

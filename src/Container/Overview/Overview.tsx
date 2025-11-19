@@ -7,11 +7,14 @@ import useOverview from '@/hooks/Overview/useOverview'
 
 import { arrayFrom, isArray } from '@/ultis/array.ults'
 import { useLocalePath } from '@/ultis/route.ults'
+import { formatNumberString } from '@/ultis/string.ults'
 
 import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
 import CAvatar from '@/Components/Custom/CAvatar'
 import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
+import CButton from '@/Components/Custom/CButton'
 import CDatePickerRanger from '@/Components/Custom/CDatePickerRanger'
+import CInput from '@/Components/Custom/CInput'
 import CSelect from '@/Components/Custom/CSelect'
 import CSwitch from '@/Components/Custom/CSwitch'
 import EventTitle from '@/Components/Event/EventTitle'
@@ -22,18 +25,17 @@ import ModelChooseHangout from '@/Components/Hangout/ModelChooseHangout'
 import EventIcon from '@/svg/Event'
 import PencilIcon from '@/svg/Hangout/PencilIcon'
 import MarkIcon from '@/svg/MarkIcon'
+import Message2Icon from '@/svg/Message2Icon'
+import NotFound from '@/svg/NotFound'
 import Party from '@/svg/Party'
+import People from '@/svg/People'
+import PeopleSmileIcon from '@/svg/PeopleSmileIcon'
 import SearchIcon from '@/svg/SearchIcon'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import { mappingEventTitle } from '@/Variable/event.variable'
 import { radiusOpts, typeEvent } from '@/Variable/select.variable'
 
-import CButton from '@/Components/Custom/CButton'
-import CInput from '@/Components/Custom/CInput'
-import NotFound from '@/svg/NotFound'
-import People from '@/svg/People'
-import PeopleSmileIcon from '@/svg/PeopleSmileIcon'
 import classes from './Overview.module.scss'
 
 const Overview = () => {
@@ -51,6 +53,7 @@ const Overview = () => {
 		hangoutPeople,
 		filters,
 		listNetwork,
+		listChatRoom,
 
 		setModal,
 		OnChangeTitleHangout,
@@ -301,6 +304,79 @@ const Overview = () => {
 			</Flex>
 		)
 	}
+	const _renderChatRoom = () => {
+		return (
+			<Flex vertical className={classes.chatRoomWrapper}>
+				<Flex
+					className={classes.title}
+					onClick={() => onChangeRoute(mainRoutes.chatRoom)}
+				>
+					<EventTitle
+						hiddenAdd
+						label="Chat room"
+						number={total.chatroom}
+						icon={<Message2Icon />}
+					/>
+				</Flex>
+				<Flex vertical className={classes.chatRoom}>
+					{!(!loading.chatroom && !isArray(listChatRoom, 1)) && (
+						<>
+							<Flex className={classes.chatRoomList}>
+								{loading.chatroom
+									? arrayFrom(10).map((_, index) => (
+											<Flex
+												key={index}
+												vertical
+												className={classes.chatRoomItem}
+											>
+												<Skeleton.Avatar
+													active
+													className={classes.contentSkeletonAva}
+												/>
+												<Skeleton.Input
+													active
+													className={classes.contentSkeletonInput}
+												/>
+												<Skeleton.Input
+													active
+													className={classes.contentSkeletonInput2}
+												/>
+											</Flex>
+									  ))
+									: isArray(listChatRoom, 1) &&
+									  listChatRoom.map((i) => {
+											const { id, avatar, title, amount_of_user } = i || {}
+											return (
+												<Flex
+													key={id}
+													vertical
+													className={classes.chatRoomItem}
+													onClick={() =>
+														onChangeRoute(`${mainRoutes.chatRoom}/${id}`)
+													}
+												>
+													<div>
+														<CAvatarBandage
+															isHidden
+															src={avatar}
+															className={classes.chatRoomAva}
+															classBandage={classes.chatRoomBandage}
+														/>
+													</div>
+													<div className={classes.chatRoomLabel}>{title}</div>
+													<div className={classes.chatRoomNum}>
+														{formatNumberString(amount_of_user)} members
+													</div>
+												</Flex>
+											)
+									  })}
+							</Flex>
+						</>
+					)}
+				</Flex>
+			</Flex>
+		)
+	}
 	const _renderModal = () => {
 		const { type, data } = modal || {}
 		let Content = <></>
@@ -346,6 +422,7 @@ const Overview = () => {
 				onScroll={onScrollUp}
 			>
 				{_renderHangout()}
+				{_renderChatRoom()}
 				{_renderMyCommunity()}
 				{_renderMyEvent()}
 				<Flex className={classes.wrapperUp} vertical>
