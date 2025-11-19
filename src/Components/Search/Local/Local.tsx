@@ -27,10 +27,12 @@ import clsx from 'clsx'
 import DotIcon from '@/svg/DotIcon'
 import MaleIcon from '@/svg/MaleIcon'
 import FeMaleIcon from '@/svg/FeMaleIcon'
+import GenderIcon from '@/svg/GenderIcon'
 
 const genderIcon = {
 	MALE: MaleIcon,
 	FEMALE: FeMaleIcon,
+	OTHER: GenderIcon,
 }
 interface LocalProps {
 	data: {
@@ -242,7 +244,17 @@ const Local = (props: LocalProps) => {
 										<DotIcon />
 									</>
 								)}
-								{!!IconGender && <IconGender />}
+								{!!IconGender && (
+									<div
+										className={clsx({
+											[classes.iconGender]: gender === 'OTHER',
+										})}
+									>
+										<IconGender
+											{...(gender === 'OTHER' && { fill: '#7987A4' })}
+										/>
+									</div>
+								)}
 							</Flex>
 						</Flex>
 					)

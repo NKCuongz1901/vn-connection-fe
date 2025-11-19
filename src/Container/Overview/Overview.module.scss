@@ -305,7 +305,19 @@
 		}
 	}
 }
-
+.prefixIcon {
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: #006b35;
+	align-items: center;
+	justify-content: center;
+	svg {
+		width: 16px !important;
+		height: 16px !important;
+		fill: #fff;
+	}
+}
 @media (min-width: 0px) and (max-width: 769px) {
 	.wrapper {
 		.container {

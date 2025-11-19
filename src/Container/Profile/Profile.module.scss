@@ -51,24 +51,18 @@
 				width: 100%;
 				.avatarWrapper {
 					height: 100%;
+					position: relative;
 
 					.avatar {
 						position: relative;
 						bottom: 40px;
 					}
-				}
-				.commonInfo {
-					gap: 8px;
-					height: 100%;
-					padding: 8px 0;
-					.name {
-						font-weight: 600;
-						word-break: break-word;
-					}
-					.address {
-						word-break: break-word;
-					}
 					.status {
+						left: 50%;
+						transform: translateX(-50%);
+						position: absolute;
+						bottom: 32px;
+						height: 24px;
 						padding: 2px 8px;
 						justify-content: center;
 						align-items: center;
@@ -79,6 +73,22 @@
 						font-size: 12px;
 						font-weight: 600;
 						line-height: 16px; /* 133.333% */
+						min-width: 78px;
+					}
+				}
+				.commonInfo {
+					gap: 8px;
+					height: 100%;
+					padding: 8px 0;
+					.flag {
+						border-radius: 4px;
+					}
+					.name {
+						font-weight: 600;
+						word-break: break-word;
+					}
+					.address {
+						word-break: break-word;
 					}
 				}
 			}

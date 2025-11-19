@@ -276,6 +276,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 			user_languages,
 			category_list,
 			is_hide_age,
+			i_am_from,
 		} = dataModal
 		const payload = {
 			id: data.id,
@@ -301,6 +302,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 			),
 			category_list: (category_list || []).map((i) => i.id),
 			is_hide_age,
+			i_am_from,
 		}
 		openConfirm({
 			message: 'Do you want to update profile ?',

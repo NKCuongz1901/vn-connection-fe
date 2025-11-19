@@ -841,11 +841,11 @@ export const countryCodes = [
 		code: 'PT',
 		dial_code: '+351',
 	},
-	{
-		name: 'Puerto Rico',
-		code: 'PR',
-		dial_code: '+1939',
-	},
+	// {
+	// 	name: 'Puerto Rico',
+	// 	code: 'PR',
+	// 	dial_code: '+1939',
+	// },
 	{
 		name: 'Puerto Rico',
 		code: 'PR',
@@ -1146,7 +1146,16 @@ export const countryCodes = [
 		code: 'ZW',
 		dial_code: '+263',
 	},
-].map((i) => ({ ...i, label: i.name || '', value: i.code || '' }))
+].map((i) => ({
+	...i,
+	label: (
+		<div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+			<span className={`flag:${i.code}`}></span>
+			<span>{i.name}</span>
+		</div>
+	),
+	value: i.code || '',
+}))
 
 export enum OTP_TYPE {
 	REGISTER = 'REGISTER',
@@ -1238,22 +1247,30 @@ export const mappingLanguageCode = {
 	Indonesian: 'id',
 }
 export const languageOpts = [
-	{ value: 'Vietnamese', label: mappingLanguage.Vietnamese },
-	{ value: 'English', label: mappingLanguage.English },
-	{ value: 'Chinese', label: mappingLanguage.Chinese },
-	{ value: 'Spanish', label: mappingLanguage.Spanish },
-	{ value: 'French', label: mappingLanguage.French },
-	{ value: 'German', label: mappingLanguage.German },
-	{ value: 'Japanese', label: mappingLanguage.Japanese },
-	{ value: 'Korean', label: mappingLanguage.Korean },
-	{ value: 'Russian', label: mappingLanguage.Russian },
-	{ value: 'Arabic', label: mappingLanguage.Arabic },
-	{ value: 'Portuguese', label: mappingLanguage.Portuguese },
-	{ value: 'Hindi', label: mappingLanguage.Hindi },
-	{ value: 'Italian', label: mappingLanguage.Italian },
-	{ value: 'Thai', label: mappingLanguage.Thai },
-	{ value: 'Indonesian', label: mappingLanguage.Indonesian },
-]
+	{ value: 'Vietnamese', label: mappingLanguage.Vietnamese, code: 'VN' },
+	{ value: 'English', label: mappingLanguage.English, code: 'GB' },
+	{ value: 'Chinese', label: mappingLanguage.Chinese, code: 'CN' },
+	{ value: 'Spanish', label: mappingLanguage.Spanish, code: 'ES' },
+	{ value: 'French', label: mappingLanguage.French, code: 'FR' },
+	{ value: 'German', label: mappingLanguage.German, code: 'DE' },
+	{ value: 'Japanese', label: mappingLanguage.Japanese, code: 'JP' },
+	{ value: 'Korean', label: mappingLanguage.Korean, code: 'KR' },
+	{ value: 'Russian', label: mappingLanguage.Russian, code: 'RU' },
+	{ value: 'Arabic', label: mappingLanguage.Arabic, code: 'AE' },
+	{ value: 'Portuguese', label: mappingLanguage.Portuguese, code: 'PT' },
+	{ value: 'Hindi', label: mappingLanguage.Hindi, code: 'IN' },
+	{ value: 'Italian', label: mappingLanguage.Italian, code: 'IT' },
+	{ value: 'Thai', label: mappingLanguage.Thai, code: 'TH' },
+	{ value: 'Indonesian', label: mappingLanguage.Indonesian, code: 'ID' },
+].map((i) => ({
+	...i,
+	label: (
+		<div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+			<span className={`flag:${i.code}`}></span>
+			<span>{i.label}</span>
+		</div>
+	),
+}))
 
 export const stateFriends = {
 	ACCEPTED: 'ACCEPTED',

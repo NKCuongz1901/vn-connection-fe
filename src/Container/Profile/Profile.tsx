@@ -24,6 +24,7 @@ import {
 	formatDate,
 	mappingGender,
 	mappingLevelOptions,
+	mappingMod,
 	stateFriends,
 } from '@/Variable/common.variable'
 
@@ -42,6 +43,7 @@ import { getAge } from '@/ultis/date.ults'
 import { mappingCountriesOptions } from '@/Variable/countryVariable'
 import classes from './Profile.module.scss'
 import CCounter from '@/Components/Custom/CCounter'
+import MarkIcon from '@/svg/MarkIcon'
 
 const skeletonItems = [
 	{ id: '2', value: 220 },
@@ -138,7 +140,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 	}, [userData, menus, loadingButtonFriend, onMenusClick])
 
 	const _renderTotalInfo = useCallback(() => {
-		const { avatar, cover, name, address, id, is_friend, i_am_from } =
+		const { avatar, cover, name, address, id, is_friend, i_am_from, mode } =
 			userData || {}
 		const isMe = id === getUserInfo('id')
 		return (
@@ -176,12 +178,20 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 					<Flex className={classes.info}>
 						<Flex className={classes.avatarWrapper}>
 							<CAvatar className={classes.avatar} size={96} src={avatar} />
+							<Flex className={classes.status}>{mappingMod[mode]}</Flex>
 						</Flex>
 						<Flex className={classes.commonInfo} vertical>
 							<div className={classes.name}>{name}</div>
-							<div>{mappingCountriesOptions[i_am_from]?.name}</div>
-							<div className={classes.address}>{address || ''}</div>
-							<Flex className={classes.status}>Available</Flex>
+							<Flex gap={4} align="center">
+								<span className={clsx(`flag:${i_am_from}`, classes.flag)} />
+								{mappingCountriesOptions[i_am_from]?.name}
+							</Flex>
+							<Flex className={classes.address} align="center" gap={4}>
+								<div>
+									<MarkIcon fill="#7987A4" />
+								</div>
+								{address || ''}
+							</Flex>
 						</Flex>
 					</Flex>
 					<Flex className={classes.endButton}>

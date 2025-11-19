@@ -37,6 +37,7 @@ import { mappingEventTitle } from '@/Variable/event.variable'
 import { radiusOpts, typeEvent } from '@/Variable/select.variable'
 
 import classes from './Overview.module.scss'
+import HappyIcon from '@/svg/HappyIcon'
 
 const Overview = () => {
 	const { loadingContext } = useLoading()
@@ -113,8 +114,12 @@ const Overview = () => {
 						disabled={loading.event}
 						value={categories}
 						options={typeEvent}
-						placeholder="Choose categories"
-						prefix={<MarkIcon />}
+						placeholder="Categories"
+						prefix={
+							<Flex className={classes.prefixIcon}>
+								<HappyIcon fill="#fff" />
+							</Flex>
+						}
 						onChange={onChangeFilter('categories')}
 					/>
 				</Flex>
