@@ -35,6 +35,7 @@ const handleParseToData = (data, categoryNetworkOpts) => {
 		i_am_from,
 		category_list,
 		country_lived,
+		is_hide_age,
 	} = cloneDeep(data)
 	const mappingCategoryNetworkOpts = (categoryNetworkOpts || []).reduce(
 		(obj, item) => {
@@ -66,6 +67,7 @@ const handleParseToData = (data, categoryNetworkOpts) => {
 			(i) => mappingCategoryNetworkOpts[i],
 		),
 		country_lived: (country_lived || '').split(', '),
+		is_hide_age: !!is_hide_age,
 	}
 	return returnData
 }
@@ -273,6 +275,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 			latitude,
 			user_languages,
 			category_list,
+			is_hide_age,
 		} = dataModal
 		const payload = {
 			id: data.id,
@@ -297,6 +300,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 				(i) => i.language_name && i.proficiency_level,
 			),
 			category_list: (category_list || []).map((i) => i.id),
+			is_hide_age,
 		}
 		openConfirm({
 			message: 'Do you want to update profile ?',

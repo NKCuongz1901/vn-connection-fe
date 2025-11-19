@@ -42,6 +42,16 @@ import TrashIcon from '@/svg/TrashIcon'
 import { isArray } from '@/ultis/array.ults'
 import { CountriesOptions } from '@/Variable/countryVariable'
 import classes from './ModalEditProfile.module.scss'
+import CCheckRadio from '@/Components/Custom/CCheckRadio'
+import ProfileIcon from '@/svg/ProfileIcon'
+import GenderIcon from '@/svg/GenderIcon'
+import MarkIcon from '@/svg/MarkIcon'
+import HappyIcon from '@/svg/HappyIcon'
+import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
+import ArmHeartIcon from '@/svg/ArmHeartIcon'
+import FavoriteIcon from '@/svg/FavoriteIcon'
+import WorldIcon from '@/svg/WorldIcon'
+import Heart from '@/svg/Heart'
 
 interface ModalEditProfileProps {
 	open: boolean
@@ -106,6 +116,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					error={errors.about_me}
 					value={about_me}
 					maxLength={200}
+					rows={4}
 					placeholder="Write something about you"
 					onChange={(e) => onChangeData('about_me', e.target.value)}
 				/>
@@ -131,6 +142,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 			user_languages,
 			i_am_from,
 			category_list,
+			is_hide_age,
 		} = dataModal
 		return (
 			<Flex className={classes.bottom}>
@@ -139,8 +151,9 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					<CInput
 						value={name}
 						error={errors.name}
+						desc="If you change your name, you can’t change it again for 30 days"
 						placeholder="Your full name"
-						prefix={<IconUserFilled />}
+						prefix={<ProfileIcon fill="#7987A4" />}
 						onChange={(e) => onChangeData('name', e.target.value)}
 					/>
 					<CDatePicker
@@ -154,12 +167,20 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 						}
 					/>
 					<Flex>
+						<CCheckRadio
+							isNoBorder
+							label={'Hide age'}
+							checked={!!is_hide_age}
+							onClick={() => onChangeData('is_hide_age', !is_hide_age)}
+						/>
+					</Flex>
+					<Flex>
 						<CSelect
 							value={gender}
 							error={errors.gender}
 							options={genderOpts}
 							placeholder="Select your gender"
-							prefix={<IconGenderBigender />}
+							prefix={<GenderIcon fill="#7987A4" />}
 							onChange={(e) => onChangeData('gender', e)}
 						/>
 					</Flex>
@@ -170,7 +191,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 						error={errors.address}
 						placeholder="Enter your location"
 						onSubmitModal={(value) => onChangeData('address', value)}
-						prefix={<IconMapPinFilled />}
+						prefix={<MarkIcon fill="#7987A4" />}
 					/>
 					<Flex>
 						<CSelect
@@ -178,7 +199,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							error={errors.mode}
 							options={modOpts}
 							onChange={(e) => onChangeData('mode', e)}
-							prefix={<IconMoodSmileFilled />}
+							prefix={<HappyIcon fill="#7987A4" />}
 							placeholder="Select your state"
 						/>
 					</Flex>
@@ -186,21 +207,21 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 						value={who_i_am}
 						error={errors.who_i_am}
 						placeholder="I am a/an"
-						prefix={<IconUserCog />}
+						prefix={<PeopleHexagonIcon fill="#7987A4" />}
 						onChange={(e) => onChangeData('who_i_am', e.target.value)}
 					/>
 					<CInput
 						value={looking_for}
 						error={errors.looking_for}
 						placeholder="Looking for ..."
-						prefix={<IconHeartPin />}
+						prefix={<FavoriteIcon fill="#7987A4" />}
 						onChange={(e) => onChangeData('looking_for', e.target.value)}
 					/>
 					<CInput
 						value={i_can_offer}
 						error={errors.i_can_offer}
 						placeholder="I can offer ..."
-						prefix={<IconUserHeart />}
+						prefix={<ArmHeartIcon fill="#7987A4" />}
 						onChange={(e) => onChangeData('i_can_offer', e.target.value)}
 					/>
 				</Flex>
@@ -213,7 +234,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							label="Native languages"
 							placeholder="Select your languages"
 							options={languageOpts}
-							prefix={<IconWorld />}
+							prefix={<WorldIcon fill="#7987A4" />}
 							onChange={(e) => onChangeData('languages_can_speak', e)}
 						/>
 					</Flex>
@@ -291,6 +312,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					<CMultiSelect
 						isRequired
 						suffixIcon={<IconChevronDown />}
+						prefixIcon={<Heart />}
 						label="Interested in"
 						options={categoryNetworkOpts}
 						value={category_list || []}
@@ -305,7 +327,6 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							label="Countries I've lived in"
 							placeholder="Select your languages"
 							options={CountriesOptions}
-							prefix={<IconWorld />}
 							onChange={(e) => onChangeData('country_lived', e)}
 						/>
 					</Flex>
@@ -317,7 +338,6 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							label="Countries I've visited"
 							placeholder="Select your languages"
 							options={CountriesOptions}
-							prefix={<IconWorld />}
 							onChange={(e) => onChangeData('country_visited', e)}
 						/>
 					</Flex>

@@ -21,7 +21,9 @@ interface CMultiSelectProps {
 	max?: number
 	error?: string
 	suffixIcon?: React.ReactNode
+	prefixIcon?: React.ReactNode
 	onChange?: any
+
 	[key: string]: any
 }
 
@@ -32,6 +34,7 @@ const CMultiSelect = (props: CMultiSelectProps) => {
 		value,
 		error,
 		suffixIcon,
+		prefixIcon,
 		options,
 		max,
 		onChange,
@@ -136,15 +139,20 @@ const CMultiSelect = (props: CMultiSelectProps) => {
 						className={clsx(classes.content, { [classes.error]: !!error })}
 						onClick={() => toggle(!shows)}
 					>
-						<div
-							className={clsx(classes.label, {
-								[classes.opacityDown]: !isArray(choose, 1),
-							})}
-						>
-							{isArray(choose, 1)
-								? (choose || []).map((i) => i.title).join(', ')
-								: 'Which category fits you best?'}
-						</div>
+						<Flex align="center" gap={8}>
+							{prefixIcon && (
+								<div className={classes.suffixIcon}>{prefixIcon}</div>
+							)}
+							<div
+								className={clsx(classes.label, {
+									[classes.opacityDown]: !isArray(choose, 1),
+								})}
+							>
+								{isArray(choose, 1)
+									? (choose || []).map((i) => i.title).join(', ')
+									: 'Which category fits you best?'}
+							</div>
+						</Flex>
 						{suffixIcon && (
 							<div className={classes.suffixIcon}>{suffixIcon}</div>
 						)}

@@ -63,6 +63,7 @@ import ClockIconDivideTopIcon from '@/svg/ClockIconDivideTopIcon'
 import WorldIcon from '@/svg/WorldIcon'
 import HouseIcon from '@/svg/HouseIcon'
 import PinTickIcon from '@/svg/PinTickIcon'
+import CalenderIcon from '@/svg/CalenderIcon'
 
 const Icons = () => {
 	const icons = [
@@ -225,6 +226,11 @@ const Icons = () => {
 		{
 			ICON: PinTickIcon,
 			name: '@/svg/PinTickIcon',
+			key: randomString(),
+		},
+		{
+			ICON: CalenderIcon,
+			name: '@/svg/CalenderIcon',
 			key: randomString(),
 		},
 	]

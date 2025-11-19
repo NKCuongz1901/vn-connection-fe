@@ -98,35 +98,47 @@ const MainLayout = (props: MainLayoutProps) => {
 			</Flex>
 		)
 	}
-	useEffect(() => {
-		const login = isLogin()
-		if (!appLayoutAuth.some((i) => pathname.includes(i))) {
-			if (!login) {
-				onChangeRoute(mainRoutes.login)
-			} else {
-				setContent(
-					<Flex vertical className="wrapperMainLayout">
-						<HeaderMainLayout onToggleMenus={toggleMenus} />
-						<Flex className="bodyMainLayout">
-							{_renderSideBar()}
-							<Flex vertical className="contentMainLayout">
-								{children}
-							</Flex>
-						</Flex>
-					</Flex>,
-				)
-			}
-		} else {
-			if (login) {
-				onChangeRoute(mainRoutes.overview)
-			} else {
-				setContent(<AuthLayout>{children}</AuthLayout>)
-			}
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [localePathname, openMenu])
+	// useEffect(() => {
+	// 	const login = isLogin()
+	// 	if (!appLayoutAuth.some((i) => pathname.includes(i))) {
+	// 		if (!login) {
+	// 			onChangeRoute(mainRoutes.login)
+	// 		} else {
+	// 			setContent(
+	// <Flex vertical className="wrapperMainLayout">
+	// 	<HeaderMainLayout onToggleMenus={toggleMenus} />
+	// 	<Flex className="bodyMainLayout">
+	// 		{_renderSideBar()}
+	// 		<Flex vertical className="contentMainLayout">
+	// 			{children}
+	// 		</Flex>
+	// 	</Flex>
+	// </Flex>,
+	// 			)
+	// 		}
+	// 	} else {
+	// 		if (login) {
+	// 			onChangeRoute(mainRoutes.overview)
+	// 		} else {
+	// 			setContent(<AuthLayout>{children}</AuthLayout>)
+	// 		}
+	// 	}
+	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// }, [localePathname, openMenu])
 
-	return <div className="mainLayout">{content}</div>
+	return (
+		<div className="mainLayout">
+			<Flex vertical className="wrapperMainLayout">
+				<HeaderMainLayout onToggleMenus={toggleMenus} />
+				<Flex className="bodyMainLayout">
+					{_renderSideBar()}
+					<Flex vertical className="contentMainLayout">
+						{children}
+					</Flex>
+				</Flex>
+			</Flex>
+		</div>
+	)
 }
 
 export default memo(MainLayout)

@@ -11,6 +11,7 @@ import { SliderRangeProps } from 'antd/es/slider'
 interface CInputOthersProps {
 	label?: string
 	error?: string
+	desc?: string
 	isRequired?: boolean
 	isNotBold?: boolean
 	[key: string]: any

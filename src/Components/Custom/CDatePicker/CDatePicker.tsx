@@ -5,6 +5,7 @@ import { DatePicker, DatePickerProps, Flex } from 'antd'
 import { memo } from 'react'
 
 import classes from './CDatePicker.module.scss'
+import CalenderIcon from '@/svg/CalenderIcon'
 interface CDatePickerOthersProps {
 	label?: string
 	error?: string
@@ -24,7 +25,7 @@ const CDatePicker = (_props: CDatePickerProps) => {
 			<DatePicker
 				allowClear
 				className={classes.wrapper}
-				prefix={<IconCalendarWeekFilled />}
+				prefix={<CalenderIcon fill="#7987A4" />}
 				suffixIcon={<IconChevronDown />}
 				style={{
 					borderRadius: 16,
