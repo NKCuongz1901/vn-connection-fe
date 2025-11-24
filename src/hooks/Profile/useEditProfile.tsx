@@ -67,7 +67,7 @@ const handleParseToData = (data, categoryNetworkOpts) => {
 			(i) => mappingCategoryNetworkOpts[i],
 		),
 		country_lived:
-			country_lived?.lenth > 1 ? (country_lived || '').split(', ') : [],
+			country_lived?.length > 1 ? (country_lived || '').split(', ') : [],
 		is_hide_age: !!is_hide_age,
 	}
 	return returnData

@@ -289,15 +289,17 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 						</Flex>
 					</Flex>
 					<span className={classes.title}>Specialties</span>
-					<CSelect
-						showSearch
-						isRequired
-						label="I am from"
-						placeholder="Enter name of countries"
-						value={i_am_from || undefined}
-						options={countryCodes}
-						onChange={(e) => onChangeData('i_am_from', e)}
-					/>
+					<div>
+						<CSelect
+							showSearch
+							isRequired
+							label="I am from"
+							placeholder="Enter name of countries"
+							value={i_am_from || undefined}
+							options={countryCodes}
+							onChange={(e) => onChangeData('i_am_from', e)}
+						/>
+					</div>
 					<div>
 						<CMultiSelect
 							isRequired
