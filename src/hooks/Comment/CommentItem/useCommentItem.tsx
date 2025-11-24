@@ -217,7 +217,7 @@ export default function useCommentItem({
 				_value = value.target.value
 				break
 			case 'removeImg':
-				const { medias } = cloneDeep(dataSubmit || {})
+				const { medias } = cloneDeep(dataSubmit) || {}
 				const _medias = (medias || []).filter(
 					(item) => item?.url !== value?.url,
 				)
