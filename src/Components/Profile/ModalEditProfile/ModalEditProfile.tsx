@@ -298,16 +298,18 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 						options={countryCodes}
 						onChange={(e) => onChangeData('i_am_from', e)}
 					/>
-					<CMultiSelect
-						isRequired
-						suffixIcon={<IconChevronDown />}
-						prefixIcon={<Heart />}
-						label="Interested in"
-						options={categoryNetworkOpts}
-						value={category_list || []}
-						error={errors.category_list}
-						onChange={(e) => onChangeData('category_list', e)}
-					/>
+					<div>
+						<CMultiSelect
+							isRequired
+							suffixIcon={<IconChevronDown />}
+							prefixIcon={<Heart />}
+							label="Interested in"
+							options={categoryNetworkOpts}
+							value={category_list || []}
+							error={errors.category_list}
+							onChange={(e) => onChangeData('category_list', e)}
+						/>
+					</div>
 					<Flex>
 						<CSelectMuti
 							isRequired

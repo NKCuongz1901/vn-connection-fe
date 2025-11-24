@@ -66,7 +66,8 @@ const handleParseToData = (data, categoryNetworkOpts) => {
 		category_list: (category_list || []).map(
 			(i) => mappingCategoryNetworkOpts[i],
 		),
-		country_lived: (country_lived || '').split(', '),
+		country_lived:
+			country_lived?.lenth > 1 ? (country_lived || '').split(', ') : [],
 		is_hide_age: !!is_hide_age,
 	}
 	return returnData
@@ -130,14 +131,14 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 				case 'user_languages':
 					{
 						const { index, value: valueData, id } = _value || {}
-						const { user_languages } = cloneDeep(dataModal || {})
+						const { user_languages } = cloneDeep(dataModal) || {}
 						user_languages[index][id] = valueData
 						value = user_languages
 					}
 					break
 				case 'user_languages_add':
 					{
-						let { user_languages } = cloneDeep(dataModal || {})
+						let { user_languages } = cloneDeep(dataModal) || {}
 						if (isArray(user_languages, 1)) {
 							user_languages.push({
 								language_name: '',
@@ -158,7 +159,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 
 				case 'user_languages_remove':
 					{
-						let { user_languages } = cloneDeep(dataModal || {})
+						let { user_languages } = cloneDeep(dataModal) || {}
 						user_languages = (user_languages || []).filter(
 							(_, index) => index !== _value,
 						)
