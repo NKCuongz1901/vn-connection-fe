@@ -13,7 +13,9 @@ export const isIOS = (): boolean =>
 export const formatPhone = (prefix: string, phone: string) =>
 	phone.startsWith('0') ? prefix + phone.slice(1) : prefix + phone
 
-export const cloneDeep = (obj: any) => (obj ? _cloneDeep(obj) : obj)
+export const cloneDeep = <T,>(obj: T): T => {
+	return obj ? _cloneDeep(obj) : obj
+}
 
 export const isFunction = (value: any) => typeof value === 'function'
 export const delay = (n: number) =>

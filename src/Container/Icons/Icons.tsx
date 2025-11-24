@@ -68,6 +68,7 @@ import MaleIcon from '@/svg/MaleIcon'
 import FeMaleIcon from '@/svg/FeMaleIcon'
 import DotIcon from '@/svg/DotIcon'
 import Message2Icon from '@/svg/Message2Icon'
+import TickIcon from '@/svg/TickIcon'
 
 const Icons = () => {
 	const icons = [
@@ -144,7 +145,7 @@ const Icons = () => {
 		},
 		{
 			ICON: DoubleHeart,
-			name: '@/svg/ArrrowRightIcon',
+			name: '@/svg/DoubleHeart',
 			key: randomString(),
 		},
 		{
@@ -256,9 +257,15 @@ const Icons = () => {
 			ICON: Message2Icon,
 			name: '@/svg/Message2Icon',
 			key: randomString(),
-		},{
+		},
+		{
 			ICON: ClockIconDivideTopIcon,
 			name: '@/svg/ClockIconDivideTopIcon',
+			key: randomString(),
+		},
+		{
+			ICON: TickIcon,
+			name: '@/svg/TickIcon',
 			key: randomString(),
 		},
 	]

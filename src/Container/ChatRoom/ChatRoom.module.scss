@@ -1,0 +1,179 @@
+.wrapper {
+	height: 100%;
+	width: 100%;
+	.container {
+		padding: 24px;
+		height: 100%;
+		width: 100%;
+		gap: 12px;
+
+		.title {
+			font-weight: 600;
+			font-size: 18px;
+			cursor: pointer;
+		}
+		.body {
+			padding: 16px;
+			width: 100%;
+			background: #fff;
+			border-radius: 16px;
+			gap: 12px;
+			.tabs {
+				width: 100%;
+				padding: 4px;
+				border-radius: 50px;
+				background: #f0f3f9;
+				.btnTab {
+					width: 50%;
+				}
+			}
+			.tabLanguage {
+				gap: 20px;
+				flex-wrap: wrap;
+				.chatRoomWrapper {
+					padding: 12px;
+					gap: 8px;
+					align-items: center;
+					cursor: pointer;
+					width: 168px;
+					min-height: 142px;
+					border-radius: 12px;
+					border: 1px solid #edf0f5;
+					background: #edf0f5;
+					.chatRoomAva {
+						min-height: 48px;
+						min-width: 48px;
+					}
+					.contentSkeletonAva {
+						min-height: 48px;
+						min-width: 48px;
+						span {
+							height: 100%;
+							width: 100%;
+						}
+					}
+					.contentSkeletonInput {
+						height: 18px;
+						min-width: 80px;
+						span {
+							height: 18px;
+							min-width: 80px;
+							width: 100%;
+						}
+					}
+					.contentSkeletonInput2 {
+						min-width: 80px;
+						height: 11px;
+						span {
+							height: 11px;
+							min-width: 80px;
+							width: 100%;
+						}
+					}
+					.contentSkeletonInput3 {
+						min-width: 80px;
+						height: 14px;
+						span {
+							height: 14px;
+							min-width: 80px;
+							width: 100%;
+						}
+					}
+					.chatRoomTitle {
+						font-weight: 500;
+						color: #0f1729;
+					}
+					.totalMem {
+						align-items: center;
+						gap: 8px;
+						color: #48546b;
+						font-size: 10px;
+					}
+					.totalOnl {
+						align-items: center;
+						gap: 4px;
+						font-weight: 600;
+						color: #48546b;
+						font-size: 12px;
+						.online {
+							display: flex;
+							width: 12px;
+							height: 12px;
+							max-width: 16px;
+							border-radius: 50%;
+							background: #1e9037;
+							flex-direction: column;
+							justify-content: center;
+							align-items: center;
+						}
+					}
+				}
+			}
+			.develop {
+				width: 100%;
+				font-size: 18px;
+				align-items: center;
+				justify-content: center;
+			}
+		}
+	}
+}
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		.container {
+			padding: 12px;
+			.title {
+			}
+			.body {
+				padding: 12px;
+				.tabs {
+					.btnTab {
+					}
+				}
+				.tabLanguage {
+					.chatRoomWrapper {
+						width: calc(33% - 12px);
+						.chatRoomTitle {
+						}
+						.totalMem {
+						}
+						.totalOnl {
+							.online {
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+@media (min-width: 0px) and (max-width: 500px) {
+	.wrapper {
+		.container {
+			padding: 8px;
+			.title {
+			}
+			.body {
+				padding: 8px;
+				.tabs {
+					.btnTab {
+					}
+				}
+				.tabLanguage {
+					.chatRoomWrapper {
+						width: calc(50% - 10px);
+						.chatRoomTitle {
+						}
+						.totalMem {
+						}
+						.totalOnl {
+							.online {
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
