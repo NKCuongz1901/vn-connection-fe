@@ -69,6 +69,7 @@ import FeMaleIcon from '@/svg/FeMaleIcon'
 import DotIcon from '@/svg/DotIcon'
 import Message2Icon from '@/svg/Message2Icon'
 import TickIcon from '@/svg/TickIcon'
+import WarningIcon from '@/svg/WarningIcon'
 
 const Icons = () => {
 	const icons = [
@@ -266,6 +267,11 @@ const Icons = () => {
 		{
 			ICON: TickIcon,
 			name: '@/svg/TickIcon',
+			key: randomString(),
+		},
+		{
+			ICON: WarningIcon,
+			name: '@/svg/WarningIcon',
 			key: randomString(),
 		},
 	]

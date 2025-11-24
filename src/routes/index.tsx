@@ -1,5 +1,6 @@
 import Event from '@/svg/Event'
 // import Heart from '@/svg/Heart'
+import Message2Icon from '@/svg/Message2Icon'
 import Message3 from '@/svg/Message3'
 import Messenger from '@/svg/Messenger'
 import OverviewIcon from '@/svg/OverviewIcon'
@@ -120,6 +121,12 @@ export const Menus = [
 		title: 'My Community',
 		Icon: People,
 		path: mainRoutes.community,
+		child: [],
+	},
+	{
+		title: 'Chat rooms',
+		Icon: Message2Icon,
+		path: mainRoutes.chatRoom,
 		child: [],
 	},
 	{
