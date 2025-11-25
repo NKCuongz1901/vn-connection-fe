@@ -357,7 +357,9 @@ const Overview = () => {
 													vertical
 													className={classes.chatRoomItem}
 													onClick={() =>
-														onChangeRoute(`${mainRoutes.chatRoom}/${id}`)
+														onChangeRoute(
+															`${mainRoutes.chatRoom}?type=language&id=${id}`,
+														)
 													}
 												>
 													<div>

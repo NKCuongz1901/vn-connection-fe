@@ -3,6 +3,7 @@ import { memo } from 'react'
 import useDetailChatRoom from '@/hooks/ChatRoom/useDetailChatRoom'
 
 import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
+import ChatRoomInboxChat from '@/Components/ChatRoomInbox/ChatRoomInboxChat'
 
 const DetailChatRoom = ({ id }) => {
 	const { modal, setModal, onSetTimesJoin } = useDetailChatRoom({ id })
@@ -34,7 +35,13 @@ const DetailChatRoom = ({ id }) => {
 		return Content
 	}
 
-	return <div>{_renderModal()}</div>
+	return (
+		<div>
+			{/* <InboxChat convId={id} /> */}
+			<ChatRoomInboxChat convId={id} />
+			{_renderModal()}
+		</div>
+	)
 }
 
 export default memo(DetailChatRoom)

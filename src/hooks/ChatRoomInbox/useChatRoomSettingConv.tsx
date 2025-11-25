@@ -6,7 +6,6 @@ import { useModal } from '@/context/ModalContext'
 import {
 	deleteConvById,
 	getConvMediasById,
-	leaveConvById,
 	updateConvMember,
 } from '@/apis/conversationApis'
 
@@ -19,18 +18,18 @@ import { randomString } from '@/ultis/string.ults'
 import { paginationCommon } from '@/Variable/common.variable'
 import { PaginationType } from '@/interface/common/common.interface'
 
-type useSettingConvProps = {
+type useChatRoomSettingConvProps = {
 	convInfo: any
 	members: any
 	onAction?: any
 	[key: string]: any
 }
 
-export default function useSettingConv({
+export default function useChatRoomSettingConv({
 	convInfo,
 	members,
 	onAction,
-}: useSettingConvProps) {
+}: useChatRoomSettingConvProps) {
 	const { toggleLoadingContext } = useLoading()
 	const { openError, openConfirm, closeModal } = useModal()
 
@@ -126,31 +125,6 @@ export default function useSettingConv({
 			ctype: 'error',
 		})
 	}
-	const handleLeaveConv = async (id) => {
-		toggleLoadingContext(true)
-		try {
-			const res: any = await leaveConvById({ id })
-			await delay(500)
-			if (res?.code === 200) {
-				onPushState({ force_id: randomString() })
-				closeModal()
-			}
-		} catch (error) {
-			openError(error)
-		} finally {
-			toggleLoadingContext()
-		}
-	}
-	const handleConfirmLeave = () => {
-		const { id } = convInfo || {}
-
-		openConfirm({
-			message: 'Are you sure want to leave this chatroom?',
-			titleLabel: 'Leave this chatroom',
-			onAccept: () => handleLeaveConv(id),
-			ctype: 'error',
-		})
-	}
 	const handleLoadMore = async () => {
 		if (!_loadmore.current || !!loading.medias) return
 		const { limit } = _paginationRefs.current
@@ -185,6 +159,5 @@ export default function useSettingConv({
 		onScroll: handleScroll,
 		onLoadMore: handleLoadMore,
 		onConfirmDelete: handleConfirmDelete,
-		onConfirmLeave: handleConfirmLeave,
 	}
 }

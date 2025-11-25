@@ -17,6 +17,7 @@
 			width: 100%;
 			background: #fff;
 			border-radius: 16px;
+			height: 100%;
 			gap: 12px;
 			.tabs {
 				width: 100%;
@@ -27,9 +28,13 @@
 					width: 50%;
 				}
 			}
+			.languageWrapper {
+				height: 100%;
+			}
 			.tabLanguage {
 				gap: 20px;
 				flex-wrap: wrap;
+				overflow: auto;
 				.chatRoomWrapper {
 					padding: 12px;
 					gap: 8px;
@@ -109,6 +114,11 @@
 					}
 				}
 			}
+			.inboxDetail {
+				width: 384px;
+				min-width: 384px;
+				max-width: 384px;
+			}
 			.develop {
 				width: 100%;
 				font-size: 18px;
@@ -144,6 +154,9 @@
 						}
 					}
 				}
+			}
+			.inboxDetail {
+				display: none;
 			}
 		}
 	}

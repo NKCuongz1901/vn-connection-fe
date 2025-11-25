@@ -1,18 +1,18 @@
 'use client'
 
 import { Flex, Skeleton } from 'antd'
+import clsx from 'clsx'
 import { memo } from 'react'
 
 import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { useLocalePath, useSafeBack } from '@/ultis/route.ults'
+import { onPushState, useSafeBack } from '@/ultis/route.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
 import useChatRoom from '@/hooks/ChatRoom/useChatRoom'
 import ArrrowLeftIcon from '@/svg/ArrrowLeftIcon'
 import TickIcon from '@/svg/TickIcon'
-
-import { mainRoutes } from '@/routes/MainRoutes'
+import DetailChatRoom from './DetailChatRoom'
 
 import classes from './ChatRoom.module.scss'
 
@@ -21,9 +21,11 @@ const tabOpts = [
 	{ value: 'location', label: 'Location' },
 ]
 const ChatRoom = () => {
-	const { onChangeRoute } = useLocalePath()
 	const { goBackOrPush } = useSafeBack()
-	const { loading, tab, listChatRoom, setTab } = useChatRoom({ tabOpts })
+	const { loading, isChatRoomDetail, id, tab, listChatRoom, setTab } =
+		useChatRoom({
+			tabOpts,
+		})
 	const _renderBack = () => {
 		return (
 			<Flex className={classes.title} onClick={() => goBackOrPush()}>
@@ -35,26 +37,32 @@ const ChatRoom = () => {
 	const _renderBody = () => {
 		return (
 			<Flex className={classes.body} vertical>
-				<Flex className={classes.tabs}>
-					{tabOpts.map((i) => (
-						<div key={i.value} className={classes.btnTab}>
-							<CButton
-								ctype={i.value === tab ? 'success' : 'disabled'}
-								onClick={() => setTab(i.value)}
-							>
-								{i.label}
-							</CButton>
-						</div>
-					))}
-				</Flex>
-				<Flex>{_renderContentTab()}</Flex>
+				{!isChatRoomDetail && (
+					<Flex className={classes.tabs}>
+						{tabOpts.map((i) => (
+							<div key={i.value} className={classes.btnTab}>
+								<CButton
+									ctype={i.value === tab ? 'success' : 'disabled'}
+									onClick={() => setTab(i.value)}
+								>
+									{i.label}
+								</CButton>
+							</div>
+						))}
+					</Flex>
+				)}
+				{_renderContentTab()}
 			</Flex>
 		)
 	}
 	const _renderTabLanguage = () => {
 		if (loading.chatroom)
 			return (
-				<Flex className={classes.tabLanguage}>
+				<Flex
+					className={clsx(classes.tabLanguage, {
+						[classes.inboxDetail]: isChatRoomDetail,
+					})}
+				>
 					{arrayFrom(10).map((_, index) => (
 						<Flex key={index} vertical className={classes.chatRoomWrapper}>
 							<Skeleton.Avatar active className={classes.contentSkeletonAva} />
@@ -72,7 +80,11 @@ const ChatRoom = () => {
 				</Flex>
 			)
 		return (
-			<Flex className={classes.tabLanguage}>
+			<Flex
+				className={clsx(classes.tabLanguage, {
+					[classes.inboxDetail]: isChatRoomDetail,
+				})}
+			>
 				{listChatRoom.map((room) => {
 					const {
 						id,
@@ -87,7 +99,7 @@ const ChatRoom = () => {
 							key={id}
 							vertical
 							className={classes.chatRoomWrapper}
-							onClick={() => onChangeRoute(`${mainRoutes.chatRoom}/${id}`)}
+							onClick={() => onPushState({ type: 'language', id })}
 						>
 							<CAvatar src={avatar} className={classes.chatRoomAva} />
 							<div className={classes.chatRoomTitle}>{title}</div>
@@ -108,7 +120,16 @@ const ChatRoom = () => {
 	const _renderContentTab = () => {
 		switch (tab) {
 			case tabOpts[0].value:
-				return _renderTabLanguage()
+				return (
+					<Flex className={classes.languageWrapper}>
+						{_renderTabLanguage()}
+						{isChatRoomDetail && (
+							<Flex className={classes.inboxWrapper}>
+								<DetailChatRoom id={id} />
+							</Flex>
+						)}
+					</Flex>
+				)
 			case tabOpts[1].value:
 				return (
 					<Flex className={classes.develop}>Feature is in development</Flex>

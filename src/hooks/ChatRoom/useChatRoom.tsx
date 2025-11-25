@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useModal } from '@/context/ModalContext'
 
@@ -6,6 +6,7 @@ import { getChatRoomList } from '@/apis/conversationApis'
 
 import { uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
+import { useQuery } from '@/ultis/route.ults'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { ConversationChatRoomProps } from '@/interface/Conversation/Conversation.interface'
@@ -18,6 +19,9 @@ interface useChatRoomProps {
 export default function useChatRoom(props: useChatRoomProps) {
 	const { tabOpts } = props
 	const { openError } = useModal()
+	const { onGetQuerry } = useQuery()
+	const { type, id } = onGetQuerry()
+
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 
 	const [tab, setTab] = useState(tabOpts[0].value)
@@ -29,6 +33,10 @@ export default function useChatRoom(props: useChatRoomProps) {
 		[],
 	)
 
+	const isChatRoomDetail = useMemo(
+		() => type === 'language' && !!id,
+		[type, id],
+	)
 	const handleGetListChatRoom = async (isNotLoading = false) => {
 		setLoading((prev) => ({ ...prev, chatroom: true }))
 		try {
@@ -69,6 +77,8 @@ export default function useChatRoom(props: useChatRoomProps) {
 	}, [])
 	return {
 		loading,
+		id,
+		isChatRoomDetail,
 		tab,
 		listChatRoom,
 		setTab,

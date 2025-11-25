@@ -1,0 +1,357 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+	.chatContent {
+		display: flex !important;
+		flex: 1;
+		width: 100%;
+		height: 200px;
+		overflow-x: scroll;
+		flex-direction: column-reverse;
+		gap: 4px;
+		padding: 12px 28px;
+		& .skeleton {
+			height: 100%;
+			width: 100%;
+		}
+		.skeletonWrapper {
+			padding: 4px 16px;
+			gap: 4px;
+			.skeleton {
+				border-radius: 16px;
+				height: 30px;
+				width: 100%;
+			}
+		}
+		.itemChat {
+			max-width: 100%;
+			.contentItem {
+				max-width: 100%;
+				gap: 4px;
+				.avatar {
+					margin-top: 4px;
+					min-width: 32px;
+					display: flex;
+				}
+				.contentInfo {
+					max-width: 100%;
+					gap: 4px;
+					position: relative;
+					.name {
+						color: #006b35;
+
+						font-size: 12px;
+						font-weight: 600;
+					}
+					.content {
+						max-width: 100%;
+						.moreIconWrapper {
+							align-items: center;
+							justify-content: center;
+							padding: 6px;
+							order: 1;
+							.moreIcon {
+								cursor: pointer;
+								border-radius: 50%;
+								height: 32px;
+								width: 32px;
+								align-items: center;
+								justify-content: center;
+								border-radius: 99px;
+								background: #f4f8fc;
+							}
+						}
+						:global(.ant-image) {
+							height: 100%;
+							height: 80px;
+						}
+						img {
+							object-fit: cover;
+						}
+						.text {
+							// min-width: 200px;
+							max-width: 80%;
+							padding: 8px 12px;
+							gap: 4px;
+							border-radius: 16px;
+							background: #f4f8fc;
+							word-break: break-word;
+							display: flex;
+							flex-direction: column;
+						}
+						.sticker {
+							// padding: 0 12px;
+						}
+						.medias {
+							flex-wrap: wrap;
+							gap: 2px;
+							border-radius: 16px;
+							overflow: hidden;
+							.media {
+								height: 140px;
+								border-radius: 16px;
+								overflow: hidden;
+							}
+							:global(.ant-image) {
+								height: 140px;
+							}
+							:global(.ant-flex) {
+								justify-content: flex-start;
+							}
+							img {
+								object-fit: cover;
+								border-radius: 16px;
+								overflow: hidden;
+							}
+							.time {
+								padding: 0 12px;
+							}
+						}
+						.time {
+							margin-top: 4px;
+							font-size: 10px;
+							font-weight: 400;
+							color: #48546b;
+							padding: 0;
+						}
+						.memberAccept {
+							color: #135a19;
+						}
+					}
+				}
+			}
+		}
+		.mt2 {
+			margin-top: 8px;
+		}
+		.isMe {
+			justify-content: flex-end;
+			.contentItem {
+				// justify-content: flex-end;
+
+				.contentInfo {
+					// justify-content: flex-end;
+
+					.content {
+						justify-content: flex-end;
+						.moreIconWrapper {
+							order: -1;
+						}
+						.text {
+							color: #135a19;
+							background: #e7f5e9;
+							word-break: break-word;
+							div {
+								display: flex;
+								justify-content: flex-end;
+							}
+						}
+						.medias {
+							:global(.ant-flex) {
+								justify-content: flex-end;
+							}
+						}
+						.time {
+							display: flex;
+							justify-content: flex-end;
+						}
+					}
+				}
+			}
+		}
+		.isCenter {
+			width: 100%;
+			justify-content: center;
+
+			.contentItem {
+				gap: 4px;
+				width: 100%;
+
+				.contentInfo {
+					width: 100%;
+					.content {
+						width: 100%;
+						.memberAccept {
+							color: #135a19;
+							width: 100%;
+							margin: 8px 0;
+							text-align: center;
+							justify-content: center;
+							.ellipsisContent {
+								width: calc(100% - 40px);
+								overflow: hidden;
+								text-overflow: ellipsis;
+								white-space: nowrap;
+								// -webkit-box-orient: vertical;
+								// -webkit-line-clamp: 2; /* số dòng tối đa */
+								// display: -webkit-box;
+							}
+						}
+					}
+				}
+			}
+		}
+		.isTemp {
+			opacity: 0.5;
+		}
+	}
+
+	.chatBox {
+		width: 100%;
+		height: 64px;
+		display: flex;
+		padding: 12px 16px;
+		justify-content: center;
+		align-items: center;
+		position: relative;
+		gap: 8px;
+		.iconHappi,
+		.sendButton {
+			cursor: pointer;
+		}
+		.chooseImg {
+			// display: none;
+			cursor: pointer;
+		}
+	}
+	.chatBoxSticket {
+		display: none;
+		gap: 12px;
+		padding: 12px;
+		.stickerTitle {
+			gap: 16px;
+
+			.stickerItemTitle {
+				padding: 8px;
+				cursor: pointer;
+				img {
+					height: 32px;
+					width: 32px;
+				}
+			}
+			& > :hover {
+				border-radius: 16px;
+				overflow: hidden;
+				background: #e7f5e9;
+			}
+		}
+		.stickerActive {
+			border-radius: 16px;
+			overflow: hidden;
+			background: #e7f5e9;
+		}
+		.contentSticker {
+			flex-wrap: wrap;
+			overflow: auto;
+			.stickerItem {
+				padding: 8px;
+				cursor: pointer;
+				img {
+					height: 48px;
+					width: 48px;
+				}
+			}
+			& > :hover {
+				border-radius: 16px;
+				overflow: hidden;
+				background: #e7f5e9;
+			}
+		}
+	}
+	.showSticker {
+		height: 240px;
+		display: flex;
+	}
+	.chatReply {
+		margin: 0px 16px;
+		padding: 8px;
+		min-height: 56px;
+		border-radius: 16px;
+		background: #fff;
+		box-shadow: -2px 0px 12px 0px rgba(0, 13, 25, 0.1);
+		gap: 4px;
+		position: relative;
+		.replyInfo {
+			gap: 4px;
+			.replyName {
+				color: #006b35;
+				font-size: 12px;
+				font-weight: 600;
+			}
+		}
+		:global(.ant-image) {
+			height: 100%;
+			height: 80px;
+		}
+		img {
+			object-fit: cover;
+		}
+		.replyCancel {
+			width: 16px;
+			height: 16px;
+			position: absolute;
+			right: 8px;
+			top: 8px;
+			color: #7987a4;
+			cursor: pointer;
+		}
+	}
+	.parentItem {
+		border-radius: 16px;
+		background: #fff;
+		margin: 0px;
+		padding: 8px;
+		gap: 4px;
+		box-shadow: -2px 0px 12px 0px rgba(0, 13, 25, 0.1);
+		.parentItemInfo {
+			flex: 1;
+			gap: 4px;
+			div {
+				justify-content: flex-start !important;
+			}
+			.parentItemName {
+				justify-content: flex-start !important;
+				color: #006b35;
+				font-size: 12px;
+				font-weight: 600;
+			}
+		}
+		:global(.ant-image) {
+			height: 100%;
+			height: 80px;
+		}
+		img {
+			object-fit: cover;
+		}
+	}
+	.chooseImgContent {
+		position: absolute;
+		z-index: 10;
+		left: 16px;
+		bottom: 64px;
+		gap: 8px;
+		overflow-y: auto;
+		width: calc(100vw - 20px);
+		.chooseImgItem {
+			position: relative;
+		}
+		.chooseImgCancel {
+			width: 16px;
+			height: 16px;
+			position: absolute;
+			right: 4px;
+			top: 0;
+			color: #fff;
+			cursor: pointer;
+		}
+		:global(.ant-image) {
+			width: 100px;
+			height: 80px;
+		}
+		img {
+			object-fit: cover;
+		}
+	}
+}

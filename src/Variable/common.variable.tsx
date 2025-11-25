@@ -1329,6 +1329,8 @@ export const specialTypeMessage = [
 	'PIN',
 	'UNPIN',
 	'MEMBER_JOIN',
+
+	'POST',
 ]
 
 export const mappingTypeMessage = {
