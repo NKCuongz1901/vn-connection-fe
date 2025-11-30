@@ -124,7 +124,7 @@ const ChatRoom = () => {
 					<Flex className={classes.languageWrapper}>
 						{_renderTabLanguage()}
 						{isChatRoomDetail && (
-							<Flex className={classes.inboxWrapper}>
+							<Flex className={classes.detailChatRoom}>
 								<DetailChatRoom id={id} />
 							</Flex>
 						)}

@@ -12,9 +12,11 @@ import { getUserInfo } from '@/ultis/storage.ults'
 
 import HappyIcon from '@/svg/HappyIcon'
 import ImageIcon from '@/svg/ImageIcon'
+import MicroPhoneIcon from '@/svg/MicroPhoneIcon'
 import MoreIcon from '@/svg/MoreIcon'
 import ReplyIcon from '@/svg/ReplyIcon'
 import SendIcon from '@/svg/SendIcon'
+import AudioRecorder from '../AudioRecorder'
 import CAvatar from '../Custom/CAvatar'
 import CImage from '../Custom/CImage'
 import CInput from '../Custom/CInput'
@@ -23,7 +25,6 @@ import CUploadMuti from '../Custom/CUploadMuti'
 import { specialTypeMessage } from '@/Variable/common.variable'
 
 import classes from './ChatRoomChatBox.module.scss'
-
 interface ChatRoomChatBoxProps {
 	type?: string
 	itemList?: any[]
@@ -44,6 +45,7 @@ const ChatRoomChatBox = ({
 	onActionMessage,
 }: ChatRoomChatBoxProps) => {
 	const {
+		isAudio,
 		_refInput,
 		activeSticker,
 		showSticker,
@@ -51,12 +53,14 @@ const ChatRoomChatBox = ({
 		text,
 		reply,
 		setReply,
+		setIsAudio,
 		setText,
 		setActiveSticker,
 		setShowSticker,
 		onScroll,
 		onGetMenus,
 	} = useChatRoomChatBox({ onLoadMore, type, onActionMessage })
+
 	const [fileList, setFileList] = useState([])
 	const hangleImportImg = (_values) => {
 		const values: any[] = []
@@ -137,11 +141,16 @@ const ChatRoomChatBox = ({
 				let Content = null
 				switch (medias?.[0].type) {
 					case 'AUDIO':
-						Content = (
-							<Flex className={classes.media} align="center">
-								developing
+						Content = (medias || []).map((media, index) => (
+							<Flex key={index}>
+								<audio
+									style={{ minWidth: '200px' }}
+									controls
+									src={media.url}
+								></audio>
+								{/* <VisualizerWithPlay src={media.url} /> */}
 							</Flex>
-						)
+						))
 						break
 					default:
 						Content = (medias || []).map((media, index) => (
@@ -394,25 +403,48 @@ const ChatRoomChatBox = ({
 					disabled={fileList?.length > 0}
 					ref={_refInput}
 				/>
-				<Flex
-					className={classes.sendButton}
-					onClick={() => {
-						if (!!text.trim() || isArray(fileList, 1)) {
-							setText('')
-							setReply(null)
+				{text || isArray(fileList, 1) ? (
+					<Flex
+						className={classes.sendButton}
+						onClick={() => {
+							if (!!text.trim() || isArray(fileList, 1)) {
+								setText('')
+								setReply(null)
+								onSendMessage({
+									type: 'TEXT',
+									content: text,
+									parent: reply,
+									medias: fileList,
+								})
+								setFileList([])
+							}
+						}}
+					>
+						<SendIcon />
+					</Flex>
+				) : (
+					<Flex
+						className={classes.micro}
+						onClick={() => setIsAudio((prev) => !prev)}
+					>
+						<MicroPhoneIcon />
+					</Flex>
+				)}
+			</Flex>
+			{!(text || isArray(fileList, 1)) && isAudio && (
+				<div>
+					<AudioRecorder
+						onClose={() => setIsAudio(false)}
+						onComplete={(e) => {
 							onSendMessage({
 								type: 'TEXT',
-								content: text,
 								parent: reply,
-								medias: fileList,
+								audio: e,
 							})
-							setFileList([])
-						}
-					}}
-				>
-					<SendIcon />
-				</Flex>
-			</Flex>
+						}}
+					/>
+				</div>
+			)}
 			{_renderSticketList()}
 		</div>
 	)

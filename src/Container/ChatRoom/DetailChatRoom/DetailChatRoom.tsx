@@ -5,6 +5,7 @@ import useDetailChatRoom from '@/hooks/ChatRoom/useDetailChatRoom'
 import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
 import ChatRoomInboxChat from '@/Components/ChatRoomInbox/ChatRoomInboxChat'
 
+import classes from './DetailChatRoom.module.scss'
 const DetailChatRoom = ({ id }) => {
 	const { modal, setModal, onSetTimesJoin } = useDetailChatRoom({ id })
 
@@ -36,9 +37,9 @@ const DetailChatRoom = ({ id }) => {
 	}
 
 	return (
-		<div>
+		<div className={classes.wrapper}>
 			{/* <InboxChat convId={id} /> */}
-			<ChatRoomInboxChat convId={id} />
+			<ChatRoomInboxChat key={id} convId={id} />
 			{_renderModal()}
 		</div>
 	)

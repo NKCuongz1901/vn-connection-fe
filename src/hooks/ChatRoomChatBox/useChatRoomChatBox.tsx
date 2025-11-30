@@ -23,6 +23,7 @@ export default function useChatRoomChatBox({
 	const [showSticker, setShowSticker] = useState(false)
 	const [text, setText] = useState('')
 	const [reply, setReply] = useState() as any
+	const [isAudio, setIsAudio] = useState(false)
 	const handleScroll = (e: any) => {
 		const clientHeight = e.target.clientHeight
 		const scrollHeight = e.target.scrollHeight
@@ -126,12 +127,15 @@ export default function useChatRoomChatBox({
 	}, [])
 
 	return {
+		isAudio,
+
 		_refInput,
 		activeSticker,
 		showSticker,
 		stickerList,
 		text,
 		reply,
+		setIsAudio,
 		setReply,
 		setText,
 		setActiveSticker,

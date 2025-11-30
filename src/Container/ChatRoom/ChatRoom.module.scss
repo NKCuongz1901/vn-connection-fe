@@ -30,6 +30,9 @@
 			}
 			.languageWrapper {
 				height: 100%;
+				.detailChatRoom {
+					flex: 1;
+				}
 			}
 			.tabLanguage {
 				gap: 20px;
@@ -41,7 +44,7 @@
 					align-items: center;
 					cursor: pointer;
 					width: 168px;
-					min-height: 142px;
+					max-height: 142px;
 					border-radius: 12px;
 					border: 1px solid #edf0f5;
 					background: #edf0f5;

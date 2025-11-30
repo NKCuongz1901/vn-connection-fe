@@ -70,6 +70,9 @@ import DotIcon from '@/svg/DotIcon'
 import Message2Icon from '@/svg/Message2Icon'
 import TickIcon from '@/svg/TickIcon'
 import WarningIcon from '@/svg/WarningIcon'
+import MicroPhoneIcon from '@/svg/MicroPhoneIcon'
+import RetryIcon from '@/svg/RetryIcon'
+import SquareIcon from '@/svg/SquareIcon'
 
 const Icons = () => {
 	const icons = [
@@ -272,6 +275,21 @@ const Icons = () => {
 		{
 			ICON: WarningIcon,
 			name: '@/svg/WarningIcon',
+			key: randomString(),
+		},
+		{
+			ICON: MicroPhoneIcon,
+			name: '@/svg/MicroPhoneIcon',
+			key: randomString(),
+		},
+		{
+			ICON: RetryIcon,
+			name: '@/svg/RetryIcon',
+			key: randomString(),
+		},
+		{
+			ICON: SquareIcon,
+			name: '@/svg/SquareIcon',
 			key: randomString(),
 		},
 	]

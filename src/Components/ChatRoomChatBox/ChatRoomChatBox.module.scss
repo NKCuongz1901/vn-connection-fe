@@ -215,6 +215,15 @@
 			// display: none;
 			cursor: pointer;
 		}
+		.micro {
+			min-width: 44px;
+			min-height: 44px;
+			justify-content: center;
+			align-items: center;
+			border-radius: 99px;
+			background: #f0f3f9;
+			cursor: pointer;
+		}
 	}
 	.chatBoxSticket {
 		display: none;

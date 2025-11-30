@@ -12,7 +12,7 @@ import {
 	pinMessageById,
 	sendMessage,
 } from '@/apis/conversationApis'
-import { handleUploadImage } from '@/apis/uploadApis'
+import { handleUploadImage, handleUploadVideo } from '@/apis/uploadApis'
 
 import { mappingMessageChat, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
@@ -125,11 +125,13 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 		content,
 		medias: _medias,
 		parent,
+		audio,
 	}: {
 		type: string
 		content?: string
 		medias?: any[]
 		parent?: any
+		audio?: any
 	}) => {
 		try {
 			let type = _type
@@ -150,6 +152,20 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 					thumbnail: null,
 					duration: 0,
 				}))
+			}
+			if (!!audio) {
+				const resAudio = await handleUploadVideo(audio)
+				type = 'MEDIAS'
+				medias.push({
+					url: resAudio,
+					fileName: null,
+					width: null,
+					height: null,
+					ratio: null,
+					type: 'AUDIO',
+					thumbnail: null,
+					duration: 3,
+				})
 			}
 			const parent_id = parent?.id
 			const _id = randomString()
