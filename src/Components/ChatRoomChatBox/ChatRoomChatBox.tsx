@@ -19,12 +19,12 @@ import SendIcon from '@/svg/SendIcon'
 import AudioRecorder from '../AudioRecorder'
 import CAvatar from '../Custom/CAvatar'
 import CImage from '../Custom/CImage'
-import CInput from '../Custom/CInput'
 import CUploadMuti from '../Custom/CUploadMuti'
 
 import { specialTypeMessage } from '@/Variable/common.variable'
 
 import classes from './ChatRoomChatBox.module.scss'
+import CInputTag from '../Custom/CInputTag'
 interface ChatRoomChatBoxProps {
 	type?: string
 	itemList?: any[]
@@ -43,6 +43,7 @@ const ChatRoomChatBox = ({
 	_scrollRef,
 	loading,
 	onActionMessage,
+	convId,
 }: ChatRoomChatBoxProps) => {
 	const {
 		isAudio,
@@ -174,7 +175,6 @@ const ChatRoomChatBox = ({
 			case 'TITLE_CHANGE':
 			case 'ADDRESS':
 			case 'MEMBER_LEAVE':
-			case 'MEMBER_JOIN':
 				return <Flex className={classes.memberAccept}>{content}</Flex>
 			case 'PIN':
 			case 'UNPIN':
@@ -185,6 +185,7 @@ const ChatRoomChatBox = ({
 						</div>
 					</Flex>
 				)
+			case 'MEMBER_JOIN':
 			case 'POST':
 				return <></>
 			default:
@@ -393,7 +394,8 @@ const ChatRoomChatBox = ({
 						<ImageIcon />
 					</CUploadMuti>
 				</Flex>
-				<CInput
+				<CInputTag
+					id={convId}
 					allowClear={false}
 					value={text}
 					style={{ height: 40 }}
@@ -403,6 +405,7 @@ const ChatRoomChatBox = ({
 					disabled={fileList?.length > 0}
 					ref={_refInput}
 				/>
+
 				{text || isArray(fileList, 1) ? (
 					<Flex
 						className={classes.sendButton}

@@ -76,3 +76,35 @@ export const parseNumberToShort = (_n: number | string) => {
 		? (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'k'
 		: n.toString()
 }
+
+export const parseMentions = (str) => {
+	const regex = /@\[(.*?)\]\((.*?)\)/g
+	const result = { text: '', mentions: [] }
+	let last = 0
+
+	let m
+	while ((m = regex.exec(str))) {
+		const full = m[0]
+		const display = m[1]
+		const id = m[2]
+
+		result.text += str.slice(last, m.index)
+
+		const replaced = '@' + display
+		const start = result.text.length
+		result.text += replaced
+		const end = result.text.length
+
+		result.mentions.push({
+			user_id: id === 'all' ? '' : id,
+			name: display,
+			position_start: start,
+			position_end: end,
+		})
+
+		last = m.index + full.length
+	}
+
+	result.text += str.slice(last)
+	return result
+}

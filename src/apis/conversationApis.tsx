@@ -270,3 +270,15 @@ export const getChatRoomList = async (params) => {
 		params: convertParams(params),
 	})
 }
+
+export const getMemberInConv = async (params: {
+	id: string
+	[key: string]: any
+}) => {
+	const { id, ..._params } = params || {}
+	const url = CONVERSATION_ROUTES.name + '/' + id + '/members'
+
+	return await axios.get(url, {
+		params: convertParams(_params),
+	})
+}

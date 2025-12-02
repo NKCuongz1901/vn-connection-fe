@@ -140,6 +140,7 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 				{/* {isArray(pinList, 1) && _renderPin()} */}
 				<Flex className={classes.chatBox}>
 					<ChatRoomChatBox
+						convId={convId}
 						itemList={messList}
 						loading={loading}
 						onLoadMore={onLoadMore}

@@ -18,7 +18,11 @@ import { mappingMessageChat, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
 import { onPushState } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
-import { generateCustomUuid, randomString } from '@/ultis/string.ults'
+import {
+	generateCustomUuid,
+	parseMentions,
+	randomString,
+} from '@/ultis/string.ults'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'
@@ -45,6 +49,8 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 	const [loading, setLoading] = useState(false)
 	const [loadingPage, setLoadingPage] = useState(false)
 	const [loadingConvInfo, setLoadingConvInfo] = useState(false)
+
+	// const disableChat =
 
 	const handleGetListMessById = async (isNoLoading?: boolean) => {
 		if (!isNoLoading) {
@@ -177,13 +183,19 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 			} as {
 				[key: string]: any
 			}
+			const { text, mentions } = parseMentions(content)
 			switch (type) {
 				default:
-					message.content = content
+					{
+						Object.assign(message, {
+							content: text,
+						})
+					}
 					break
 			}
 			const _res = {
-				content,
+				content: text,
+				mentions,
 				type,
 				user_id: getUserInfo('id'),
 				id: _id,
@@ -204,6 +216,7 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 			const res: any = await sendMessage({
 				conversation_id: convId,
 				message: message,
+				mentions,
 			})
 			const _data = res?.results?.object || {}
 			setMessList((prev: any[]) => {
