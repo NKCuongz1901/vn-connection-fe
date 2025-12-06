@@ -1,9 +1,14 @@
+import { ItemType } from 'antd/es/menu/interface'
 import { useEffect, useRef, useState } from 'react'
 
 import { getListSticket } from '@/apis/postApis'
 
 import { useModal } from '@/context/ModalContext'
-import { ItemType } from 'antd/es/menu/interface'
+
+import { textToSpeech, translate } from '@/apis/conversationApis'
+import { handleUploadFile } from '@/apis/uploadApis'
+
+import { playAudio, stopAudio } from '@/ultis/file.utls'
 import { copyToClipboard } from '@/ultis/string.ults'
 
 type useHangoutChatProps = {
@@ -18,12 +23,98 @@ export default function useChatRoomChatBox({
 }: useHangoutChatProps) {
 	const { openError, openSuccess } = useModal()
 	const _refInput = useRef() as any
+	const prevAudioId = useRef('')
+
 	const [stickerList, setStickerList] = useState([]) as any[]
 	const [activeSticker, setActiveSticker] = useState(0)
 	const [showSticker, setShowSticker] = useState(false)
 	const [text, setText] = useState('')
 	const [reply, setReply] = useState() as any
 	const [isAudio, setIsAudio] = useState(false)
+
+	const [listSpToText, setListSpToText] = useState({})
+	const [listSpToTextLoading, setListSpToTextLoading] = useState({})
+
+	const [listTextToSpeech, setListTextToSpeech] = useState({})
+	const [listTextToSpeechLoading, setListTextToSpeechLoading] = useState({})
+
+	const [listTranslate, setListTranslate] = useState({})
+	const [_listTranslateLoading, setListTranslateLoading] = useState({})
+
+	const [playAudioId, setPlayAudioId] = useState('')
+	const handleA = async (url) => {
+		const res = await fetch('/api/proxy', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				url: url,
+				fileName: 'audio.mp3',
+			}),
+		})
+
+		const blob = await res.blob()
+		const file = new File([blob], 'audio.mp3', { type: blob.type })
+		return file
+	}
+	const handleAddSpToText = async (item) => {
+		const { id, medias } = item || {}
+		setListSpToTextLoading((prev) => ({ ...prev, [id]: true }))
+		try {
+			const res1 = await handleA(medias[0]?.url)
+
+			// giả lập như file được chọn từ input
+			const res: any = await handleUploadFile(res1)
+			const text = res?.results?.object?.text
+			setListSpToText((prev) => ({ ...prev, [id]: text }))
+		} catch (error) {
+			openError(error)
+		} finally {
+			setListSpToTextLoading((prev) => ({ ...prev, [id]: false }))
+		}
+	}
+	const handleAddTextToSpeech = async (item) => {
+		const { id, content } = item || {}
+		if (listTextToSpeech[id]) {
+			setPlayAudioId(id)
+
+			return
+		}
+		setListTextToSpeechLoading((prev) => ({ ...prev, [id]: true }))
+		try {
+			const payload = {
+				text: content,
+			}
+			const res: any = await textToSpeech({ payload })
+			const url = res?.results?.object?.url
+			setListTextToSpeech((prev) => ({ ...prev, [id]: url }))
+			setPlayAudioId(id)
+		} catch (error) {
+			openError(error)
+		} finally {
+			setListTextToSpeechLoading((prev) => ({ ...prev, [id]: false }))
+		}
+	}
+
+	const handleAddTranslate = async (item) => {
+		const { id, content } = item || {}
+
+		setListTranslateLoading((prev) => ({ ...prev, [id]: true }))
+		try {
+			const payload = {
+				word: content,
+				sourceLanguage: 'vi',
+				targetLanguage: 'en',
+			}
+			const res: any = await translate({ payload })
+			const vocab = res?.results?.object?.vocab
+			setListTranslate((prev) => ({ ...prev, [id]: vocab }))
+		} catch (error) {
+			openError(error)
+		} finally {
+			setListTranslateLoading((prev) => ({ ...prev, [id]: false }))
+		}
+	}
+
 	const handleScroll = (e: any) => {
 		const clientHeight = e.target.clientHeight
 		const scrollHeight = e.target.scrollHeight
@@ -121,11 +212,28 @@ export default function useChatRoomChatBox({
 		]
 		return menus
 	}
+	const handlePlayAudio = (playAudioId) => {
+		stopAudio(prevAudioId.current)
+
+		playAudio(playAudioId, listTextToSpeech[playAudioId], () =>
+			setPlayAudioId(''),
+		)
+	}
+	const handleStopAudio = (id) => {
+		stopAudio(id)
+		setPlayAudioId('')
+	}
 	useEffect(() => {
 		handleGetSticker()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
-
+	useEffect(() => {
+		if (playAudioId) {
+			handlePlayAudio(playAudioId)
+			prevAudioId.current = playAudioId
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [playAudioId])
 	return {
 		isAudio,
 
@@ -135,6 +243,13 @@ export default function useChatRoomChatBox({
 		stickerList,
 		text,
 		reply,
+		listSpToText,
+		listSpToTextLoading,
+		listTextToSpeechLoading,
+		listTextToSpeech,
+		playAudioId,
+		listTranslate,
+
 		setIsAudio,
 		setReply,
 		setText,
@@ -142,5 +257,10 @@ export default function useChatRoomChatBox({
 		setShowSticker,
 		onScroll: handleScroll,
 		onGetMenus: handleGetMenus,
+		onAddSpToText: handleAddSpToText,
+		onAddTextToSpeech: handleAddTextToSpeech,
+		onPlayAudio: handlePlayAudio,
+		onStopAudio: handleStopAudio,
+		onAddTranslate: handleAddTranslate,
 	}
 }

@@ -73,6 +73,10 @@ import WarningIcon from '@/svg/WarningIcon'
 import MicroPhoneIcon from '@/svg/MicroPhoneIcon'
 import RetryIcon from '@/svg/RetryIcon'
 import SquareIcon from '@/svg/SquareIcon'
+import CcIcon from '@/svg/CcIcon'
+import PlayIcon from '@/svg/PlayIcon'
+import TranslateIcon from '@/svg/TranslateIcon'
+import VolumeIcon from '@/svg/VolumeIcon'
 
 const Icons = () => {
 	const icons = [
@@ -290,6 +294,26 @@ const Icons = () => {
 		{
 			ICON: SquareIcon,
 			name: '@/svg/SquareIcon',
+			key: randomString(),
+		},
+		{
+			ICON: CcIcon,
+			name: '@/svg/CcIcon',
+			key: randomString(),
+		},
+		{
+			ICON: PlayIcon,
+			name: '@/svg/PlayIcon',
+			key: randomString(),
+		},
+		{
+			ICON: TranslateIcon,
+			name: '@/svg/TranslateIcon',
+			key: randomString(),
+		},
+		{
+			ICON: VolumeIcon,
+			name: '@/svg/VolumeIcon',
 			key: randomString(),
 		},
 	]

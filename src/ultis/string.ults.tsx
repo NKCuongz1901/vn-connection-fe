@@ -96,7 +96,7 @@ export const parseMentions = (str) => {
 		const end = result.text.length
 
 		result.mentions.push({
-			user_id: id === 'all' ? '' : id,
+			user_id: id === 'allg7pQm2aKtx' ? '' : id,
 			name: display,
 			position_start: start,
 			position_end: end,

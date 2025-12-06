@@ -282,3 +282,12 @@ export const getMemberInConv = async (params: {
 		params: convertParams(_params),
 	})
 }
+
+export const textToSpeech = async ({ payload }) => {
+	const url = `${CONVERSATION_ROUTES.textToSpeech}`
+	return await axios.post(url, payload, {})
+}
+export const translate = async ({ payload }) => {
+	const url = `${CONVERSATION_ROUTES.translate}`
+	return await axios.post(url, payload, {})
+}

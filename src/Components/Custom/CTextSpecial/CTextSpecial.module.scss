@@ -1,4 +1,12 @@
 .wrapper {
 	width: 100%;
 	height: 100%;
+	display: initial !important;
+	.tag {
+		color: rgba(0, 103, 184, 0.8);
+		cursor: pointer;
+		&:hover {
+			color: #0067b8;
+		}
+	}
 }

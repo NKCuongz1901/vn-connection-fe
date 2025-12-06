@@ -183,7 +183,7 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 			} as {
 				[key: string]: any
 			}
-			const { text, mentions } = parseMentions(content)
+			const { text, mentions } = type !== 'MEDIAS' ? parseMentions(content) : {}
 			switch (type) {
 				default:
 					{

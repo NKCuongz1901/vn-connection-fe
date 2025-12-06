@@ -1,3 +1,5 @@
+import { UPLOAD_ROUTES } from '@/routes'
+
 import axios from '../axios'
 const axiosUpload = axios.create() // không config Authorization
 
@@ -107,6 +109,19 @@ export const handleUploadImage = async (file, _option = {}) => {
 	try {
 		const res = (await uploadProgress(file)) as any
 		return res
+	} catch (error) {
+		throw error
+	}
+}
+
+export const handleUploadFile = async (file) => {
+	if (!file) return ''
+	try {
+		const formData = new FormData()
+
+		formData.set('file', file)
+		const response = await axios.post(UPLOAD_ROUTES.speechToText, formData)
+		return response
 	} catch (error) {
 		throw error
 	}

@@ -60,6 +60,8 @@ export const CONVERSATION_ROUTES = {
 	invite: 'invite-join-conversation',
 	inviteAll: 'invite-all-join-conversation',
 	convChatRoom: 'conversation/chat_room',
+	textToSpeech: 'files/text-to-speech',
+	translate: 'vocabulary/quick-translate',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',
@@ -69,6 +71,7 @@ export const FRIEND_ROUTES = {
 }
 export const UPLOAD_ROUTES = {
 	name: '/image/upload',
+	speechToText: 'files/speech-to-text',
 }
 export const HANGOUT_ROUTES = {
 	name: 'hangout',

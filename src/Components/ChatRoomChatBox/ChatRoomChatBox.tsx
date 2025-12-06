@@ -10,21 +10,26 @@ import { arrayFrom, isArray } from '@/ultis/array.ults'
 import { handleParseFileImg } from '@/ultis/file.utls'
 import { getUserInfo } from '@/ultis/storage.ults'
 
+import CcIcon from '@/svg/CcIcon'
 import HappyIcon from '@/svg/HappyIcon'
 import ImageIcon from '@/svg/ImageIcon'
 import MicroPhoneIcon from '@/svg/MicroPhoneIcon'
 import MoreIcon from '@/svg/MoreIcon'
 import ReplyIcon from '@/svg/ReplyIcon'
 import SendIcon from '@/svg/SendIcon'
+import TranslateIcon from '@/svg/TranslateIcon'
+import VolumeIcon from '@/svg/VolumeIcon'
 import AudioRecorder from '../AudioRecorder'
 import CAvatar from '../Custom/CAvatar'
 import CImage from '../Custom/CImage'
+import CInputTag from '../Custom/CInputTag'
+import CTextSpecial from '../Custom/CTextSpecial'
 import CUploadMuti from '../Custom/CUploadMuti'
+import VisualizerWithPlay from './VisualizerWithPlay'
 
 import { specialTypeMessage } from '@/Variable/common.variable'
 
 import classes from './ChatRoomChatBox.module.scss'
-import CInputTag from '../Custom/CInputTag'
 interface ChatRoomChatBoxProps {
 	type?: string
 	itemList?: any[]
@@ -53,6 +58,13 @@ const ChatRoomChatBox = ({
 		stickerList,
 		text,
 		reply,
+		listSpToText,
+		listSpToTextLoading,
+		listTextToSpeechLoading,
+		playAudioId,
+		listTranslate,
+		onStopAudio,
+
 		setReply,
 		setIsAudio,
 		setText,
@@ -60,6 +72,9 @@ const ChatRoomChatBox = ({
 		setShowSticker,
 		onScroll,
 		onGetMenus,
+		onAddSpToText,
+		onAddTextToSpeech,
+		onAddTranslate,
 	} = useChatRoomChatBox({ onLoadMore, type, onActionMessage })
 
 	const [fileList, setFileList] = useState([])
@@ -104,22 +119,47 @@ const ChatRoomChatBox = ({
 			</Flex>
 		)
 	}
-	const _renderContentChat = ({
-		type,
-		content,
-		medias,
-		isLast,
-		created_at,
-		parent,
-		user,
-	}) => {
+	const _renderContentChat = (item) => {
+		const {
+			id,
+			type,
+			content,
+			mentions,
+			medias,
+			isLast,
+			created_at,
+			parent,
+			user,
+			user_id,
+			isTemp,
+		} = item || {}
+
 		const { name } = user || {}
+		const spToText = listSpToText[id]
+		const trans = listTranslate[id]
+		const isMe = getUserInfo('id') === user_id
+		const isMemberAction = specialTypeMessage.includes(type)
+		const typeMedia = medias?.[0]?.type
+		const loadingSpToText = !!listSpToTextLoading[id]
 		switch (type) {
 			case 'TEXT':
 				return (
 					<div className={classes.text}>
 						{_renderParentItem(parent)}
-						<div>{content}</div>
+						<CTextSpecial data={content} mentions={mentions} />
+						{trans && (
+							<div style={{ fontSize: 10 }}>
+								<Flex vertical>
+									{trans}
+									<div>
+										<span>UniVini AI </span>
+										<b style={{ color: '#006B35', fontSize: 12 }}>
+											Change language
+										</b>
+									</div>
+								</Flex>
+							</div>
+						)}
 						{isLast && (
 							<div className={classes.time}>
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
@@ -144,12 +184,10 @@ const ChatRoomChatBox = ({
 					case 'AUDIO':
 						Content = (medias || []).map((media, index) => (
 							<Flex key={index}>
-								<audio
-									style={{ minWidth: '200px' }}
-									controls
+								<VisualizerWithPlay
+									item={item}
 									src={media.url}
-								></audio>
-								{/* <VisualizerWithPlay src={media.url} /> */}
+								></VisualizerWithPlay>
 							</Flex>
 						))
 						break
@@ -162,7 +200,33 @@ const ChatRoomChatBox = ({
 				}
 				return (
 					<Flex className={classes.medias} vertical>
-						{Content}
+						<Flex>
+							{!(isTemp || isMemberAction) && (
+								<Flex className={classes.moreIconWrapper}>
+									{!isMe && typeMedia === 'AUDIO' && (
+										<Flex
+											className={clsx(classes.moreIcon, {
+												[classes.disabled]: loadingSpToText,
+											})}
+											onClick={() => !loadingSpToText && onAddSpToText(item)}
+										>
+											<CcIcon />
+										</Flex>
+									)}
+									<Dropdown
+										trigger={['click']}
+										menu={{ items: onGetMenus({ item, isMe }) }}
+										disabled={isTemp || isMemberAction}
+									>
+										<Flex className={classes.moreIcon}>
+											<MoreIcon />
+										</Flex>
+									</Dropdown>
+								</Flex>
+							)}
+							{Content}
+						</Flex>
+						{!!spToText && <Flex className={classes.spToText}>{spToText}</Flex>}
 						{isLast && (
 							<div className={classes.time}>
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
@@ -198,6 +262,9 @@ const ChatRoomChatBox = ({
 		const isMe = getUserInfo('id') === user_id
 		const isMemberAction = specialTypeMessage.includes(type)
 		const isNot = isMe || isMemberAction
+		const typeMedia = item?.medias?.[0]?.type
+		const loadingSpToText = !!listSpToTextLoading[id]
+
 		return (
 			<Flex
 				className={clsx(classes.itemChat, {
@@ -220,8 +287,47 @@ const ChatRoomChatBox = ({
 							<Flex className={classes.name}>{user?.name}</Flex>
 						)}
 						<Flex className={classes.content}>
-							{!(isTemp || isMemberAction) && (
+							{!(isTemp || isMemberAction) && type !== 'MEDIAS' && (
 								<Flex className={classes.moreIconWrapper}>
+									{!isMe && typeMedia === 'AUDIO' && (
+										<Flex
+											className={clsx(classes.moreIcon, {
+												[classes.disabled]: loadingSpToText,
+											})}
+											onClick={() => !loadingSpToText && onAddSpToText(item)}
+										>
+											<CcIcon />
+										</Flex>
+									)}
+									{type === 'TEXT' && !isMe && (
+										<Flex
+											className={clsx(classes.moreIcon, {
+												[classes.disabled]: loadingSpToText,
+											})}
+											onClick={() => onAddTranslate(item)}
+										>
+											<TranslateIcon />
+										</Flex>
+									)}
+									{!isMe && (
+										<Flex
+											className={clsx(classes.moreIcon, {
+												[classes.disabled]: listTextToSpeechLoading[id],
+												[classes.isPlaying]: playAudioId === id,
+											})}
+											onClick={() => {
+												if (playAudioId === id) {
+													onStopAudio(id)
+												} else {
+													if (!listTextToSpeechLoading[id]) {
+														onAddTextToSpeech(item)
+													}
+												}
+											}}
+										>
+											<VolumeIcon />
+										</Flex>
+									)}
 									<Dropdown
 										trigger={['click']}
 										menu={{ items: onGetMenus({ item, isMe }) }}
