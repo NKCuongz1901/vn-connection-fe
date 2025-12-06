@@ -20,7 +20,7 @@ const CTextSpecial = ({ data, mentions, ...rest }: CTextSpecialProps) => {
 		if (!data) return []
 
 		// 1. Sort mentions by position_start
-		const sorted = [...mentions].sort(
+		const sorted = [...(mentions || [])].sort(
 			(a, b) => a.position_start - b.position_start,
 		)
 
