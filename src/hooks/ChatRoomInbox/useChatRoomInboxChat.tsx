@@ -377,6 +377,7 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 				if (conversation_id !== convId) return
 				setMessList((prev: any[]) => {
 					const contents = prev
+					// const { parent } = (contents || []).find((i) => i.id === data.id)
 					switch (type) {
 						case 'MEMBER_JOIN':
 							const { name } = sender || {}
