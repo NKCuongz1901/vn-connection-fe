@@ -458,20 +458,20 @@ const ChatRoomChatBox = ({
 			{reply && _renderReply()}
 			<Flex
 				className={clsx(classes.chatBox)}
-				onKeyDown={(e) => {
-					if (e.key === 'Enter') {
-						e.preventDefault()
-						if (!!text.trim()) {
-							setText('')
-							setReply(null)
-							onSendMessage({
-								type: 'TEXT',
-								content: text,
-								parent: reply,
-							})
-						}
-					}
-				}}
+				// onKeyDown={(e) => {
+				// 	if (e.key === 'Enter') {
+				// 		e.preventDefault()
+				// 		if (!!text.trim()) {
+				// 			setText('')
+				// 			setReply(null)
+				// 			onSendMessage({
+				// 				type: 'TEXT',
+				// 				content: text,
+				// 				parent: reply,
+				// 			})
+				// 		}
+				// 	}
+				// }}
 			>
 				<Flex className={classes.chooseImg}>
 					<Flex className={classes.chooseImgContent}>
@@ -501,15 +501,29 @@ const ChatRoomChatBox = ({
 					</CUploadMuti>
 				</Flex>
 				<CInputTag
+					ref={_refInput}
 					id={convId}
 					allowClear={false}
 					value={text}
 					style={{ height: 40 }}
 					suffix={_renderIconHappy()}
 					placeholder="Enter your text ..."
-					onChange={(e) => setText(e.target.value)}
 					disabled={fileList?.length > 0}
-					ref={_refInput}
+					onChange={(e) => setText(e.target.value)}
+					onSendMessage={(e) => {
+						if (e.key === 'Enter') {
+							e.preventDefault()
+							if (!!text.trim()) {
+								setText('')
+								setReply(null)
+								onSendMessage({
+									type: 'TEXT',
+									content: text,
+									parent: reply,
+								})
+							}
+						}
+					}}
 				/>
 
 				{text || isArray(fileList, 1) ? (

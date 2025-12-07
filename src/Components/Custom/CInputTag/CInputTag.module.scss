@@ -1,5 +1,7 @@
 .layout {
 	width: 100%;
+	max-width: 636px;
+	position: relative;
 	.wrapperMentionSuggest {
 		width: 100%;
 		max-height: 144px;
@@ -33,6 +35,12 @@
 			}
 		}
 	}
+	.suffix {
+		position: absolute;
+		right: 8px;
+		bottom: 50%;
+		transform: translateY(50%);
+	}
 }
 .wrapper :global(.ant-input) {
 	padding: 8px 16px;
@@ -59,5 +67,11 @@
 			-o-transition: background-color 2147483647s;
 			transition: background-color 2147483647s;
 		}
+	}
+}
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.layout {
+		max-width: calc(100dvw - 148px);
 	}
 }

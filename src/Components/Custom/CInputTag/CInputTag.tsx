@@ -26,6 +26,8 @@ interface CInputTagProps {
 	id: string
 	value?: string
 	onChange?: any
+	onSendMessage?: any
+	suffix?: any
 }
 const defaultUser = {
 	id: 'allg7pQm2aKtx',
@@ -33,7 +35,7 @@ const defaultUser = {
 	avatar: '',
 }
 const CInputTag = forwardRef((_props: CInputTagProps, _ref: any) => {
-	const { id, onChange, value } = _props
+	const { id, suffix, onChange, onSendMessage, value } = _props
 	const timeoutRef = useRef(null)
 	const pagination = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const loadMore = useRef(true)
@@ -253,6 +255,23 @@ const CInputTag = forwardRef((_props: CInputTagProps, _ref: any) => {
 		return () => highlighter.removeEventListener('click', onClick)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [value])
+	useEffect(() => {
+		const el = inputRef.current
+		if (!el) return
+		const onKeyDown = (e) => {
+			if (e.key === 'Enter') {
+				e.preventDefault()
+				e.stopPropagation()
+				onSendMessage(e)
+			}
+		}
+		el.addEventListener('keydown', onKeyDown)
+		return () => {
+			el.removeEventListener('keydown', onKeyDown)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [inputRef.current, value])
+
 	const _renderCustomSuggestionsContainer = () => {
 		if (!openMention) return
 		return (
@@ -311,6 +330,7 @@ const CInputTag = forwardRef((_props: CInputTagProps, _ref: any) => {
 					displayTransform={(_id, display) => `@${display}`}
 				/>
 			</MentionsInput>
+			{!!suffix && <div className={classes.suffix}>{suffix}</div>}
 		</div>
 	)
 })

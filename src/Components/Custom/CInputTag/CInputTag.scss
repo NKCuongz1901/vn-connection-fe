@@ -7,11 +7,12 @@
 		color: #0f1729;
 		min-height: 44px;
 		border-radius: 16px;
+		width: 100%;
 	}
 	.mentionsInput__input {
 		color: #0f1729;
 		border-radius: 16px;
-		padding: 12px 8px;
+		padding: 12px 36px 12px 8px;
 		&:focus {
 			outline: none;
 		}
@@ -33,7 +34,7 @@
 		padding: 12px !important;
 	}
 	.mentionsInput__highlighter {
-		padding: 12px 8px;
+		padding: 12px 36px 12px 8px;
 		// max-width: 616px;
 	}
 	.mentionsInput__suggestions__item--focused {
