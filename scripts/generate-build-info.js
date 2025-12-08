@@ -1,6 +1,5 @@
 const fs = require('fs')
 const path = require('path')
-//push 1 commit
 const buildInfo = {
 	version: Date.now(), // timestamp build
 }
