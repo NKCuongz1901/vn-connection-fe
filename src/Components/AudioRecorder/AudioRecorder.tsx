@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
 import { Flex } from 'antd'
 import dayjs from 'dayjs'
+import { useEffect, useRef, useState } from 'react'
 
 import MicroPhoneIcon from '@/svg/MicroPhoneIcon'
 import RetryIcon from '@/svg/RetryIcon'
 import SendIcon from '@/svg/SendIcon'
 import SquareIcon from '@/svg/SquareIcon'
 import CButton from '../Custom/CButton'
+import VisualizerWithPlay from '../VisualizerWithPlay'
+
 import classes from './AudioRecorder.module.scss'
 
 interface AudioRecorderProps {
@@ -112,11 +114,9 @@ export default function AudioRecorder(props: AudioRecorderProps) {
 			case !!audio:
 				content = (
 					<Flex className={classes.recordAfter}>
-						<audio
-							style={{ minWidth: '200px' }}
-							controls
-							src={audioURL}
-						></audio>
+						<Flex className={classes.audio}>
+							<VisualizerWithPlay src={audioURL} />
+						</Flex>
 					</Flex>
 				)
 				break

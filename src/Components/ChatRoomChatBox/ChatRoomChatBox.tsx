@@ -25,7 +25,7 @@ import CImage from '../Custom/CImage'
 import CInputTag from '../Custom/CInputTag'
 import CTextSpecial from '../Custom/CTextSpecial'
 import CUploadMuti from '../Custom/CUploadMuti'
-import VisualizerWithPlay from './VisualizerWithPlay'
+import VisualizerWithPlay from '../VisualizerWithPlay'
 
 import { specialTypeMessage } from '@/Variable/common.variable'
 
@@ -184,10 +184,7 @@ const ChatRoomChatBox = ({
 					case 'AUDIO':
 						Content = (medias || []).map((media, index) => (
 							<Flex key={index}>
-								<VisualizerWithPlay
-									item={item}
-									src={media.url}
-								></VisualizerWithPlay>
+								<VisualizerWithPlay item={item} src={media.url} />
 							</Flex>
 						))
 						break

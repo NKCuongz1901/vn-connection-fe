@@ -50,9 +50,12 @@
 				background: #f0f3f9;
 				align-items: center;
 				justify-content: center;
-				width: 100%;
 				height: 160px;
+				width: 100%;
 				gap: 8px;
+				.audio {
+					width: 60%;
+				}
 			}
 		}
 		.bottom {
@@ -63,6 +66,118 @@
 			.btn {
 				font-size: 28px;
 				width: 33%;
+			}
+		}
+	}
+}
+
+.wrapper {
+	width: 100%;
+	.container {
+		min-height: 200px;
+		width: 100%;
+		padding: 16px;
+		gap: 16px;
+		.top {
+			width: 100%;
+			.recordBefore {
+				cursor: pointer;
+				border-radius: 32px;
+				background: #f0f3f9;
+				width: 100%;
+				align-items: center;
+				justify-content: center;
+				padding: 38px 0;
+				gap: 8px;
+				font-size: 12px;
+				height: 160px;
+				svg {
+					height: 40px;
+					width: 40px;
+				}
+				.title {
+					font-weight: 600;
+				}
+			}
+			.recordDuring {
+				border-radius: 32px;
+				background: #f0f3f9;
+				width: 100%;
+				height: 160px;
+				gap: 8px;
+				.record {
+					align-items: center;
+					justify-content: center;
+					font-size: 24px;
+					gap: 4px;
+					.redDot {
+						width: 8px;
+						height: 8px;
+						border-radius: 50%;
+						background: #cd3031;
+					}
+				}
+			}
+			.recordAfter {
+				border-radius: 32px;
+				background: #f0f3f9;
+				align-items: center;
+				justify-content: center;
+				height: 160px;
+				width: 100%;
+				gap: 8px;
+				.audio {
+					width: 60%;
+				}
+			}
+		}
+		.bottom {
+			align-items: center;
+			gap: 8px;
+			button {
+				height: 56px;
+			}
+			.btn {
+				font-size: 28px;
+				width: 33%;
+			}
+		}
+	}
+}
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		.container {
+			padding: 4px;
+			height: auto;
+			min-height: auto;
+			.top {
+				.recordBefore {
+					padding: 12px;
+					height: auto;
+					svg {
+						height: 32px;
+					}
+					.title {
+					}
+				}
+				.recordDuring {
+					.record {
+						.redDot {
+						}
+					}
+				}
+				.recordAfter {
+					.audio {
+					}
+				}
+			}
+			.bottom {
+				button {
+					height: 32px;
+				}
+				.btn {
+					font-size: 12px;
+				}
 			}
 		}
 	}

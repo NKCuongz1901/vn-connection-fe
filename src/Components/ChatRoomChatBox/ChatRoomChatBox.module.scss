@@ -424,3 +424,379 @@
 		}
 	}
 }
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		.chatContent {
+			padding: 4px;
+			& .skeleton {
+			}
+			.skeletonWrapper {
+				.skeleton {
+				}
+			}
+			.itemChat {
+				.contentItem {
+					.avatar {
+					}
+					.contentInfo {
+						.name {
+						}
+						.content {
+							.moreIconWrapper {
+								.moreIcon {
+								}
+								.disabled {
+								}
+								.isPlaying {
+									svg {
+										path {
+										}
+									}
+								}
+							}
+							:global(.ant-image) {
+							}
+							img {
+							}
+							.text {
+							}
+							.sticker {
+							}
+							.medias {
+								.moreIconWrapper {
+									.moreIcon {
+									}
+									.disabled {
+									}
+									.isPlaying {
+										svg {
+											path {
+											}
+										}
+									}
+								}
+								.media {
+								}
+								:global(.ant-image) {
+								}
+								:global(.ant-flex) {
+								}
+								img {
+								}
+								.time {
+								}
+								.spToText {
+									div {
+									}
+								}
+							}
+							.time {
+							}
+							.memberAccept {
+							}
+						}
+					}
+				}
+			}
+			.mt2 {
+			}
+			.isMe {
+				.contentItem {
+					// justify-content: flex-end;
+
+					.contentInfo {
+						// justify-content: flex-end;
+
+						.content {
+							.moreIconWrapper {
+							}
+							.text {
+								div {
+								}
+							}
+							.medias {
+								.moreIconWrapper {
+								}
+								:global(.ant-flex) {
+								}
+							}
+							.time {
+							}
+						}
+					}
+				}
+			}
+			.isCenter {
+				.contentItem {
+					.contentInfo {
+						.content {
+							.memberAccept {
+								.ellipsisContent {
+								}
+							}
+						}
+					}
+				}
+			}
+			.isTemp {
+			}
+		}
+
+		.chatBox {
+			.iconHappi,
+			.sendButton {
+				cursor: pointer;
+			}
+			.chooseImg {
+				// display: none;
+				cursor: pointer;
+			}
+			.micro {
+			}
+		}
+		.chatBoxSticket {
+			.stickerTitle {
+				.stickerItemTitle {
+					img {
+					}
+				}
+				& > :hover {
+				}
+			}
+			.stickerActive {
+			}
+			.contentSticker {
+				.stickerItem {
+					img {
+					}
+				}
+				& > :hover {
+				}
+			}
+		}
+		.showSticker {
+		}
+		.chatReply {
+			.replyInfo {
+				.replyName {
+				}
+			}
+			:global(.ant-image) {
+			}
+			img {
+			}
+			.replyCancel {
+			}
+		}
+		.parentItem {
+			.parentItemInfo {
+				div {
+				}
+				.parentItemName {
+				}
+			}
+			:global(.ant-image) {
+			}
+			img {
+			}
+		}
+		.chooseImgContent {
+			.chooseImgItem {
+			}
+			.chooseImgCancel {
+			}
+			:global(.ant-image) {
+			}
+			img {
+			}
+		}
+	}
+}
+/*
+.wrapper {
+		.chatContent {
+			& .skeleton {
+			}
+			.skeletonWrapper {
+				.skeleton {
+				}
+			}
+			.itemChat {
+				.contentItem {
+					.avatar {
+					}
+					.contentInfo {
+						.name {
+						}
+						.content {
+							.moreIconWrapper {
+								.moreIcon {
+								}
+								.disabled {
+								}
+								.isPlaying {
+									svg {
+										path {
+										}
+									}
+								}
+							}
+							:global(.ant-image) {
+							}
+							img {
+							}
+							.text {
+							}
+							.sticker {
+							}
+							.medias {
+								.moreIconWrapper {
+									.moreIcon {
+									}
+									.disabled {
+									}
+									.isPlaying {
+										svg {
+											path {
+											}
+										}
+									}
+								}
+								.media {
+								}
+								:global(.ant-image) {
+								}
+								:global(.ant-flex) {
+								}
+								img {
+								}
+								.time {
+								}
+								.spToText {
+									div {
+									}
+								}
+							}
+							.time {
+							}
+							.memberAccept {
+							}
+						}
+					}
+				}
+			}
+			.mt2 {
+			}
+			.isMe {
+				.contentItem {
+					// justify-content: flex-end;
+
+					.contentInfo {
+						// justify-content: flex-end;
+
+						.content {
+							.moreIconWrapper {
+							}
+							.text {
+								div {
+								}
+							}
+							.medias {
+								.moreIconWrapper {
+								}
+								:global(.ant-flex) {
+								}
+							}
+							.time {
+							}
+						}
+					}
+				}
+			}
+			.isCenter {
+				.contentItem {
+					.contentInfo {
+						.content {
+							.memberAccept {
+								.ellipsisContent {
+								}
+							}
+						}
+					}
+				}
+			}
+			.isTemp {
+			}
+		}
+
+		.chatBox {
+			.iconHappi,
+			.sendButton {
+				cursor: pointer;
+			}
+			.chooseImg {
+				// display: none;
+				cursor: pointer;
+			}
+			.micro {
+			}
+		}
+		.chatBoxSticket {
+			.stickerTitle {
+				.stickerItemTitle {
+					img {
+					}
+				}
+				& > :hover {
+				}
+			}
+			.stickerActive {
+			}
+			.contentSticker {
+				.stickerItem {
+					img {
+					}
+				}
+				& > :hover {
+				}
+			}
+		}
+		.showSticker {
+		}
+		.chatReply {
+			.replyInfo {
+				.replyName {
+				}
+			}
+			:global(.ant-image) {
+			}
+			img {
+			}
+			.replyCancel {
+			}
+		}
+		.parentItem {
+			.parentItemInfo {
+				div {
+				}
+				.parentItemName {
+				}
+			}
+			:global(.ant-image) {
+			}
+			img {
+			}
+		}
+		.chooseImgContent {
+			.chooseImgItem {
+			}
+			.chooseImgCancel {
+			}
+			:global(.ant-image) {
+			}
+			img {
+			}
+		}
+	}
+*/
