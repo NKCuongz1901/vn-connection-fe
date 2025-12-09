@@ -20,6 +20,16 @@
 			.userInChat {
 				align-items: center;
 				gap: 8px;
+				line-height: 20px;
+				.totalMem {
+					align-items: center;
+					line-height: 20px;
+					cursor: pointer;
+					svg {
+						height: 16px;
+						width: 16px;
+					}
+				}
 			}
 			& .skeleton {
 				height: 30px;

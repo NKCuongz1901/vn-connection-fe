@@ -46,6 +46,8 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 
 	const [pinList, setPinList] = useState<any[]>([])
 	const [totalPin, setTotalPin] = useState<number>(0)
+	const [total, setTotal] = useState({ member: 0 })
+
 	const [loading, setLoading] = useState(false)
 	const [loadingPage, setLoadingPage] = useState(false)
 	const [loadingConvInfo, setLoadingConvInfo] = useState(false)
@@ -268,7 +270,9 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 				page: 1,
 				limit: 50,
 			})
-			setMember(res?.results?.objects?.rows || [])
+			const { rows, count } = res?.results?.objects || {}
+			setMember(rows)
+			setTotal((prev) => ({ ...prev, member: count }))
 		} catch (error) {
 			openError(error)
 		} finally {
@@ -436,6 +440,7 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 		messList,
 		pinList,
 		members,
+		total,
 		convInfo,
 		loadingPage,
 		loading,

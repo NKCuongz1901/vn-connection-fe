@@ -26,3 +26,24 @@ export interface ConversationChatRoomProps {
 	host: any
 	friend: any
 }
+
+export interface MemberProps {
+	id: string
+	type: string
+	user_id: string
+	is_accept_notification: boolean
+	created_at: string
+	user: {
+		id: string
+		avatar: string
+		name: string
+		age: number
+		birthday: string
+		is_verified: boolean
+		country_code: string
+		address_local: string
+		blocked_at: any
+		profile: any
+	} | null
+	dating: any
+}

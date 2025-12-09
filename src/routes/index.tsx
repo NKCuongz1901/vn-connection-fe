@@ -62,6 +62,8 @@ export const CONVERSATION_ROUTES = {
 	convChatRoom: 'conversation/chat_room',
 	textToSpeech: 'files/text-to-speech',
 	translate: 'vocabulary/quick-translate',
+	membersAroundMe: 'members-around-me',
+	member: 'members',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',

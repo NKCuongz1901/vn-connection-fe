@@ -291,3 +291,24 @@ export const translate = async ({ payload }) => {
 	const url = `${CONVERSATION_ROUTES.translate}`
 	return await axios.post(url, payload, {})
 }
+
+export const getMemberAroundMe = async (params: {
+	id: string
+	[key: string]: any
+}) => {
+	const { id, ..._params } = params
+	const url = `${CONVERSATION_ROUTES.name}/${id}/${CONVERSATION_ROUTES.membersAroundMe}`
+
+	return await axios.get(url, {
+		params: convertParams(_params),
+	})
+}
+export const getMember = async (params: { id: string; [key: string]: any }) => {
+	const { id, ..._params } = params
+
+	const url = `${CONVERSATION_ROUTES.name}/${id}/${CONVERSATION_ROUTES.member}`
+
+	return await axios.get(url, {
+		params: convertParams(_params),
+	})
+}

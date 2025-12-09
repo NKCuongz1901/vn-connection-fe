@@ -10,7 +10,9 @@ import ChatRoomChatBox from '@/Components/ChatRoomChatBox'
 import CAvatar from '@/Components/Custom/CAvatar'
 import ArrrowRightIcon from '@/svg/ArrrowRightIcon'
 import MoreIcon from '@/svg/MoreIcon'
+import People from '@/svg/People'
 import PinIcon from '@/svg/PinIcon'
+import ModalViewMember from '../ModalViewMember'
 import ModelPin from '../ModelPin'
 import SettingConv from '../SettingConv'
 
@@ -28,6 +30,8 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 	const { convId, isNoHeader } = props
 	const {
 		_scrollRef,
+
+		total,
 		messList,
 		members,
 		loadingPage,
@@ -38,6 +42,7 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 		setModal,
 		openSetting,
 		convInfo,
+
 		setOpenSetting,
 		onSendMessage,
 		onActionMessage,
@@ -56,7 +61,16 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 					<>
 						<Flex className={classes.userInChat}>
 							<CAvatar src={avatar || ''} />
-							<span>{title}</span>
+							<span>{title} Chat Room</span>
+							<Flex
+								className={classes.totalMem}
+								onClick={() =>
+									setModal({ type: 'member', data: { id: convId } })
+								}
+							>
+								({total.member}
+								<People />)
+							</Flex>
 						</Flex>
 						<Flex className={classes.action}>
 							<Flex
@@ -124,6 +138,17 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 					/>
 				)
 				break
+			case 'member':
+				content = (
+					<ModalViewMember
+						id={data?.id || ''}
+						onClose={() => {
+							onGetPinMessage()
+							setModal(null)
+						}}
+					/>
+				)
+				break
 
 			default:
 				break
@@ -158,7 +183,7 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 				/>
 			)}
 
-			{/* {modal?.type && _renderModal()} */}
+			{modal?.type && _renderModal()}
 		</div>
 	)
 }
