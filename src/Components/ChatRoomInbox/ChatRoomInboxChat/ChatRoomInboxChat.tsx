@@ -49,6 +49,7 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 		onLoadMore,
 		onGetPinMessage,
 		onActionSettingConv,
+		onAddReact,
 	} = useChatRoomInboxChat({ convId })
 	const { avatar, title } = convInfo || {}
 	const _renderHeader = () => {
@@ -172,6 +173,7 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 						_scrollRef={_scrollRef}
 						onSendMessage={onSendMessage}
 						onActionMessage={onActionMessage}
+						onAddReact={onAddReact}
 					/>
 				</Flex>
 			</Flex>

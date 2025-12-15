@@ -64,6 +64,8 @@ export const CONVERSATION_ROUTES = {
 	translate: 'vocabulary/quick-translate',
 	membersAroundMe: 'members-around-me',
 	member: 'members',
+	reactLs: 'conversation/reaction',
+	messReaction: 'message/reaction',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',

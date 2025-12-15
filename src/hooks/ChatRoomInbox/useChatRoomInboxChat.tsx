@@ -9,7 +9,9 @@ import {
 	getConvMembersById,
 	getConvMessById,
 	getPinMessageById,
+	getReact,
 	pinMessageById,
+	reactMessageById,
 	sendMessage,
 } from '@/apis/conversationApis'
 import { handleUploadImage, handleUploadVideo } from '@/apis/uploadApis'
@@ -25,6 +27,7 @@ import {
 } from '@/ultis/string.ults'
 
 import { PaginationType } from '@/interface/common/common.interface'
+import { ReactionPtops } from '@/interface/Conversation/Conversation.interface'
 import { paginationCommon } from '@/Variable/common.variable'
 
 type useHangoutChatProps = {
@@ -52,8 +55,23 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 	const [loadingPage, setLoadingPage] = useState(false)
 	const [loadingConvInfo, setLoadingConvInfo] = useState(false)
 
-	// const disableChat =
+	const reactList = useRef<{ [key: string]: ReactionPtops }>({})
 
+	// const disableChat =
+	const handleGetReact = async () => {
+		try {
+			const res: any = await getReact({ fields: ['$all'] })
+			reactList.current = (res?.results?.objects?.rows || []).reduce(
+				(obj, item) => {
+					obj[item.id] = item
+					return obj
+				},
+				{},
+			)
+		} catch (error) {
+			openError(error)
+		}
+	}
 	const handleGetListMessById = async (isNoLoading?: boolean) => {
 		if (!isNoLoading) {
 			setLoading(true)
@@ -415,7 +433,53 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 		},
 		[convId],
 	)
+	const handleParseDataSocketReact = useCallback((data) => {
+		setMessList((prev) => {
+			const _prev = cloneDeep(prev)
+			const { message_id, user_id, id, reaction_id } = data || {}
+			const findItem = (_prev || []).find((i) => i.id === message_id)
+			let reactions = findItem?.reactions || []
+			const type = reactions.find((i) => i.id === id) ? 'remove' : 'add'
+			reactions = reactions.filter((i) => i?.user_id !== user_id)
+			if (type === 'add') {
+				reactions.push({
+					id: id,
+					user_id: user_id,
+					reaction_id: reaction_id,
+					created_at: +new Date(),
+					reaction: reactList.current[reaction_id],
+					user: {
+						id: user_id,
+					},
+				})
+			}
+			findItem.reactions = reactions
+			return _prev
+		})
+		try {
+		} catch (error) {
+			console.log('error:', error)
+		}
+	}, [])
+	const handleAddReact = async ({ item, react, type }) => {
+		const { conversation_id, _id } = item || {}
+		const { id: reaction_id } = react || {}
+		try {
+			const payload = {
+				type_reaction: type || 'add',
+				conversation_id,
+				reaction_id,
+			}
+			await reactMessageById({ id: _id, payload })
+		} catch (error) {
+			openError(error)
+		}
+	}
 
+	useEffect(() => {
+		handleGetReact()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 	useEffect(() => {
 		_paginationRefs.current.page = 1
 		handleGetInfoConv()
@@ -429,11 +493,12 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 		if (!socket) return
 
 		socket.on('message', handleParseDataSocket)
-
+		socket.on('message_reaction', handleParseDataSocketReact)
 		return () => {
 			socket.off('message', handleParseDataSocket)
+			socket.off('message_reaction', handleParseDataSocketReact)
 		}
-	}, [convId, handleParseDataSocket, socket])
+	}, [convId, handleParseDataSocket, handleParseDataSocketReact, socket])
 
 	return {
 		_scrollRef,
@@ -450,11 +515,13 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 		setModal,
 		openSetting,
 		setOpenSetting,
+		setMessList,
 		onSendMessage: handleSendMessage,
 		onLoadMore: handleLoadMore,
 		onActionMessage: handleActionMessage,
 		onGetPinMessage: handleGetPinMessage,
 		onGetListMessById: handleGetListMessById,
 		onActionSettingConv: handleActionSettingConv,
+		onAddReact: handleAddReact,
 	}
 }

@@ -312,3 +312,23 @@ export const getMember = async (params: { id: string; [key: string]: any }) => {
 		params: convertParams(_params),
 	})
 }
+
+export const getReact = async (params = {}) => {
+	const url = `${CONVERSATION_ROUTES.reactLs}`
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const reactMessageById = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: any
+}) => {
+	const url = CONVERSATION_ROUTES.messReaction + '/' + id
+
+	return await axios.post(url, payload)
+}

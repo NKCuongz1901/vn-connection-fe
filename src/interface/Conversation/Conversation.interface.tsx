@@ -47,3 +47,14 @@ export interface MemberProps {
 	} | null
 	dating: any
 }
+
+export interface ReactionPtops {
+	id: string
+	emoji: string
+	image_url: string
+	label: string
+	is_active: boolean
+	created_at: string
+	updated_at: string
+	deleted_at: any
+}

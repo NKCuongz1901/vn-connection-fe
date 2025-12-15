@@ -5,32 +5,39 @@ import { getListSticket } from '@/apis/postApis'
 
 import { useModal } from '@/context/ModalContext'
 
-import { textToSpeech, translate } from '@/apis/conversationApis'
+import { getReact, textToSpeech, translate } from '@/apis/conversationApis'
 import { handleUploadFile } from '@/apis/uploadApis'
 
 import { playAudio, stopAudio } from '@/ultis/file.utls'
 import { copyToClipboard } from '@/ultis/string.ults'
 
+import { ReactionPtops } from '@/interface/Conversation/Conversation.interface'
+
 type useHangoutChatProps = {
 	type?: string
 	onLoadMore?: any
+	onAddReact?: any
 	[key: string]: any
 }
 export default function useChatRoomChatBox({
 	onLoadMore,
 	type,
 	onActionMessage,
+	onAddReact,
 }: useHangoutChatProps) {
 	const { openError, openSuccess } = useModal()
 	const _refInput = useRef() as any
 	const prevAudioId = useRef('')
 
 	const [stickerList, setStickerList] = useState([]) as any[]
+	const [reactList, setReactList] = useState<ReactionPtops[]>([])
 	const [activeSticker, setActiveSticker] = useState(0)
 	const [showSticker, setShowSticker] = useState(false)
 	const [text, setText] = useState('')
 	const [reply, setReply] = useState() as any
 	const [isAudio, setIsAudio] = useState(false)
+
+	const [openReact, setOpenReact] = useState() as any
 
 	const [listSpToText, setListSpToText] = useState({})
 	const [listSpToTextLoading, setListSpToTextLoading] = useState({})
@@ -42,7 +49,7 @@ export default function useChatRoomChatBox({
 	const [_listTranslateLoading, setListTranslateLoading] = useState({})
 
 	const [playAudioId, setPlayAudioId] = useState('')
-	const handleA = async (url) => {
+	const handleAddMp3 = async (url) => {
 		const res = await fetch('/api/proxy', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -60,7 +67,7 @@ export default function useChatRoomChatBox({
 		const { id, medias } = item || {}
 		setListSpToTextLoading((prev) => ({ ...prev, [id]: true }))
 		try {
-			const res1 = await handleA(medias[0]?.url)
+			const res1 = await handleAddMp3(medias[0]?.url)
 
 			// giả lập như file được chọn từ input
 			const res: any = await handleUploadFile(res1)
@@ -139,6 +146,9 @@ export default function useChatRoomChatBox({
 	const handleReply = (item) => {
 		setReply(item)
 		_refInput?.current?.focus()
+	}
+	const handleOpenReact = (item) => {
+		setOpenReact(item)
 	}
 	const handleCopy = (data) => {
 		copyToClipboard(data, {
@@ -223,8 +233,21 @@ export default function useChatRoomChatBox({
 		stopAudio(id)
 		setPlayAudioId('')
 	}
+	const handleGetReact = async () => {
+		try {
+			const res: any = await getReact({ fields: ['$all'] })
+			setReactList(res?.results?.objects?.rows || [])
+		} catch (error) {
+			openError(error)
+		}
+	}
+	const handleAddReact = async (values) => {
+		await onAddReact(values)
+		setOpenReact(null)
+	}
 	useEffect(() => {
 		handleGetSticker()
+		handleGetReact()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 	useEffect(() => {
@@ -249,6 +272,8 @@ export default function useChatRoomChatBox({
 		listTextToSpeech,
 		playAudioId,
 		listTranslate,
+		reactList,
+		openReact,
 
 		setIsAudio,
 		setReply,
@@ -262,5 +287,8 @@ export default function useChatRoomChatBox({
 		onPlayAudio: handlePlayAudio,
 		onStopAudio: handleStopAudio,
 		onAddTranslate: handleAddTranslate,
+		onAddReact: handleAddReact,
+		onOpenReact: handleOpenReact,
+		setOpenReact,
 	}
 }

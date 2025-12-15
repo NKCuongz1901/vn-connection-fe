@@ -12,6 +12,7 @@ import { getUserInfo } from '@/ultis/storage.ults'
 
 import CcIcon from '@/svg/CcIcon'
 import HappyIcon from '@/svg/HappyIcon'
+import Heart from '@/svg/Heart'
 import ImageIcon from '@/svg/ImageIcon'
 import MicroPhoneIcon from '@/svg/MicroPhoneIcon'
 import MoreIcon from '@/svg/MoreIcon'
@@ -38,18 +39,11 @@ interface ChatRoomChatBoxProps {
 	_scrollRef?: any
 	loading?: boolean
 	onActionMessage?: any
+	onAddReact?: any
 	[key: string]: any
 }
-const ChatRoomChatBox = ({
-	type,
-	itemList,
-	onLoadMore,
-	onSendMessage,
-	_scrollRef,
-	loading,
-	onActionMessage,
-	convId,
-}: ChatRoomChatBoxProps) => {
+const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
+	const { itemList, onSendMessage, _scrollRef, loading, convId } = props
 	const {
 		isAudio,
 		_refInput,
@@ -63,6 +57,9 @@ const ChatRoomChatBox = ({
 		listTextToSpeechLoading,
 		playAudioId,
 		listTranslate,
+		openReact,
+		reactList,
+
 		onStopAudio,
 
 		setReply,
@@ -75,7 +72,10 @@ const ChatRoomChatBox = ({
 		onAddSpToText,
 		onAddTextToSpeech,
 		onAddTranslate,
-	} = useChatRoomChatBox({ onLoadMore, type, onActionMessage })
+		onAddReact,
+		onOpenReact,
+		setOpenReact,
+	} = useChatRoomChatBox(props)
 
 	const [fileList, setFileList] = useState([])
 	const hangleImportImg = (_values) => {
@@ -119,6 +119,24 @@ const ChatRoomChatBox = ({
 			</Flex>
 		)
 	}
+	const _renderReactView = (reactions) => {
+		if (!isArray(reactions, 1)) return
+		return (
+			<Flex className={classes.reactView}>
+				{(reactions || []).map((i, index) => {
+					const { reaction } = i || {}
+					const { image_url } = reaction || {}
+					if (index > 2) return
+					return (
+						<div key={i.id} className={classes.reactViewIcon}>
+							<CImage src={image_url} />
+						</div>
+					)
+				})}
+				{reactions.length}
+			</Flex>
+		)
+	}
 	const _renderContentChat = (item) => {
 		const {
 			id,
@@ -132,6 +150,7 @@ const ChatRoomChatBox = ({
 			user,
 			user_id,
 			isTemp,
+			reactions,
 		} = item || {}
 
 		const { name } = user || {}
@@ -165,6 +184,7 @@ const ChatRoomChatBox = ({
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
 							</div>
 						)}
+						{_renderReactView(reactions)}
 					</div>
 				)
 			case 'STICKER':
@@ -176,6 +196,7 @@ const ChatRoomChatBox = ({
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
 							</div>
 						)}
+						{_renderReactView(reactions)}
 					</Flex>
 				)
 			case 'MEDIAS': {
@@ -219,9 +240,18 @@ const ChatRoomChatBox = ({
 											<MoreIcon />
 										</Flex>
 									</Dropdown>
+									<Flex
+										className={clsx(classes.moreIcon, {})}
+										onClick={() => onOpenReact(item)}
+									>
+										<Heart />
+									</Flex>
 								</Flex>
 							)}
-							{Content}
+							<Flex className={classes.mediaContent}>
+								{Content}
+								{_renderReactView(reactions)}
+							</Flex>
 						</Flex>
 						{!!spToText && <Flex className={classes.spToText}>{spToText}</Flex>}
 						{isLast && (
@@ -253,8 +283,40 @@ const ChatRoomChatBox = ({
 				return <Flex className={classes.memberAccept}>{type}</Flex>
 		}
 	}
+	const _renderReact = (item) => {
+		if (item?.id !== openReact?.id) return
+		const { reactions } = item || {}
+		const reactType = (reactions || []).find(
+			(i) => i.user_id === getUserInfo('id'),
+		)
+
+		return (
+			<Flex className={classes.reactWrapper}>
+				{(reactList || []).map((react) => {
+					const { id, image_url } = react
+					const isActive = reactType?.reaction_id === id
+					return (
+						<Flex
+							key={id}
+							className={clsx(classes.reactItem, {
+								[classes.activeReact]: isActive,
+							})}
+							onClick={() =>
+								onAddReact({ item, react, type: isActive ? 'remove' : 'add' })
+							}
+						>
+							<div className={classes.reactIcon}>
+								<CImage src={image_url} />
+							</div>
+						</Flex>
+					)
+				})}
+			</Flex>
+		)
+	}
 	const _renderItemChat = ({ item }) => {
-		const { id, user, isFirst, isLast, type, user_id, isTemp } = item || {}
+		const { id, user, isFirst, isLast, type, user_id, reactions, isTemp } =
+			item || {}
 
 		const isMe = getUserInfo('id') === user_id
 		const isMemberAction = specialTypeMessage.includes(type)
@@ -283,7 +345,11 @@ const ChatRoomChatBox = ({
 						{isFirst && !isNot && (
 							<Flex className={classes.name}>{user?.name}</Flex>
 						)}
-						<Flex className={classes.content}>
+						<Flex
+							className={clsx(classes.content, {
+								[classes.isReaction]: isArray(reactions, 1),
+							})}
+						>
 							{!(isTemp || isMemberAction) && type !== 'MEDIAS' && (
 								<Flex className={classes.moreIconWrapper}>
 									{!isMe && typeMedia === 'AUDIO' && (
@@ -334,12 +400,19 @@ const ChatRoomChatBox = ({
 											<MoreIcon />
 										</Flex>
 									</Dropdown>
+									<Flex
+										className={clsx(classes.moreIcon, {})}
+										onClick={() => onOpenReact(item)}
+									>
+										<Heart />
+									</Flex>
 								</Flex>
 							)}
 							{_renderContentChat(item)}
 						</Flex>
 					</Flex>
 				</Flex>
+				{_renderReact(item)}
 			</Flex>
 		)
 	}
@@ -437,7 +510,12 @@ const ChatRoomChatBox = ({
 	}
 
 	return (
-		<div className={classes.wrapper}>
+		<div
+			className={classes.wrapper}
+			onClick={() => {
+				if (openReact) setOpenReact(false)
+			}}
+		>
 			<Flex
 				className={classes.chatContent}
 				vertical
@@ -453,23 +531,7 @@ const ChatRoomChatBox = ({
 					))}
 			</Flex>
 			{reply && _renderReply()}
-			<Flex
-				className={clsx(classes.chatBox)}
-				// onKeyDown={(e) => {
-				// 	if (e.key === 'Enter') {
-				// 		e.preventDefault()
-				// 		if (!!text.trim()) {
-				// 			setText('')
-				// 			setReply(null)
-				// 			onSendMessage({
-				// 				type: 'TEXT',
-				// 				content: text,
-				// 				parent: reply,
-				// 			})
-				// 		}
-				// 	}
-				// }}
-			>
+			<Flex className={clsx(classes.chatBox)}>
 				<Flex className={classes.chooseImg}>
 					<Flex className={classes.chooseImgContent}>
 						{fileList.map((i) => (

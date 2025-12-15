@@ -27,9 +27,11 @@
 		}
 		.itemChat {
 			max-width: 100%;
+			position: relative;
 			.contentItem {
 				max-width: 100%;
 				gap: 4px;
+				position: relative;
 				.avatar {
 					margin-top: 4px;
 					min-width: 32px;
@@ -52,6 +54,7 @@
 							justify-content: center;
 							padding: 6px;
 							gap: 8px;
+							position: relative;
 							order: 1;
 							.moreIcon {
 								cursor: pointer;
@@ -82,18 +85,19 @@
 							object-fit: cover;
 						}
 						.text {
-							// min-width: 200px;
+							min-width: 100px;
 							max-width: 80%;
 							padding: 8px 12px;
 							gap: 4px;
 							border-radius: 16px;
 							background: #f4f8fc;
+							position: relative;
 							word-break: break-word;
 							display: flex;
 							flex-direction: column;
 						}
 						.sticker {
-							// padding: 0 12px;
+							position: relative;
 						}
 						.medias {
 							flex-wrap: wrap;
@@ -106,6 +110,7 @@
 								padding: 6px;
 								gap: 8px;
 								order: 1;
+								position: relative;
 								.moreIcon {
 									cursor: pointer;
 									border-radius: 50%;
@@ -126,6 +131,9 @@
 										}
 									}
 								}
+							}
+							.mediaContent {
+								position: relative;
 							}
 							.media {
 								height: 140px;
@@ -175,7 +183,56 @@
 							color: #135a19;
 						}
 					}
+					.isReaction {
+						margin-bottom: 16px;
+					}
 				}
+			}
+			.reactWrapper {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -150%);
+
+				background: #e9eaec;
+				height: 56px;
+				align-items: center;
+				gap: 8px;
+				padding: 8px;
+				border-radius: 40px;
+				z-index: 2;
+				cursor: pointer;
+				.reactItem {
+					.reactIcon {
+						height: 40px;
+						width: 40px;
+					}
+					:hover {
+						background: #fff;
+						border-radius: 50%;
+					}
+				}
+				.activeReact {
+					background: #fff;
+					border-radius: 50%;
+				}
+			}
+		}
+		.reactView {
+			padding: 4px;
+			background: #f0f3f9;
+			border-radius: 40px;
+			gap: 4;
+			color: #48546b;
+			align-items: center;
+			border: 1px solid #fff;
+			position: absolute;
+			right: 0;
+			bottom: 0;
+			transform: translateY(50%);
+			.reactViewIcon {
+				height: 20px;
+				width: 20px;
 			}
 		}
 		.mt2 {
@@ -185,6 +242,7 @@
 			justify-content: flex-end;
 			.contentItem {
 				// justify-content: flex-end;
+				position: relative;
 
 				.contentInfo {
 					// justify-content: flex-end;
@@ -192,6 +250,7 @@
 					.content {
 						justify-content: flex-end;
 						.moreIconWrapper {
+							position: relative;
 							order: -1;
 							gap: 8px;
 						}
@@ -199,6 +258,8 @@
 							color: #135a19;
 							background: #e7f5e9;
 							word-break: break-word;
+							position: relative;
+							min-width: 100px;
 							div {
 								display: flex;
 								justify-content: flex-end;
@@ -207,6 +268,7 @@
 						.medias {
 							.moreIconWrapper {
 								order: -1;
+								position: relative;
 								gap: 8px;
 							}
 							:global(.ant-flex) {
@@ -220,6 +282,51 @@
 					}
 				}
 			}
+			.reactWrapper {
+				position: absolute;
+				// top: -60px;
+				background: #e9eaec;
+				height: 56px;
+				align-items: center;
+				gap: 8px;
+				padding: 8px;
+				border-radius: 40px;
+				z-index: 2;
+				right: 0px;
+				left: unset;
+				.reactItem {
+					.reactIcon {
+						height: 40px;
+						width: 40px;
+					}
+					:hover {
+						background: #fff;
+						border-radius: 50%;
+					}
+				}
+				.activeReact {
+					background: #fff;
+					border-radius: 50%;
+				}
+			}
+			.reactView {
+				padding: 4px;
+				background: #f0f3f9;
+				border-radius: 40px;
+				gap: 4;
+				color: #48546b;
+				align-items: center;
+				border: 1px solid #fff;
+				position: absolute;
+				left: 0;
+				bottom: 0;
+				right: unset;
+				transform: translateY(50%);
+				.reactViewIcon {
+					height: 20px;
+					width: 20px;
+				}
+			}
 		}
 		.isCenter {
 			width: 100%;
@@ -228,7 +335,7 @@
 			.contentItem {
 				gap: 4px;
 				width: 100%;
-
+				position: relative;
 				.contentInfo {
 					width: 100%;
 					.content {
