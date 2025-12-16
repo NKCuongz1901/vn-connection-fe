@@ -113,8 +113,8 @@ export default function useChatRoomChatBox({
 				targetLanguage: 'en',
 			}
 			const res: any = await translate({ payload })
-			const vocab = res?.results?.object?.vocab
-			setListTranslate((prev) => ({ ...prev, [id]: vocab }))
+			const example = res?.results?.object?.example
+			setListTranslate((prev) => ({ ...prev, [id]: example }))
 		} catch (error) {
 			openError(error)
 		} finally {
