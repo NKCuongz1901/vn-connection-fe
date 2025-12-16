@@ -384,10 +384,6 @@ export default function useChatRoomInboxChat({
 		}
 	}
 	const handleActionSettingConv = ({ key, value: _value }) => {
-		console.log(
-			`🌸🌸🌸 TrieuNinhHan ~ :384 ~ handleActionSettingConv ~ { key, value: _value }:`,
-			{ key, value: _value },
-		)
 		switch (key) {
 			case 'noti':
 				handleGetMembersConv(true)

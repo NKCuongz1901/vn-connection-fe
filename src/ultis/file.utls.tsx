@@ -103,7 +103,6 @@ export async function urlToAudioFile(audioUrl, defaultFilename = 'audio') {
 
 const audioMap: Record<string, HTMLAudioElement> = {}
 export const playAudio = (id: string, url: string, cb?: () => void): void => {
-	console.log('🌸🌸🌸 TrieuNinhHan ~ :106 ~ playAudio ~ url:', url)
 	let audio = audioMap[id]
 
 	if (!audio) {

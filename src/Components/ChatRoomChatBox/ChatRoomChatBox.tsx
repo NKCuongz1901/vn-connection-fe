@@ -8,6 +8,7 @@ import useChatRoomChatBox from '@/hooks/ChatRoomChatBox/useChatRoomChatBox'
 
 import { arrayFrom, isArray } from '@/ultis/array.ults'
 import { handleParseFileImg } from '@/ultis/file.utls'
+import { useLocalePath } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 
 import CcIcon from '@/svg/CcIcon'
@@ -29,6 +30,7 @@ import CUploadMuti from '../Custom/CUploadMuti'
 import VisualizerWithPlay from '../VisualizerWithPlay'
 
 import { specialTypeMessage } from '@/Variable/common.variable'
+import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './ChatRoomChatBox.module.scss'
 interface ChatRoomChatBoxProps {
@@ -44,6 +46,7 @@ interface ChatRoomChatBoxProps {
 }
 const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 	const { itemList, onSendMessage, _scrollRef, loading, convId } = props
+	const { onChangeRoute } = useLocalePath()
 	const {
 		isAudio,
 		_refInput,
@@ -338,7 +341,15 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 				<Flex className={classes.contentItem}>
 					{!isNot && (
 						<Flex className={classes.avatar}>
-							{isFirst && <CAvatar src={user?.avatar} />}
+							{isFirst && (
+								<CAvatar
+									style={{ cursor: 'pointer' }}
+									src={user?.avatar}
+									onClick={() =>
+										onChangeRoute(`${mainRoutes.profile}/${user_id}`)
+									}
+								/>
+							)}
 						</Flex>
 					)}
 					<Flex className={classes.contentInfo} vertical>
