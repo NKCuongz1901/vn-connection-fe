@@ -6,12 +6,12 @@ importScripts(
 )
 
 firebase.initializeApp({
-	apiKey: 'AIzaSyDfcC1XJ6KVwxSIp-SCBwTgqbEqOyA7UZI',
-	authDomain: 'vn-connections.firebaseapp.com',
-	projectId: 'vn-connections',
-	storageBucket: 'vn-connections.firebasestorage.app',
-	messagingSenderId: '642636000783',
-	appId: '1:642636000783:web:d320eda63721086184fd7a',
+	apiKey: 'AIzaSyBVk2djUST-4cMXuHNhmr2z9hM4VpjacXg',
+	authDomain: 'univini-develop.firebaseapp.com',
+	projectId: 'univini-develop',
+	storageBucket: 'univini-develop.firebasestorage.app',
+	messagingSenderId: '34059510604',
+	appId: '1:34059510604:web:9df3c716ba1274850fe5e9',
 })
 
 const messaging = firebase.messaging()
