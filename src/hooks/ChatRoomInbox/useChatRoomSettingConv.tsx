@@ -13,11 +13,12 @@ import {
 import { uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
 import { onPushState } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { getUserInfo, removeStorageCookie } from '@/ultis/storage.ults'
 import { randomString } from '@/ultis/string.ults'
 
 import { paginationCommon } from '@/Variable/common.variable'
 import { PaginationType } from '@/interface/common/common.interface'
+import { mainRoutes } from '@/routes/MainRoutes'
 
 type useChatRoomSettingConvProps = {
 	convInfo: any
@@ -136,6 +137,7 @@ export default function useChatRoomSettingConv({
 			if (res?.code === 200) {
 				onPushState({ force_id: randomString() })
 				onAction({ key: 'leave', value: id })
+				removeStorageCookie(`${mainRoutes.chatRoom}_${id}`)
 				closeModal()
 			}
 		} catch (error) {
