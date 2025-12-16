@@ -617,7 +617,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 					</Flex>
 				) : (
 					<Flex
-						className={classes.micro}
+						className={clsx(classes.micro, { [classes.isAudioMicro]: isAudio })}
 						onClick={() => setIsAudio((prev) => !prev)}
 					>
 						<MicroPhoneIcon />
