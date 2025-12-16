@@ -13,7 +13,7 @@ interface DetailChatRoomProps {
 }
 
 const DetailChatRoom = (props: DetailChatRoomProps) => {
-	const { id } = props
+	const { id, onSuccess = () => null } = props
 	const { modal, setModal, onSetTimesJoin } = useDetailChatRoom(props)
 
 	const _renderModal = () => {
@@ -46,7 +46,7 @@ const DetailChatRoom = (props: DetailChatRoomProps) => {
 	return (
 		<div className={classes.wrapper}>
 			{/* <InboxChat convId={id} /> */}
-			<ChatRoomInboxChat key={id} convId={id} />
+			<ChatRoomInboxChat key={id} convId={id} onSuccess={onSuccess} />
 			{_renderModal()}
 		</div>
 	)

@@ -133,6 +133,7 @@ export default function useSettingConv({
 			await delay(500)
 			if (res?.code === 200) {
 				onPushState({ force_id: randomString() })
+				onAction({ key: 'leave', value: id })
 				closeModal()
 			}
 		} catch (error) {

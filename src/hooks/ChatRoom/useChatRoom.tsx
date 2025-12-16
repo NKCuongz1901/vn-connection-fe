@@ -106,6 +106,20 @@ export default function useChatRoom(props: useChatRoomProps) {
 					}
 				}
 				break
+			case 'leave':
+				setListChatRoom((prev) =>
+					prev.map((i) => {
+						if (i.id === id) {
+							return {
+								...i,
+								users_in_conversation: [],
+							}
+						} else {
+							return i
+						}
+					}),
+				)
+				break
 			default:
 				break
 		}

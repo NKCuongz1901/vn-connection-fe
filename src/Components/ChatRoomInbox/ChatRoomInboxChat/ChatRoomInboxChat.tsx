@@ -25,6 +25,7 @@ const mappingType = {
 interface ChatRoomInboxChatProps {
 	convId: string
 	isNoHeader?: boolean
+	onSuccess?: any
 }
 const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 	const { convId, isNoHeader } = props
@@ -50,7 +51,7 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 		onGetPinMessage,
 		onActionSettingConv,
 		onAddReact,
-	} = useChatRoomInboxChat({ convId })
+	} = useChatRoomInboxChat(props)
 	const { avatar, title } = convInfo || {}
 	const _renderHeader = () => {
 		if (!!isNoHeader) return

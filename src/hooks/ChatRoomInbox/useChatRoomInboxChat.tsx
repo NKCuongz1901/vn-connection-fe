@@ -32,8 +32,13 @@ import { paginationCommon } from '@/Variable/common.variable'
 
 type useHangoutChatProps = {
 	convId: string
+	onSuccess?: any
+	[key: string]: any
 }
-export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
+export default function useChatRoomInboxChat({
+	convId,
+	onSuccess = () => null,
+}: useHangoutChatProps) {
 	const { openError } = useModal()
 	const { socket } = useSocket()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
@@ -379,12 +384,19 @@ export default function useChatRoomInboxChat({ convId }: useHangoutChatProps) {
 		}
 	}
 	const handleActionSettingConv = ({ key, value: _value }) => {
+		console.log(
+			`🌸🌸🌸 TrieuNinhHan ~ :384 ~ handleActionSettingConv ~ { key, value: _value }:`,
+			{ key, value: _value },
+		)
 		switch (key) {
 			case 'noti':
 				handleGetMembersConv(true)
 				break
 			case 'back':
 				setOpenSetting(false)
+				break
+			case 'leave':
+				onSuccess({ type: key, id: _value })
 				break
 			default:
 				break
