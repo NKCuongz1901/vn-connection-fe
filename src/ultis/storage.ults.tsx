@@ -68,8 +68,14 @@ export const isLogin = () => {
 }
 
 export const handleRemoveAllCookie = () => {
-	const keys = ['token', 'refresh_token', 'info', 'refresh_token_flag']
-	keys.forEach((i) => {
-		removeStorageCookie(i)
+	document.cookie.split(';').forEach((c) => {
+		document.cookie = c
+			.replace(/^ +/, '')
+			.replace(/=.*/, '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/')
 	})
+
+	// const keys = ['token', 'refresh_token', 'info', 'refresh_token_flag']
+	// keys.forEach((i) => {
+	// 	removeStorageCookie(i)
+	// })
 }
