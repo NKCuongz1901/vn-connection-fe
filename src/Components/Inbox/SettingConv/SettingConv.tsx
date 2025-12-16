@@ -191,28 +191,25 @@ const SettingConv = (props: SettingConvProps) => {
 				</Flex>
 
 				<Flex className={classes.mediaListWrapper} onScroll={onScroll}>
-					{loading.medias ? (
-						arrayFrom(3).map((_, index) => (
+					<>
+						{(medias || []).map((item) => (
+							<Flex key={item?.url} className={classes.mediaItem}>
+								<CImage src={item?.url} preview />
+							</Flex>
+						))}
+						{arrayFrom(3).map((_, index) => (
 							<Flex className={classes.mediaItem} key={index}>
 								<Skeleton.Input className={classes.skeleton} />
 							</Flex>
-						))
-					) : (
-						<>
-							{(medias || []).map((item) => (
-								<Flex key={item?.url} className={classes.mediaItem}>
-									<CImage src={item?.url} preview />
-								</Flex>
-							))}
-							{_loadmore.current && !loading.medias && (
-								<Flex className={classes.loadMore}>
-									<CButton ctype="oranger" onClick={onLoadMore}>
-										Load More
-									</CButton>
-								</Flex>
-							)}
-						</>
-					)}
+						))}
+						{_loadmore.current && !loading.medias && (
+							<Flex className={classes.loadMore}>
+								<CButton ctype="oranger" onClick={onLoadMore}>
+									Load More
+								</CButton>
+							</Flex>
+						)}
+					</>
 				</Flex>
 			</Flex>
 		)

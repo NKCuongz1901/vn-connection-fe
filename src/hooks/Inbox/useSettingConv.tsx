@@ -90,7 +90,9 @@ export default function useSettingConv({
 				}
 				setMedias((prev: any[]) => {
 					const contents = isNew ? [] : prev
-					const resData = (_rows || []).flatMap((item) => item?.medias || [])
+					const resData = (_rows || []).flatMap((item) =>
+						(item?.medias || []).filter((i) => i.type === 'IMAGE'),
+					)
 					const newData = uniqueArray([...contents, ...resData], 'url') || []
 					return newData
 				})
@@ -154,9 +156,7 @@ export default function useSettingConv({
 	}
 	const handleLoadMore = async () => {
 		if (!_loadmore.current || !!loading.medias) return
-		const { limit } = _paginationRefs.current
-		const currentPage = Math.trunc((medias || []).length / limit)
-		_paginationRefs.current.page = currentPage + 1
+		_paginationRefs.current.page += 1
 		await handleGetMedia()
 	}
 	const handleScroll = (e: any) => {

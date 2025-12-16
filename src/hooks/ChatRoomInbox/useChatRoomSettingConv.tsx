@@ -6,6 +6,7 @@ import { useModal } from '@/context/ModalContext'
 import {
 	deleteConvById,
 	getConvMediasById,
+	leaveConvById,
 	updateConvMember,
 } from '@/apis/conversationApis'
 
@@ -89,7 +90,9 @@ export default function useChatRoomSettingConv({
 				}
 				setMedias((prev: any[]) => {
 					const contents = isNew ? [] : prev
-					const resData = (_rows || []).flatMap((item) => item?.medias || [])
+					const resData = (_rows || []).flatMap((item) =>
+						(item?.medias || []).filter((i) => i.type === 'IMAGE'),
+					)
 					const newData = uniqueArray([...contents, ...resData], 'url') || []
 					return newData
 				})
@@ -125,11 +128,35 @@ export default function useChatRoomSettingConv({
 			ctype: 'error',
 		})
 	}
+	const handleLeaveConv = async (id) => {
+		toggleLoadingContext(true)
+		try {
+			const res: any = await leaveConvById({ id })
+			await delay(500)
+			if (res?.code === 200) {
+				onPushState({ force_id: randomString() })
+				onAction({ key: 'leave', value: id })
+				closeModal()
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			toggleLoadingContext()
+		}
+	}
+	const handleConfirmLeave = () => {
+		const { id } = convInfo || {}
+
+		openConfirm({
+			message: 'Are you sure want to leave this chatroom?',
+			titleLabel: 'Leave this chatroom',
+			onAccept: () => handleLeaveConv(id),
+			ctype: 'error',
+		})
+	}
 	const handleLoadMore = async () => {
 		if (!_loadmore.current || !!loading.medias) return
-		const { limit } = _paginationRefs.current
-		const currentPage = Math.trunc((medias || []).length / limit)
-		_paginationRefs.current.page = currentPage + 1
+		_paginationRefs.current.page += 1
 		await handleGetMedia()
 	}
 	const handleScroll = (e: any) => {
@@ -159,5 +186,6 @@ export default function useChatRoomSettingConv({
 		onScroll: handleScroll,
 		onLoadMore: handleLoadMore,
 		onConfirmDelete: handleConfirmDelete,
+		onConfirmLeave: handleConfirmLeave,
 	}
 }
