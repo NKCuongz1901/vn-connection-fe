@@ -1734,3 +1734,8 @@ export const mappingCountriesOptions = CountriesOptions.reduce((obj, item) => {
 	obj[item.code] = item
 	return obj
 }, {})
+
+export const LEFT_FLAG = {
+	Chinese: true,
+	Arabic: true,
+}

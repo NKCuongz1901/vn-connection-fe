@@ -53,6 +53,13 @@
 						min-height: 48px;
 						min-width: 48px;
 					}
+					.leftFlag {
+						img {
+							position: relative;
+							left: 10px;
+							width: unset;
+						}
+					}
 					.contentSkeletonAva {
 						min-height: 48px;
 						min-width: 48px;

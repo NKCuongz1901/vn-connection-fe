@@ -14,12 +14,15 @@ import ArrrowLeftIcon from '@/svg/ArrrowLeftIcon'
 import TickIcon from '@/svg/TickIcon'
 import DetailChatRoom from './DetailChatRoom'
 
+import { LEFT_FLAG } from '@/Variable/countryVariable'
+
 import classes from './ChatRoom.module.scss'
 
 const tabOpts = [
 	{ value: 'language', label: 'Language' },
 	{ value: 'location', label: 'Location' },
 ]
+
 const ChatRoom = () => {
 	const { goBackOrPush } = useSafeBack()
 	const { loading, isChatRoomDetail, id, tab, listChatRoom, setTab } =
@@ -101,7 +104,12 @@ const ChatRoom = () => {
 							className={classes.chatRoomWrapper}
 							onClick={() => onPushState({ type: 'language', id })}
 						>
-							<CAvatar src={avatar} className={classes.chatRoomAva} />
+							<CAvatar
+								src={avatar}
+								className={clsx(classes.chatRoomAva, {
+									[classes.leftFlag]: !!LEFT_FLAG[title],
+								})}
+							/>
 							<div className={classes.chatRoomTitle}>{title}</div>
 							<Flex className={classes.totalMem}>
 								{!!isArray(users_in_conversation, 1) && <TickIcon />}
