@@ -25,10 +25,17 @@ const tabOpts = [
 
 const ChatRoom = () => {
 	const { goBackOrPush } = useSafeBack()
-	const { loading, isChatRoomDetail, id, tab, listChatRoom, setTab } =
-		useChatRoom({
-			tabOpts,
-		})
+	const {
+		loading,
+		isChatRoomDetail,
+		id,
+		tab,
+		listChatRoom,
+		setTab,
+		onSuccess,
+	} = useChatRoom({
+		tabOpts,
+	})
 	const _renderBack = () => {
 		return (
 			<Flex className={classes.title} onClick={() => goBackOrPush()}>
@@ -133,7 +140,7 @@ const ChatRoom = () => {
 						{_renderTabLanguage()}
 						{isChatRoomDetail && (
 							<Flex className={classes.detailChatRoom}>
-								<DetailChatRoom id={id} />
+								<DetailChatRoom id={id} onSuccess={onSuccess} />
 							</Flex>
 						)}
 					</Flex>

@@ -6,8 +6,15 @@ import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
 import ChatRoomInboxChat from '@/Components/ChatRoomInbox/ChatRoomInboxChat'
 
 import classes from './DetailChatRoom.module.scss'
-const DetailChatRoom = ({ id }) => {
-	const { modal, setModal, onSetTimesJoin } = useDetailChatRoom({ id })
+
+interface DetailChatRoomProps {
+	id: string
+	onSuccess?: any
+}
+
+const DetailChatRoom = (props: DetailChatRoomProps) => {
+	const { id } = props
+	const { modal, setModal, onSetTimesJoin } = useDetailChatRoom(props)
 
 	const _renderModal = () => {
 		const { type } = modal || {}

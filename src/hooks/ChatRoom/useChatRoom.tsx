@@ -4,9 +4,10 @@ import { useModal } from '@/context/ModalContext'
 
 import { getChatRoomList } from '@/apis/conversationApis'
 
-import { uniqueArray } from '@/ultis/array.ults'
+import { isArray, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
 import { useQuery } from '@/ultis/route.ults'
+import { getUserInfo } from '@/ultis/storage.ults'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { ConversationChatRoomProps } from '@/interface/Conversation/Conversation.interface'
@@ -71,6 +72,45 @@ export default function useChatRoom(props: useChatRoomProps) {
 		}
 	}
 
+	const handleSuccess = ({ type, id, data }) => {
+		switch (type) {
+			case 'join':
+				{
+					const item = listChatRoom.find((i) => i.id === id)
+					if (!isArray(item?.users_in_conversation, 1)) {
+						const { id: _id, type, conversation_id, user_id } = data || {}
+						const { avatar, name } = getUserInfo() || {}
+						setListChatRoom((prev) =>
+							prev.map((i) =>
+								i.id === id
+									? {
+											...i,
+											users_in_conversation: [
+												{
+													id: _id,
+													type: type,
+													conversation_id: conversation_id,
+													user_id: user_id,
+													amount_of_remind: 2,
+													user: {
+														id: user_id,
+														avatar: avatar,
+														name: name,
+													},
+												},
+											],
+									  }
+									: i,
+							),
+						)
+					}
+				}
+				break
+			default:
+				break
+		}
+	}
+
 	useEffect(() => {
 		handleGetListChatRoom()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -82,5 +122,6 @@ export default function useChatRoom(props: useChatRoomProps) {
 		tab,
 		listChatRoom,
 		setTab,
+		onSuccess: handleSuccess,
 	}
 }

@@ -10,10 +10,11 @@ import { mainRoutes } from '@/routes/MainRoutes'
 
 interface useDetailChatRoomProps {
 	id: string
+	onSuccess?: any
 }
 
 export default function useDetailChatRoom(props: useDetailChatRoomProps) {
-	const { id } = props
+	const { id, onSuccess = () => null } = props
 	const { openError } = useModal()
 	const [modal, setModal] = useState<{
 		type?: string
@@ -41,7 +42,9 @@ export default function useDetailChatRoom(props: useDetailChatRoomProps) {
 	}
 	const handleJoinChatRoom = async () => {
 		try {
-			await joinConversation({ id, status: true })
+			const res: any = await joinConversation({ id, status: true })
+			console.log('🌸🌸🌸 TrieuNinhHan ~ :46 ~ handleJoinChatRoom ~ res:', res)
+			onSuccess({ type: 'join', id, data: res?.object })
 		} catch (error) {
 			openError(error)
 		}
