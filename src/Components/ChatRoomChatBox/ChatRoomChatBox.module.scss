@@ -65,6 +65,10 @@
 								justify-content: center;
 								border-radius: 99px;
 								background: #f4f8fc;
+								svg {
+									height: 20px;
+									width: 20px;
+								}
 							}
 							.disabled {
 								cursor: not-allowed;
