@@ -59,7 +59,7 @@ const ModalNotiChatRoom = (props: ModalCRUDDiscussionProps) => {
 				}
 				styles={{
 					content: {
-						width: 800,
+						width: 600,
 					},
 				}}
 				footer={[
