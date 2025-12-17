@@ -1739,3 +1739,7 @@ export const LEFT_FLAG = {
 	Chinese: true,
 	Arabic: true,
 }
+
+export const mappingFlag = {
+	en: 'GB',
+}

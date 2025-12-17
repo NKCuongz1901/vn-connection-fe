@@ -28,6 +28,7 @@ import DotIcon from '@/svg/DotIcon'
 import MaleIcon from '@/svg/MaleIcon'
 import FeMaleIcon from '@/svg/FeMaleIcon'
 import GenderIcon from '@/svg/GenderIcon'
+import { mappingFlag } from '@/Variable/countryVariable'
 
 const genderIcon = {
 	MALE: MaleIcon,
@@ -234,7 +235,12 @@ const Local = (props: LocalProps) => {
 									className={classes.userAvatar}
 									onClick={() => onChangeRoute(`${mainRoutes.profile}/${id}`)}
 								/>
-								<div className={clsx(`flag:${country_code}`, classes.flag)} />
+								<div
+									className={clsx(
+										`flag:${mappingFlag[country_code] || country_code}`,
+										classes.flag,
+									)}
+								/>
 							</Flex>
 							<div className={classes.userName}> {name}</div>
 							<Flex align="center" gap={4}>

@@ -40,7 +40,10 @@ import ProfileCircleIcon from '@/svg/ProfileCircleIcon'
 import TwoUser from '@/svg/TwoUser'
 import WorldIcon from '@/svg/WorldIcon'
 import { getAge } from '@/ultis/date.ults'
-import { mappingCountriesOptions } from '@/Variable/countryVariable'
+import {
+	mappingCountriesOptions,
+	mappingFlag,
+} from '@/Variable/countryVariable'
 import classes from './Profile.module.scss'
 import CCounter from '@/Components/Custom/CCounter'
 import MarkIcon from '@/svg/MarkIcon'
@@ -183,7 +186,12 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 						<Flex className={classes.commonInfo} vertical>
 							<div className={classes.name}>{name}</div>
 							<Flex gap={4} align="center">
-								<span className={clsx(`flag:${i_am_from}`, classes.flag)} />
+								<span
+									className={clsx(
+										`flag:${mappingFlag[i_am_from] || i_am_from}`,
+										classes.flag,
+									)}
+								/>
 								{mappingCountriesOptions[i_am_from]?.name}
 							</Flex>
 							<Flex className={classes.address} align="center" gap={4}>

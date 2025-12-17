@@ -21,6 +21,7 @@ import { MemberProps } from '@/interface/Conversation/Conversation.interface'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './ModalViewMember.module.scss'
+import { mappingFlag } from '@/Variable/countryVariable'
 
 interface ModelChooseHangoutProps {
 	id: string
@@ -78,7 +79,12 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 						onClick={() => onOpenNewRoute(`${mainRoutes.profile}/${id}`)}
 					/>
 					<div className={classes.flagWrapper}>
-						<div className={clsx(`flag:${country_code}`, classes.flag)} />
+						<div
+							className={clsx(
+								`flag:${mappingFlag[country_code] || country_code}`,
+								classes.flag,
+							)}
+						/>
 					</div>
 				</Flex>
 				<div className={classes.userName}> {name}</div>
