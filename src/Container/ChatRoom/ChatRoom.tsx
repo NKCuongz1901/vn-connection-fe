@@ -37,6 +37,7 @@ const ChatRoom = () => {
 		tabOpts,
 	})
 	const _renderBack = () => {
+		if (isChatRoomDetail) return
 		return (
 			<Flex className={classes.title} onClick={() => goBackOrPush()}>
 				<ArrrowLeftIcon />
@@ -155,7 +156,12 @@ const ChatRoom = () => {
 	}
 	return (
 		<div className={classes.wrapper}>
-			<Flex className={classes.container} vertical>
+			<Flex
+				className={clsx(classes.container, {
+					[classes.containerChatDetail]: isChatRoomDetail,
+				})}
+				vertical
+			>
 				{_renderBack()}
 				{_renderBody()}
 			</Flex>

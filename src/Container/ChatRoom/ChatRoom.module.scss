@@ -13,9 +13,7 @@
 			cursor: pointer;
 		}
 		.body {
-			padding: 16px;
 			width: 100%;
-			background: #fff;
 			border-radius: 16px;
 			height: 100%;
 			gap: 12px;
@@ -31,20 +29,24 @@
 			.languageWrapper {
 				height: 100%;
 				.detailChatRoom {
+					padding: 24px 32px;
 					flex: 1;
 					width: 100%;
+					border-radius: 16px;
 				}
 			}
 			.tabLanguage {
 				gap: 20px;
 				flex-wrap: wrap;
 				overflow: auto;
+				background: #fff;
+				padding: 16px;
 				.chatRoomWrapper {
 					padding: 12px;
 					gap: 8px;
 					align-items: center;
 					cursor: pointer;
-					width: 168px;
+					width: 164px;
 					max-height: 142px;
 					border-radius: 12px;
 					border: 1px solid #edf0f5;
@@ -138,6 +140,12 @@
 			}
 		}
 	}
+	.containerChatDetail {
+		padding: 0;
+		.body {
+			border-radius: 0;
+		}
+	}
 }
 
 @media (min-width: 0px) and (max-width: 769px) {
@@ -168,6 +176,18 @@
 			}
 			.inboxDetail {
 				display: none;
+			}
+		}
+		.containerChatDetail {
+			padding: 0;
+			.body {
+				padding: 0;
+				border-radius: 0;
+				.languageWrapper {
+					.detailChatRoom {
+						padding: 0;
+					}
+				}
 			}
 		}
 	}

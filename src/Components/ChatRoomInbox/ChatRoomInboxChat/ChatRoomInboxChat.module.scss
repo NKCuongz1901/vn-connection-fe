@@ -4,6 +4,7 @@
 	background: #fff;
 	width: 100%;
 	min-width: 712px;
+	border-radius: 16px;
 	.chatContainer {
 		width: 100%;
 
@@ -125,6 +126,7 @@
 }
 @media (min-width: 0px) and (max-width: 769px) {
 	.InboxChatWrapper {
+		border-radius: 0;
 		min-width: 100%;
 		.mini {
 			display: none;
