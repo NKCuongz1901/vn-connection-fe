@@ -35,6 +35,8 @@ export default function useModalViewMember({ id }: useModalViewMemberProps) {
 	const [loading, setLoading] = useState({ around: false, all: false })
 	const [apiId, setApiId] = useState('')
 
+	const [total, setTotal] = useState({ around: 0 })
+
 	const [keyword, setKeyword] = useState('')
 	const [local, setLocal] = useState({ address: '', lat: 0, long: 0 })
 	const handleGetMemberAroundMe = async () => {
@@ -44,7 +46,7 @@ export default function useModalViewMember({ id }: useModalViewMemberProps) {
 				id,
 				fields: ['$all'],
 				page: 1,
-				limit: 10,
+				limit: 8,
 			}
 			setMemberAround([])
 
@@ -59,9 +61,10 @@ export default function useModalViewMember({ id }: useModalViewMemberProps) {
 			const res: any = keyword
 				? await getMember(params)
 				: await getMemberAroundMe(params)
-			const { rows } = res?.results?.objects || {}
+			const { rows, count } = res?.results?.objects || {}
 			await delay(500)
 			setMemberAround(rows)
+			setTotal((prev) => ({ ...prev, around: count }))
 		} catch (error) {
 			openError(error)
 		} finally {
@@ -181,6 +184,7 @@ export default function useModalViewMember({ id }: useModalViewMemberProps) {
 		local,
 		memberAround,
 		memberAll,
+		total,
 
 		setKeyword,
 		onChangeKeyword: handleChangeKeyword,

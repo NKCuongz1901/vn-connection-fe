@@ -101,6 +101,22 @@
 					}
 				}
 			}
+			.moreAround {
+				position: relative;
+				.moreAroundMe {
+					position: absolute;
+					top: 0;
+					background: rgba(0, 8, 25, 0.48);
+					height: 64px;
+					width: 64px;
+					border-radius: 50%;
+					align-items: center;
+					justify-content: center;
+					color: #fff;
+					font-weight: 600;
+					font-size: 18px;
+				}
+			}
 			.skeleton {
 				gap: 4px;
 				min-width: 170px;
@@ -219,6 +235,7 @@
 						}
 					}
 				}
+
 				.skeleton {
 					min-width: calc(50% - 16px);
 					max-width: calc(50% - 16px);

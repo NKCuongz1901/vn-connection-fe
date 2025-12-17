@@ -7,6 +7,7 @@ import useModalViewMember from '@/hooks/ChatRoomInbox/useModalViewMember'
 
 import { arrayFrom } from '@/ultis/array.ults'
 import { useLocalePath } from '@/ultis/route.ults'
+import { formatNumberString } from '@/ultis/string.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CInput from '@/Components/Custom/CInput'
@@ -20,8 +21,8 @@ import MarkIcon from '@/svg/MarkIcon'
 import { MemberProps } from '@/interface/Conversation/Conversation.interface'
 import { mainRoutes } from '@/routes/MainRoutes'
 
-import classes from './ModalViewMember.module.scss'
 import { mappingFlag } from '@/Variable/countryVariable'
+import classes from './ModalViewMember.module.scss'
 
 interface ModelChooseHangoutProps {
 	id: string
@@ -46,6 +47,7 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 		local,
 		memberAround,
 		memberAll,
+		total,
 
 		onScroll,
 		onChangeKeyword,
@@ -117,7 +119,7 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 	const _renderAroundMe = () => {
 		const { address } = local || {}
 		const _address = address?.split(',').slice(-2).join(', ')
-
+		const isMore = total.around - memberAround.length > 0
 		return (
 			<Flex className={classes.section} vertical>
 				<Flex className={classes.header} vertical>
@@ -125,7 +127,21 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 					<div className={classes.subTitle}>{_address}</div>
 				</Flex>
 				<Flex className={classes.userList}>
-					{memberAround.map(_renderItem)}
+					{memberAround.slice(0, 7).map(_renderItem)}
+					{isMore && !loading.around && (
+						<Flex className={clsx(classes.moreAround, classes.user)} vertical>
+							<Flex className={classes.userAvatarWrapper}>
+								<CAvatar
+									src={memberAround[7]?.user?.avatar}
+									className={classes.userAvatar}
+									onClick={() => onOpenNewRoute(`${mainRoutes.profile}/${id}`)}
+								/>
+							</Flex>
+							<Flex className={classes.moreAroundMe}>
+								+{formatNumberString(total.around - memberAround.length + 1)}
+							</Flex>
+						</Flex>
+					)}
 					{loading.around && _renderLoading()}
 				</Flex>
 			</Flex>
