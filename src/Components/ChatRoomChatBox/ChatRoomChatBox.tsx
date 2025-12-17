@@ -412,7 +412,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 										</Flex>
 									</Dropdown>
 									<Flex
-										className={clsx(classes.moreIcon, {})}
+										className={clsx(classes.moreIcon, classes.iconHeart)}
 										onClick={() => onOpenReact(item)}
 									>
 										<Heart />
