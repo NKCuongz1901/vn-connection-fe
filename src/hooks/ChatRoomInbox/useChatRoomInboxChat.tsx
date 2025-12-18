@@ -8,6 +8,7 @@ import {
 	getConvInfoById,
 	getConvMembersById,
 	getConvMessById,
+	getMessageById,
 	getPinMessageById,
 	getReact,
 	pinMessageById,
@@ -29,6 +30,7 @@ import {
 import { PaginationType } from '@/interface/common/common.interface'
 import { ReactionPtops } from '@/interface/Conversation/Conversation.interface'
 import { paginationCommon } from '@/Variable/common.variable'
+import { isEmptyObject } from '@/ultis/object.ults'
 
 type useHangoutChatProps = {
 	convId: string
@@ -48,7 +50,7 @@ export default function useChatRoomInboxChat({
 	const [convInfo, setConvInfo] = useState<{ [key: string]: any }>({})
 	const [members, setMember] = useState<any[]>([])
 	const [messList, setMessList] = useState<any[]>([])
-
+	const messListRef = useRef(messList)
 	const [modal, setModal] = useState({ type: '', data: null }) as any
 	const [openSetting, setOpenSetting] = useState(false)
 
@@ -399,15 +401,26 @@ export default function useChatRoomInboxChat({
 		}
 	}
 
+	const handleGetMessageById = useCallback(async (id: string) => {
+		try {
+			const res: any = await getMessageById({ id, fields: ['$all'] })
+			return res?.results?.object
+		} catch {}
+	}, [])
+
 	const handleParseDataSocket = useCallback(
-		(data) => {
+		async (data) => {
 			try {
-				const { conversation_id, type, sender } = data || {}
+				const { conversation_id, type, sender, parent_id } = data || {}
 				let { content, content_en } = data || {}
 				if (conversation_id !== convId) return
+				let { parent: _parent, ...parent } =
+					messListRef.current.find((i) => i.id === parent_id) || {}
+				if (parent_id && isEmptyObject(parent)) {
+					parent = await handleGetMessageById(parent_id)
+				}
 				setMessList((prev: any[]) => {
 					const contents = prev
-					// const { parent } = (contents || []).find((i) => i.id === data.id)
 					switch (type) {
 						case 'MEMBER_JOIN':
 							const { name } = sender || {}
@@ -439,6 +452,7 @@ export default function useChatRoomInboxChat({
 				console.log('error:', error)
 			}
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[convId],
 	)
 	const handleParseDataSocketReact = useCallback((data) => {
@@ -507,6 +521,10 @@ export default function useChatRoomInboxChat({
 			socket.off('message_reaction', handleParseDataSocketReact)
 		}
 	}, [convId, handleParseDataSocket, handleParseDataSocketReact, socket])
+
+	useEffect(() => {
+		messListRef.current = messList
+	}, [messList])
 
 	return {
 		_scrollRef,

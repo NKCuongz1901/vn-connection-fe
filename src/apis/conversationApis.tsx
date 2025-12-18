@@ -114,7 +114,16 @@ export const sendMessage = async (payload: any) => {
 
 	return await axios.post(url, payload)
 }
-
+export const getMessageById = async (params: {
+	id: string
+	[key: string]: any
+}) => {
+	const { id, name, ..._params } = params
+	const url = CONVERSATION_ROUTES.message + `/${id}`
+	return await axios.get(url, {
+		params: { ...convertParams(_params), name },
+	})
+}
 export const deleteMessageById = async ({ id }: { id: string }) => {
 	const url = CONVERSATION_ROUTES.message + `/${id}`
 	return await axios.delete(url)
