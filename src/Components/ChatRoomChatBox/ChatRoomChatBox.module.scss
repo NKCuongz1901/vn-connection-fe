@@ -144,6 +144,9 @@
 								height: 140px;
 								border-radius: 16px;
 								overflow: hidden;
+								:global(.ant-image) {
+									width: 100%;
+								}
 							}
 							:global(.ant-image) {
 								height: 140px;

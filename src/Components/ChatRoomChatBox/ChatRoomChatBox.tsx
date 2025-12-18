@@ -215,7 +215,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 					default:
 						Content = (medias || []).map((media, index) => (
 							<Flex className={classes.media} key={index}>
-								<CImage src={media.url} />
+								<CImage preview src={media.url} />
 							</Flex>
 						))
 				}
