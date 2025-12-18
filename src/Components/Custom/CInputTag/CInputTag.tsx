@@ -3,7 +3,14 @@
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { cloneDeep } from 'lodash'
-import { forwardRef, memo, useEffect, useRef, useState } from 'react'
+import {
+	forwardRef,
+	memo,
+	useEffect,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from 'react'
 import { Mention, MentionsInput } from 'react-mentions'
 
 import { getMemberInConv } from '@/apis/conversationApis'
@@ -24,6 +31,7 @@ import classes from './CInputTag.module.scss'
 import './CInputTag.scss'
 interface CInputTagProps {
 	id: string
+	disabled?: boolean
 	value?: string
 	onChange?: any
 	onSendMessage?: any
@@ -34,8 +42,8 @@ const defaultUser = {
 	display: 'all',
 	avatar: '',
 }
-const CInputTag = forwardRef((_props: CInputTagProps, _ref: any) => {
-	const { id, suffix, onChange, onSendMessage, value } = _props
+const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
+	const { id, disabled, suffix, onChange, onSendMessage, value } = _props
 	const timeoutRef = useRef(null)
 	const pagination = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const loadMore = useRef(true)
@@ -46,6 +54,9 @@ const CInputTag = forwardRef((_props: CInputTagProps, _ref: any) => {
 	const [loading, setLoading] = useState(false)
 	const [users, setUsers] = useState([])
 	const [keyword, setKeyword] = useState('')
+
+	useImperativeHandle(ref, () => inputRef.current, [])
+
 	const handleGetUser = async () => {
 		setLoading(true)
 		try {
@@ -310,8 +321,14 @@ const CInputTag = forwardRef((_props: CInputTagProps, _ref: any) => {
 		)
 	}
 	return (
-		<div className={clsx(classes.layout, 'mentionsInput')} ref={containerRef}>
+		<div
+			className={clsx(classes.layout, 'mentionsInput', {
+				[classes.disabled]: disabled,
+			})}
+			ref={containerRef}
+		>
 			<MentionsInput
+				readOnly={disabled}
 				inputRef={inputRef}
 				placeholder="Text message"
 				value={value}
