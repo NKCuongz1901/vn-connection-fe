@@ -242,6 +242,13 @@
 							width: 40px;
 							border: 1px solid #cbd5e1;
 						}
+						.leftFlag {
+							img {
+								position: relative;
+								left: 9px;
+								width: unset;
+							}
+						}
 						.chatRoomBandage {
 							height: 24px;
 							width: 24px;

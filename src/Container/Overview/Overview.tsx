@@ -38,6 +38,7 @@ import { radiusOpts, typeEvent } from '@/Variable/select.variable'
 
 import classes from './Overview.module.scss'
 import HappyIcon from '@/svg/HappyIcon'
+import { LEFT_FLAG } from '@/Variable/countryVariable'
 
 const Overview = () => {
 	const { loadingContext } = useLoading()
@@ -366,7 +367,9 @@ const Overview = () => {
 														<CAvatarBandage
 															isHidden
 															src={avatar}
-															className={classes.chatRoomAva}
+															className={clsx(classes.chatRoomAva, {
+																[classes.leftFlag]: !!LEFT_FLAG[title],
+															})}
 															classBandage={classes.chatRoomBandage}
 														/>
 													</div>
