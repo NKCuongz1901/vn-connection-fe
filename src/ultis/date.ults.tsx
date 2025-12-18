@@ -62,3 +62,15 @@ export const getAge = (dateString: string) => {
 	if (!dateString) return ''
 	return dayjs().diff(dayjs(dateString), 'year')
 }
+
+export const parseDayFromIsNewDate = (created) => {
+	if (!created) return ''
+
+	const d = dayjs(created)
+
+	if (d.isSame(dayjs(), 'day')) {
+		return `Today, ${d.format('HH:mm')}`
+	}
+
+	return d.format('MMMM, DD YYYY HH:mm')
+}

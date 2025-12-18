@@ -1,4 +1,5 @@
 import { specialTypeMessage } from '@/Variable/common.variable'
+import dayjs from 'dayjs'
 import _ from 'lodash'
 
 export const isArray = (value: any, minLength?: number) => {
@@ -34,6 +35,9 @@ export const mappingMessageChat = (newData) => {
 		isLast:
 			newData?.[index - 1]?.user_id !== item?.user_id ||
 			specialTypeMessage.includes(newData?.[index - 1]?.type),
+		isNewDate:
+			!newData?.[index + 1] ||
+			!dayjs(item.created_at).isSame(newData[index + 1].created_at, 'day'),
 		_id: item._id || item.id,
 	}))
 }

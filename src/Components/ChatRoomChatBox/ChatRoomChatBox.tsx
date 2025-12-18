@@ -7,6 +7,7 @@ import { memo, useCallback, useState } from 'react'
 import useChatRoomChatBox from '@/hooks/ChatRoomChatBox/useChatRoomChatBox'
 
 import { arrayFrom, isArray } from '@/ultis/array.ults'
+import { parseDayFromIsNewDate } from '@/ultis/date.ults'
 import { handleParseFileImg } from '@/ultis/file.utls'
 import { useLocalePath } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
@@ -318,8 +319,18 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		)
 	}
 	const _renderItemChat = ({ item }) => {
-		const { id, user, isFirst, isLast, type, user_id, reactions, isTemp } =
-			item || {}
+		const {
+			id,
+			user,
+			isFirst,
+			isLast,
+			isNewDate,
+			isTemp,
+			type,
+			user_id,
+			reactions,
+			created_at,
+		} = item || {}
 
 		const isMe = getUserInfo('id') === user_id
 		const isMemberAction = specialTypeMessage.includes(type)
@@ -328,102 +339,109 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		const loadingSpToText = !!listSpToTextLoading[id]
 
 		return (
-			<Flex
-				className={clsx(classes.itemChat, {
-					[classes.mt2]: isFirst,
-					[classes.isMe]: isMe,
-					[classes.isLast]: isLast,
-					[classes.isCenter]: isMemberAction,
-					[classes.isTemp]: isTemp,
-				})}
-				key={id}
-			>
-				<Flex className={classes.contentItem}>
-					{!isNot && (
-						<Flex className={classes.avatar}>
-							{isFirst && (
-								<CAvatar
-									style={{ cursor: 'pointer' }}
-									src={user?.avatar}
-									onClick={() =>
-										onChangeRoute(`${mainRoutes.profile}/${user_id}`)
-									}
-								/>
-							)}
-						</Flex>
-					)}
-					<Flex className={classes.contentInfo} vertical>
-						{isFirst && !isNot && (
-							<Flex className={classes.name}>{user?.name}</Flex>
+			<Flex vertical key={id}>
+				{isNewDate && (
+					<Flex className={classes.date}>
+						{parseDayFromIsNewDate(created_at)}
+					</Flex>
+				)}
+
+				<Flex
+					className={clsx(classes.itemChat, {
+						[classes.mt2]: isFirst,
+						[classes.isMe]: isMe,
+						[classes.isLast]: isLast,
+						[classes.isCenter]: isMemberAction,
+						[classes.isTemp]: isTemp,
+					})}
+				>
+					<Flex className={classes.contentItem}>
+						{!isNot && (
+							<Flex className={classes.avatar}>
+								{isFirst && (
+									<CAvatar
+										style={{ cursor: 'pointer' }}
+										src={user?.avatar}
+										onClick={() =>
+											onChangeRoute(`${mainRoutes.profile}/${user_id}`)
+										}
+									/>
+								)}
+							</Flex>
 						)}
-						<Flex
-							className={clsx(classes.content, {
-								[classes.isReaction]: isArray(reactions, 1),
-							})}
-						>
-							{!(isTemp || isMemberAction) && type !== 'MEDIAS' && (
-								<Flex className={classes.moreIconWrapper}>
-									{!isMe && typeMedia === 'AUDIO' && (
-										<Flex
-											className={clsx(classes.moreIcon, {
-												[classes.disabled]: loadingSpToText,
-											})}
-											onClick={() => !loadingSpToText && onAddSpToText(item)}
-										>
-											<CcIcon />
-										</Flex>
-									)}
-									{type === 'TEXT' && !isMe && (
-										<Flex
-											className={clsx(classes.moreIcon, {
-												[classes.disabled]: loadingSpToText,
-											})}
-											onClick={() => onAddTranslate(item)}
-										>
-											<TranslateIcon />
-										</Flex>
-									)}
-									{!isMe && (
-										<Flex
-											className={clsx(classes.moreIcon, {
-												[classes.disabled]: listTextToSpeechLoading[id],
-												[classes.isPlaying]: playAudioId === id,
-											})}
-											onClick={() => {
-												if (playAudioId === id) {
-													onStopAudio(id)
-												} else {
-													if (!listTextToSpeechLoading[id]) {
-														onAddTextToSpeech(item)
-													}
-												}
-											}}
-										>
-											<VolumeIcon />
-										</Flex>
-									)}
-									<Dropdown
-										trigger={['click']}
-										menu={{ items: onGetMenus({ item, isMe }) }}
-										disabled={isTemp || isMemberAction}
-									>
-										<Flex className={classes.moreIcon}>
-											<MoreIcon />
-										</Flex>
-									</Dropdown>
-									<Flex
-										className={clsx(classes.moreIcon, classes.iconHeart)}
-										onClick={() => onOpenReact(item)}
-									>
-										<Heart />
-									</Flex>
-								</Flex>
+						<Flex className={classes.contentInfo} vertical>
+							{isFirst && !isNot && (
+								<Flex className={classes.name}>{user?.name}</Flex>
 							)}
-							{_renderContentChat(item)}
+							<Flex
+								className={clsx(classes.content, {
+									[classes.isReaction]: isArray(reactions, 1),
+								})}
+							>
+								{!(isTemp || isMemberAction) && type !== 'MEDIAS' && (
+									<Flex className={classes.moreIconWrapper}>
+										{!isMe && typeMedia === 'AUDIO' && (
+											<Flex
+												className={clsx(classes.moreIcon, {
+													[classes.disabled]: loadingSpToText,
+												})}
+												onClick={() => !loadingSpToText && onAddSpToText(item)}
+											>
+												<CcIcon />
+											</Flex>
+										)}
+										{type === 'TEXT' && !isMe && (
+											<Flex
+												className={clsx(classes.moreIcon, {
+													[classes.disabled]: loadingSpToText,
+												})}
+												onClick={() => onAddTranslate(item)}
+											>
+												<TranslateIcon />
+											</Flex>
+										)}
+										{!isMe && (
+											<Flex
+												className={clsx(classes.moreIcon, {
+													[classes.disabled]: listTextToSpeechLoading[id],
+													[classes.isPlaying]: playAudioId === id,
+												})}
+												onClick={() => {
+													if (playAudioId === id) {
+														onStopAudio(id)
+													} else {
+														if (!listTextToSpeechLoading[id]) {
+															onAddTextToSpeech(item)
+														}
+													}
+												}}
+											>
+												<VolumeIcon />
+											</Flex>
+										)}
+										<Dropdown
+											trigger={['click']}
+											menu={{ items: onGetMenus({ item, isMe }) }}
+											disabled={isTemp || isMemberAction}
+										>
+											<Flex className={classes.moreIcon}>
+												<MoreIcon />
+											</Flex>
+										</Dropdown>
+										<Flex
+											className={clsx(classes.moreIcon, classes.iconHeart)}
+											onClick={() => onOpenReact(item)}
+										>
+											<Heart />
+										</Flex>
+									</Flex>
+								)}
+								{_renderContentChat(item)}
+							</Flex>
 						</Flex>
 					</Flex>
+					{_renderReact(item)}
 				</Flex>
-				{_renderReact(item)}
 			</Flex>
 		)
 	}
