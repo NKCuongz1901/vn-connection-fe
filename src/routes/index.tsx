@@ -61,7 +61,7 @@ export const CONVERSATION_ROUTES = {
 	inviteAll: 'invite-all-join-conversation',
 	convChatRoom: 'conversation/chat_room',
 	textToSpeech: 'files/text-to-speech',
-	translate: 'vocabulary/quick-translate',
+	translate: 'vocabulary/translate-text',
 	membersAroundMe: 'members-around-me',
 	member: 'members',
 	reactLs: 'conversation/reaction',

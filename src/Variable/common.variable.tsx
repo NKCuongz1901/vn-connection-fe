@@ -1264,6 +1264,7 @@ export const languageOpts = [
 	{ value: 'Indonesian', label: mappingLanguage.Indonesian, code: 'ID' },
 ].map((i) => ({
 	...i,
+	lang: mappingLanguageCode[i.value],
 	label: (
 		<div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
 			<span className={`flag:${i.code}`}></span>

@@ -2,6 +2,7 @@ import { ItemType } from 'antd/es/menu/interface'
 import { useEffect, useRef, useState } from 'react'
 
 import { getListSticket } from '@/apis/postApis'
+import { getUserProfile, updateUserProfile } from '@/apis/userApis'
 
 import { useModal } from '@/context/ModalContext'
 
@@ -46,9 +47,10 @@ export default function useChatRoomChatBox({
 	const [listTextToSpeechLoading, setListTextToSpeechLoading] = useState({})
 
 	const [listTranslate, setListTranslate] = useState({})
-	const [_listTranslateLoading, setListTranslateLoading] = useState({})
+	const [listTranslateLoading, setListTranslateLoading] = useState({})
 
 	const [playAudioId, setPlayAudioId] = useState('')
+	const [language, setLanguage] = useState('en')
 	const handleAddMp3 = async (url) => {
 		const res = await fetch('/api/proxy', {
 			method: 'POST',
@@ -102,18 +104,17 @@ export default function useChatRoomChatBox({
 		}
 	}
 
-	const handleAddTranslate = async (item) => {
+	const handleAddTranslate = async (item, code?: string) => {
 		const { id, content } = item || {}
 
 		setListTranslateLoading((prev) => ({ ...prev, [id]: true }))
 		try {
 			const payload = {
-				word: content,
-				sourceLanguage: 'vi',
-				targetLanguage: 'en',
+				text: content,
+				targetLanguage: code || language || 'en',
 			}
 			const res: any = await translate({ payload })
-			const example = res?.results?.object?.example
+			const example = res?.results?.object?.translated_text
 			setListTranslate((prev) => ({ ...prev, [id]: example }))
 		} catch (error) {
 			openError(error)
@@ -245,11 +246,37 @@ export default function useChatRoomChatBox({
 		await onAddReact(values)
 		setOpenReact(null)
 	}
+
+	const handleChangeLanguage = async ({ item, code }) => {
+		try {
+			await updateUserProfile({ language_for_translate: code })
+			setLanguage(code || 'en')
+			handleAddTranslate(item, code)
+		} catch (error) {
+			openError(error)
+		}
+	}
+
+	const handleGetProfile = async () => {
+		try {
+			const res: any = await getUserProfile({
+				params: {
+					fields: ['$all'],
+				},
+			})
+			setLanguage(res?.results?.object?.language_for_translate)
+		} catch (error) {
+			openError(error)
+		}
+	}
+
 	useEffect(() => {
 		handleGetSticker()
 		handleGetReact()
+		handleGetProfile()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
+
 	useEffect(() => {
 		if (playAudioId) {
 			handlePlayAudio(playAudioId)
@@ -259,6 +286,7 @@ export default function useChatRoomChatBox({
 	}, [playAudioId])
 	return {
 		isAudio,
+		listTranslateLoading,
 
 		_refInput,
 		activeSticker,
@@ -274,7 +302,9 @@ export default function useChatRoomChatBox({
 		listTranslate,
 		reactList,
 		openReact,
+		language,
 
+		setOpenReact,
 		setIsAudio,
 		setReply,
 		setText,
@@ -289,6 +319,6 @@ export default function useChatRoomChatBox({
 		onAddTranslate: handleAddTranslate,
 		onAddReact: handleAddReact,
 		onOpenReact: handleOpenReact,
-		setOpenReact,
+		onChangeLanguage: handleChangeLanguage,
 	}
 }

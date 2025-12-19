@@ -26,11 +26,12 @@ import AudioRecorder from '../AudioRecorder'
 import CAvatar from '../Custom/CAvatar'
 import CImage from '../Custom/CImage'
 import CInputTag from '../Custom/CInputTag'
+import CLoading from '../Custom/CLoading/CLoading'
 import CTextSpecial from '../Custom/CTextSpecial'
 import CUploadMuti from '../Custom/CUploadMuti'
 import VisualizerWithPlay from '../VisualizerWithPlay'
 
-import { specialTypeMessage } from '@/Variable/common.variable'
+import { languageOpts, specialTypeMessage } from '@/Variable/common.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './ChatRoomChatBox.module.scss'
@@ -49,6 +50,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 	const { itemList, onSendMessage, _scrollRef, loading, convId } = props
 	const { onChangeRoute } = useLocalePath()
 	const {
+		listTranslateLoading,
 		isAudio,
 		_refInput,
 		activeSticker,
@@ -63,10 +65,12 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		listTranslate,
 		openReact,
 		reactList,
+		language,
 
 		onStopAudio,
 
 		setReply,
+		setOpenReact,
 		setIsAudio,
 		setText,
 		setActiveSticker,
@@ -78,7 +82,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		onAddTranslate,
 		onAddReact,
 		onOpenReact,
-		setOpenReact,
+		onChangeLanguage,
 	} = useChatRoomChatBox(props)
 
 	const [fileList, setFileList] = useState([])
@@ -176,9 +180,30 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 									{trans}
 									<div>
 										<span>UniVini AI </span>
-										<b style={{ color: '#006B35', fontSize: 12 }}>
-											Change language
-										</b>
+										<Dropdown
+											trigger={['click']}
+											menu={{
+												items: languageOpts.map((i) => ({
+													label: i.label,
+													key: i.lang,
+													onClick: () =>
+														onChangeLanguage({ item, code: i.lang }),
+												})),
+												selectedKeys: [language],
+												className: classes.dropdownChangeLanguage,
+											}}
+											disabled={isTemp || isMemberAction}
+										>
+											<b
+												style={{
+													color: '#006B35',
+													fontSize: 12,
+													cursor: 'pointer',
+												}}
+											>
+												Change language
+											</b>
+										</Dropdown>
 									</div>
 								</Flex>
 							</div>
@@ -232,7 +257,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 											})}
 											onClick={() => !loadingSpToText && onAddSpToText(item)}
 										>
-											<CcIcon />
+											{loadingSpToText ? <CLoading /> : <CcIcon />}
 										</Flex>
 									)}
 									<Dropdown
@@ -387,17 +412,21 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 												})}
 												onClick={() => !loadingSpToText && onAddSpToText(item)}
 											>
-												<CcIcon />
+												{loadingSpToText ? <CLoading /> : <CcIcon />}
 											</Flex>
 										)}
 										{type === 'TEXT' && !isMe && (
 											<Flex
 												className={clsx(classes.moreIcon, {
-													[classes.disabled]: loadingSpToText,
+													[classes.disabled]: listTranslateLoading[id],
 												})}
 												onClick={() => onAddTranslate(item)}
 											>
-												<TranslateIcon />
+												{listTranslateLoading[id] ? (
+													<CLoading />
+												) : (
+													<TranslateIcon />
+												)}
 											</Flex>
 										)}
 										{!isMe && (
@@ -416,7 +445,11 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 													}
 												}}
 											>
-												<VolumeIcon />
+												{listTextToSpeechLoading[id] ? (
+													<CLoading />
+												) : (
+													<VolumeIcon />
+												)}
 											</Flex>
 										)}
 										<Dropdown
