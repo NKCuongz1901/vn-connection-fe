@@ -36,7 +36,7 @@ const genderIcon = {
 }
 
 const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
-	const { onOpenNewRoute } = useLocalePath()
+	const { onChangeRoute } = useLocalePath()
 
 	const {
 		refInput,
@@ -79,7 +79,7 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 						src={avatar}
 						className={classes.userAvatar}
 						onClick={() => {
-							if (id) onOpenNewRoute(`${mainRoutes.profile}/${id}`)
+							if (id) onChangeRoute(`${mainRoutes.profile}/${id}`)
 						}}
 					/>
 					<div className={classes.flagWrapper}>
@@ -136,7 +136,7 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 								<CAvatar
 									src={memberAround[7]?.user?.avatar}
 									className={classes.userAvatar}
-									onClick={() => onOpenNewRoute(`${mainRoutes.profile}/${id}`)}
+									onClick={() => onChangeRoute(`${mainRoutes.profile}/${id}`)}
 								/>
 							</Flex>
 							<Flex className={classes.moreAroundMe}>
