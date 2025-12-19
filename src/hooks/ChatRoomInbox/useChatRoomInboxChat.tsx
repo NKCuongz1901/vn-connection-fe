@@ -19,6 +19,7 @@ import { handleUploadImage, handleUploadVideo } from '@/apis/uploadApis'
 
 import { mappingMessageChat, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
+import { isEmptyObject } from '@/ultis/object.ults'
 import { onPushState } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 import {
@@ -30,7 +31,6 @@ import {
 import { PaginationType } from '@/interface/common/common.interface'
 import { ReactionPtops } from '@/interface/Conversation/Conversation.interface'
 import { paginationCommon } from '@/Variable/common.variable'
-import { isEmptyObject } from '@/ultis/object.ults'
 
 type useHangoutChatProps = {
 	convId: string
@@ -388,7 +388,7 @@ export default function useChatRoomInboxChat({
 	const handleActionSettingConv = ({ key, value: _value }) => {
 		switch (key) {
 			case 'noti':
-				handleGetMembersConv(true)
+				setConvInfo((prev) => ({ ...prev, join: _value }))
 				break
 			case 'back':
 				setOpenSetting(false)

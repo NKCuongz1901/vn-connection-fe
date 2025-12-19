@@ -13,7 +13,7 @@ import {
 import { uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
 import { onPushState } from '@/ultis/route.ults'
-import { getUserInfo, removeStorageCookie } from '@/ultis/storage.ults'
+import { removeStorageCookie } from '@/ultis/storage.ults'
 import { randomString } from '@/ultis/string.ults'
 
 import { paginationCommon } from '@/Variable/common.variable'
@@ -22,14 +22,12 @@ import { mainRoutes } from '@/routes/MainRoutes'
 
 type useChatRoomSettingConvProps = {
 	convInfo: any
-	members: any
 	onAction?: any
 	[key: string]: any
 }
 
 export default function useChatRoomSettingConv({
 	convInfo,
-	members,
 	onAction,
 }: useChatRoomSettingConvProps) {
 	const { toggleLoadingContext } = useLoading()
@@ -45,9 +43,8 @@ export default function useChatRoomSettingConv({
 
 	const handleUpdateConvMem = async () => {
 		setLoading((prev) => ({ ...prev, updateConvMem: true }))
-		const { id } = convInfo || {}
-		const { id: memberId, is_accept_notification } =
-			(members || []).find((item) => item.user_id === getUserInfo()?.id) || {}
+		const { id, join } = convInfo || {}
+		const { id: memberId, is_accept_notification } = join
 		try {
 			const res: any = await updateConvMember({
 				id,
@@ -55,7 +52,7 @@ export default function useChatRoomSettingConv({
 				payload: { is_accept_notification: !is_accept_notification },
 			})
 			if (res) {
-				onAction({ key: 'noti' })
+				onAction({ key: 'noti', value: res?.results?.object })
 			}
 		} catch (error) {
 			openError(error)

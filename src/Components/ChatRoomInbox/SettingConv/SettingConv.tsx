@@ -7,7 +7,6 @@ import { memo } from 'react'
 import useChatRoomSettingConv from '@/hooks/ChatRoomInbox/useChatRoomSettingConv'
 
 import { arrayFrom } from '@/ultis/array.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
@@ -28,7 +27,7 @@ interface SettingConvProps {
 	[key: string]: any
 }
 const SettingConv = (props: SettingConvProps) => {
-	const { convInfo, members, onAction } = props || {}
+	const { convInfo, onAction } = props || {}
 	const {
 		loading,
 		modal,
@@ -43,10 +42,9 @@ const SettingConv = (props: SettingConvProps) => {
 		onConfirmLeave,
 	} = useChatRoomSettingConv({
 		convInfo,
-		members,
 		onAction,
 	})
-	const { avatar, title } = convInfo || {}
+	const { avatar, title, join } = convInfo || {}
 	const _renderItem = ({
 		icon,
 		text,
@@ -69,8 +67,7 @@ const SettingConv = (props: SettingConvProps) => {
 	}
 	const _renderBody1 = () => {
 		const fill = '#7987A4'
-		const { is_accept_notification, user_id } =
-			(members || []).find((item) => item.user_id === getUserInfo()?.id) || {}
+		const { is_accept_notification, user_id } = join
 		return (
 			<Flex className={classes.body} vertical>
 				{/* {_renderItem({
