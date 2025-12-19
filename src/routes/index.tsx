@@ -131,7 +131,7 @@ export const Menus = [
 		child: [],
 	},
 	{
-		title: 'Chat rooms',
+		title: 'Chat room',
 		Icon: Message2Icon,
 		path: mainRoutes.chatRoom,
 		child: [],
