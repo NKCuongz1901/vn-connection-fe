@@ -78,7 +78,9 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 					<CAvatar
 						src={avatar}
 						className={classes.userAvatar}
-						onClick={() => onOpenNewRoute(`${mainRoutes.profile}/${id}`)}
+						onClick={() => {
+							if (id) onOpenNewRoute(`${mainRoutes.profile}/${id}`)
+						}}
 					/>
 					<div className={classes.flagWrapper}>
 						<div
