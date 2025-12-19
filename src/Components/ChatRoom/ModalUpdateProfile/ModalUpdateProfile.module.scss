@@ -1,0 +1,24 @@
+.titleModal {
+	/* Body/Body 18 Semibold */
+	font-size: 18px;
+	font-weight: 600;
+	align-items: center;
+	gap: 12px;
+}
+
+.container {
+	.wrapperModal {
+		gap: 16px;
+		.ruleItem {
+			gap: 4px;
+			.ruleTitle {
+				font-weight: 500;
+			}
+			.ruleLabel {
+				color: #48546b;
+
+				font-size: 12px;
+			}
+		}
+	}
+}

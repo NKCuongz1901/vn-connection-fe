@@ -8,15 +8,17 @@ import { createConversation, getCategoryList } from '@/apis/conversationApis'
 import { getUserProfile } from '@/apis/userApis'
 
 import { delay } from '@/ultis/common.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { useLocalePath, useQuery } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 
-import { mainRoutes } from '@/routes/MainRoutes'
 import { CategoriFavOptProps } from '@/interface/Community/Community.interface'
+import { mainRoutes } from '@/routes/MainRoutes'
 
 export default function useProfile({ id }: { id?: string }) {
 	const { openError } = useModal()
 	const { onChangeRoute } = useLocalePath()
+	const { onGetQuerry } = useQuery()
+	const { redirect } = onGetQuerry()
 	const {
 		onAccept,
 		onAdd,
@@ -136,6 +138,9 @@ export default function useProfile({ id }: { id?: string }) {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id])
+	const handleReDirect = () => {
+		return onChangeRoute(redirect)
+	}
 	const menus: {
 		responMenus: ItemType[]
 		cancelMenus: ItemType[]
@@ -195,5 +200,6 @@ export default function useProfile({ id }: { id?: string }) {
 		onGetUserProfile: handleGetUserProfile,
 		onMenusClick: handleMenusClick,
 		onOpenInbox: handleOpenInbox,
+		onReDirect: handleReDirect,
 	}
 }

@@ -1,14 +1,14 @@
 'use client'
 import { IconChevronLeft } from '@tabler/icons-react'
 import { Dropdown, Flex, Skeleton } from 'antd'
-import dayjs from 'dayjs'
 import clsx from 'clsx'
+import dayjs from 'dayjs'
 import { memo, useCallback } from 'react'
 
 import useProfile from '@/hooks/Profile/useProfile'
 
 import { toJson } from '@/ultis/common.ults'
-import { useLocalePath, useSafeBack } from '@/ultis/route.ults'
+import { useLocalePath, useQuery, useSafeBack } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
@@ -28,25 +28,27 @@ import {
 	stateFriends,
 } from '@/Variable/common.variable'
 
+import CCounter from '@/Components/Custom/CCounter'
 import ArmHeartIcon from '@/svg/ArmHeartIcon'
 import ClockIconDivideTopIcon from '@/svg/ClockIconDivideTopIcon'
 import FavoriteIcon from '@/svg/FavoriteIcon'
 import GenderIcon from '@/svg/GenderIcon'
 import Heart from '@/svg/Heart'
 import HouseIcon from '@/svg/HouseIcon'
+import MarkIcon from '@/svg/MarkIcon'
 import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
 import PinTickIcon from '@/svg/PinTickIcon'
 import ProfileCircleIcon from '@/svg/ProfileCircleIcon'
 import TwoUser from '@/svg/TwoUser'
 import WorldIcon from '@/svg/WorldIcon'
 import { getAge } from '@/ultis/date.ults'
+
 import {
 	mappingCountriesOptions,
 	mappingFlag,
 } from '@/Variable/countryVariable'
+
 import classes from './Profile.module.scss'
-import CCounter from '@/Components/Custom/CCounter'
-import MarkIcon from '@/svg/MarkIcon'
 
 const skeletonItems = [
 	{ id: '2', value: 220 },
@@ -59,6 +61,8 @@ interface ProfileProps {
 	isMinimize?: boolean
 }
 const Profile = ({ id, isMinimize }: ProfileProps) => {
+	const { onGetQuerry } = useQuery()
+	const { redirect } = onGetQuerry()
 	const {
 		loading,
 		loadingButtonFriend,
@@ -71,6 +75,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		onGetUserProfile,
 		onMenusClick,
 		onOpenInbox,
+		onReDirect,
 	} = useProfile({
 		id,
 	})
@@ -486,7 +491,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 					open={openEditProfile}
 					onClose={onCloseEditP}
 					data={userData}
-					onGetUserProfile={onGetUserProfile}
+					onGetUserProfile={redirect ? onReDirect : onGetUserProfile}
 				/>
 			)}
 		</Flex>

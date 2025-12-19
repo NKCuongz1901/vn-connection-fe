@@ -5,8 +5,9 @@ import clsx from 'clsx'
 import { memo } from 'react'
 
 import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { onPushState, useSafeBack } from '@/ultis/route.ults'
+import { onPushState, useLocalePath, useSafeBack } from '@/ultis/route.ults'
 
+import ModalUpdateProfile from '@/Components/ChatRoom/ModalUpdateProfile'
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
 import useChatRoom from '@/hooks/ChatRoom/useChatRoom'
@@ -15,6 +16,7 @@ import TickIcon from '@/svg/TickIcon'
 import DetailChatRoom from './DetailChatRoom'
 
 import { LEFT_FLAG } from '@/Variable/countryVariable'
+import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './ChatRoom.module.scss'
 
@@ -25,7 +27,9 @@ const tabOpts = [
 
 const ChatRoom = () => {
 	const { goBackOrPush } = useSafeBack()
+	const { onChangeRoute } = useLocalePath()
 	const {
+		openModal,
 		loading,
 		isChatRoomDetail,
 		id,
@@ -33,6 +37,7 @@ const ChatRoom = () => {
 		listChatRoom,
 		setTab,
 		onSuccess,
+		setOpenModal,
 	} = useChatRoom({
 		tabOpts,
 	})
@@ -164,6 +169,17 @@ const ChatRoom = () => {
 			>
 				{_renderBack()}
 				{_renderBody()}
+				{openModal && (
+					<ModalUpdateProfile
+						open
+						onClose={() => setOpenModal(false)}
+						onSubmit={() =>
+							onChangeRoute(
+								`${mainRoutes.profile}?redirect=${mainRoutes.chatRoom}`,
+							)
+						}
+					/>
+				)}
 			</Flex>
 		</div>
 	)

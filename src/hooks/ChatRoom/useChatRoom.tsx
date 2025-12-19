@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useModal } from '@/context/ModalContext'
 
 import { getChatRoomList } from '@/apis/conversationApis'
+import { getUserProfile } from '@/apis/userApis'
 
 import { isArray, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
@@ -11,6 +12,7 @@ import { getUserInfo } from '@/ultis/storage.ults'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { ConversationChatRoomProps } from '@/interface/Conversation/Conversation.interface'
+import { UserProps } from '@/interface/User/User.interface'
 import { paginationCommon } from '@/Variable/common.variable'
 
 interface useChatRoomProps {
@@ -33,6 +35,9 @@ export default function useChatRoom(props: useChatRoomProps) {
 	const [listChatRoom, setListChatRoom] = useState<ConversationChatRoomProps[]>(
 		[],
 	)
+
+	const [_profile, setProfile] = useState<UserProps>(null)
+	const [openModal, setOpenModal] = useState(false)
 
 	const isChatRoomDetail = useMemo(
 		() => type === 'language' && !!id,
@@ -125,11 +130,31 @@ export default function useChatRoom(props: useChatRoomProps) {
 		}
 	}
 
+	const handleGetProfile = async () => {
+		try {
+			const res: any = await getUserProfile({
+				params: {
+					fields: ['$all'],
+				},
+			})
+			const { languages_can_speak, avatar } = res?.results?.object || {}
+
+			if (!languages_can_speak || !avatar) {
+				setOpenModal(true)
+			}
+			setProfile(res?.results?.object)
+		} catch (error) {
+			openError(error)
+		}
+	}
+
 	useEffect(() => {
 		handleGetListChatRoom()
+		handleGetProfile()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 	return {
+		openModal,
 		loading,
 		id,
 		isChatRoomDetail,
@@ -137,5 +162,6 @@ export default function useChatRoom(props: useChatRoomProps) {
 		listChatRoom,
 		setTab,
 		onSuccess: handleSuccess,
+		setOpenModal,
 	}
 }
