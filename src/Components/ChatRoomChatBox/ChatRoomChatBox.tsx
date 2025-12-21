@@ -13,6 +13,7 @@ import { useLocalePath } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 
 import CcIcon from '@/svg/CcIcon'
+import DotIcon from '@/svg/DotIcon'
 import HappyIcon from '@/svg/HappyIcon'
 import Heart from '@/svg/Heart'
 import ImageIcon from '@/svg/ImageIcon'
@@ -188,11 +189,16 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 						{_renderParentItem(parent)}
 						<CTextSpecial data={content} mentions={mentions} />
 						{trans && (
-							<div style={{ fontSize: 10 }}>
-								<Flex vertical>
-									{trans}
-									<div>
-										<span>UniVini AI </span>
+							<div className={classes.translateWrapper}>
+								<Flex vertical className={classes.translateContainer}>
+									<div className={classes.translateText}>{trans}</div>
+									<Flex className={classes.translateOpt}>
+										<span className={classes.translateOptTitle}>
+											UniVini AI
+										</span>
+										<div className={classes.dot}>
+											<DotIcon />
+										</div>
 										<Dropdown
 											trigger={['click']}
 											menu={{
@@ -217,7 +223,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 												Change language
 											</b>
 										</Dropdown>
-									</div>
+									</Flex>
 								</Flex>
 							</div>
 						)}
@@ -648,7 +654,6 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 					<CUploadMuti
 						fileList={fileList.map((i) => i.file)}
 						onChange={({ file: _file, fileList: newList }) => {
-							console.log('🌸🌸🌸 TrieuNinhHan ~ :651 ~ newList:', newList)
 							handleImportMedia(newList)
 						}}
 						accept="image/*,video/*"

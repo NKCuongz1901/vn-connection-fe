@@ -106,6 +106,32 @@
 							word-break: break-word;
 							display: flex;
 							flex-direction: column;
+							.translateWrapper {
+								margin-top: 8px;
+								.translateContainer {
+									font-size: 12px;
+									color: #48546b;
+									gap: 4px;
+									.translateText {
+									}
+									.translateOpt {
+										gap: 4px;
+										align-items: center;
+										.translateOptTitle {
+											font-size: 10px;
+										}
+										.dot {
+											display: flex;
+											align-items: center;
+											justify-content: center;
+											min-width: 4px;
+											min-height: 4px;
+											max-width: 4px;
+											max-height: 4px;
+										}
+									}
+								}
+							}
 						}
 						.sticker {
 							position: relative;
@@ -114,7 +140,7 @@
 							flex-wrap: wrap;
 							gap: 2px;
 							border-radius: 16px;
-							overflow: hidden;
+							// overflow: hidden;
 							.moreIconWrapper {
 								align-items: center;
 								justify-content: center;
