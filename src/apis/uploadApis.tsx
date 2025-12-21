@@ -25,9 +25,28 @@ export const uploadProgress = async (
 		throw error
 	}
 }
-export const uploadProgressVideo = async (file) => {
+export const uploadProgressAudio = async (file) => {
 	try {
 		const _file = await buildFileMetadata(file, 'audio')
+		const response = (await axios.post('files/pre-signed-url', _file)) as any
+		const { result_url, upload_url } = response?.results?.object || {}
+		await axiosUpload.put(upload_url, file, {
+			headers: {
+				'Content-Type': file.type,
+				Authorization: undefined,
+			},
+		})
+
+		return result_url
+	} catch (error) {
+		console.error('Upload failed:', error)
+		throw error
+	}
+}
+
+export const uploadProgressVideo = async (file) => {
+	try {
+		const _file = await buildFileMetadata(file, 'video')
 		const response = (await axios.post('files/pre-signed-url', _file)) as any
 		const { result_url, upload_url } = response?.results?.object || {}
 		await axiosUpload.put(upload_url, file, {
@@ -97,6 +116,17 @@ export const handleUploadVideo = async (file, _option = {}) => {
 	// const { isAll } = option || ({} as any)
 	try {
 		const res = (await uploadProgressVideo(file)) as any
+		return res
+	} catch (error) {
+		throw error
+	}
+}
+
+export const handleUploadAudio = async (file, _option = {}) => {
+	if (!file) return ''
+	// const { isAll } = option || ({} as any)
+	try {
+		const res = (await uploadProgressAudio(file)) as any
 		return res
 	} catch (error) {
 		throw error

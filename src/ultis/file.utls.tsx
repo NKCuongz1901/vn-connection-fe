@@ -14,6 +14,35 @@ export const handleParseFileImg = (file) => {
 	}
 	return {}
 }
+export const handleParseFileVideo = async (file) => {
+	try {
+		if (file?.type?.startsWith('video')) {
+			const duration: number = await new Promise((resolve) => {
+				const video = document.createElement('video')
+				video.preload = 'metadata'
+
+				video.onloadedmetadata = () => {
+					URL.revokeObjectURL(video.src)
+					resolve(video.duration)
+				}
+
+				video.onerror = () => resolve(0)
+				video.src = URL.createObjectURL(file)
+			})
+
+			if (duration <= 60) {
+				const videoUrl = URL.createObjectURL(file)
+				return {
+					videoUrl,
+					file,
+				}
+			}
+		}
+	} catch (error) {
+		console.log('error:', error)
+	}
+	return {}
+}
 
 export const handleUploadMedia = async (fileList) => {
 	const _medias = fileList

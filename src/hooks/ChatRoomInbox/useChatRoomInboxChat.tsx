@@ -15,7 +15,11 @@ import {
 	reactMessageById,
 	sendMessage,
 } from '@/apis/conversationApis'
-import { handleUploadImage, handleUploadVideo } from '@/apis/uploadApis'
+import {
+	handleUploadImage,
+	handleUploadAudio,
+	handleUploadVideo,
+} from '@/apis/uploadApis'
 
 import { mappingMessageChat, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
@@ -171,13 +175,15 @@ export default function useChatRoomInboxChat({
 			let medias = []
 			if (_medias?.length > 0) {
 				const uploadPromises = _medias.map((media) =>
-					handleUploadImage(media.file),
+					media?.type === 'IMAGE'
+						? handleUploadImage(media.file)
+						: handleUploadVideo(media.file),
 				)
 				const resList = await Promise.all(uploadPromises)
 				type = 'MEDIAS'
-				medias = (resList || []).map((i) => ({
-					url: i,
-					type: 'IMAGE',
+				medias = (_medias || []).map((i, index) => ({
+					url: resList[index],
+					type: i?.type || 'IMAGE',
 					fileName: null,
 					width: 692,
 					height: 1500,
@@ -187,7 +193,7 @@ export default function useChatRoomInboxChat({
 				}))
 			}
 			if (!!audio) {
-				const resAudio = await handleUploadVideo(audio)
+				const resAudio = await handleUploadAudio(audio)
 				type = 'MEDIAS'
 				medias.push({
 					url: resAudio,

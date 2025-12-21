@@ -8,7 +8,7 @@ import useChatRoomChatBox from '@/hooks/ChatRoomChatBox/useChatRoomChatBox'
 
 import { arrayFrom, isArray } from '@/ultis/array.ults'
 import { parseDayFromIsNewDate } from '@/ultis/date.ults'
-import { handleParseFileImg } from '@/ultis/file.utls'
+import { handleParseFileImg, handleParseFileVideo } from '@/ultis/file.utls'
 import { useLocalePath } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 
@@ -86,16 +86,29 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 	} = useChatRoomChatBox(props)
 
 	const [fileList, setFileList] = useState([])
-	const hangleImportImg = (_values) => {
-		const values: any[] = []
-		;(_values || []).forEach((i) => {
-			const { imageUrl, file } = handleParseFileImg(i?.originFileObj) || {}
-			if (imageUrl) {
-				values.push({ imageUrl, file })
+	const handleImportMedia = async (_values) => {
+		const values = []
+
+		for (const i of _values || []) {
+			const file = i?.originFileObj
+			if (!file) continue
+
+			if (file.type?.startsWith('image')) {
+				const { imageUrl } = handleParseFileImg(file)
+				if (imageUrl) values.push({ type: 'IMAGE', url: imageUrl, file })
+				continue
 			}
-		})
+
+			if (file.type?.startsWith('video')) {
+				const { videoUrl } = await handleParseFileVideo(file)
+				if (videoUrl) values.push({ type: 'VIDEO', url: videoUrl, file })
+				continue
+			}
+		}
+
 		setFileList(values)
 	}
+
 	const _renderParentItem = (parent) => {
 		const { type, content, user } = parent || {}
 		if (!type) return <></>
@@ -239,11 +252,21 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 						))
 						break
 					default:
-						Content = (medias || []).map((media, index) => (
-							<Flex className={classes.media} key={index}>
-								<CImage preview src={media.url} />
-							</Flex>
-						))
+						Content = (medias || []).map((media, index) => {
+							const { type } = media || {}
+							const isImg = type === 'IMAGE'
+							return (
+								<Flex className={classes.media} key={index}>
+									{isImg ? (
+										<CImage preview src={media.url} />
+									) : (
+										<video controls>
+											<source src={media.url} type="video/mp4" />
+										</video>
+									)}
+								</Flex>
+							)
+						})
 				}
 				return (
 					<Flex className={classes.medias} vertical>
@@ -596,27 +619,39 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 			<Flex className={clsx(classes.chatBox)}>
 				<Flex className={classes.chooseImg}>
 					<Flex className={classes.chooseImgContent}>
-						{fileList.map((i) => (
-							<Flex key={i.imageUrl} className={classes.chooseImgItem}>
-								<CImage preview={true} src={i.imageUrl} />
-								<Flex
-									className={classes.chooseImgCancel}
-									onClick={() =>
-										setFileList((prev) =>
-											prev.filter((prev) => prev.imageUrl !== i.imageUrl),
-										)
-									}
-								>
-									<IconCircleXFilled />
+						{fileList.map((i) => {
+							const { url, type } = i || {}
+							const isImg = type === 'IMAGE'
+							return (
+								<Flex key={url} className={classes.chooseImgItem}>
+									{isImg ? (
+										<CImage preview={true} src={url} />
+									) : (
+										<video controls>
+											<source src={url} type="video/mp4" />
+										</video>
+									)}
+									<Flex
+										className={classes.chooseImgCancel}
+										onClick={() =>
+											setFileList((prev) =>
+												prev.filter((prev) => prev.url !== url),
+											)
+										}
+									>
+										<IconCircleXFilled />
+									</Flex>
 								</Flex>
-							</Flex>
-						))}
+							)
+						})}
 					</Flex>
 					<CUploadMuti
 						fileList={fileList.map((i) => i.file)}
 						onChange={({ file: _file, fileList: newList }) => {
-							hangleImportImg(newList)
+							console.log('🌸🌸🌸 TrieuNinhHan ~ :651 ~ newList:', newList)
+							handleImportMedia(newList)
 						}}
+						accept="image/*,video/*"
 					>
 						<ImageIcon />
 					</CUploadMuti>
