@@ -46,7 +46,12 @@ const DetailChatRoom = (props: DetailChatRoomProps) => {
 	return (
 		<div className={classes.wrapper}>
 			{/* <InboxChat convId={id} /> */}
-			<ChatRoomInboxChat key={id} convId={id} onSuccess={onSuccess} />
+			<ChatRoomInboxChat
+				key={id}
+				convId={id}
+				onSuccess={onSuccess}
+				onChangeModal={setModal}
+			/>
 			{_renderModal()}
 		</div>
 	)

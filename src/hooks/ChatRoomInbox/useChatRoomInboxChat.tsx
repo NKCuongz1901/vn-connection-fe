@@ -16,8 +16,8 @@ import {
 	sendMessage,
 } from '@/apis/conversationApis'
 import {
-	handleUploadImage,
 	handleUploadAudio,
+	handleUploadImage,
 	handleUploadVideo,
 } from '@/apis/uploadApis'
 
@@ -39,11 +39,13 @@ import { paginationCommon } from '@/Variable/common.variable'
 type useHangoutChatProps = {
 	convId: string
 	onSuccess?: any
+	onChangeModal?: any
 	[key: string]: any
 }
 export default function useChatRoomInboxChat({
 	convId,
 	onSuccess = () => null,
+	onChangeModal = () => null,
 }: useHangoutChatProps) {
 	const { openError } = useModal()
 	const { socket } = useSocket()
@@ -283,6 +285,11 @@ export default function useChatRoomInboxChat({
 				id: convId,
 				fields: ['$all'],
 			})
+			const { join } = res?.results?.object || {}
+			const { amount_of_remind } = join || {}
+			if (!amount_of_remind || amount_of_remind < 2) {
+				onChangeModal({ type: 'noti' })
+			}
 			setConvInfo(res?.results?.object)
 		} catch (error) {
 			openError(error)

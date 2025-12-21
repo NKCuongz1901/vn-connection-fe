@@ -4,38 +4,9 @@ import { memo } from 'react'
 
 import CButton from '@/Components/Custom/CButton'
 import CModal from '@/Components/Custom/CModal/CModal'
-import WarningIcon from '@/svg/WarningIcon'
 
-import classes from './ModalUpdateProfile.module.scss'
 import ProfileIcon from '@/svg/ProfileIcon'
-
-const rules = [
-	{
-		title: 'No External Chat Links',
-		label:
-			'Do not share links that lead to other platforms or groups with similar features outside UniVini.',
-	},
-	{
-		title: 'No Nudity or Harassment',
-		label:
-			'Absolutely no nudity, sexual content, hate speech, bullying, or harassment of any kind.',
-	},
-	{
-		title: 'No Faud or Scam',
-		label:
-			'Do not promote fake products, services, job offers, or attemp to scam or deceive others.',
-	},
-	{
-		title: 'No Spam or Repetitive Messages',
-		label:
-			'Don’t flood the chat with repeated messages, emojis, or irrelevant promotions.',
-	},
-	{
-		title: 'Refrain from Politics and Religion Debates',
-		label:
-			'These topics often lead to arguments or discomfort. Please keep the chat friendly and inclusive',
-	},
-]
+import classes from './ModalUpdateProfile.module.scss'
 
 interface ModalUpdateProfileProps {
 	open: boolean

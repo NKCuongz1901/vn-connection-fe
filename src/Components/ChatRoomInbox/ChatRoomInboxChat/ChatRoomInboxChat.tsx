@@ -26,6 +26,7 @@ interface ChatRoomInboxChatProps {
 	convId: string
 	isNoHeader?: boolean
 	onSuccess?: any
+	onChangeModal?: any
 }
 const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 	const { convId, isNoHeader } = props
