@@ -166,8 +166,6 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 			content,
 			mentions,
 			medias,
-			isLast,
-			created_at,
 			parent,
 			user,
 			user_id,
@@ -227,11 +225,11 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 								</Flex>
 							</div>
 						)}
-						{isLast && (
+						{/* {isLast && (
 							<div className={classes.time}>
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
 							</div>
-						)}
+						)} */}
 						{_renderReactView(reactions)}
 					</div>
 				)
@@ -239,11 +237,11 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 				return (
 					<Flex vertical className={classes.sticker}>
 						<CImage src={content} />
-						{isLast && (
+						{/* {isLast && (
 							<div className={classes.time}>
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
 							</div>
-						)}
+						)} */}
 						{_renderReactView(reactions)}
 					</Flex>
 				)
@@ -312,11 +310,11 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 							</Flex>
 						</Flex>
 						{!!spToText && <Flex className={classes.spToText}>{spToText}</Flex>}
-						{isLast && (
+						{/* {isLast && (
 							<div className={classes.time}>
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
 							</div>
-						)}
+						)} */}
 					</Flex>
 				)
 			}
@@ -425,8 +423,15 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 							</Flex>
 						)}
 						<Flex className={classes.contentInfo} vertical>
-							{isFirst && !isNot && (
-								<Flex className={classes.name}>{user?.name}</Flex>
+							{isFirst && (
+								<Flex className={classes.infoNameTime}>
+									{!isNot && <Flex className={classes.name}>{user?.name}</Flex>}
+									{!isMemberAction && (
+										<div className={classes.time}>
+											{created_at ? dayjs(created_at).format('HH:mm') : ''}
+										</div>
+									)}
+								</Flex>
 							)}
 							<Flex
 								className={clsx(classes.content, {

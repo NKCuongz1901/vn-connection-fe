@@ -47,11 +47,16 @@
 					max-width: 100%;
 					gap: 4px;
 					position: relative;
-					.name {
-						// color: #006b35;
-
+					.infoNameTime {
 						font-size: 12px;
-						font-weight: 600;
+						gap: 4px;
+						.name {
+							font-weight: 600;
+						}
+						.time {
+							color: #48546b;
+							padding: 0;
+						}
 					}
 					.content {
 						max-width: 100%;
@@ -214,13 +219,7 @@
 								flex-direction: column;
 							}
 						}
-						.time {
-							margin-top: 4px;
-							font-size: 10px;
-							font-weight: 400;
-							color: #48546b;
-							padding: 0;
-						}
+
 						.memberAccept {
 							color: #135a19;
 						}
@@ -320,6 +319,15 @@
 						.time {
 							display: flex;
 							justify-content: flex-end;
+						}
+					}
+					.infoNameTime {
+						font-size: 12px;
+						gap: 4px;
+						justify-content: flex-end;
+						.time {
+							color: #48546b;
+							padding: 0;
 						}
 					}
 				}
