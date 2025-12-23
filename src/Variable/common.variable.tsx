@@ -1330,8 +1330,8 @@ export const specialTypeMessage = [
 	'PIN',
 	'UNPIN',
 	'MEMBER_JOIN',
-
 	'POST',
+	'OPEN_TALKROOM',
 ]
 
 export const mappingTypeMessage = {
