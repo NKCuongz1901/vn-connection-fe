@@ -66,6 +66,7 @@ export const CONVERSATION_ROUTES = {
 	member: 'members',
 	reactLs: 'conversation/reaction',
 	messReaction: 'message/reaction',
+	language: 'language',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',

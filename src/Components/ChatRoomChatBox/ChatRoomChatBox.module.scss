@@ -594,6 +594,15 @@
 .dropdownChangeLanguage {
 	height: 200px;
 	overflow: auto;
+	.dropdownWrapper {
+		gap: 4px;
+		align-items: center;
+
+		img {
+			height: 20px;
+			width: 30px;
+		}
+	}
 }
 @media (min-width: 0px) and (max-width: 769px) {
 	.wrapper {

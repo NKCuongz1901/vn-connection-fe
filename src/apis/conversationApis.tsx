@@ -341,3 +341,11 @@ export const reactMessageById = async ({
 
 	return await axios.post(url, payload)
 }
+
+export const getLanguageList = async (params) => {
+	const url = CONVERSATION_ROUTES.language
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}

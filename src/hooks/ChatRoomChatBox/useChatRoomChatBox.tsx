@@ -6,13 +6,21 @@ import { getUserProfile, updateUserProfile } from '@/apis/userApis'
 
 import { useModal } from '@/context/ModalContext'
 
-import { getReact, textToSpeech, translate } from '@/apis/conversationApis'
+import {
+	getLanguageList,
+	getReact,
+	textToSpeech,
+	translate,
+} from '@/apis/conversationApis'
 import { handleUploadFile } from '@/apis/uploadApis'
 
 import { playAudio, stopAudio } from '@/ultis/file.utls'
 import { copyToClipboard } from '@/ultis/string.ults'
 
-import { ReactionPtops } from '@/interface/Conversation/Conversation.interface'
+import {
+	LanguageProps,
+	ReactionPtops,
+} from '@/interface/Conversation/Conversation.interface'
 
 type useHangoutChatProps = {
 	type?: string
@@ -31,6 +39,7 @@ export default function useChatRoomChatBox({
 	const prevAudioId = useRef('')
 
 	const [stickerList, setStickerList] = useState([]) as any[]
+	const [languages, setLanguages] = useState<LanguageProps[]>([])
 	const [reactList, setReactList] = useState<ReactionPtops[]>([])
 	const [activeSticker, setActiveSticker] = useState(0)
 	const [showSticker, setShowSticker] = useState(false)
@@ -140,6 +149,16 @@ export default function useChatRoomChatBox({
 				fields: ['$all'],
 			})
 			setStickerList(res?.results?.objects?.rows || [])
+		} catch (error) {
+			openError(error)
+		}
+	}
+	const handleGetLanguage = async () => {
+		try {
+			const res: any = await getLanguageList({
+				fields: ['$all'],
+			})
+			setLanguages(res?.results?.objects?.rows || [])
 		} catch (error) {
 			openError(error)
 		}
@@ -274,6 +293,7 @@ export default function useChatRoomChatBox({
 		handleGetSticker()
 		handleGetReact()
 		handleGetProfile()
+		handleGetLanguage()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -303,6 +323,7 @@ export default function useChatRoomChatBox({
 		reactList,
 		openReact,
 		language,
+		languages,
 
 		setOpenReact,
 		setIsAudio,

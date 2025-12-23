@@ -58,3 +58,16 @@ export interface ReactionPtops {
 	updated_at: string
 	deleted_at: any
 }
+
+export interface LanguageProps {
+	id: string
+	name: string
+	code: string
+	flag: string
+	native_name: string | null
+	native_code: string | null
+	order: number
+	created_at: string
+	updated_at: string
+	deleted_at: string | null
+}
