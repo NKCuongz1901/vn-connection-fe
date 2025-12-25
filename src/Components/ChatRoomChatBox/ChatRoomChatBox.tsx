@@ -32,7 +32,7 @@ import CTextSpecial from '../Custom/CTextSpecial'
 import CUploadMuti from '../Custom/CUploadMuti'
 import VisualizerWithPlay from '../VisualizerWithPlay'
 
-import { specialTypeMessage } from '@/Variable/common.variable'
+import { languageOpts, specialTypeMessage } from '@/Variable/common.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './ChatRoomChatBox.module.scss'
@@ -67,7 +67,6 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		openReact,
 		reactList,
 		language,
-		languages,
 
 		onStopAudio,
 
@@ -201,18 +200,11 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 										<Dropdown
 											trigger={['click']}
 											menu={{
-												items: languages.map((i) => ({
-													label: (
-														<Flex className={classes.dropdownWrapper}>
-															<div>
-																<CImage src={i.flag} />
-															</div>
-															<span>{i.name}</span>
-														</Flex>
-													),
-													key: i.code,
+												items: languageOpts.map((i) => ({
+													label: i.label,
+													key: i.lang,
 													onClick: () =>
-														onChangeLanguage({ item, code: i.code }),
+														onChangeLanguage({ item, code: i.lang }),
 												})),
 												selectedKeys: [language],
 												className: classes.dropdownChangeLanguage,
