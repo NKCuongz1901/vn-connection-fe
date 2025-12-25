@@ -387,6 +387,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 
 		const isMe = getUserInfo('id') === user_id
 		const isMemberAction = specialTypeMessage.includes(type)
+		if (isMemberAction) return
 		const isNot = isMe || isMemberAction
 		const typeMedia = item?.medias?.[0]?.type
 		const loadingSpToText = !!listSpToTextLoading[id]
