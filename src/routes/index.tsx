@@ -19,6 +19,7 @@ export const AUTH_ROUTES = {
 	verifyOTP: '/auth/otp/verify',
 	forgetPassword: '/auth/forget_password',
 	registerByPhone: '/auth/register_by_phone',
+	logout: '/auth/logout',
 }
 export const USER_ROUTES = {
 	profile: '/user/profile',

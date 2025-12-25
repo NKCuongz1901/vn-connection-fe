@@ -42,6 +42,10 @@ export const forgetPasswordByPhone = async (payload: {
 	return await axios.post(AUTH_ROUTES.forgetPassword, payload)
 }
 
+export const logout = async (payload: { [key: string]: any }) => {
+	return await axios.post(AUTH_ROUTES.logout, payload)
+}
+
 export const registerByPhone = async (payload: {
 	uid: string
 	password: string

@@ -13,7 +13,12 @@ import { getNotificationCount } from '@/apis/notificationApis'
 import { updateUserProfile } from '@/apis/userApis'
 
 import { useLocalePath } from '@/ultis/route.ults'
-import { handleRemoveAllCookie, isLogin } from '@/ultis/storage.ults'
+import {
+	getStorageCookie,
+	handleRemoveAllCookie,
+	handleStorageCookie,
+	isLogin,
+} from '@/ultis/storage.ults'
 
 import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
@@ -22,6 +27,7 @@ import LogoSvg from '@/svg/LogoSvg'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 
+import { logout } from '@/apis/authApis'
 import './HeaderMainLayout.scss'
 
 interface HeaderMainLayoutProps {
@@ -131,6 +137,11 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 					const token = await initFCM()
 					console.log('🏖️ FCM Token:', token)
 					if (token) {
+						handleStorageCookie({
+							key: 'last_token_web',
+							data: token,
+							expireInDays: 300,
+						})
 						// 🔥 Lưu token về server nếu cần
 						handleUpdateProfile(token)
 					}
@@ -195,6 +206,26 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
+	const handleLogout = async () => {
+		try {
+			// Tắt console.log() sau khi debug
+			const access_token = getStorageCookie('token')
+			const refresh_token = getStorageCookie('refresh_token')
+			const last_token_web = getStorageCookie('last_token_web')
+			const body = {
+				access_token,
+				refresh_token,
+				last_token_web,
+			}
+			await logout(body)
+		} catch (error) {
+			console.error('🔥 Lỗi trong quá trình logout', error)
+		} finally {
+			handleRemoveAllCookie()
+			onChangeRoute(mainRoutes.login)
+		}
+	}
+
 	const handleMenusClick = useCallback((type: string) => {
 		switch (type) {
 			case 'profile':
@@ -203,8 +234,7 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 			case 'fns':
 				break
 			case 'signout':
-				handleRemoveAllCookie()
-				onChangeRoute(mainRoutes.login)
+				handleLogout()
 				break
 			default:
 				break
