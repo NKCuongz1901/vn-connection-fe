@@ -298,6 +298,9 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							isRequired
 							label="I am from"
 							placeholder="Enter name of countries"
+							filterOption={(input, option) =>
+								option?.name?.toLowerCase().includes(input.toLowerCase())
+							}
 							value={i_am_from || undefined}
 							options={countryCodes}
 							onChange={(e) => onChangeData('i_am_from', e)}
