@@ -126,19 +126,7 @@ const MainLayout = (props: MainLayoutProps) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [localePathname, openMenu])
 
-	return (
-		<div className="mainLayout">
-			<Flex vertical className="wrapperMainLayout">
-				<HeaderMainLayout onToggleMenus={toggleMenus} />
-				<Flex className="bodyMainLayout">
-					{_renderSideBar()}
-					<Flex vertical className="contentMainLayout">
-						{children}
-					</Flex>
-				</Flex>
-			</Flex>
-		</div>
-	)
+	return <div className="mainLayout">{content}</div>
 }
 
 export default memo(MainLayout)
