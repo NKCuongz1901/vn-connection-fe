@@ -215,6 +215,9 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					/>
 				</Flex>
 				<Flex className={classes.bottomItem}>
+					<Flex className={classes.title}>
+						Languages I can speak <span className="error">*</span>
+					</Flex>
 					<Flex>
 						<CSelectMuti
 							isRequired
