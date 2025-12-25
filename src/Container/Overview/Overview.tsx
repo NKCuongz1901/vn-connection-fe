@@ -24,6 +24,7 @@ import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
 import ModelChooseHangout from '@/Components/Hangout/ModelChooseHangout'
 import EventIcon from '@/svg/Event'
 import PencilIcon from '@/svg/Hangout/PencilIcon'
+import HappyIcon from '@/svg/HappyIcon'
 import MarkIcon from '@/svg/MarkIcon'
 import Message2Icon from '@/svg/Message2Icon'
 import NotFound from '@/svg/NotFound'
@@ -31,14 +32,14 @@ import Party from '@/svg/Party'
 import People from '@/svg/People'
 import PeopleSmileIcon from '@/svg/PeopleSmileIcon'
 import SearchIcon from '@/svg/SearchIcon'
+import UpcomingEvent from '@/svg/UpcomingEvent'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import { mappingEventTitle } from '@/Variable/event.variable'
 import { radiusOpts, typeEvent } from '@/Variable/select.variable'
 
-import classes from './Overview.module.scss'
-import HappyIcon from '@/svg/HappyIcon'
 import { LEFT_FLAG } from '@/Variable/countryVariable'
+import classes from './Overview.module.scss'
 
 const Overview = () => {
 	const { loadingContext } = useLoading()
@@ -444,7 +445,7 @@ const Overview = () => {
 							hiddenAdd
 							label={mappingEventTitle[mainRoutes.upcomingEvent]}
 							number={total.event}
-							icon={<EventIcon />}
+							icon={<UpcomingEvent />}
 						/>
 					</Flex>
 					{_renderFilter()}
