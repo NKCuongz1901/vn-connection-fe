@@ -139,15 +139,15 @@ export const Menus = [
 		child: [],
 	},
 	{
-		title: 'My Events',
-		Icon: Event,
-		path: mainRoutes.event,
-		child: [],
-	},
-	{
 		title: 'Explore By Interest',
 		Icon: People,
 		path: mainRoutes.exploreInterest,
+		child: [],
+	},
+	{
+		title: 'My Events',
+		Icon: Event,
+		path: mainRoutes.event,
 		child: [],
 	},
 	{
