@@ -58,9 +58,7 @@ export default function useModalViewMember({ id }: useModalViewMemberProps) {
 					long,
 				})
 			}
-			const res: any = keyword
-				? await getMember(params)
-				: await getMemberAroundMe(params)
+			const res: any = await getMemberAroundMe(params)
 			const { rows, count } = res?.results?.objects || {}
 			await delay(500)
 			setMemberAround(rows)
