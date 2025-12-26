@@ -103,7 +103,7 @@ const ChatRoom = () => {
 			>
 				{listChatRoom.map((room) => {
 					const {
-						id,
+						id: _id,
 						title,
 						amount_of_user,
 						amount_of_user_online,
@@ -112,10 +112,12 @@ const ChatRoom = () => {
 					} = room || {}
 					return (
 						<Flex
-							key={id}
+							key={_id}
 							vertical
-							className={classes.chatRoomWrapper}
-							onClick={() => onPushState({ type: 'language', id })}
+							className={clsx(classes.chatRoomWrapper, {
+								[classes.chatRoomWrapperActive]: id === _id,
+							})}
+							onClick={() => onPushState({ type: 'language', id: _id })}
 						>
 							<CAvatar
 								src={avatar}

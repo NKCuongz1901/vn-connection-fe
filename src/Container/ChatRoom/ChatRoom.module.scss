@@ -123,8 +123,12 @@
 							flex-direction: column;
 							justify-content: center;
 							align-items: center;
+							border: 1px solid #fff;
 						}
 					}
+				}
+				.chatRoomWrapperActive {
+					background: #e7f5e9;
 				}
 			}
 			.inboxDetail {
