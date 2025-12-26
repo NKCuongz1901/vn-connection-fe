@@ -132,7 +132,7 @@ const ChatRoom = () => {
 							</Flex>
 							<Flex className={classes.totalOnl}>
 								<div className={classes.online} />
-								<div>{amount_of_user_online} users online</div>
+								<div>{amount_of_user_online} members online</div>
 							</Flex>
 						</Flex>
 					)
