@@ -215,7 +215,7 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 			const body = {
 				access_token,
 				refresh_token,
-				last_token_web,
+				fcm_token: last_token_web,
 			}
 			await logout(body)
 		} catch (error) {
