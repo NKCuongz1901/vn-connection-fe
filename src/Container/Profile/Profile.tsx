@@ -203,7 +203,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 								<div>
 									<MarkIcon fill="#7987A4" />
 								</div>
-								{address || ''}
+								{(address || '').split(',').at(-1)}
 							</Flex>
 						</Flex>
 					</Flex>
