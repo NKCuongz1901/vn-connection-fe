@@ -146,11 +146,12 @@ const Overview = () => {
 						<>
 							<Flex vertical gap="4px">
 								<Flex className={classes.hangoutPeople}>
-									{hangoutPeople.map((people) => (
-										<div key={people.id}>
-											<CAvatar src={people.avatar} />
-										</div>
-									))}
+									{!!is_open_hangout &&
+										hangoutPeople.map((people) => (
+											<div key={people.id}>
+												<CAvatar src={people.avatar} />
+											</div>
+										))}
 								</Flex>
 								<Flex className={classes.switchStatus}>
 									<span>
