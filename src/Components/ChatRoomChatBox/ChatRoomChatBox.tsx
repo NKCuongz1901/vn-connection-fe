@@ -679,7 +679,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 					disabled={fileList?.length > 0}
 					onChange={(e) => setText(e.target.value)}
 					onSendMessage={(e) => {
-						if (e.key === 'Enter') {
+						if (e.key === 'Enter' && !e.shiftKey) {
 							e.preventDefault()
 							if (!!text.trim()) {
 								setText('')
