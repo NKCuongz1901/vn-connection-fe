@@ -272,9 +272,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>
-						Message for you <span className="error"> *</span>
-					</div>
+					<div className={classes.title}>Message for you</div>
 					{content.map((item) => {
 						const { id, label, value, Icon } = item || {}
 						return (
@@ -298,9 +296,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>
-						About me <span className="error"> *</span>
-					</div>
+					<div className={classes.title}>About me</div>
 					<div>{about_me}</div>
 				</Flex>
 			</Flex>
@@ -313,9 +309,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>
-						Languages <span className="error"> *</span>
-					</div>
+					<div className={classes.title}>Languages</div>
 					<Flex vertical gap={12}>
 						<Flex className={classes.languageName}>
 							<div>{languages_can_speak}</div>
@@ -382,9 +376,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>
-						Summary <span className="error"> *</span>
-					</div>
+					<div className={classes.title}>Summary</div>
 					{content.map((item) => {
 						const { id, label, value, Icon } = item || {}
 						return (
@@ -437,9 +429,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>
-						Specialties <span className="error"> *</span>
-					</div>
+					<div className={classes.title}>Specialties</div>
 					{content.map((item) => {
 						const { id, label, value, Icon, isCount, count } = item || {}
 						return (
