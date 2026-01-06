@@ -187,13 +187,13 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 				birthday: 'Please select a valid date of member since',
 				gender: 'Please choose your gender',
 				address: 'Please enter a full address',
-				mode: 'Please choose your state',
-				who_i_am: 'Please enter your role',
-				looking_for: 'Please specify what you are looking for',
-				i_can_offer: 'Please specify what you can offer',
+				// mode: 'Please choose your state',
+				// who_i_am: 'Please enter your role',
+				// looking_for: 'Please specify what you are looking for',
+				// i_can_offer: 'Please specify what you can offer',
 				category_list: 'Please provide your areas of interest',
-				country_visited: 'Please enter the countries visited',
-				country_lived: 'Please enter the countries lived',
+				// country_visited: 'Please enter the countries visited',
+				// country_lived: 'Please enter the countries lived',
 			}).filter(([key]) => {
 				switch (key) {
 					case 'country_visited':
