@@ -146,7 +146,7 @@ export default function useOverview() {
 				type: mainRoutes.upcomingEvent,
 				radius,
 				...(categories && { categories: [categories] }),
-				title,
+				...(title && { title }),
 				...dates,
 			})
 			const { code, results } = res || {}
