@@ -20,8 +20,10 @@ interface openSuccessProps {
 interface openConfirmProps {
 	message: string
 	titleLabel?: string
-	onAccept?: any
+	confirmLabel?: string
+	cancelLabel?: string
 	ctype?: string
+	onAccept?: any
 	[key: string]: any
 }
 const ModalContext = createContext({

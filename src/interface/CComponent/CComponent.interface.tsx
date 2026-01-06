@@ -21,6 +21,8 @@ export interface CInputProps extends CInputOthersProps, InputProps {}
 export interface CTextAreaProps extends CInputOthersProps, TextAreaProps {}
 interface CModalOthersProps {
 	titleLabel?: string
+	confirmLabel?: string
+	cancelLabel?: string
 	[key: string]: any
 }
 
