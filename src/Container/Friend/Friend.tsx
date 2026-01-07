@@ -161,8 +161,25 @@ const Friend = () => {
 				return
 			}
 			switch (tab) {
+				case optionFriends[0].value:
+					{
+						switch (type) {
+							case 'unfriend':
+								setTotal((prev) => ({ ...prev, [tab]: prev[tab] - 1 }))
+								contents = contents.filter((item: any) => item?.id !== idItem)
+								if (!isArray(contents, paginationCommon.limit)) {
+									_paginationRefs.current[tab].page = 1
+									handleLoadMore()
+								}
+								break
+							default:
+								break
+						}
+					}
+					break
 				case optionFriends[1].value:
 					contents = contents.filter((item: any) => item?.id !== idItem)
+					setTotal((prev) => ({ ...prev, [tab]: prev[tab] - 1 }))
 					if (!isArray(contents, paginationCommon.limit)) {
 						_paginationRefs.current[tab].page = 1
 						handleLoadMore()
@@ -179,6 +196,7 @@ const Friend = () => {
 								}
 								break
 							case 'delete':
+								setTotal((prev) => ({ ...prev, [tab]: prev[tab] - 1 }))
 								contents[idx] = {
 									...contents[idx],
 									deleted: true,

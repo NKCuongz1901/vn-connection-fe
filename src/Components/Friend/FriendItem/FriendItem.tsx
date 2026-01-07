@@ -136,13 +136,13 @@ const FriendItem = (_props: FriendItemProps) => {
 				<Flex>
 					<UserMoreAction
 						id={id}
-						isFriend={type === optionFriends[0].value ? dataShow : null}
+						isFriend={type === optionFriends[0].value ? item : null}
+						onCallback={(data) => onCallback({ ...data, tab: type })}
 					/>
 				</Flex>
 			</Flex>
 		)
 	}, [
-		dataShow,
 		id,
 		item,
 		loading,
