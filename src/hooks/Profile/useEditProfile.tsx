@@ -55,7 +55,7 @@ const handleParseToData = (data, categoryNetworkOpts) => {
 		mode: modOpts.find((i) => i.value === mode),
 		i_am_interested_in,
 		languages_can_speak: languages_can_speak_array,
-		country_visited: (country_visited || '').split(', '),
+		country_visited: country_visited ? (country_visited || '').split(', ') : [],
 		who_i_am,
 		looking_for,
 		i_can_offer,
@@ -182,7 +182,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 		const { languages_can_speak } = data || {}
 		const _errors: any = Object.fromEntries(
 			Object.entries({
-				about_me: 'Please briefly describe yourself',
+				// about_me: 'Please briefly describe yourself',
 				name: 'Please enter your name',
 				birthday: 'Please select a valid date of member since',
 				gender: 'Please choose your gender',
