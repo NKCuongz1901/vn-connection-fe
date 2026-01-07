@@ -149,7 +149,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 				Add friend
 			</CButton>
 		)
-	}, [userData, menus, loadingButtonFriend, onMenusClick])
+	}, [userData, menus, loadingButtonFriend, isMinimize, onMenusClick])
 
 	const _renderTotalInfo = useCallback(() => {
 		const { avatar, cover, name, address, id, is_friend, i_am_from, mode } =
