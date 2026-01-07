@@ -59,6 +59,8 @@ export default function useOverview() {
 		latitude: null,
 		longitude: null,
 	})
+	const [defaultTitleHangout, setDefaultTitleHangout] =
+		useState('I want to hang out')
 	const [hangoutPeople, setHangoutPeople] = useState<any[]>([])
 	const [totalHangout, setTotalHangout] = useState(0)
 
@@ -268,7 +270,9 @@ export default function useOverview() {
 	}
 	const handleUpdateUserInfo = async (otherData) => {
 		toggleLoadingContext(true)
+
 		try {
+			setDefaultTitleHangout('')
 			const payload = {
 				...userData,
 				...otherData,
@@ -468,6 +472,8 @@ export default function useOverview() {
 		filters,
 		listNetwork,
 		listChatRoom,
+		defaultTitleHangout,
+
 		OnChangeTitleHangout: handleOnChangeTitleHangout,
 		onUpdateUserInfo: handleUpdateUserInfo,
 		onCRUDSuccess: handleCRUDSuccess,

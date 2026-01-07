@@ -53,6 +53,11 @@ const Friend = () => {
 		[optionFriends[1].value]: false,
 		[optionFriends[2].value]: false,
 	})
+	const [total, setTotal] = useState({
+		[optionFriends[0].value]: 0,
+		[optionFriends[1].value]: 0,
+		[optionFriends[2].value]: 0,
+	})
 	const handleParseParams = useCallback(
 		({ type, searchText }: { type: string; searchText: string }) => {
 			const { page, limit } = _paginationRefs.current[type] || {}
@@ -117,6 +122,29 @@ const Friend = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[toJson(friendList)],
 	)
+
+	const getAllTotal = useCallback(async () => {
+		try {
+			const params = {
+				page: 1,
+				limit: 1,
+			}
+			const res: any[] = await Promise.all(
+				optionFriends.map(({ value }) =>
+					getFriends({ params: { ...params, type: value } }),
+				),
+			)
+
+			setTotal({
+				[optionFriends[0].value]: res[0]?.pagination?.total,
+				[optionFriends[1].value]: res[1]?.pagination?.total,
+				[optionFriends[2].value]: res[2]?.pagination?.total,
+			})
+		} catch (error) {
+			openError(error)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 	const handleLoadMore = useCallback(async () => {
 		const isLoadMore =
@@ -184,6 +212,11 @@ const Friend = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[activeTab, handleLoadMore, toJson(loading)],
 	)
+
+	useEffect(() => {
+		getAllTotal()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 	useEffect(() => {
 		_refFirst.current = false
 		_paginationRefs.current[activeTab].page = 1
@@ -219,6 +252,7 @@ const Friend = () => {
 				<Flex className={classes.leftMiddle}>
 					{optionFriends.map((item) => {
 						const { value, label } = item
+						const count = total[value]
 						return (
 							<Flex
 								key={value}
@@ -227,7 +261,7 @@ const Friend = () => {
 								})}
 								onClick={() => setActiveTab(value)}
 							>
-								{label}
+								{label} ({count})
 							</Flex>
 						)
 					})}

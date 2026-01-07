@@ -203,7 +203,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 								<div>
 									<MarkIcon fill="#7987A4" />
 								</div>
-								{(address || '').split(',').at(-1)}
+								{(address || '').split(',').slice(-2).join(',')}
 							</Flex>
 						</Flex>
 					</Flex>
@@ -346,7 +346,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 	}, [toJson(userData)])
 
 	const _renderSumary = useCallback(() => {
-		const { amount_of_friend, gender, birthday } = userData || {}
+		const { amount_of_friend, gender, birthday, created_at } = userData || {}
 		const content = [
 			{
 				label: 'Friends',
@@ -368,7 +368,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 			},
 			{
 				label: 'Member since',
-				value: birthday ? dayjs(birthday).format(formatDate.dmy) : '',
+				value: created_at ? dayjs(created_at).format(formatDate.dmy) : '',
 				id: 4,
 				Icon: ClockIconDivideTopIcon,
 			},

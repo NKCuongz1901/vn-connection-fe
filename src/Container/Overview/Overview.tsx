@@ -57,6 +57,7 @@ const Overview = () => {
 		filters,
 		listNetwork,
 		listChatRoom,
+		defaultTitleHangout,
 
 		setModal,
 		OnChangeTitleHangout,
@@ -171,7 +172,11 @@ const Overview = () => {
 								className={classes.titleHangout}
 								onClick={() => setModal({ type: 'choose', data: userData })}
 							>
-								<span>{title_open_hangout || 'I want to hang out'}</span>
+								<span>
+									{defaultTitleHangout ||
+										title_open_hangout ||
+										'I want to hang out'}
+								</span>
 								<Flex>
 									<PencilIcon />
 								</Flex>
@@ -216,6 +221,20 @@ const Overview = () => {
 								className={classes.contentSkeleton}
 							/>
 						))}
+					{!loadingMyEvent && !isArray(listMyEvent, 1) && (
+						<Flex className={classes.notData} vertical>
+							<EventIcon fill="#1e9037" />
+							<span className={classes.labelNoData}>
+								You haven't joined any events yet !
+							</span>
+							<CButton
+								ctype="oranger"
+								onClick={() => onChangeRoute(`${mainRoutes.search}`)}
+							>
+								Explore now
+							</CButton>
+						</Flex>
+					)}
 				</Flex>
 			</Flex>
 		)

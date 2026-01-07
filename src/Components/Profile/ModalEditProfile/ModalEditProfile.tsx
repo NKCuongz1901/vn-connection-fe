@@ -223,6 +223,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					<Flex>
 						<CSelectMuti
 							isRequired
+							isSimple
 							error={errors.languages_can_speak}
 							value={languages_can_speak}
 							label="Native languages"
@@ -322,6 +323,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					</div>
 					<Flex>
 						<CSelectMuti
+							isSimple
 							error={errors.country_lived}
 							value={country_lived}
 							label="Countries I've lived in"
@@ -332,6 +334,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					</Flex>
 					<Flex>
 						<CSelectMuti
+							isSimple
 							error={errors.country_visited}
 							value={country_visited}
 							label="Countries I've visited"

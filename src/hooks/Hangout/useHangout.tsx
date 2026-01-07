@@ -39,6 +39,9 @@ export default function useHangout() {
 	})
 	const [myWaitting, setMyWaitting] = useState([]) as any[]
 	const [postId, setPostId] = useState('')
+	const [defaultTitleHangout, setDefaultTitleHangout] =
+		useState('I want to hang out')
+
 	const key = useRef<string>(randomString())
 	const [loadingProfile, setLoadingProfile] = useState<boolean>(false)
 
@@ -93,6 +96,7 @@ export default function useHangout() {
 	const handleUpdateUserInfo = async (otherData) => {
 		toggleLoadingContext(true)
 		try {
+			setDefaultTitleHangout('')
 			const payload = {
 				...userData,
 				...otherData,
@@ -238,6 +242,8 @@ export default function useHangout() {
 		key,
 		hangoutPeople,
 		totalHangout,
+		defaultTitleHangout,
+
 		setPostId,
 		setModal,
 		setCurrentPage,

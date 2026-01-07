@@ -40,11 +40,12 @@ export interface CDatePickerProps
 		DatePickerProps {}
 
 interface CSelectOthersProps {
-	label?: string
-	error?: string
 	isRequired?: boolean
 	isWhite?: boolean
 	isMaxRadius?: boolean
+	isSimple?: boolean
+	label?: string
+	error?: string
 	[key: string]: any
 }
 

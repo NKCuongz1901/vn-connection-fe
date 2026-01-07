@@ -38,6 +38,9 @@ const Hangout = () => {
 		hangoutPeople,
 		totalHangout,
 		loadingProfile,
+
+		defaultTitleHangout,
+
 		setCurrentPage,
 		onUpdateUserInfo,
 		onScroll,
@@ -87,7 +90,11 @@ const Hangout = () => {
 								className={classes.titleHangout}
 								onClick={() => setModal({ type: 'choose', data: userData })}
 							>
-								<span>{title_open_hangout || 'I want to hang out'}</span>
+								<span>
+									{defaultTitleHangout ||
+										title_open_hangout ||
+										'I want to hang out'}
+								</span>
 								<Flex>
 									<PencilIcon />
 								</Flex>
