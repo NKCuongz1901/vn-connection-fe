@@ -262,6 +262,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 			case 'STICKER':
 				return (
 					<Flex vertical className={classes.sticker}>
+						{_renderParentItem(parent)}
 						<CImage src={content} />
 						{/* {isLast && (
 							<div className={classes.time}>
