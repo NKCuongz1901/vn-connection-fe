@@ -1,6 +1,5 @@
 'use client'
 import { SearchOutlined } from '@ant-design/icons'
-import { IconChevronLeft } from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
@@ -13,7 +12,6 @@ import { isArray, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, isMobile, toJson } from '@/ultis/common.ults'
 import { useLocalePath, useQuery } from '@/ultis/route.ults'
 
-import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
 import FriendItem from '@/Components/Friend/FriendItem'
 import NotFound from '@/svg/NotFound'
@@ -241,12 +239,6 @@ const Friend = () => {
 		return (
 			<Flex className={classes.left} vertical>
 				<Flex className={classes.leftTop}>
-					<Flex>
-						<IconChevronLeft
-							className={classes.icon}
-							onClick={() => onChangeRoute(mainRoutes.home)}
-						/>
-					</Flex>
 					<Flex className={classes.title}>Friends</Flex>
 				</Flex>
 				<Flex className={classes.leftMiddle}>
@@ -313,12 +305,12 @@ const Friend = () => {
 										<NotFound />
 										<div className={classes.title}>No results found</div>
 										<span>Do you want to explore more friends?</span>
-										<Flex
+										{/* <Flex
 											className={classes.exploreButton}
 											onClick={() => onChangeRoute(mainRoutes.search)}
 										>
 											<CButton ctype="oranger">Explore now</CButton>
-										</Flex>
+										</Flex> */}
 									</Flex>
 							  )}
 						{loading[activeTab] &&
