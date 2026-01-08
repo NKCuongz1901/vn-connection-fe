@@ -131,7 +131,7 @@ export default function useOverview() {
 			if (date) {
 				Object.assign(dates, {
 					start_time: date[0].startOf('day').valueOf(),
-					end_time: date[0].endOf('day').valueOf(),
+					end_time: date[1].endOf('day').valueOf(),
 				})
 			}
 			let isNew = page === 1
