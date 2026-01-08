@@ -5,8 +5,6 @@ import { useCallback } from 'react'
 
 import useFriendItem from '@/hooks/Friend/useFriendItem'
 
-import { useLocalePath } from '@/ultis/route.ults'
-
 import CAvatar from '@/Components/Custom/CAvatar'
 import UserMoreAction from '@/Components/User/UserMoreAction'
 import ProfileTick from '@/svg/FriendSvg/ProfileTick'
@@ -25,7 +23,6 @@ interface FriendItemProps {
 }
 const FriendItem = (_props: FriendItemProps) => {
 	const { item, type, onCallback } = _props || {}
-	const { onChangeRoute } = useLocalePath()
 	const { loading, onAccept, onCancel, onAdd } = useFriendItem({})
 	const { user, friend } = item || {}
 	const dataShow = type === optionFriends[1].value ? user : friend
@@ -134,22 +131,13 @@ const FriendItem = (_props: FriendItemProps) => {
 					<UserMoreAction
 						id={id}
 						isFriend={type === optionFriends[0].value ? item : null}
+						iconDotsStyle={{ color: '#7987A4' }}
 						onCallback={(data) => onCallback({ ...data, tab: type })}
 					/>
 				</Flex>
 			</Flex>
 		)
-	}, [
-		id,
-		item,
-		loading,
-		onAccept,
-		onAdd,
-		onCallback,
-		onCancel,
-		onChangeRoute,
-		type,
-	])
+	}, [id, item, loading, onAccept, onAdd, onCallback, onCancel, type])
 	return (
 		<Flex className={classes.wrapper}>
 			<Flex className={classes.left}>
