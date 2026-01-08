@@ -422,7 +422,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 				value: country_visited,
 				id: 3,
 				Icon: PinTickIcon,
-				count: (country_visited || '').split(',')?.length,
+				count: (country_visited || '').split(',').filter(Boolean)?.length,
 				isCount: true,
 			},
 		]
