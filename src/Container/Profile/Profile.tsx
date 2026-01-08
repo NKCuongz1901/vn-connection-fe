@@ -277,7 +277,9 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 						const { id, label, value, Icon } = item || {}
 						return (
 							<Flex key={id} gap={8}>
-								<Flex>{Icon ? <Icon fill="#006B35" /> : null}</Flex>
+								<Flex className={classes.contentIcon}>
+									{Icon ? <Icon fill="#006B35" /> : null}
+								</Flex>
 								<Flex vertical>
 									<div className={classes.label}>{label}</div>
 									<div>{value}</div>
@@ -381,7 +383,9 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 						const { id, label, value, Icon } = item || {}
 						return (
 							<Flex key={id} gap={8}>
-								<Flex>{Icon ? <Icon fill="#006B35" /> : null}</Flex>
+								<Flex className={classes.contentIcon}>
+									{Icon ? <Icon fill="#006B35" /> : null}
+								</Flex>
 								<Flex vertical>
 									<div className={classes.label}>{label}</div>
 									<div className={id === 1 ? classes.friend : ''}>{value}</div>
@@ -434,7 +438,9 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 						const { id, label, value, Icon, isCount, count } = item || {}
 						return (
 							<Flex key={id} gap={8}>
-								<Flex>{Icon ? <Icon fill="#006B35" /> : null}</Flex>
+								<Flex className={classes.contentIcon}>
+									{Icon ? <Icon fill="#006B35" /> : null}
+								</Flex>
 								<Flex vertical>
 									<Flex className={classes.label}>
 										{label} &nbsp;{!!isCount && <CCounter number={count} />}

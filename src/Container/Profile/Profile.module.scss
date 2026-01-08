@@ -115,18 +115,26 @@
 			font-weight: 600;
 			line-height: 24px; /* 150% */
 		}
+		.contentIcon {
+			padding: 2px;
+			svg {
+				// height: au;
+				width: 20px;
+			}
+		}
 		.label {
 			color: #48546b;
 
 			/* Body/Body 14 Semibold */
 			font-size: 14px;
 			font-style: normal;
-			font-weight: 500;
+			font-weight: 600;
 			line-height: 20px; /* 142.857% */
 		}
 		.content {
 			gap: 8px;
 			width: 100%;
+			font-size: 14px;
 			.friend {
 				color: #006b35;
 			}
