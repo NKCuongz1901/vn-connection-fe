@@ -138,8 +138,14 @@
 								}
 							}
 						}
+						.stickerWrapper {
+							width: 100%;
+							position: relative;
+						}
 						.sticker {
 							position: relative;
+							width: 80px;
+							justify-content: flex-end;
 						}
 						.medias {
 							flex-wrap: wrap;
@@ -329,6 +335,11 @@
 							color: #48546b;
 							padding: 0;
 						}
+					}
+					.stickerWrapper {
+						width: 100%;
+						position: relative;
+						align-items: flex-end;
 					}
 				}
 			}

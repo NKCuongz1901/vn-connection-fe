@@ -261,15 +261,17 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 				)
 			case 'STICKER':
 				return (
-					<Flex vertical className={classes.sticker}>
+					<Flex vertical className={classes.stickerWrapper}>
 						{_renderParentItem(parent)}
-						<CImage src={content} />
-						{/* {isLast && (
+						<Flex vertical className={classes.sticker}>
+							<CImage src={content} />
+							{/* {isLast && (
 							<div className={classes.time}>
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
 							</div>
 						)} */}
-						{_renderReactView(reactions)}
+							{_renderReactView(reactions)}
+						</Flex>
 					</Flex>
 				)
 			case 'MEDIAS': {
