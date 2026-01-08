@@ -74,7 +74,8 @@ const Hangout = () => {
 								</Flex>
 								<Flex className={classes.switchStatus}>
 									<span>
-										{totalHangout + 1} People available to hangout now
+										{totalHangout + Number(is_open_hangout)} People available to
+										hangout now
 									</span>
 									<CSwitch
 										value={is_open_hangout}
