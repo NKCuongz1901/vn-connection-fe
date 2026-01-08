@@ -1,10 +1,4 @@
-import {
-	IconBrandMessengerFilled,
-	IconCircleCheckFilled,
-	IconUserMinus,
-	IconUserPlus,
-	IconXboxXFilled,
-} from '@tabler/icons-react'
+import { IconCircleCheckFilled, IconXboxXFilled } from '@tabler/icons-react'
 import { Flex } from 'antd'
 import clsx from 'clsx'
 import { useCallback } from 'react'
@@ -15,9 +9,11 @@ import { useLocalePath } from '@/ultis/route.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import UserMoreAction from '@/Components/User/UserMoreAction'
-import { optionFriends } from '@/Variable/common.variable'
+import ProfileTick from '@/svg/FriendSvg/ProfileTick'
+import ProfileFriend from '@/svg/ProfileFriend'
+import ProfileFriendPlus from '@/svg/ProfileFriendPlus'
 
-import { mainRoutes } from '@/routes/MainRoutes'
+import { optionFriends } from '@/Variable/common.variable'
 
 import classes from './FriendItem.module.scss'
 
@@ -40,11 +36,8 @@ const FriendItem = (_props: FriendItemProps) => {
 		switch (type) {
 			case optionFriends[0].value:
 				contentOther = (
-					<Flex>
-						<IconBrandMessengerFilled
-							className={classes.iconMess}
-							onClick={() => onChangeRoute(`${mainRoutes.inbox}/${id}`)}
-						/>
+					<Flex className={classes.iconMess}>
+						<ProfileTick />
 					</Flex>
 				)
 				break
@@ -88,7 +81,7 @@ const FriendItem = (_props: FriendItemProps) => {
 				contentOther = (
 					<Flex>
 						{deleted ? (
-							<IconUserPlus
+							<Flex
 								className={clsx(classes.iconPeoplePlus, {
 									[classes.disabled]: loading,
 								})}
@@ -104,9 +97,11 @@ const FriendItem = (_props: FriendItemProps) => {
 											}),
 									})
 								}}
-							/>
+							>
+								<ProfileFriendPlus />
+							</Flex>
 						) : (
-							<IconUserMinus
+							<Flex
 								className={clsx(classes.iconPeopleMinus, {
 									[classes.disabled]: loading,
 								})}
@@ -122,7 +117,9 @@ const FriendItem = (_props: FriendItemProps) => {
 											}),
 									})
 								}}
-							/>
+							>
+								<ProfileFriend />
+							</Flex>
 						)}
 					</Flex>
 				)
