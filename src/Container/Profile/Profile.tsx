@@ -89,15 +89,11 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 			if (state === stateFriends.ACCEPTED) {
 				return (
 					<Dropdown
-						disabled={loadingButtonFriend || isMinimize}
+						disabled={loadingButtonFriend}
 						menu={{ items: deleteMenus }}
 						trigger={['click']}
 					>
-						<CButton
-							ctype="disabled"
-							style={{ height: 40 }}
-							disabled={isMinimize}
-						>
+						<CButton ctype="disabled" style={{ height: 40 }}>
 							<Flex>
 								<ProfileTick />
 							</Flex>
@@ -110,7 +106,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 					return (
 						<Dropdown menu={{ items: responMenus }} trigger={['click']}>
 							<CButton
-								disabled={loadingButtonFriend || isMinimize}
+								disabled={loadingButtonFriend}
 								ctype="success"
 								style={{ height: 40 }}
 							>
@@ -125,7 +121,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 					return (
 						<Dropdown menu={{ items: cancelMenus }} trigger={['click']}>
 							<CButton
-								disabled={loadingButtonFriend || isMinimize}
+								disabled={loadingButtonFriend}
 								ctype="disabled"
 								style={{ height: 40 }}
 							>
@@ -149,7 +145,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 				Add friend
 			</CButton>
 		)
-	}, [userData, menus, loadingButtonFriend, isMinimize, onMenusClick])
+	}, [userData, menus, loadingButtonFriend, onMenusClick])
 
 	const _renderTotalInfo = useCallback(() => {
 		const { avatar, cover, name, address, id, is_friend, i_am_from, mode } =
@@ -234,7 +230,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 							</>
 						) : (
 							<>
-								{_renderButtonFriend()}
+								{!isMinimize && _renderButtonFriend()}
 								<CButton
 									ctype="disabled"
 									style={{ height: 40 }}
