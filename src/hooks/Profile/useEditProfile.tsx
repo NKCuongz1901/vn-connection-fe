@@ -107,6 +107,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 		looking_for: '',
 		i_can_offer: '',
 		category: '',
+		i_am_from: '',
 	})
 	const [userLanguageOpts, setUserLanguageOpts] = useState(
 		cloneDeep(languageOpts),
@@ -191,7 +192,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 				// who_i_am: 'Please enter your role',
 				// looking_for: 'Please specify what you are looking for',
 				// i_can_offer: 'Please specify what you can offer',
-				i_am_from: 'Please fill the field',
+				i_am_from: 'This field can not empty',
 				category_list: 'Please provide your areas of interest',
 				// country_visited: 'Please enter the countries visited',
 				// country_lived: 'Please enter the countries lived',

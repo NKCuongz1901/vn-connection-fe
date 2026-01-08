@@ -305,6 +305,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 								option?.name?.toLowerCase().includes(input.toLowerCase())
 							}
 							value={i_am_from || undefined}
+							error={errors.i_am_from}
 							options={countryCodes}
 							onChange={(e) => onChangeData('i_am_from', e)}
 						/>
