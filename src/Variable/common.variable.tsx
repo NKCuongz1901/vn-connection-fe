@@ -1470,6 +1470,7 @@ export const languageOpts = [
 	{ value: 'Ukrainian', label: mappingLanguage.Ukrainian, code: 'UA' },
 ].map((i) => ({
 	...i,
+	searchLabel: i.label,
 	lang: mappingLanguageCode[i.value],
 	label: (
 		<div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>

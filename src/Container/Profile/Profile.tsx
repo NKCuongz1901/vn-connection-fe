@@ -203,7 +203,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 								<div>
 									<MarkIcon fill="#7987A4" />
 								</div>
-								{address || ''}
+								{(address || '').split(',').slice(-2).join(',')}
 							</Flex>
 						</Flex>
 					</Flex>
@@ -272,14 +272,14 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>
-						Message for you <span className="error"> *</span>
-					</div>
+					<div className={classes.title}>Message for you</div>
 					{content.map((item) => {
 						const { id, label, value, Icon } = item || {}
 						return (
 							<Flex key={id} gap={8}>
-								<Flex>{Icon ? <Icon fill="#006B35" /> : null}</Flex>
+								<Flex className={classes.contentIcon}>
+									{Icon ? <Icon fill="#006B35" /> : null}
+								</Flex>
 								<Flex vertical>
 									<div className={classes.label}>{label}</div>
 									<div>{value}</div>
@@ -298,9 +298,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>
-						About me <span className="error"> *</span>
-					</div>
+					<div className={classes.title}>About me</div>
 					<div>{about_me}</div>
 				</Flex>
 			</Flex>
@@ -313,9 +311,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>
-						Languages <span className="error"> *</span>
-					</div>
+					<div className={classes.title}>Languages</div>
 					<Flex vertical gap={12}>
 						<Flex className={classes.languageName}>
 							<div>{languages_can_speak}</div>
@@ -352,7 +348,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 	}, [toJson(userData)])
 
 	const _renderSumary = useCallback(() => {
-		const { amount_of_friend, gender, birthday } = userData || {}
+		const { amount_of_friend, gender, birthday, created_at } = userData || {}
 		const content = [
 			{
 				label: 'Friends',
@@ -374,7 +370,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 			},
 			{
 				label: 'Member since',
-				value: birthday ? dayjs(birthday).format(formatDate.dmy) : '',
+				value: created_at ? dayjs(created_at).format(formatDate.dmy) : '',
 				id: 4,
 				Icon: ClockIconDivideTopIcon,
 			},
@@ -382,14 +378,14 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>
-						Summary <span className="error"> *</span>
-					</div>
+					<div className={classes.title}>Summary</div>
 					{content.map((item) => {
 						const { id, label, value, Icon } = item || {}
 						return (
 							<Flex key={id} gap={8}>
-								<Flex>{Icon ? <Icon fill="#006B35" /> : null}</Flex>
+								<Flex className={classes.contentIcon}>
+									{Icon ? <Icon fill="#006B35" /> : null}
+								</Flex>
 								<Flex vertical>
 									<div className={classes.label}>{label}</div>
 									<div className={id === 1 ? classes.friend : ''}>{value}</div>
@@ -430,21 +426,21 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 				value: country_visited,
 				id: 3,
 				Icon: PinTickIcon,
-				count: (country_visited || '').split(',')?.length,
+				count: (country_visited || '').split(',').filter(Boolean)?.length,
 				isCount: true,
 			},
 		]
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
-					<div className={classes.title}>
-						Specialties <span className="error"> *</span>
-					</div>
+					<div className={classes.title}>Specialties</div>
 					{content.map((item) => {
 						const { id, label, value, Icon, isCount, count } = item || {}
 						return (
 							<Flex key={id} gap={8}>
-								<Flex>{Icon ? <Icon fill="#006B35" /> : null}</Flex>
+								<Flex className={classes.contentIcon}>
+									{Icon ? <Icon fill="#006B35" /> : null}
+								</Flex>
 								<Flex vertical>
 									<Flex className={classes.label}>
 										{label} &nbsp;{!!isCount && <CCounter number={count} />}

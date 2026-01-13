@@ -19,8 +19,13 @@
 			height: 28px;
 			width: 28px;
 		}
+
 		.iconMess {
+			border-radius: 99px;
+			background: #f4f8fc;
 			color: #006b35;
+			align-items: center;
+			justify-content: center;
 		}
 		.iconCancel {
 			background: #7987a4;
@@ -31,14 +36,18 @@
 		.iconAccept {
 			color: #006b35;
 		}
-		.iconPeoplePlus {
-			color: #e55a0f;
-			cursor: pointer;
-		}
+
+		.iconPeoplePlus,
 		.iconPeopleMinus {
-			color: #7987a4;
 			cursor: pointer;
+			background: #f4f8fc;
+			align-items: center;
+			justify-content: center;
+			border-radius: 50%;
+			height: 28px;
+			width: 28px;
 		}
+
 		.wrapperIconCancel {
 			align-items: center;
 			justify-content: center;

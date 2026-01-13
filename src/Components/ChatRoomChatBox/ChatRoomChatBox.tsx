@@ -1,5 +1,5 @@
 import { IconCircleXFilled } from '@tabler/icons-react'
-import { Dropdown, Flex, Skeleton } from 'antd'
+import { Dropdown, Flex, Menu, Skeleton } from 'antd'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
 import { memo, useCallback, useState } from 'react'
@@ -26,6 +26,7 @@ import VolumeIcon from '@/svg/VolumeIcon'
 import AudioRecorder from '../AudioRecorder'
 import CAvatar from '../Custom/CAvatar'
 import CImage from '../Custom/CImage'
+import CInput from '../Custom/CInput'
 import CInputTag from '../Custom/CInputTag'
 import CLoading from '../Custom/CLoading/CLoading'
 import CTextSpecial from '../Custom/CTextSpecial'
@@ -67,7 +68,9 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		openReact,
 		reactList,
 		language,
+		searchCountry,
 
+		setSearchCountry,
 		onStopAudio,
 
 		setReply,
@@ -199,16 +202,39 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 										</div>
 										<Dropdown
 											trigger={['click']}
-											menu={{
-												items: languageOpts.map((i) => ({
-													label: i.label,
-													key: i.lang,
-													onClick: () =>
-														onChangeLanguage({ item, code: i.lang }),
-												})),
-												selectedKeys: [language],
-												className: classes.dropdownChangeLanguage,
+											onOpenChange={() => {
+												setSearchCountry('')
 											}}
+											dropdownRender={() => (
+												<Flex vertical className={classes.wrapperMenuCoutry}>
+													<CInput
+														placeholder="Search language"
+														size="small"
+														value={searchCountry}
+														onChange={(e) => setSearchCountry(e.target.value)}
+														style={{ height: 32 }}
+													/>
+													<div className={classes.dropdownChangeLanguage}>
+														<Menu
+															selectedKeys={[language]}
+															items={languageOpts
+																.filter((i) =>
+																	i.searchLabel
+																		.toLocaleLowerCase()
+																		.includes(
+																			searchCountry.toLocaleLowerCase(),
+																		),
+																)
+																.map((i) => ({
+																	key: i.lang,
+																	label: i.label,
+																	onClick: () =>
+																		onChangeLanguage({ item, code: i.lang }),
+																}))}
+														/>
+													</div>
+												</Flex>
+											)}
 											disabled={isTemp || isMemberAction}
 										>
 											<b
@@ -235,14 +261,17 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 				)
 			case 'STICKER':
 				return (
-					<Flex vertical className={classes.sticker}>
-						<CImage src={content} />
-						{/* {isLast && (
+					<Flex vertical className={classes.stickerWrapper}>
+						{_renderParentItem(parent)}
+						<Flex vertical className={classes.sticker}>
+							<CImage src={content} />
+							{/* {isLast && (
 							<div className={classes.time}>
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
 							</div>
 						)} */}
-						{_renderReactView(reactions)}
+							{_renderReactView(reactions)}
+						</Flex>
 					</Flex>
 				)
 			case 'MEDIAS': {
@@ -679,7 +708,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 					disabled={fileList?.length > 0}
 					onChange={(e) => setText(e.target.value)}
 					onSendMessage={(e) => {
-						if (e.key === 'Enter') {
+						if (e.key === 'Enter' && !e.shiftKey) {
 							e.preventDefault()
 							if (!!text.trim()) {
 								setText('')

@@ -48,7 +48,11 @@ export default function useUserMoreAction({
 					message: 'You have successfully unfriended this user.',
 					onAccept: () => {
 						if (isFunction(onCallback)) {
-							onCallback({ id: isFriend?.friend_id })
+							onCallback({
+								id: isFriend?.friend_id,
+								data: isFriend,
+								type: 'unfriend',
+							})
 						}
 					},
 				})

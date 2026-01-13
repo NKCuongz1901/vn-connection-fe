@@ -1,23 +1,17 @@
-import {
-	IconBrandMessengerFilled,
-	IconCircleCheckFilled,
-	IconUserMinus,
-	IconUserPlus,
-	IconXboxXFilled,
-} from '@tabler/icons-react'
+import { IconCircleCheckFilled, IconXboxXFilled } from '@tabler/icons-react'
 import { Flex } from 'antd'
 import clsx from 'clsx'
 import { useCallback } from 'react'
 
 import useFriendItem from '@/hooks/Friend/useFriendItem'
 
-import { useLocalePath } from '@/ultis/route.ults'
-
 import CAvatar from '@/Components/Custom/CAvatar'
 import UserMoreAction from '@/Components/User/UserMoreAction'
-import { optionFriends } from '@/Variable/common.variable'
+import ProfileTick from '@/svg/FriendSvg/ProfileTick'
+import ProfileFriend from '@/svg/ProfileFriend'
+import ProfileFriendPlus from '@/svg/ProfileFriendPlus'
 
-import { mainRoutes } from '@/routes/MainRoutes'
+import { optionFriends } from '@/Variable/common.variable'
 
 import classes from './FriendItem.module.scss'
 
@@ -29,7 +23,6 @@ interface FriendItemProps {
 }
 const FriendItem = (_props: FriendItemProps) => {
 	const { item, type, onCallback } = _props || {}
-	const { onChangeRoute } = useLocalePath()
 	const { loading, onAccept, onCancel, onAdd } = useFriendItem({})
 	const { user, friend } = item || {}
 	const dataShow = type === optionFriends[1].value ? user : friend
@@ -40,11 +33,8 @@ const FriendItem = (_props: FriendItemProps) => {
 		switch (type) {
 			case optionFriends[0].value:
 				contentOther = (
-					<Flex>
-						<IconBrandMessengerFilled
-							className={classes.iconMess}
-							onClick={() => onChangeRoute(`${mainRoutes.inbox}/${id}`)}
-						/>
+					<Flex className={classes.iconMess}>
+						<ProfileTick />
 					</Flex>
 				)
 				break
@@ -88,7 +78,7 @@ const FriendItem = (_props: FriendItemProps) => {
 				contentOther = (
 					<Flex>
 						{deleted ? (
-							<IconUserPlus
+							<Flex
 								className={clsx(classes.iconPeoplePlus, {
 									[classes.disabled]: loading,
 								})}
@@ -104,9 +94,11 @@ const FriendItem = (_props: FriendItemProps) => {
 											}),
 									})
 								}}
-							/>
+							>
+								<ProfileFriendPlus />
+							</Flex>
 						) : (
-							<IconUserMinus
+							<Flex
 								className={clsx(classes.iconPeopleMinus, {
 									[classes.disabled]: loading,
 								})}
@@ -122,7 +114,9 @@ const FriendItem = (_props: FriendItemProps) => {
 											}),
 									})
 								}}
-							/>
+							>
+								<ProfileFriend />
+							</Flex>
 						)}
 					</Flex>
 				)
@@ -136,23 +130,14 @@ const FriendItem = (_props: FriendItemProps) => {
 				<Flex>
 					<UserMoreAction
 						id={id}
-						isFriend={type === optionFriends[0].value ? dataShow : null}
+						isFriend={type === optionFriends[0].value ? item : null}
+						iconDotsStyle={{ color: '#7987A4' }}
+						onCallback={(data) => onCallback({ ...data, tab: type })}
 					/>
 				</Flex>
 			</Flex>
 		)
-	}, [
-		dataShow,
-		id,
-		item,
-		loading,
-		onAccept,
-		onAdd,
-		onCallback,
-		onCancel,
-		onChangeRoute,
-		type,
-	])
+	}, [id, item, loading, onAccept, onAdd, onCallback, onCancel, type])
 	return (
 		<Flex className={classes.wrapper}>
 			<Flex className={classes.left}>

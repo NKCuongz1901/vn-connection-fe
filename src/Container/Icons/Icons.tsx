@@ -77,6 +77,8 @@ import CcIcon from '@/svg/CcIcon'
 import PlayIcon from '@/svg/PlayIcon'
 import TranslateIcon from '@/svg/TranslateIcon'
 import VolumeIcon from '@/svg/VolumeIcon'
+import ProfileFriend from '@/svg/ProfileFriend'
+import ProfileFriendPlus from '@/svg/ProfileFriendPlus'
 
 const Icons = () => {
 	const icons = [
@@ -314,6 +316,16 @@ const Icons = () => {
 		{
 			ICON: VolumeIcon,
 			name: '@/svg/VolumeIcon',
+			key: randomString(),
+		},
+		{
+			ICON: ProfileFriend,
+			name: '@/svg/ProfileFriend',
+			key: randomString(),
+		},
+		{
+			ICON: ProfileFriendPlus,
+			name: '@/svg/ProfileFriendPlus',
 			key: randomString(),
 		},
 	]

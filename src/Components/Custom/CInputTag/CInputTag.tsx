@@ -270,7 +270,7 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 		const el = inputRef.current
 		if (!el) return
 		const onKeyDown = (e) => {
-			if (e.key === 'Enter') {
+			if (e.key === 'Enter' && !e.shiftKey) {
 				e.preventDefault()
 				e.stopPropagation()
 				onSendMessage(e)

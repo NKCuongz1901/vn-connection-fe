@@ -1,6 +1,5 @@
 'use client'
 import { SearchOutlined } from '@ant-design/icons'
-import { IconChevronLeft } from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
@@ -13,7 +12,6 @@ import { isArray, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, isMobile, toJson } from '@/ultis/common.ults'
 import { useLocalePath, useQuery } from '@/ultis/route.ults'
 
-import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
 import FriendItem from '@/Components/Friend/FriendItem'
 import NotFound from '@/svg/NotFound'
@@ -52,6 +50,11 @@ const Friend = () => {
 		[optionFriends[0].value]: false,
 		[optionFriends[1].value]: false,
 		[optionFriends[2].value]: false,
+	})
+	const [total, setTotal] = useState({
+		[optionFriends[0].value]: 0,
+		[optionFriends[1].value]: 0,
+		[optionFriends[2].value]: 0,
 	})
 	const handleParseParams = useCallback(
 		({ type, searchText }: { type: string; searchText: string }) => {
@@ -118,6 +121,29 @@ const Friend = () => {
 		[toJson(friendList)],
 	)
 
+	const getAllTotal = useCallback(async () => {
+		try {
+			const params = {
+				page: 1,
+				limit: 1,
+			}
+			const res: any[] = await Promise.all(
+				optionFriends.map(({ value }) =>
+					getFriends({ params: { ...params, type: value } }),
+				),
+			)
+
+			setTotal({
+				[optionFriends[0].value]: res[0]?.pagination?.total,
+				[optionFriends[1].value]: res[1]?.pagination?.total,
+				[optionFriends[2].value]: res[2]?.pagination?.total,
+			})
+		} catch (error) {
+			openError(error)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
+
 	const handleLoadMore = useCallback(async () => {
 		const isLoadMore =
 			_paginationRefs.current[activeTab].page <
@@ -135,8 +161,25 @@ const Friend = () => {
 				return
 			}
 			switch (tab) {
+				case optionFriends[0].value:
+					{
+						switch (type) {
+							case 'unfriend':
+								setTotal((prev) => ({ ...prev, [tab]: prev[tab] - 1 }))
+								contents = contents.filter((item: any) => item?.id !== idItem)
+								if (!isArray(contents, paginationCommon.limit)) {
+									_paginationRefs.current[tab].page = 1
+									handleLoadMore()
+								}
+								break
+							default:
+								break
+						}
+					}
+					break
 				case optionFriends[1].value:
 					contents = contents.filter((item: any) => item?.id !== idItem)
+					setTotal((prev) => ({ ...prev, [tab]: prev[tab] - 1 }))
 					if (!isArray(contents, paginationCommon.limit)) {
 						_paginationRefs.current[tab].page = 1
 						handleLoadMore()
@@ -153,6 +196,7 @@ const Friend = () => {
 								}
 								break
 							case 'delete':
+								setTotal((prev) => ({ ...prev, [tab]: prev[tab] - 1 }))
 								contents[idx] = {
 									...contents[idx],
 									deleted: true,
@@ -184,6 +228,11 @@ const Friend = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[activeTab, handleLoadMore, toJson(loading)],
 	)
+
+	useEffect(() => {
+		getAllTotal()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 	useEffect(() => {
 		_refFirst.current = false
 		_paginationRefs.current[activeTab].page = 1
@@ -208,17 +257,12 @@ const Friend = () => {
 		return (
 			<Flex className={classes.left} vertical>
 				<Flex className={classes.leftTop}>
-					<Flex>
-						<IconChevronLeft
-							className={classes.icon}
-							onClick={() => onChangeRoute(mainRoutes.home)}
-						/>
-					</Flex>
 					<Flex className={classes.title}>Friends</Flex>
 				</Flex>
 				<Flex className={classes.leftMiddle}>
 					{optionFriends.map((item) => {
 						const { value, label } = item
+						const count = total[value]
 						return (
 							<Flex
 								key={value}
@@ -227,7 +271,7 @@ const Friend = () => {
 								})}
 								onClick={() => setActiveTab(value)}
 							>
-								{label}
+								{label} ({count})
 							</Flex>
 						)
 					})}
@@ -279,12 +323,12 @@ const Friend = () => {
 										<NotFound />
 										<div className={classes.title}>No results found</div>
 										<span>Do you want to explore more friends?</span>
-										<Flex
+										{/* <Flex
 											className={classes.exploreButton}
 											onClick={() => onChangeRoute(mainRoutes.search)}
 										>
 											<CButton ctype="oranger">Explore now</CButton>
-										</Flex>
+										</Flex> */}
 									</Flex>
 							  )}
 						{loading[activeTab] &&

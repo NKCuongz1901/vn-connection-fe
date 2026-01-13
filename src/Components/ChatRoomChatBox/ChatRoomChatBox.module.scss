@@ -138,8 +138,14 @@
 								}
 							}
 						}
+						.stickerWrapper {
+							width: 100%;
+							position: relative;
+						}
 						.sticker {
 							position: relative;
+							width: 80px;
+							justify-content: flex-end;
 						}
 						.medias {
 							flex-wrap: wrap;
@@ -329,6 +335,11 @@
 							color: #48546b;
 							padding: 0;
 						}
+					}
+					.stickerWrapper {
+						width: 100%;
+						position: relative;
+						align-items: flex-end;
 					}
 				}
 			}
@@ -591,16 +602,36 @@
 		}
 	}
 }
-.dropdownChangeLanguage {
-	height: 200px;
-	overflow: auto;
-	.dropdownWrapper {
-		gap: 4px;
-		align-items: center;
+.wrapperMenuCoutry {
+	box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08),
+		0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+	border-radius: 8px !important;
+	padding-top: 8px !important;
+	background-color: #ffffff;
 
-		img {
-			height: 20px;
-			width: 30px;
+	input {
+		height: 32px !important;
+		max-height: 32px;
+	}
+	.dropdownChangeLanguage {
+		height: 200px;
+		// overflow: auto;
+		list-style-type: none;
+		background-color: #ffffff;
+		background-clip: padding-box;
+		outline: none;
+
+		:global(.ant-dropdown-menu-vertical) {
+			height: 200px;
+		}
+		.dropdownWrapper {
+			gap: 4px;
+			align-items: center;
+
+			img {
+				height: 20px;
+				width: 30px;
+			}
 		}
 	}
 }
@@ -656,10 +687,6 @@
 									}
 								}
 								.media {
-								}
-								:global(.ant-image) {
-								}
-								:global(.ant-flex) {
 								}
 								img {
 								}

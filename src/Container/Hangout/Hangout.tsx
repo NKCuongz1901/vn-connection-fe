@@ -38,6 +38,9 @@ const Hangout = () => {
 		hangoutPeople,
 		totalHangout,
 		loadingProfile,
+
+		defaultTitleHangout,
+
 		setCurrentPage,
 		onUpdateUserInfo,
 		onScroll,
@@ -62,15 +65,17 @@ const Hangout = () => {
 						<>
 							<Flex vertical gap="4px">
 								<Flex className={classes.hangoutPeople}>
-									{hangoutPeople.map((people) => (
-										<div key={people.id}>
-											<CAvatar src={people.avatar} />
-										</div>
-									))}
+									{!!is_open_hangout &&
+										hangoutPeople.map((people) => (
+											<div key={people.id}>
+												<CAvatar src={people.avatar} />
+											</div>
+										))}
 								</Flex>
 								<Flex className={classes.switchStatus}>
 									<span>
-										{totalHangout + 1} People available to hangout now
+										{totalHangout + Number(is_open_hangout)} People available to
+										hangout now
 									</span>
 									<CSwitch
 										value={is_open_hangout}
@@ -86,7 +91,11 @@ const Hangout = () => {
 								className={classes.titleHangout}
 								onClick={() => setModal({ type: 'choose', data: userData })}
 							>
-								<span>{title_open_hangout || 'I want to hang out'}</span>
+								<span>
+									{defaultTitleHangout ||
+										title_open_hangout ||
+										'I want to hang out'}
+								</span>
 								<Flex>
 									<PencilIcon />
 								</Flex>

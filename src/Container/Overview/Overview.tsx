@@ -57,6 +57,7 @@ const Overview = () => {
 		filters,
 		listNetwork,
 		listChatRoom,
+		defaultTitleHangout,
 
 		setModal,
 		OnChangeTitleHangout,
@@ -146,15 +147,17 @@ const Overview = () => {
 						<>
 							<Flex vertical gap="4px">
 								<Flex className={classes.hangoutPeople}>
-									{hangoutPeople.map((people) => (
-										<div key={people.id}>
-											<CAvatar src={people.avatar} />
-										</div>
-									))}
+									{!!is_open_hangout &&
+										hangoutPeople.map((people) => (
+											<div key={people.id}>
+												<CAvatar src={people.avatar} />
+											</div>
+										))}
 								</Flex>
 								<Flex className={classes.switchStatus}>
 									<span>
-										{totalHangout + 1} People available to hangout now
+										{totalHangout + Number(is_open_hangout)} People available to
+										hangout now
 									</span>
 									<CSwitch
 										value={is_open_hangout}
@@ -170,7 +173,11 @@ const Overview = () => {
 								className={classes.titleHangout}
 								onClick={() => setModal({ type: 'choose', data: userData })}
 							>
-								<span>{title_open_hangout || 'I want to hang out'}</span>
+								<span>
+									{defaultTitleHangout ||
+										title_open_hangout ||
+										'I want to hang out'}
+								</span>
 								<Flex>
 									<PencilIcon />
 								</Flex>
@@ -215,6 +222,20 @@ const Overview = () => {
 								className={classes.contentSkeleton}
 							/>
 						))}
+					{!loadingMyEvent && !isArray(listMyEvent, 1) && (
+						<Flex className={classes.notData} vertical>
+							<EventIcon fill="#1e9037" />
+							<span className={classes.labelNoData}>
+								You haven't joined any events yet !
+							</span>
+							<CButton
+								ctype="oranger"
+								onClick={() => onChangeRoute(`${mainRoutes.search}`)}
+							>
+								Explore now
+							</CButton>
+						</Flex>
+					)}
 				</Flex>
 			</Flex>
 		)

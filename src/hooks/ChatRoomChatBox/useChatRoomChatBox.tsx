@@ -36,6 +36,8 @@ export default function useChatRoomChatBox({
 	const [showSticker, setShowSticker] = useState(false)
 	const [text, setText] = useState('')
 	const [reply, setReply] = useState() as any
+	const [searchCountry, setSearchCountry] = useState('')
+
 	const [isAudio, setIsAudio] = useState(false)
 
 	const [openReact, setOpenReact] = useState() as any
@@ -303,7 +305,9 @@ export default function useChatRoomChatBox({
 		reactList,
 		openReact,
 		language,
+		searchCountry,
 
+		setSearchCountry,
 		setOpenReact,
 		setIsAudio,
 		setReply,

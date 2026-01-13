@@ -1,5 +1,6 @@
 import Event from '@/svg/Event'
 // import Heart from '@/svg/Heart'
+import HappyIcon from '@/svg/HappyIcon'
 import Message2Icon from '@/svg/Message2Icon'
 import Message3 from '@/svg/Message3'
 import Messenger from '@/svg/Messenger'
@@ -140,7 +141,7 @@ export const Menus = [
 	},
 	{
 		title: 'Explore By Interest',
-		Icon: People,
+		Icon: HappyIcon,
 		path: mainRoutes.exploreInterest,
 		child: [],
 	},

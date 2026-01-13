@@ -59,6 +59,8 @@ export default function useOverview() {
 		latitude: null,
 		longitude: null,
 	})
+	const [defaultTitleHangout, setDefaultTitleHangout] =
+		useState('I want to hang out')
 	const [hangoutPeople, setHangoutPeople] = useState<any[]>([])
 	const [totalHangout, setTotalHangout] = useState(0)
 
@@ -129,7 +131,7 @@ export default function useOverview() {
 			if (date) {
 				Object.assign(dates, {
 					start_time: date[0].startOf('day').valueOf(),
-					end_time: date[0].endOf('day').valueOf(),
+					end_time: date[1].endOf('day').valueOf(),
 				})
 			}
 			let isNew = page === 1
@@ -146,7 +148,7 @@ export default function useOverview() {
 				type: mainRoutes.upcomingEvent,
 				radius,
 				...(categories && { categories: [categories] }),
-				title,
+				...(title && { title }),
 				...dates,
 			})
 			const { code, results } = res || {}
@@ -268,7 +270,9 @@ export default function useOverview() {
 	}
 	const handleUpdateUserInfo = async (otherData) => {
 		toggleLoadingContext(true)
+
 		try {
+			setDefaultTitleHangout('')
 			const payload = {
 				...userData,
 				...otherData,
@@ -468,6 +472,8 @@ export default function useOverview() {
 		filters,
 		listNetwork,
 		listChatRoom,
+		defaultTitleHangout,
+
 		OnChangeTitleHangout: handleOnChangeTitleHangout,
 		onUpdateUserInfo: handleUpdateUserInfo,
 		onCRUDSuccess: handleCRUDSuccess,

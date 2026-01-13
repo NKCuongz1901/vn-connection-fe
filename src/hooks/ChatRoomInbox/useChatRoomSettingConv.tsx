@@ -147,10 +147,12 @@ export default function useChatRoomSettingConv({
 		const { id } = convInfo || {}
 
 		openConfirm({
-			message: 'Are you sure want to leave this chatroom?',
-			titleLabel: 'Leave this chatroom',
-			onAccept: () => handleLeaveConv(id),
+			message:
+				'Too many notifications? Turn them off in Settings. And you’re always welcome back!',
+			titleLabel: 'Leave group',
+			confirmLabel: 'Leave group',
 			ctype: 'error',
+			onAccept: () => handleLeaveConv(id),
 		})
 	}
 	const handleLoadMore = async () => {

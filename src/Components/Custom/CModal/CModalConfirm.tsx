@@ -19,6 +19,8 @@ const CModalConfirm = (_props: CModalProps) => {
 		onCancel,
 		onOk,
 		message: _message,
+		confirmLabel,
+		cancelLabel,
 		titleLabel,
 		ctype,
 		...props
@@ -40,7 +42,7 @@ const CModalConfirm = (_props: CModalProps) => {
 						ctype="disabled"
 						style={{ width: 240 }}
 					>
-						Cancel
+						{cancelLabel || 'Cancel'}
 					</CButton>
 					<CButton
 						disabled={loadingContext}
@@ -48,7 +50,7 @@ const CModalConfirm = (_props: CModalProps) => {
 						ctype={ctype ? mappingCtype[ctype] || ctype : 'oranger'}
 						style={{ width: 240 }}
 					>
-						Confirm
+						{confirmLabel || 'Confirm'}
 					</CButton>
 				</Flex>,
 			]}

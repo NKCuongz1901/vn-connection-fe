@@ -55,7 +55,7 @@ const handleParseToData = (data, categoryNetworkOpts) => {
 		mode: modOpts.find((i) => i.value === mode),
 		i_am_interested_in,
 		languages_can_speak: languages_can_speak_array,
-		country_visited: (country_visited || '').split(', '),
+		country_visited: country_visited ? (country_visited || '').split(', ') : [],
 		who_i_am,
 		looking_for,
 		i_can_offer,
@@ -107,6 +107,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 		looking_for: '',
 		i_can_offer: '',
 		category: '',
+		i_am_from: '',
 	})
 	const [userLanguageOpts, setUserLanguageOpts] = useState(
 		cloneDeep(languageOpts),
@@ -182,18 +183,19 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 		const { languages_can_speak } = data || {}
 		const _errors: any = Object.fromEntries(
 			Object.entries({
-				about_me: 'Please briefly describe yourself',
+				// about_me: 'Please briefly describe yourself',
 				name: 'Please enter your name',
-				birthday: 'Please select a valid date of member since',
+				// birthday: 'Please select a valid date of member since',
 				gender: 'Please choose your gender',
 				address: 'Please enter a full address',
-				mode: 'Please choose your state',
-				who_i_am: 'Please enter your role',
-				looking_for: 'Please specify what you are looking for',
-				i_can_offer: 'Please specify what you can offer',
+				// mode: 'Please choose your state',
+				// who_i_am: 'Please enter your role',
+				// looking_for: 'Please specify what you are looking for',
+				// i_can_offer: 'Please specify what you can offer',
+				i_am_from: 'This field can not empty',
 				category_list: 'Please provide your areas of interest',
-				country_visited: 'Please enter the countries visited',
-				country_lived: 'Please enter the countries lived',
+				// country_visited: 'Please enter the countries visited',
+				// country_lived: 'Please enter the countries lived',
 			}).filter(([key]) => {
 				switch (key) {
 					case 'country_visited':
@@ -295,7 +297,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 			gender: gender?.value || gender || null,
 			mode: mode?.value || mode || null,
 			languages_can_speak: languages_can_speak.join(', '),
-			birthday: dayjs(birthday).toISOString(),
+			birthday: birthday ? dayjs(birthday).toISOString() : '',
 			longitude,
 			latitude,
 			user_languages: (user_languages || []).filter(

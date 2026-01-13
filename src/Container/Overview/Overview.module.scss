@@ -126,7 +126,6 @@
 			.myCommunity {
 				border-radius: 16px;
 				background: #fff;
-				height: 160px;
 
 				.communityText {
 					padding: 8px 16px;
@@ -144,6 +143,7 @@
 					.communityItem {
 						justify-content: space-between;
 						cursor: pointer;
+						gap: 8px;
 						.contentSkeletonAva {
 							height: 64px;
 							width: 64px;
@@ -277,7 +277,9 @@
 			align-items: center;
 			justify-content: center;
 			width: 100%;
-			gap: 12;
+			gap: 12px;
+			border-radius: 16px;
+			background: #fff;
 			.labelNoData {
 				font-weight: 500;
 			}

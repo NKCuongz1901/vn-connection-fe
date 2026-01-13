@@ -100,7 +100,6 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 			<Flex className={classes.about}>
 				<CTextArea
 					showCount
-					isRequired
 					label="About"
 					error={errors.about_me}
 					value={about_me}
@@ -136,7 +135,10 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 		return (
 			<Flex className={classes.bottom}>
 				<Flex className={classes.bottomItem}>
-					<span className={classes.title}>Summary</span>
+					<span className={classes.title}>
+						Summary
+						<span className="error">*</span>
+					</span>
 					<CInput
 						value={name}
 						error={errors.name}
@@ -221,6 +223,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					<Flex>
 						<CSelectMuti
 							isRequired
+							isSimple
 							error={errors.languages_can_speak}
 							value={languages_can_speak}
 							label="Native languages"
@@ -302,6 +305,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 								option?.name?.toLowerCase().includes(input.toLowerCase())
 							}
 							value={i_am_from || undefined}
+							error={errors.i_am_from}
 							options={countryCodes}
 							onChange={(e) => onChangeData('i_am_from', e)}
 						/>
@@ -320,7 +324,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					</div>
 					<Flex>
 						<CSelectMuti
-							isRequired
+							isSimple
 							error={errors.country_lived}
 							value={country_lived}
 							label="Countries I've lived in"
@@ -331,7 +335,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					</Flex>
 					<Flex>
 						<CSelectMuti
-							isRequired
+							isSimple
 							error={errors.country_visited}
 							value={country_visited}
 							label="Countries I've visited"

@@ -1,16 +1,17 @@
 'use client'
 
 import { ArrowRightOutlined } from '@ant-design/icons'
-import { IconCalendarWeekFilled, IconChevronDown } from '@tabler/icons-react'
+import { IconChevronDown } from '@tabler/icons-react'
 import { DatePicker, Flex } from 'antd'
 import { RangePickerProps } from 'antd/es/date-picker'
+import clsx from 'clsx'
 import dayjs from 'dayjs'
 import { memo } from 'react'
 
+import CalenderIcon from '@/svg/CalenderIcon'
 import CButton from '../CButton'
 
 import classes from './CDatePickerRanger.module.scss'
-import clsx from 'clsx'
 
 const { RangePicker } = DatePicker
 
@@ -98,7 +99,12 @@ const CDatePickerRanger = (_props: CDatePickerRangerProps) => {
 				allowClear
 				{...(value && { value: value })}
 				className={classes.wrapper}
-				prefix={<IconCalendarWeekFilled />}
+				format={'DD/MM/YYYY'}
+				prefix={
+					<div>
+						<CalenderIcon fill="#1e9037" />
+					</div>
+				}
 				suffixIcon={<IconChevronDown />}
 				separator={<ArrowRightOutlined style={{ fontSize: 16 }} />}
 				panelRender={(panelNode) => (
