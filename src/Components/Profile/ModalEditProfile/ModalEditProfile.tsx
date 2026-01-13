@@ -300,7 +300,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							showSearch
 							isRequired
 							label="I am from"
-							placeholder="Enter name of countries"
+							placeholder="Select your countries"
 							filterOption={(input, option) =>
 								option?.name?.toLowerCase().includes(input.toLowerCase())
 							}
@@ -316,6 +316,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							suffixIcon={<IconChevronDown />}
 							prefixIcon={<Heart />}
 							label="Interested in"
+							placeholder="Enter your interests"
 							options={categoryNetworkOpts}
 							value={category_list || []}
 							error={errors.category_list}
@@ -328,7 +329,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							error={errors.country_lived}
 							value={country_lived}
 							label="Countries I've lived in"
-							placeholder="Select your languages"
+							placeholder="Which countries have you lived in?"
 							options={CountriesOptions}
 							onChange={(e) => onChangeData('country_lived', e)}
 						/>
@@ -339,7 +340,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							error={errors.country_visited}
 							value={country_visited}
 							label="Countries I've visited"
-							placeholder="Select your languages"
+							placeholder="Which countries have you visited?"
 							options={CountriesOptions}
 							onChange={(e) => onChangeData('country_visited', e)}
 						/>

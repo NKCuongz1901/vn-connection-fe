@@ -20,6 +20,7 @@ interface CMultiSelectProps {
 	options: CategoriFavOptProps[]
 	max?: number
 	error?: string
+	placeholder?: string
 	suffixIcon?: React.ReactNode
 	prefixIcon?: React.ReactNode
 	onChange?: any
@@ -37,6 +38,7 @@ const CMultiSelect = (props: CMultiSelectProps) => {
 		prefixIcon,
 		options,
 		max,
+		placeholder,
 		onChange,
 	} = props
 	const { openError } = useModal()
@@ -150,7 +152,7 @@ const CMultiSelect = (props: CMultiSelectProps) => {
 							>
 								{isArray(choose, 1)
 									? (choose || []).map((i) => i.title).join(', ')
-									: 'Which category fits you best?'}
+									: placeholder || 'Which category fits you best?'}
 							</div>
 						</Flex>
 						{suffixIcon && (
