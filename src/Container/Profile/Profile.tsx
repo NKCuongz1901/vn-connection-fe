@@ -175,7 +175,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 							<Flex className={classes.icon}>
 								<UserMoreAction
 									id={id}
-									isFriend={is_friend}
+									isFriend={!isMinimize && is_friend}
 									onCallback={onGetUserProfile}
 								/>
 							</Flex>
