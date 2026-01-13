@@ -348,7 +348,10 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 	}, [toJson(userData)])
 
 	const _renderSumary = useCallback(() => {
-		const { amount_of_friend, gender, birthday, created_at } = userData || {}
+		const { id, amount_of_friend, gender, birthday, created_at, is_hide_age } =
+			userData || {}
+		const isHideAge = is_hide_age && id !== getUserInfo('id')
+
 		const content = [
 			{
 				label: 'Friends',
@@ -362,12 +365,16 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 				id: 2,
 				Icon: GenderIcon,
 			},
-			{
-				label: 'Age',
-				value: getAge(birthday),
-				id: 3,
-				Icon: ProfileCircleIcon,
-			},
+			...(isHideAge
+				? []
+				: [
+						{
+							label: 'Age',
+							value: getAge(birthday),
+							id: 3,
+							Icon: ProfileCircleIcon,
+						},
+				  ]),
 			{
 				label: 'Member since',
 				value: created_at ? dayjs(created_at).format(formatDate.dmy) : '',
