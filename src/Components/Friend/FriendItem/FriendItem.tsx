@@ -51,7 +51,11 @@ const FriendItem = (_props: FriendItemProps) => {
 									onCancel({
 										id: idItem,
 										onCallback: () =>
-											onCallback({ tab: type, data: { id: idItem } }),
+											onCallback({
+												tab: type,
+												type: 'delete',
+												data: { id: idItem },
+											}),
 									})
 								}}
 							/>
@@ -66,7 +70,11 @@ const FriendItem = (_props: FriendItemProps) => {
 									onAccept({
 										id: idItem,
 										onCallback: () =>
-											onCallback({ tab: type, data: { id: idItem } }),
+											onCallback({
+												tab: type,
+												type: 'add',
+												data: { id: idItem },
+											}),
 									})
 								}}
 							/>

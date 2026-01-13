@@ -179,7 +179,23 @@ const Friend = () => {
 					break
 				case optionFriends[1].value:
 					contents = contents.filter((item: any) => item?.id !== idItem)
-					setTotal((prev) => ({ ...prev, [tab]: prev[tab] - 1 }))
+					switch (type) {
+						case 'add':
+							setTotal((prev) => ({
+								...prev,
+								[tab]: prev[tab] - 1,
+								[optionFriends[0].value]: prev[optionFriends[0].value] + 1,
+							}))
+							break
+						case 'delete':
+							setTotal((prev) => ({
+								...prev,
+								[tab]: prev[tab] - 1,
+							}))
+							break
+						default:
+							break
+					}
 					if (!isArray(contents, paginationCommon.limit)) {
 						_paginationRefs.current[tab].page = 1
 						handleLoadMore()
