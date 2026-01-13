@@ -137,6 +137,7 @@ const FriendItem = (_props: FriendItemProps) => {
 				{contentOther}
 				<Flex>
 					<UserMoreAction
+						isNotBlock
 						id={id}
 						isFriend={type === optionFriends[0].value ? item : null}
 						iconDotsStyle={{ color: '#7987A4' }}

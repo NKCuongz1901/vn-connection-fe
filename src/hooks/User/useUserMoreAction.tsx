@@ -11,10 +11,12 @@ import { isFunction } from '@/ultis/common.ults'
 export default function useUserMoreAction({
 	id,
 	isFriend,
+	isNotBlock,
 	onCallback,
 }: {
 	id: string
 	isFriend?: any
+	isNotBlock?: boolean
 	onCallback?: any
 }) {
 	const { toggleLoadingContext } = useLoading()
@@ -103,11 +105,15 @@ export default function useUserMoreAction({
 				  ]
 				: []),
 
-			{
-				key: 'block',
-				label: 'Block',
-				onClick: () => handleMenusClick('block'),
-			},
+			...(!isNotBlock
+				? [
+						{
+							key: 'block',
+							label: 'Block',
+							onClick: () => handleMenusClick('block'),
+						},
+				  ]
+				: []),
 
 			{
 				key: 'report',

@@ -9,11 +9,13 @@ import ModalReport from '../../Custom/ModalReport'
 const UserMoreAction = ({
 	id,
 	isFriend,
+	isNotBlock,
 	iconDotsStyle = {},
 	onCallback,
 }: {
 	id: string
 	isFriend?: any
+	isNotBlock?: boolean
 	iconDotsStyle?: CSSProperties
 	onCallback?: any
 	[key: string]: any
@@ -21,6 +23,7 @@ const UserMoreAction = ({
 	const { loading, menus, open, onClose } = useUserMoreAction({
 		id,
 		isFriend,
+		isNotBlock,
 		onCallback,
 	})
 	return (
