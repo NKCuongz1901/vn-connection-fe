@@ -122,7 +122,7 @@ export default function useUserMoreAction({
 				style: { color: '#F80024' },
 			},
 		],
-		[handleMenusClick, isFriend],
+		[handleMenusClick, isFriend, isNotBlock],
 	)
 
 	return { loading, menus, open, onClose: handleClose }
