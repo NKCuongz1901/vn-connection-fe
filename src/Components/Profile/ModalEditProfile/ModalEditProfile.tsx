@@ -5,28 +5,21 @@ import dayjs from 'dayjs'
 import { useLoading } from '@/context/LoadingContext'
 import useEditProfile from '@/hooks/Profile/useEditProfile'
 
+import { isArray } from '@/ultis/array.ults'
+
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
+import CCheckRadio from '@/Components/Custom/CCheckRadio'
+import CCounter from '@/Components/Custom/CCounter'
 import CDatePicker from '@/Components/Custom/CDatePicker'
 import CInput from '@/Components/Custom/CInput'
 import CInputMap from '@/Components/Custom/CInputMap'
 import CModal from '@/Components/Custom/CModal/CModal'
+import CMultiSelect from '@/Components/Custom/CMultiSelect'
 import CSelect from '@/Components/Custom/CSelect'
 import CSelectMuti from '@/Components/Custom/CSelectMuti'
 import CTextArea from '@/Components/Custom/CTextArea'
 import CUpload from '@/Components/Custom/CUpload'
-
-import {
-	countryCodes,
-	formatDate,
-	genderOpts,
-	languageOpts,
-	levelOptions,
-	modOpts,
-} from '@/Variable/common.variable'
-
-import CCheckRadio from '@/Components/Custom/CCheckRadio'
-import CMultiSelect from '@/Components/Custom/CMultiSelect'
 import AddIcon from '@/svg/AddIcon'
 import ArmHeartIcon from '@/svg/ArmHeartIcon'
 import FavoriteIcon from '@/svg/FavoriteIcon'
@@ -38,7 +31,15 @@ import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
 import ProfileIcon from '@/svg/ProfileIcon'
 import TrashIcon from '@/svg/TrashIcon'
 import WorldIcon from '@/svg/WorldIcon'
-import { isArray } from '@/ultis/array.ults'
+
+import {
+	countryCodes,
+	formatDate,
+	genderOpts,
+	languageOpts,
+	levelOptions,
+	modOpts,
+} from '@/Variable/common.variable'
 import { CountriesOptions } from '@/Variable/countryVariable'
 import classes from './ModalEditProfile.module.scss'
 
@@ -339,7 +340,12 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							isSimple
 							error={errors.country_visited}
 							value={country_visited}
-							label="Countries I've visited"
+							label={
+								<Flex gap={4} align="center">
+									Countries I've visited
+									<CCounter number={(country_visited || []).length} />
+								</Flex>
+							}
 							placeholder="Which countries have you visited?"
 							options={CountriesOptions}
 							onChange={(e) => onChangeData('country_visited', e)}

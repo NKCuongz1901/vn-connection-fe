@@ -44,7 +44,7 @@ interface CSelectOthersProps {
 	isWhite?: boolean
 	isMaxRadius?: boolean
 	isSimple?: boolean
-	label?: string
+	label?: any
 	error?: string
 	[key: string]: any
 }
