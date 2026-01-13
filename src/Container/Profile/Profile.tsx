@@ -8,16 +8,31 @@ import { memo, useCallback } from 'react'
 import useProfile from '@/hooks/Profile/useProfile'
 
 import { toJson } from '@/ultis/common.ults'
+import { getAge } from '@/ultis/date.ults'
 import { useLocalePath, useQuery, useSafeBack } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
+import CCounter from '@/Components/Custom/CCounter'
 import ModalEditProfile from '@/Components/Profile/ModalEditProfile'
 import UserMoreAction from '@/Components/User/UserMoreAction'
+import ArmHeartIcon from '@/svg/ArmHeartIcon'
+import ClockIconDivideTopIcon from '@/svg/ClockIconDivideTopIcon'
+import FavoriteIcon from '@/svg/FavoriteIcon'
 import ProfileCancelIcon from '@/svg/FriendSvg/ProfileCancelIcon'
 import ProfileTick from '@/svg/FriendSvg/ProfileTick'
 import ShareIcon from '@/svg/FriendSvg/ShareIcon'
+import GenderIcon from '@/svg/GenderIcon'
+import Heart from '@/svg/Heart'
+import HouseIcon from '@/svg/HouseIcon'
+import MarkIcon from '@/svg/MarkIcon'
+import Messenger from '@/svg/Messenger'
+import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
+import PinTickIcon from '@/svg/PinTickIcon'
+import ProfileCircleIcon from '@/svg/ProfileCircleIcon'
+import TwoUser from '@/svg/TwoUser'
+import WorldIcon from '@/svg/WorldIcon'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import {
@@ -27,21 +42,6 @@ import {
 	mappingMod,
 	stateFriends,
 } from '@/Variable/common.variable'
-
-import CCounter from '@/Components/Custom/CCounter'
-import ArmHeartIcon from '@/svg/ArmHeartIcon'
-import ClockIconDivideTopIcon from '@/svg/ClockIconDivideTopIcon'
-import FavoriteIcon from '@/svg/FavoriteIcon'
-import GenderIcon from '@/svg/GenderIcon'
-import Heart from '@/svg/Heart'
-import HouseIcon from '@/svg/HouseIcon'
-import MarkIcon from '@/svg/MarkIcon'
-import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
-import PinTickIcon from '@/svg/PinTickIcon'
-import ProfileCircleIcon from '@/svg/ProfileCircleIcon'
-import TwoUser from '@/svg/TwoUser'
-import WorldIcon from '@/svg/WorldIcon'
-import { getAge } from '@/ultis/date.ults'
 
 import {
 	mappingCountriesOptions,
@@ -95,7 +95,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 					>
 						<CButton ctype="disabled" style={{ height: 40 }}>
 							<Flex>
-								<ProfileTick />
+								<ProfileTick fill="#000" />
 							</Flex>
 							<span>Friend</span>
 						</CButton>
@@ -236,7 +236,10 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 									style={{ height: 40 }}
 									onClick={onOpenInbox}
 								>
-									Inbox
+									<Flex>
+										<Messenger fill="#006B35" />
+									</Flex>
+									<span>Inbox</span>
 								</CButton>
 							</>
 						)}
