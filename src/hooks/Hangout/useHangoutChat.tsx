@@ -25,6 +25,11 @@ import { randomString } from '@/ultis/string.ults'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'
+import {
+	handleUploadAudio,
+	handleUploadImage,
+	handleUploadVideo,
+} from '@/apis/uploadApis'
 const libraries: any = ['places']
 
 type useHangoutChatProps = {
@@ -181,15 +186,54 @@ export default function useHangoutChat({
 		}
 	}
 	const handleSendMessage = async ({
-		type,
+		type: _type,
 		content,
-		medias,
+		medias: _medias,
+		parent: _,
+		audio,
 	}: {
 		type: string
 		content?: string
-		medias?: []
+		medias?: any[]
+		parent?: any
+		audio?: any
 	}) => {
 		try {
+			let type = _type
+			let medias = []
+			if (_medias?.length > 0) {
+				const uploadPromises = _medias.map((media) =>
+					media?.type === 'IMAGE'
+						? handleUploadImage(media.file)
+						: handleUploadVideo(media.file),
+				)
+				const resList = await Promise.all(uploadPromises)
+				type = 'MEDIAS'
+				medias = (_medias || []).map((i, index) => ({
+					url: resList[index],
+					type: i?.type || 'IMAGE',
+					fileName: null,
+					width: 692,
+					height: 1500,
+					ratio: 0.4613333333333333,
+					thumbnail: null,
+					duration: 0,
+				}))
+			}
+			if (!!audio) {
+				const resAudio = await handleUploadAudio(audio)
+				type = 'MEDIAS'
+				medias.push({
+					url: resAudio,
+					fileName: null,
+					width: null,
+					height: null,
+					ratio: null,
+					type: 'AUDIO',
+					thumbnail: null,
+					duration: 3,
+				})
+			}
 			const _id = randomString()
 			const _res = {
 				content,
