@@ -77,54 +77,58 @@ const Overview = () => {
 	const _renderFilter = () => {
 		const { radius, date, categories, title } = filters
 		return (
-			<Flex className={classes.filter}>
-				<Flex className={classes.search}>
-					<CInput
-						value={title}
-						placeholder="Search by keywords"
-						style={{ background: '#fff', borderRadius: 40, height: 44 }}
-						prefix={<SearchIcon />}
-						onChange={onChangeKeyword}
-					/>
+			<Flex vertical className={classes.renderFilter}>
+				<Flex className={classes.filter}>
+					<Flex className={classes.search}>
+						<CInput
+							value={title}
+							placeholder="Search by keywords"
+							style={{ background: '#fff', borderRadius: 40, height: 44 }}
+							prefix={<SearchIcon />}
+							onChange={onChangeKeyword}
+						/>
+					</Flex>
+					<Flex>
+						<CDatePickerRanger
+							isWhite
+							style={{ background: '#fff', borderRadius: 40 }}
+							disabled={loading.event}
+							value={date}
+							onChange={onChangeFilter('date')}
+						/>
+					</Flex>
+					<Flex className={classes.distance}>
+						<CSelect
+							isMaxRadius
+							isWhite
+							style={{ background: '#fff', borderRadius: 40 }}
+							disabled={loading.event}
+							value={radius}
+							options={radiusOpts}
+							placeholder="Choose distance"
+							prefix={<MarkIcon />}
+							onChange={onChangeFilter('radius')}
+						/>
+					</Flex>
 				</Flex>
-				<Flex>
-					<CDatePickerRanger
-						isWhite
-						style={{ background: '#fff', borderRadius: 40 }}
-						disabled={loading.event}
-						value={date}
-						onChange={onChangeFilter('date')}
-					/>
-				</Flex>
-				<Flex className={classes.distance}>
-					<CSelect
-						isMaxRadius
-						isWhite
-						style={{ background: '#fff', borderRadius: 40 }}
-						disabled={loading.event}
-						value={radius}
-						options={radiusOpts}
-						placeholder="Choose distance"
-						prefix={<MarkIcon />}
-						onChange={onChangeFilter('radius')}
-					/>
-				</Flex>
-				<Flex className={classes.distance}>
-					<CSelect
-						isMaxRadius
-						isWhite
-						style={{ background: '#fff', borderRadius: 40 }}
-						disabled={loading.event}
-						value={categories}
-						options={typeEvent}
-						placeholder="Categories"
-						prefix={
-							<Flex className={classes.prefixIcon}>
-								<HappyIcon fill="#fff" />
+				<Flex className={classes.categoryWrapper}>
+					{typeEvent.map((item) => {
+						const { value, label } = item
+						return (
+							<Flex
+								key={value}
+								className={clsx(classes.categoryItem, {
+									[classes.categoryActive]: (categories || []).includes(value),
+									[classes.disabled]: loading.event,
+								})}
+								onClick={() =>
+									!loading.event && onChangeFilter('categories')(value)
+								}
+							>
+								{label}
 							</Flex>
-						}
-						onChange={onChangeFilter('categories')}
-					/>
+						)
+					})}
 				</Flex>
 			</Flex>
 		)

@@ -8,6 +8,9 @@
 		gap: 12px;
 		width: 100%;
 		overflow: overlay;
+		.renderFilter {
+			gap: 16px;
+		}
 		.filter {
 			// background: #fff;
 			border-radius: 16px;
@@ -18,6 +21,32 @@
 			}
 			.search {
 				width: 295px;
+			}
+		}
+		.categoryWrapper {
+			overflow: auto;
+			gap: 8px;
+			&::-webkit-scrollbar {
+				display: none;
+			}
+			.categoryItem {
+				padding: 8px 12px;
+				justify-content: center;
+				align-items: center;
+				gap: 8px;
+				background: #fff;
+				border-radius: 40px;
+				cursor: pointer;
+				min-width: fit-content;
+			}
+			.categoryActive {
+				border: 1px solid #006b35;
+				background: #e7f5e9;
+				color: #006b35;
+			}
+			.disabled {
+				cursor: not-allowed;
+				opacity: 0.5;
 			}
 		}
 		.hangout {
