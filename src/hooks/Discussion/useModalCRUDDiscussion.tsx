@@ -119,7 +119,6 @@ export default function useModalCRUDDiscussion({
 			medias = (resList || []).map((i) => ({
 				url: i,
 				type: 'IMAGE',
-				...i,
 			}))
 		}
 
