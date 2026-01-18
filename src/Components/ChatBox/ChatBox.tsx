@@ -23,6 +23,7 @@ import { specialTypeMessage } from '@/Variable/common.variable'
 
 import MoreIcon from '@/svg/MoreIcon'
 import classes from './ChatBox.module.scss'
+import { parseDayFromIsNewDate } from '@/ultis/date.ults'
 interface ChatBoxProps {
 	type?: string
 	itemList?: any[]
@@ -179,47 +180,63 @@ const ChatBox = ({
 		}
 	}
 	const _renderItemChat = ({ item }) => {
-		const { id, user, isFirst, isLast, type, user_id, isTemp } = item || {}
+		const {
+			id,
+			user,
+			isFirst,
+			isLast,
+			isNewDate,
+			type,
+			user_id,
+			created_at,
+			isTemp,
+		} = item || {}
 
 		const isMe = getUserInfo('id') === user_id
 		const isMemberAction = specialTypeMessage.includes(type)
 		const isNot = isMe || isMemberAction
 		return (
-			<Flex
-				className={clsx(classes.itemChat, {
-					[classes.mt2]: isFirst,
-					[classes.isMe]: isMe,
-					[classes.isLast]: isLast,
-					[classes.isCenter]: isMemberAction,
-					[classes.isTemp]: isTemp,
-				})}
-				key={id}
-			>
-				<Flex className={classes.contentItem}>
-					{!isNot && (
-						<Flex className={classes.avatar}>
-							{isFirst && <CAvatar src={user?.avatar} />}
-						</Flex>
-					)}
-					<Flex className={classes.contentInfo} vertical>
-						{isFirst && !isNot && (
-							<Flex className={classes.name}>{user?.name}</Flex>
+			<Flex vertical key={id}>
+				{isNewDate && (
+					<Flex className={classes.date}>
+						{parseDayFromIsNewDate(created_at)}
+					</Flex>
+				)}
+				<Flex
+					className={clsx(classes.itemChat, {
+						[classes.mt2]: isFirst,
+						[classes.isMe]: isMe,
+						[classes.isLast]: isLast,
+						[classes.isCenter]: isMemberAction,
+						[classes.isTemp]: isTemp,
+					})}
+				>
+					<Flex className={classes.contentItem}>
+						{!isNot && (
+							<Flex className={classes.avatar}>
+								{isFirst && <CAvatar src={user?.avatar} />}
+							</Flex>
 						)}
-						<Flex className={classes.content}>
-							{!(isTemp || isMemberAction) && (
-								<Flex className={classes.moreIconWrapper}>
-									<Dropdown
-										trigger={['click']}
-										menu={{ items: onGetMenus({ item, isMe }) }}
-										disabled={isTemp || isMemberAction}
-									>
-										<Flex className={classes.moreIcon}>
-											<MoreIcon />
-										</Flex>
-									</Dropdown>
-								</Flex>
+						<Flex className={classes.contentInfo} vertical>
+							{isFirst && !isNot && (
+								<Flex className={classes.name}>{user?.name}</Flex>
 							)}
-							{_renderContentChat(item)}
+							<Flex className={classes.content}>
+								{!(isTemp || isMemberAction) && (
+									<Flex className={classes.moreIconWrapper}>
+										<Dropdown
+											trigger={['click']}
+											menu={{ items: onGetMenus({ item, isMe }) }}
+											disabled={isTemp || isMemberAction}
+										>
+											<Flex className={classes.moreIcon}>
+												<MoreIcon />
+											</Flex>
+										</Dropdown>
+									</Flex>
+								)}
+								{_renderContentChat(item)}
+							</Flex>
 						</Flex>
 					</Flex>
 				</Flex>
