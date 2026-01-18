@@ -73,7 +73,14 @@ export default function useUserMoreAction({
 			setLoading(false)
 			toggleLoadingContext()
 		}
-	}, [isFriend, onCallback, openError, openSuccess, toggleLoadingContext])
+	}, [
+		isFriend,
+		isProfile,
+		onCallback,
+		openError,
+		openSuccess,
+		toggleLoadingContext,
+	])
 	const handleClose = useCallback(() => {
 		setOpen({ open: false, data: '' })
 	}, [])

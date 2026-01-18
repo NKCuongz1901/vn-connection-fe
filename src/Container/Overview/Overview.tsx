@@ -24,7 +24,6 @@ import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
 import ModelChooseHangout from '@/Components/Hangout/ModelChooseHangout'
 import EventIcon from '@/svg/Event'
 import PencilIcon from '@/svg/Hangout/PencilIcon'
-import HappyIcon from '@/svg/HappyIcon'
 import MarkIcon from '@/svg/MarkIcon'
 import Message2Icon from '@/svg/Message2Icon'
 import NotFound from '@/svg/NotFound'
@@ -290,9 +289,9 @@ const Overview = () => {
 													className={classes.contentSkeletonInput}
 												/>
 											</Flex>
-									  ))
+										))
 									: isArray(listNetwork, 1) &&
-									  listNetwork.map((i) => {
+										listNetwork.map((i) => {
 											const { id, avatar, userRole, title } = i || {}
 											return (
 												<Flex
@@ -314,7 +313,7 @@ const Overview = () => {
 													<div className={classes.communityLabel}>{title}</div>
 												</Flex>
 											)
-									  })}
+										})}
 							</Flex>
 						</>
 					)}
@@ -374,9 +373,9 @@ const Overview = () => {
 													className={classes.contentSkeletonInput2}
 												/>
 											</Flex>
-									  ))
+										))
 									: isArray(listChatRoom, 1) &&
-									  listChatRoom.map((i) => {
+										listChatRoom.map((i) => {
 											const { id, avatar, title, amount_of_user } = i || {}
 											return (
 												<Flex
@@ -405,7 +404,7 @@ const Overview = () => {
 													</div>
 												</Flex>
 											)
-									  })}
+										})}
 							</Flex>
 						</>
 					)}
