@@ -102,12 +102,17 @@ const Friend = () => {
 						pagination?.total / pagination?.limit || 1,
 					)
 					_paginationRefs.current[type].totalPage = totalPage
-					const data = results?.objects?.rows || []
+					const { rows: data, count } = results?.objects || []
+
 					setFriendList((prev) => {
 						const contents = isNew ? [] : prev[type]
 						const dataShow = uniqueArray([...contents, ...data], 'id') as any
 						return { ...prev, [type]: dataShow }
 					})
+					setTotal((prev) => ({
+						...prev,
+						[type]: count || 0,
+					}))
 				}
 			} catch (error) {
 				console.error('  error:', error)
@@ -333,7 +338,7 @@ const Friend = () => {
 											/>
 										</Flex>
 									)
-							  })
+								})
 							: !loading[activeTab] && (
 									<Flex className={classes.notFound} vertical>
 										<NotFound />
@@ -346,7 +351,7 @@ const Friend = () => {
 											<CButton ctype="oranger">Explore now</CButton>
 										</Flex> */}
 									</Flex>
-							  )}
+								)}
 						{loading[activeTab] &&
 							Array.from({ length: 4 }).map((_, index) => (
 								<Skeleton.Input

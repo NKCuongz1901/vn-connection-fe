@@ -4,19 +4,21 @@ import { useCallback, useMemo, useState } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { deleteFriend } from '@/apis/friendApis'
+import { deleteFriend, updateFriend } from '@/apis/friendApis'
 import { blockUser } from '@/apis/userApis'
 import { isFunction } from '@/ultis/common.ults'
 
 export default function useUserMoreAction({
 	id,
 	isFriend,
+	isProfile,
 	isNotBlock,
 	onCallback,
 }: {
 	id: string
 	isFriend?: any
 	isNotBlock?: boolean
+	isProfile?: boolean
 	onCallback?: any
 }) {
 	const { toggleLoadingContext } = useLoading()
@@ -44,7 +46,13 @@ export default function useUserMoreAction({
 		setLoading(true)
 		try {
 			toggleLoadingContext(true)
-			const res = await deleteFriend({ id: isFriend?.id })
+			const res = await (isProfile
+				? deleteFriend({ id: isFriend?.id })
+				: updateFriend({
+						id: isFriend?.id,
+						payload: { state: 'REJECTED' },
+					}))
+
 			if (res) {
 				openSuccess({
 					message: 'You have successfully unfriended this user.',
@@ -102,7 +110,7 @@ export default function useUserMoreAction({
 							label: 'Unfriend',
 							onClick: () => handleMenusClick('unfriend'),
 						},
-				  ]
+					]
 				: []),
 
 			...(!isNotBlock
@@ -112,7 +120,7 @@ export default function useUserMoreAction({
 							label: 'Block',
 							onClick: () => handleMenusClick('block'),
 						},
-				  ]
+					]
 				: []),
 
 			{

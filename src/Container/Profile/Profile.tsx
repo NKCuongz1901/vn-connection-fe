@@ -175,6 +175,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 							<Flex className={classes.icon}>
 								<UserMoreAction
 									id={id}
+									isProfile
 									isFriend={!isMinimize && is_friend}
 									onCallback={onGetUserProfile}
 								/>
@@ -377,7 +378,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 							id: 3,
 							Icon: ProfileCircleIcon,
 						},
-				  ]),
+					]),
 			{
 				label: 'Member since',
 				value: created_at ? dayjs(created_at).format(formatDate.dmy) : '',

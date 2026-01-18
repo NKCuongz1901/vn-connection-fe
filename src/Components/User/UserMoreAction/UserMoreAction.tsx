@@ -6,26 +6,17 @@ import useUserMoreAction from '@/hooks/User/useUserMoreAction'
 
 import ModalReport from '../../Custom/ModalReport'
 
-const UserMoreAction = ({
-	id,
-	isFriend,
-	isNotBlock,
-	iconDotsStyle = {},
-	onCallback,
-}: {
+const UserMoreAction = (props: {
 	id: string
 	isFriend?: any
 	isNotBlock?: boolean
+	isProfile?: boolean
 	iconDotsStyle?: CSSProperties
 	onCallback?: any
 	[key: string]: any
 }) => {
-	const { loading, menus, open, onClose } = useUserMoreAction({
-		id,
-		isFriend,
-		isNotBlock,
-		onCallback,
-	})
+	const { iconDotsStyle = {} } = props
+	const { loading, menus, open, onClose } = useUserMoreAction(props)
 	return (
 		<Flex onClick={(e) => e.stopPropagation()}>
 			<Dropdown disabled={loading} menu={{ items: menus }} trigger={['click']}>
