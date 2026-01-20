@@ -229,7 +229,7 @@ const Overview = () => {
 						<Flex className={classes.notData} vertical>
 							<EventIcon fill="#1e9037" />
 							<span className={classes.labelNoData}>
-								You haven't joined any events yet !
+								You haven't joined any activities yet !
 							</span>
 							<CButton
 								ctype="oranger"
@@ -494,7 +494,7 @@ const Overview = () => {
 							<Flex className={classes.eventNotFound} vertical>
 								<NotFound />
 								<span className={classes.eventNotFoundTitle}>
-									No events here yet
+									No activities here yet
 								</span>
 								<span className={classes.eventNotFoundLabel}>
 									Try another location or create a meetup to bring people

@@ -130,10 +130,10 @@ export default function useEventCoHost({ id, user }: any) {
 					},
 					{
 						key: 'ALL',
-						label: 'All repeated events',
+						label: 'All repeated activities',
 						onClick: () => handleMenusClick({ key: 'ALL', id, isUpgrate }),
 					},
-			  ]
+				]
 		return menus
 	}
 	const handleMenusClick = ({

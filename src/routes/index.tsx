@@ -146,13 +146,13 @@ export const Menus = [
 		child: [],
 	},
 	{
-		title: 'My Events',
+		title: 'My Activities',
 		Icon: Event,
 		path: mainRoutes.event,
 		child: [],
 	},
 	{
-		title: 'Upcoming Events',
+		title: 'Upcoming Activities',
 		Icon: UpcomingEvent,
 		path: mainRoutes.upcomingEvent,
 		child: [],

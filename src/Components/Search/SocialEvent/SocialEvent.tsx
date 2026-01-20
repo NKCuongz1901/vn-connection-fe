@@ -31,7 +31,7 @@ interface EventInAppProps {
 	}
 	[key: string]: any
 }
-const Local = (props: EventInAppProps) => {
+const SocialEvent = (props: EventInAppProps) => {
 	const { onChangeRoute } = useLocalePath()
 	const {
 		_loadmore,
@@ -137,7 +137,7 @@ const Local = (props: EventInAppProps) => {
 						onClick={() => onChangeRoute(mainRoutes.search)}
 					/>
 					<UpcomingEvent fill="#1E9037" />
-					<div className={classes.headerLabel}>Social Events </div>
+					<div className={classes.headerLabel}>Social Activities </div>
 					<Flex className={classes.totalEvent}>{total.event}</Flex>
 				</Flex>
 				{_renderFilter()}
@@ -147,4 +147,4 @@ const Local = (props: EventInAppProps) => {
 	)
 }
 
-export default memo(Local)
+export default memo(SocialEvent)

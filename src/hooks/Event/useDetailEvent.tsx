@@ -252,7 +252,7 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 									? [
 											{
 												key: 'ALL',
-												label: 'Edit all future events',
+												label: 'Edit all future activities',
 												onClick: () => handleMenusClick({ key: 'ALL' }),
 											},
 											{
@@ -261,10 +261,10 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 												onClick: () =>
 													handleMenusClick({ key: 'ONLY_THIS_EVENT' }),
 											},
-									  ]
+										]
 									: null,
 							},
-					  ]
+						]
 					: []),
 				{
 					key: 'share',
@@ -279,7 +279,7 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 								style: { color: '#F80024' },
 								onClick: () => handleMenusClick({ key: 'cancel' }),
 							},
-					  ]
+						]
 					: []),
 			]
 		},
@@ -292,7 +292,7 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 			return [
 				{
 					key: 'ALL',
-					label: 'Edit all future events',
+					label: 'Edit all future activities',
 					onClick: () => handleMenusClick({ key: 'ALL' }),
 				},
 				{

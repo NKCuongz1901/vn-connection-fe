@@ -255,7 +255,7 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 				</Flex>
 				<Flex className="headerSearchMainLayout">
 					<CInput
-						placeholder="Find your events"
+						placeholder="Find your activities"
 						style={{ borderRadius: 40, height: 40 }}
 						prefix={<SearchOutlined className="headerSeachOutline" />}
 					/>
