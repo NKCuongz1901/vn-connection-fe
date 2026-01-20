@@ -60,7 +60,8 @@ interface ProfileProps {
 	id?: string
 	isMinimize?: boolean
 }
-const Profile = ({ id, isMinimize }: ProfileProps) => {
+const Profile = (props: ProfileProps) => {
+	const { isMinimize } = props
 	const { onGetQuerry } = useQuery()
 	const { redirect } = onGetQuerry()
 	const {
@@ -76,9 +77,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		onMenusClick,
 		onOpenInbox,
 		onReDirect,
-	} = useProfile({
-		id,
-	})
+	} = useProfile(props)
 	const { goBackOrPush } = useSafeBack()
 	const { onChangeRoute } = useLocalePath()
 	const _renderButtonFriend = useCallback(() => {
@@ -176,6 +175,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 								<UserMoreAction
 									id={id}
 									isProfile
+									userData={userData}
 									isFriend={!isMinimize && is_friend}
 									onCallback={onGetUserProfile}
 								/>
