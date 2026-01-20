@@ -14,6 +14,7 @@ interface CInputOthersProps {
 	desc?: string
 	isRequired?: boolean
 	isNotBold?: boolean
+	isFullHeight?: boolean
 	[key: string]: any
 }
 
@@ -36,8 +37,7 @@ interface CDatePickerOthersProps {
 }
 
 export interface CDatePickerProps
-	extends CDatePickerOthersProps,
-		DatePickerProps {}
+	extends CDatePickerOthersProps, DatePickerProps {}
 
 interface CSelectOthersProps {
 	isRequired?: boolean

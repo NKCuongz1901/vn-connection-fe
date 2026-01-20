@@ -199,9 +199,14 @@ const ModalCRUDCommunity = ({
 			<Flex className={classes.right}>
 				<CTextArea
 					isRequired
+					isFullHeight
 					showCount
 					label="About"
-					placeholder="Describe the community"
+					placeholder={`Share your community’s purpose or vibe.
+								What’s this community about?
+								Tell what members can do here.
+								Describe your main topic or goal. 
+								What makes your community special?`}
 					value={about}
 					error={errors.about}
 					maxLength={2000}

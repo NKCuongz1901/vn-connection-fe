@@ -13,6 +13,9 @@
 	border-radius: 16px;
 	background: #f4f8fc;
 }
+.wrapper :global(.ant-input::placeholder) {
+	white-space: pre-line;
+}
 .wrapper :global(.ant-input-group-addon) {
 	padding: 8px 16px;
 	background: #f4f8fc;
@@ -33,4 +36,7 @@
 			transition: background-color 2147483647s;
 		}
 	}
+}
+.fullHeight {
+	flex: 1;
 }
