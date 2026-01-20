@@ -183,6 +183,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		const isMemberAction = specialTypeMessage.includes(type)
 		const typeMedia = medias?.[0]?.type
 		const loadingSpToText = !!listSpToTextLoading[id]
+		console.log('🌸🌸🌸 TrieuNinhHan ~ :187 ~ _renderContentChat ~ type:', type)
 		switch (type) {
 			case 'TEXT':
 				return (
@@ -364,6 +365,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 			case 'MEMBER_JOIN':
 			case 'POST':
 			case 'OPEN_TALKROOM':
+			case 'OPEN_CHAT_CREATE':
 				return <></>
 			default:
 				return <Flex className={classes.memberAccept}>{type}</Flex>
