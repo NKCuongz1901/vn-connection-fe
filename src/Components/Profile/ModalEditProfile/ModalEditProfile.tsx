@@ -104,7 +104,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					label="About"
 					error={errors.about_me}
 					value={about_me}
-					maxLength={200}
+					maxLength={2000}
 					rows={4}
 					placeholder="Write something about you"
 					onChange={(e) => onChangeData('about_me', e.target.value)}
