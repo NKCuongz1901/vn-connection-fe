@@ -134,8 +134,8 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 				break
 			case 'leave':
 				openConfirm({
-					titleLabel: 'Leave event',
-					message: 'Are you sure want to leave event ?',
+					titleLabel: 'Leave activity',
+					message: 'Are you sure want to leave activity ?',
 					onAccept: () => {
 						handleJoinPost()
 						closeModal()
@@ -201,12 +201,12 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 			case 'cancel':
 				openConfirm({
 					message:
-						'We will send a message to inform the attendees that the event has been canceled',
+						'We will send a message to inform the attendees that the activity has been canceled',
 					onAccept: () => {
 						handleCancelEventConfirm()
 						closeModal()
 					},
-					titleLabel: 'Cancel event',
+					titleLabel: 'Cancel activity',
 				})
 				break
 			case 'ALL':
@@ -238,13 +238,13 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 					? [
 							{
 								key: 'extend',
-								label: 'Extend event',
+								label: 'Extend activity',
 								onClick: () =>
 									handleSetOpenModal({ type: 'extend', dataModal: detailPost }),
 							},
 							{
 								key: 'edit',
-								label: 'Edit event',
+								label: 'Edit activity',
 								onClick: () =>
 									!isRepeat &&
 									handleSetOpenModal({ type: 'edit', dataModal: detailPost }),
@@ -257,7 +257,7 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 											},
 											{
 												key: 'ONLY_THIS_EVENT',
-												label: 'Edit only this event',
+												label: 'Edit only this activity',
 												onClick: () =>
 													handleMenusClick({ key: 'ONLY_THIS_EVENT' }),
 											},
@@ -268,14 +268,14 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 					: []),
 				{
 					key: 'share',
-					label: 'Share event',
+					label: 'Share activity',
 					onClick: () => handleMenusClick({ key: 'share' }),
 				},
 				...(isHost
 					? [
 							{
 								key: 'cancel',
-								label: 'Cancel event',
+								label: 'Cancel activity',
 								style: { color: '#F80024' },
 								onClick: () => handleMenusClick({ key: 'cancel' }),
 							},
@@ -297,7 +297,7 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 				},
 				{
 					key: 'ONLY_THIS_EVENT',
-					label: 'Edit only this event',
+					label: 'Edit only this activity',
 					onClick: () => handleMenusClick({ key: 'ONLY_THIS_EVENT' }),
 				},
 			]

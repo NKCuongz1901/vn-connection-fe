@@ -384,7 +384,9 @@ export default function useCRUDEvent({
 			const { code, results } = res || {}
 			if (code === 200) {
 				openSuccess({
-					message: id ? 'Edit event successfully' : 'Create event successfully',
+					message: id
+						? 'Edit activity successfully'
+						: 'Create activity successfully',
 					onAccept: () => {
 						if (onSuccess) {
 							onSuccess?.(results?.object)
@@ -407,8 +409,8 @@ export default function useCRUDEvent({
 		}
 		openConfirm({
 			message: id
-				? 'Do you want edit this event ?'
-				: 'Do you want create event ?',
+				? 'Do you want edit this activity ?'
+				: 'Do you want create activity ?',
 			onAccept: handleCreatePost,
 		})
 	}

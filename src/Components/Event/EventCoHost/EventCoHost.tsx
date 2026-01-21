@@ -93,7 +93,9 @@ const EventCoHost = ({ id, user }) => {
 							)
 						})
 					) : (
-						<Flex className={classes.notFound}>This event has no co-host</Flex>
+						<Flex className={classes.notFound}>
+							This activity has no co-host
+						</Flex>
 					)}
 				</Flex>
 			</CModal>

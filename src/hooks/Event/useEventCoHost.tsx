@@ -124,7 +124,7 @@ export default function useEventCoHost({ id, user }: any) {
 			: [
 					{
 						key: 'ONLY_THIS_EVENT',
-						label: 'This event only',
+						label: 'This activity only',
 						onClick: () =>
 							handleMenusClick({ key: 'ONLY_THIS_EVENT', id, isUpgrate }),
 					},

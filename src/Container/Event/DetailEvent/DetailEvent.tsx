@@ -148,7 +148,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 										disabled={loadingContext}
 										icon={<IconEdit />}
 									>
-										Edit event
+										Edit activity
 									</CButton>
 								</Dropdown>
 							) : (
@@ -160,7 +160,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 										onSetOpenModal({ type: 'edit', dataModal: detailPost })
 									}
 								>
-									Edit event
+									Edit activity
 								</CButton>
 							)
 						) : is_joined ? (
@@ -234,7 +234,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 				{isRepeat && (
 					<Flex className={classes.repeat}>
 						<IconRepeat className={classes.iconRepeat} />
-						<span>Repeated event</span>
+						<span>Repeated activity</span>
 					</Flex>
 				)}
 				{_renderInfo()}
@@ -329,12 +329,12 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 					const options = [
 						{
 							value: 'ONLY_THIS_EVENT',
-							label: 'Delete only this event',
+							label: 'Delete only this activity',
 							ctype: 'oranger',
 						},
 						{
 							value: 'ALL',
-							label: 'Delete all future event',
+							label: 'Delete all future activity',
 							ctype: 'disabled',
 						},
 					]

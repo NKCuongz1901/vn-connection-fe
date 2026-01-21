@@ -200,14 +200,14 @@ const ModalCRUDEvent = ({
 						longitude={longitude}
 						latitude={latitude}
 						error={error.address}
-						label="Where is my event happening?"
+						label="Where is my activity happening?"
 						placeholder="Enter location"
 						onSubmitModal={onChangeValue('address')}
 						prefix={<IconMapPinFilled />}
 					/>
 				</Flex>
 				<Flex className={classes.time} vertical>
-					<span className={classes.title}>When is my event happening?</span>
+					<span className={classes.title}>When is my activity happening?</span>
 					<Flex className={classes.timePicker} vertical>
 						<CDatePicker
 							showTime
@@ -243,14 +243,14 @@ const ModalCRUDEvent = ({
 				<Flex className={classes.desc}>
 					<CSelect
 						disabled={!!id}
-						label="Does this event repeat"
+						label="Does this activity repeat"
 						value={type}
 						options={
 							sameDate
 								? repeatOpt
 								: repeatOpt.filter(
 										(i) => !['DAILY', 'MULTI_DAYS'].includes(i.value),
-								  )
+									)
 						}
 						placeholder="Select type repeat"
 						onChange={onChangeValue('type')}
@@ -321,7 +321,7 @@ const ModalCRUDEvent = ({
 			<CModal
 				onClose={onClose}
 				onCancel={onClose}
-				title={id ? 'Edit event' : 'Create event'}
+				title={id ? 'Edit activity' : 'Create activity'}
 				styles={{
 					content: {
 						width: 800,
@@ -335,7 +335,7 @@ const ModalCRUDEvent = ({
 							ctype="oranger"
 							style={{ width: 200 }}
 						>
-							{id ? 'Edit event' : 'Create event'}
+							{id ? 'Edit activity' : 'Create activity'}
 						</CButton>
 					</Flex>,
 				]}
