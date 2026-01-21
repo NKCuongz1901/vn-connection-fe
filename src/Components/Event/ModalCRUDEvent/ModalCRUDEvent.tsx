@@ -26,9 +26,14 @@ import CSelectMuti from '@/Components/Custom/CSelectMuti'
 import CSwitch from '@/Components/Custom/CSwitch'
 import CTextArea from '@/Components/Custom/CTextArea'
 import CUpload from '@/Components/Custom/CUpload'
+import Event from '@/svg/Event'
 
 import { daysOfWeek } from '@/Variable/common.variable'
-import { repeatOpt, ticketEntranceTypeOpt } from '@/Variable/select.variable'
+import {
+	repeatOpt,
+	ticketEntranceTypeOpt,
+	typeEvent,
+} from '@/Variable/select.variable'
 
 import classes from './ModalCRUDEvent.module.scss'
 
@@ -88,12 +93,29 @@ const ModalCRUDEvent = ({
 	}
 	const _renderTopRight = () => {
 		const { ticketSw, pricingSw } = toggle
-		const { ticket_entrance_type, ticket_entrance, menu_price } = event
+		const {
+			ticket_entrance_type,
+			ticket_entrance,
+			menu_price,
+			expect_participant,
+		} = event
 		const { min: minEntr, max: maxEntr } = ticket_entrance
 		const { min: minPrice, max: maxPrice } = menu_price
 
 		return (
 			<>
+				<Flex className={classes.numberPeople}>
+					<CInput
+						value={expect_participant}
+						error={error.expect_participant}
+						label="Let people know how many are joining?"
+						placeholder="Number of people"
+						subLabel="Only add attendee number when you're sure people have confirmed."
+						maxLength={10}
+						prefix={<IconUsersGroup />}
+						onChange={onChangeValue('expect_participant')}
+					/>
+				</Flex>
 				<Flex className={classes.entrance} vertical>
 					<Flex className={classes.entranceOpt}>
 						<span className={classes.title}>Ticket entrance fee</span>
@@ -189,6 +211,7 @@ const ModalCRUDEvent = ({
 			repeat_type,
 			longitude,
 			latitude,
+			categories,
 		} = event
 		const { type, days, amount_of_repeat } = repeat_type
 		return (
@@ -303,6 +326,20 @@ const ModalCRUDEvent = ({
 						placeholder="Write something here"
 						onChange={onChangeValue('description')}
 						maxLength={2000}
+					/>
+				</Flex>
+				<Flex className={classes.desc}>
+					<CSelectMuti
+						isRequired
+						isSimple
+						error={error.categories}
+						maxLength={3}
+						value={categories}
+						label="Activity Category"
+						placeholder="Select your languages"
+						options={typeEvent}
+						prefix={<Event fill="#7987A4" />}
+						onChange={onChangeValue('categories')}
 					/>
 				</Flex>
 			</>

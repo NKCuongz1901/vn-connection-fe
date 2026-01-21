@@ -12,6 +12,7 @@ interface CInputOthersProps {
 	label?: string
 	error?: string
 	desc?: string
+	subLabel?: string
 	isRequired?: boolean
 	isNotBold?: boolean
 	isFullHeight?: boolean

@@ -319,5 +319,4 @@ export const typeEvent = [
 	{ value: 'Social', label: 'Social' },
 	{ value: 'Workshop', label: 'Workshop' },
 	{ value: 'Language Exchange', label: 'Language Exchange' },
-	{ value: 'Business', label: 'Business' },
 ]

@@ -32,9 +32,11 @@ const handleParseData = (data: any) => {
 		thumbnails,
 		ticket_entrance_type,
 		limit_participant,
+		expect_participant,
 		ticket_entrance,
 		menu_price,
 		repeat_type,
+		categories,
 		id,
 	} = data || {}
 	const [minEntr, maxEntr] = (ticket_entrance || '').split(':')
@@ -52,6 +54,8 @@ const handleParseData = (data: any) => {
 		ticket_entrance_type:
 			ticket_entrance_type || ticketEntranceTypeOpt[0].value,
 		limit_participant,
+		expect_participant,
+		categories: categories,
 		ticket_entrance: {
 			min: formatNumberString(minEntr),
 			max: formatNumberString(maxEntr),
@@ -100,6 +104,8 @@ export default function useCRUDEvent({
 		limit_participant: '',
 		days: '',
 		description: '',
+		expect_participant: '',
+		categories: '',
 	})
 	const [toggle, setToggle] = useState({
 		ticketSw: [
@@ -188,12 +194,18 @@ export default function useCRUDEvent({
 					key = 'repeat_type'
 					break
 				case 'limit_participant':
+				case 'expect_participant':
 					value = formatNumberString(_value.target.value)
 					break
 				case 'start_time':
 				case 'end_time':
 					if (dayjs(_value).isBefore(dayjs())) {
 						value = null
+					}
+					break
+				case 'categories':
+					if (isArray(value, 4)) {
+						return openError('You can only select up to 3 items')
 					}
 					break
 				default:
@@ -217,6 +229,7 @@ export default function useCRUDEvent({
 			repeat_type,
 			ticket_entrance,
 			menu_price,
+			categories,
 		} = event
 		const { ticketSw, pricingSw } = toggle
 		const { type, days } = repeat_type
@@ -227,6 +240,7 @@ export default function useCRUDEvent({
 			start_time,
 			end_time,
 			thumbnails,
+			categories,
 			// limit_participant,
 		}
 		const _error = {} as any
@@ -235,6 +249,11 @@ export default function useCRUDEvent({
 				case 'title':
 				case 'description':
 					if (!(value || '').trim()) {
+						_error[key] = 'Field is required'
+					}
+					break
+				case 'categories':
+					if (!isArray(value, 1)) {
 						_error[key] = 'Field is required'
 					}
 					break
@@ -321,7 +340,9 @@ export default function useCRUDEvent({
 			ticket_entrance,
 			menu_price,
 			limit_participant,
+			expect_participant,
 			repeat_type,
+			categories,
 		} = event
 		const { ticketSw, pricingSw } = toggle
 		const { min: minEntr, max: maxEntr } = ticket_entrance
@@ -366,11 +387,13 @@ export default function useCRUDEvent({
 			longitude: longitude,
 			thumbnails: _thumbnails || [],
 			ticket_entrance_type: ticketSw ? ticket_entrance_type : 'FREE',
-			limit_participant: Number(limit_participant),
+			limit_participant: Number(convertStringToNumber(limit_participant)),
+			expect_participant: Number(convertStringToNumber(expect_participant)),
 			ticket_entrance: _ticket_entrance,
 			menu_price: _menu_price,
 			area_name: null,
 			repeat_type,
+			categories: categories || [],
 			edit_type: edit_type || null,
 		}
 	}
