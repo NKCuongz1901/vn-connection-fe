@@ -225,7 +225,8 @@ const Local = (props: LocalProps) => {
 		return (
 			<Flex className={classes.userList} onScroll={onScroll}>
 				{user.map((item) => {
-					const { id, avatar, name, country_code, age, gender } = item || {}
+					const { id, avatar, name, i_am_from, country_code, age, gender } =
+						item || {}
 					const IconGender = genderIcon[gender]
 					return (
 						<Flex key={id} vertical className={classes.user}>
@@ -237,7 +238,7 @@ const Local = (props: LocalProps) => {
 								/>
 								<div
 									className={clsx(
-										`flag:${mappingFlag[country_code] || country_code}`,
+										`flag:${mappingFlag[i_am_from || country_code] || i_am_from || country_code}`,
 										classes.flag,
 									)}
 								/>
