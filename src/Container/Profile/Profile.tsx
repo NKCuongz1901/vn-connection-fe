@@ -303,7 +303,7 @@ const Profile = (props: ProfileProps) => {
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
 					<div className={classes.title}>About me</div>
-					<div>{about_me}</div>
+					<div className={classes.aboutMe}>{about_me}</div>
 				</Flex>
 			</Flex>
 		)

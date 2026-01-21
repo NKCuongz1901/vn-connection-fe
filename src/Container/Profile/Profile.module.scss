@@ -136,6 +136,9 @@
 			gap: 8px;
 			width: 100%;
 			font-size: 14px;
+			.aboutMe {
+				white-space: pre-wrap;
+			}
 			.friend {
 				color: #006b35;
 			}
