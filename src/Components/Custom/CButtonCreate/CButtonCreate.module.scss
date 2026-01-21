@@ -1,0 +1,15 @@
+.wrapper {
+	.container {
+		button {
+			height: 32px;
+			font-size: 12px;
+			padding: 8px;
+			span {
+				display: flex;
+				align-items: center;
+				line-height: 16px;
+				gap: 4px;
+			}
+		}
+	}
+}

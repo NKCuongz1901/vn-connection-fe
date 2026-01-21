@@ -2,7 +2,6 @@ import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { memo } from 'react'
 
-import { useLoading } from '@/context/LoadingContext'
 import useOverview from '@/hooks/Overview/useOverview'
 
 import { arrayFrom, isArray } from '@/ultis/array.ults'
@@ -13,10 +12,10 @@ import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
 import CAvatar from '@/Components/Custom/CAvatar'
 import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
 import CButton from '@/Components/Custom/CButton'
+import CButtonCreate from '@/Components/Custom/CButtonCreate'
 import CDatePickerRanger from '@/Components/Custom/CDatePickerRanger'
 import CInput from '@/Components/Custom/CInput'
 import CSelect from '@/Components/Custom/CSelect'
-import CSwitch from '@/Components/Custom/CSwitch'
 import EventTitle from '@/Components/Event/EventTitle'
 import ItemEvent from '@/Components/Event/ItemEvent'
 import ItemEventTicket from '@/Components/Event/ItemEventTicket'
@@ -41,7 +40,6 @@ import { LEFT_FLAG } from '@/Variable/countryVariable'
 import classes from './Overview.module.scss'
 
 const Overview = () => {
-	const { loadingContext } = useLoading()
 	const { onChangeRoute } = useLocalePath()
 	const {
 		_childRef,
@@ -60,7 +58,6 @@ const Overview = () => {
 
 		setModal,
 		OnChangeTitleHangout,
-		onUpdateUserInfo,
 		onCRUDSuccess,
 		onScroll,
 
@@ -162,14 +159,19 @@ const Overview = () => {
 										{totalHangout + Number(is_open_hangout)} People available to
 										hangout now
 									</span>
-									<CSwitch
+									<CButtonCreate
+										onClick={() => onChangeRoute(mainRoutes.hangout)}
+									>
+										Hangout now
+									</CButtonCreate>
+									{/* <CSwitch
 										value={is_open_hangout}
 										disabled={loadingContext}
 										ctype="success"
 										onChange={(value) =>
 											onUpdateUserInfo({ is_open_hangout: value })
 										}
-									/>
+									/> */}
 								</Flex>
 							</Flex>
 							<Flex
@@ -202,6 +204,7 @@ const Overview = () => {
 					<EventTitle
 						label={mappingEventTitle[type] || type}
 						number={totalMyEvent}
+						labelCreateBtn="Create activity"
 						icon={<EventIcon />}
 						onAddNew={(e) => {
 							e?.stopPropagation?.()
@@ -253,6 +256,7 @@ const Overview = () => {
 					<EventTitle
 						label="My community"
 						number={total.network}
+						labelCreateBtn="Create community"
 						icon={<People />}
 						onAddNew={(e) => {
 							e?.stopPropagation?.()

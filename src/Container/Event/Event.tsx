@@ -67,6 +67,7 @@ const Event = (_props: EventProps) => {
 					hiddenAdd={hiddenAdd}
 					label={mappingEventTitle[type] || type}
 					number={total}
+					labelCreateBtn="Create activity"
 					icon={<EventIcon />}
 					onAddNew={(e) => {
 						e?.stopPropagation?.()
