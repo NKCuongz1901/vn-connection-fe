@@ -17,6 +17,7 @@ import { memo } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import useDetailEvent from '@/hooks/Event/useDetailEvent'
 
+import { isArray } from '@/ultis/array.ults'
 import { cloneDeep } from '@/ultis/common.ults'
 import { getDateInfo } from '@/ultis/date.ults'
 import { isEmptyObject } from '@/ultis/object.ults'
@@ -34,6 +35,7 @@ import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
 import ModalMyFriend from '@/Components/Friend/ModalMyFriend'
 import GroupPeopleIcon from '@/svg/Event/GroupPeopleIcon'
 import GroupPeopleJoinIcon from '@/svg/Event/GroupPeopleJoinIcon'
+import GroupIcon from '@/svg/GroupIcon'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import { repeatOpt, ticketEntranceType } from '@/Variable/select.variable'
@@ -113,6 +115,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 			repeat_type,
 			amount_of_participant,
 			limit_participant,
+			categories,
 		} = detailPost || {}
 		const { type } = repeat_type || {}
 		const id = getUserInfo('id')
@@ -138,7 +141,18 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 		return (
 			<Flex className={classes.info} vertical>
 				<Flex className={classes.title}>
-					<div className={classes.titleLabel}>{title}</div>
+					<Flex className={classes.titleInfo} vertical>
+						<div className={classes.titleLabel}>{title}</div>
+						{isArray(categories, 1) && (
+							<Flex className={classes.categories}>
+								{(categories || []).map((i) => (
+									<div key={i} className={classes.category}>
+										{i}
+									</div>
+								))}
+							</Flex>
+						)}
+					</Flex>
 					<Flex className={classes.btn}>
 						{isHost ? (
 							isRepeat ? (
@@ -222,7 +236,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 		)
 	}
 	const _renderTop = () => {
-		const { thumbnails, repeat_type } = detailPost || {}
+		const { thumbnails, repeat_type, expect_participant } = detailPost || {}
 		const { type } = repeat_type || {}
 		const isRepeat = type !== repeatOpt[0].value
 		return (
@@ -231,6 +245,12 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 				<Flex className={classes.image}>
 					<CImage src={thumbnails?.[0] || ''} />
 				</Flex>
+				{!!expect_participant && (
+					<Flex className={classes.expectParticipant}>
+						<GroupIcon />
+						<div>Joining: {formatNumberString(expect_participant)}</div>
+					</Flex>
+				)}
 				{isRepeat && (
 					<Flex className={classes.repeat}>
 						<IconRepeat className={classes.iconRepeat} />

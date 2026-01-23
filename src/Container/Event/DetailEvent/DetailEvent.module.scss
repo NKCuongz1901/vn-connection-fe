@@ -12,6 +12,24 @@
 			width: 100%;
 
 			position: relative;
+			.expectParticipant {
+				position: absolute;
+				padding: 4px 16px 4px 8px;
+				justify-content: center;
+				align-items: center;
+				gap: 8px;
+				border-radius: 16px;
+				border: 1px solid #f4f8fc;
+				background: #fff;
+				color: #000;
+				font-size: 12px;
+				font-weight: 600;
+				height: 36px;
+				z-index: 1;
+				top: 200px;
+				transform: translateY(-50%);
+				left: 24px;
+			}
 			.action {
 				position: absolute;
 				z-index: 1;
@@ -76,8 +94,26 @@
 					font-weight: 600;
 					gap: 12px;
 					word-break: break-word;
-					.titleLabel {
+					.titleInfo {
 						flex: 1;
+						gap: 8px;
+					}
+					.titleLabel {
+					}
+					.categories {
+						gap: 8px;
+						font-size: 14px;
+						font-weight: 400;
+						.category {
+							padding: 8px 12px;
+							justify-content: center;
+							align-items: center;
+							gap: 8px;
+							background: #f4f7fc;
+							border-radius: 40px;
+							cursor: pointer;
+							min-width: fit-content;
+						}
 					}
 					.btn {
 						gap: 12px;
