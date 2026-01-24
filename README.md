@@ -32,6 +32,7 @@ npm run dev
 2. Boolean
 3. Common type
 4. Function
+5. Oke
 
 ## Rule commit code
 
