@@ -84,7 +84,7 @@ const ModalCRUDEvent = ({
 					<CInput
 						value={title}
 						error={error.title}
-						placeholder="Event title"
+						placeholder="Activities title"
 						onChange={onChangeValue('title')}
 					/>
 				</Flex>
