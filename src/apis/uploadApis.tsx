@@ -16,6 +16,7 @@ export const uploadProgress = async (
 			headers: {
 				'Content-Type': file.type,
 				Authorization: undefined,
+				'Cache-Control': 'public, max-age=31536000, immutable',
 			},
 		})
 
@@ -34,6 +35,7 @@ export const uploadProgressAudio = async (file) => {
 			headers: {
 				'Content-Type': file.type,
 				Authorization: undefined,
+				'Cache-Control': 'public, max-age=31536000, immutable',
 			},
 		})
 
@@ -53,6 +55,7 @@ export const uploadProgressVideo = async (file) => {
 			headers: {
 				'Content-Type': file.type,
 				Authorization: undefined,
+				'Cache-Control': 'public, max-age=31536000, immutable',
 			},
 		})
 
