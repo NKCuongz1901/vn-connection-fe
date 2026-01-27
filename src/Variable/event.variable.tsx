@@ -9,3 +9,12 @@ export const participantType = {
 	OWNER: 'OWNER',
 	USER: 'USER',
 }
+
+export const mappingTabBtn = {
+	interested: 'interested',
+	my: 'my',
+}
+export const tabBtns = [
+	{ value: mappingTabBtn.interested, label: 'Interested activities' },
+	{ value: mappingTabBtn.my, label: 'My activities' },
+]

@@ -11,21 +11,16 @@ import { paginationCommon } from '@/Variable/common.variable'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { mainRoutes } from '@/routes/MainRoutes'
-import { mappingTabBtn } from '@/Variable/event.variable'
 
-export default function useEvent({ type, onCRUDSuccess }: any) {
+export default function useUpcomingEvent({ type, onCRUDSuccess }: any) {
 	const { openError } = useModal()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const _parentRef = useRef<HTMLDivElement | null>(null)
 	const _childRef = useRef<HTMLDivElement | null>(null)
 	const [listPost, setListPost] = useState([]) as any[]
 	const [loadmore, setLoadMore] = useState(true)
-	const [total, setTotal] = useState({
-		[mappingTabBtn.interested]: 0,
-		[mappingTabBtn.my]: 0,
-	})
+	const [total, setTotal] = useState(0)
 	const [loading, setLoading] = useState(false)
-	const [tabActive, setTabActive] = useState(mappingTabBtn.interested)
 	const handleGetListPost = async (isNotLoading = false) => {
 		setLoading(true)
 		try {
@@ -33,9 +28,6 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 			let isNew = page === 1
 			if (isNotLoading) {
 				isNew = false
-			}
-			if (isNew) {
-				setListPost([])
 			}
 			const params = {
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
@@ -45,9 +37,7 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 				radius: 20,
 			}
 
-			const res: any = await (
-				tabActive === mappingTabBtn.my ? getListPost : getMyEventsJoined
-			)(params)
+			const res: any = await (true ? getListPost : getMyEventsJoined)(params)
 
 			const { code, results } = res || {}
 			await delay(1000)
@@ -61,34 +51,13 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 					const dataShow = uniqueArray([...contents, ...rows], 'id') as any[]
 					return dataShow
 				})
-				setTotal((prev) => ({ ...prev, [tabActive]: count }))
+				setTotal(count)
 			}
 		} catch (error) {
 			openError(error)
 		} finally {
 			setLoading(false)
 		}
-	}
-
-	const handleGetTotal = async () => {
-		try {
-			const params = {
-				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
-				page: 1,
-				limit: 1,
-				type,
-				radius: 20,
-			}
-
-			const [listPostRes, myEventsRes]: any = await Promise.all([
-				getListPost(params),
-				getMyEventsJoined(params),
-			])
-			setTotal({
-				[mappingTabBtn.interested]: myEventsRes?.pagination?.total,
-				[mappingTabBtn.my]: listPostRes?.pagination?.total,
-			})
-		} catch {}
 	}
 
 	const handleLoadMore = async () => {
@@ -125,14 +94,9 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 	}
 
 	useEffect(() => {
-		handleGetTotal()
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
-	useEffect(() => {
-		_paginationRefs.current.page = 1
 		handleGetListPost()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [tabActive])
+	}, [])
 
 	useEffect(() => {
 		handleAutoLoadMore()
@@ -141,13 +105,11 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 
 	return {
 		loading,
-		tabActive,
 		_parentRef,
 		_childRef,
 		total,
 		listPost,
 		onScroll: handleScroll,
 		onSuccess: handleCreateSuccess,
-		setTabActive,
 	}
 }

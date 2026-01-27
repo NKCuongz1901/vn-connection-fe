@@ -39,6 +39,7 @@ export const POST_ROUTES = {
 	sticker: 'sticker',
 	myEventInHome: 'post/my-event-in-home',
 	likeComment: 'comment/like',
+	myEventsJoined: 'post/my-events-joined',
 }
 export const CONVERSATION_ROUTES = {
 	name: 'conversation',
