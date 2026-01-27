@@ -123,6 +123,27 @@
 						}
 					}
 				}
+				.eventRepeatBox {
+					width: 100px;
+					justify-content: center;
+					border-radius: 16px;
+					background: #f4f8fc;
+					font-size: 14px;
+					padding: 8px;
+					gap: 8px;
+					color: #48546b;
+					border: 1px solid #f4f8fc;
+					cursor: pointer;
+				}
+				.activeEventRepeatBox {
+					color: #006b35;
+					background: rgba(0, 107, 53, 0.05);
+					border: 1px solid #006b35;
+					svg,
+					path {
+						fill: #006b35;
+					}
+				}
 				.price {
 					width: 100%;
 					.entr {

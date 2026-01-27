@@ -84,6 +84,21 @@ export const goToGoogleMap = ({ lat, lng }: { lat: number; lng: number }) => {
 		handleGoToPage(url, '_blank')
 	}
 }
-export const onPushState = (params: { [key: string]: any }) => {
-	window.history.pushState({}, '', '?' + new URLSearchParams(params).toString())
+export const onPushState = (
+	params?: { [key: string]: any },
+	newId?: string,
+) => {
+	let pathname = window.location.pathname
+
+	if (newId) {
+		const parts = pathname.split('/')
+		parts[parts.length - 1] = newId
+		pathname = parts.join('/')
+	}
+
+	const query = params
+		? '?' + new URLSearchParams(params).toString()
+		: window.location.search
+
+	window.history.pushState({}, '', pathname + query)
 }

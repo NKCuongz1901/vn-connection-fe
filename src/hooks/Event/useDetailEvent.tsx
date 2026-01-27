@@ -24,7 +24,7 @@ interface useDetailEventProps {
 	id: string
 	[key: string]: any
 }
-export default function useDetailEvent({ id }: useDetailEventProps) {
+export default function useDetailEvent({ id: _id }: useDetailEventProps) {
 	const { openConfirm, openError, openSuccess, closeModal } = useModal()
 	const { toggleLoadingContext } = useLoading()
 	const { onChangeRoute } = useLocalePath()
@@ -32,6 +32,7 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 	const _refKeyEventParticipant = useRef(randomString())
 
 	const [detailPost, setDetailPost] = useState({}) as any
+	const [id, setId] = useState(_id)
 	const [loading, setLoading] = useState({ detailLoad: false })
 	const [loadingShare, setLoadingShare] = useState({}) as any
 	const [shareList, setShareList] = useState([]) as any
@@ -310,8 +311,12 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id])
 
+	useEffect(() => {
+		setId(_id)
+	}, [_id])
 	return {
 		_refKeyEventParticipant,
+		id,
 		loading,
 		loadingShare,
 		detailPost,
@@ -326,5 +331,6 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 		onShareFriend: handleShareFriend,
 		onGetDetailPost: handleGetDetailPost,
 		onCopy: handleCopy,
+		setId,
 	}
 }

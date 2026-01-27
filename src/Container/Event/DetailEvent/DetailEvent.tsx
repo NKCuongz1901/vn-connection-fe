@@ -12,6 +12,8 @@ import {
 	IconTicket,
 } from '@tabler/icons-react'
 import { Dropdown, Flex, Skeleton } from 'antd'
+import clsx from 'clsx'
+import dayjs from 'dayjs'
 import { memo } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
@@ -21,7 +23,7 @@ import { isArray } from '@/ultis/array.ults'
 import { cloneDeep } from '@/ultis/common.ults'
 import { getDateInfo } from '@/ultis/date.ults'
 import { isEmptyObject } from '@/ultis/object.ults'
-import { goToGoogleMap, useSafeBack } from '@/ultis/route.ults'
+import { goToGoogleMap, onPushState, useSafeBack } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 import { formatNumberString } from '@/ultis/string.ults'
 
@@ -33,6 +35,7 @@ import EventComment from '@/Components/Event/EventComment'
 import EventParticipant from '@/Components/Event/EventParticipant'
 import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
 import ModalMyFriend from '@/Components/Friend/ModalMyFriend'
+import ClockIcon from '@/svg/ClockIcon'
 import GroupPeopleIcon from '@/svg/Event/GroupPeopleIcon'
 import GroupPeopleJoinIcon from '@/svg/Event/GroupPeopleJoinIcon'
 import GroupIcon from '@/svg/GroupIcon'
@@ -53,9 +56,10 @@ interface DetailEventProps {
 	type?: string
 	[key: string]: any
 }
-const DetailEvent = ({ id, type }: DetailEventProps) => {
+const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 	const {
 		_refKeyEventParticipant,
+		id,
 		detailPost,
 		loading,
 		loadingShare,
@@ -69,10 +73,12 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 		onShareFriend,
 		onGetDetailPost,
 		onCopy,
-	} = useDetailEvent({ id })
+		setId,
+	} = useDetailEvent({ id: _id })
 	const { detailLoad } = loading
 	const { loadingContext } = useLoading()
 	const { goBackOrPush } = useSafeBack()
+	const { events } = detailPost || {}
 	const _renderSkeleton = () => {
 		return (
 			<Flex className={classes.container} vertical>
@@ -84,6 +90,37 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 						style={{ width: '100%', height: i.value }}
 					/>
 				))}
+			</Flex>
+		)
+	}
+	const _renderEvents = () => {
+		if (!isArray(events, 2)) return
+		return (
+			<Flex gap={10}>
+				{events.map((event) => {
+					const { id: idEvent, start_time } = event
+					const date = dayjs(start_time).format('ddd, D MMM').toUpperCase()
+					const time = dayjs(start_time).format('HH:ss').toUpperCase()
+					return (
+						<Flex
+							className={clsx(classes.eventRepeatBox, {
+								[classes.activeEventRepeatBox]: id === idEvent,
+							})}
+							key={idEvent}
+							vertical
+							onClick={() => {
+								onPushState({}, idEvent)
+								setId(idEvent)
+							}}
+						>
+							<div className="bold">{date}</div>
+							<Flex gap={4} align="center">
+								<ClockIcon />
+								{time}
+							</Flex>
+						</Flex>
+					)
+				})}
 			</Flex>
 		)
 	}
@@ -209,6 +246,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 						</CButton>
 					</Flex>
 				</Flex>
+				{_renderEvents()}
 				<Flex className={classes.price}>
 					<Flex className={classes.entr} vertical>
 						<Flex>
@@ -432,7 +470,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 	}
 	return (
 		<div className={classes.wrapper}>
-			{detailLoad ? (
+			{detailLoad && isEmptyObject(detailPost) ? (
 				_renderSkeleton()
 			) : !isEmptyObject(detailPost) ? (
 				<Flex className={classes.container} vertical>
