@@ -54,7 +54,7 @@ const Search = () => {
 					<EventTitle
 						hiddenNumber
 						hiddenAdd
-						label={`${total.user} locals and expats ${
+						label={`${total.user} Locals and Expats ${
 							address ? `in ${address}` : ''
 						}`}
 						icon={<ProfileIcon />}
@@ -89,7 +89,7 @@ const Search = () => {
 					<EventTitle
 						hiddenNumber
 						hiddenAdd
-						label={`${total.event} social activities ${
+						label={`${total.event} Social Activities ${
 							address ? `in ${address}` : ''
 						}`}
 						icon={<ProfileIcon />}
