@@ -219,7 +219,7 @@ export default function useCRUDEvent({
 	const handleValidate = () => {
 		const {
 			title,
-			description,
+			// description,
 			address,
 			start_time,
 			end_time,
@@ -235,7 +235,7 @@ export default function useCRUDEvent({
 		const { type, days } = repeat_type
 		const fields = {
 			title,
-			description,
+			// description,
 			address,
 			start_time,
 			end_time,
