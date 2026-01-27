@@ -507,7 +507,6 @@ const Overview = () => {
 							</Flex>
 						)}
 					</Flex>
-					{_renderModal()}
 				</Flex>
 			</Flex>
 			{_renderModal()}
