@@ -154,11 +154,17 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 			limit_participant,
 			categories,
 		} = detailPost || {}
+		console.log(
+			'🌸🌸🌸 TrieuNinhHan ~ :155 ~ _renderInfo ~ limit_participant:',
+			limit_participant,
+		)
 		const { type } = repeat_type || {}
 		const id = getUserInfo('id')
 		const isHost = id === user_id
 		const isRepeat = type !== repeatOpt[0].value
-		const isFull = amount_of_participant + 1 >= limit_participant
+		const isFull =
+			limit_participant !== null &&
+			amount_of_participant + 1 >= limit_participant
 		let ticketValue = ''
 		const [minEntr, maxEntr] = (ticket_entrance || '').split(':')
 		switch (ticket_entrance_type) {
