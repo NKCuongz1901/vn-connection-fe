@@ -12,6 +12,11 @@ import CModal from '@/Components/Custom/CModal/CModal'
 import CAvatar from '@/Components/Custom/CAvatar'
 
 import { mainRoutes } from '@/routes/MainRoutes'
+import { stateFriends } from '@/Variable/common.variable'
+import ProfileFriendPlus from '@/svg/ProfileFriendPlus'
+import ProfileFriend from '@/svg/ProfileFriend'
+import ProfileTick from '@/svg/FriendSvg/ProfileTick'
+import { getUserInfo } from '@/ultis/storage.ults'
 
 interface ModalEventParticipantProps {
 	id: string
@@ -21,13 +26,57 @@ interface ModalEventParticipantProps {
 const ModalEventParticipant = (_props: ModalEventParticipantProps) => {
 	const { id, onClose } = _props
 	const { onGetPath } = useLocalePath()
-	const { loading, _parentRef, _childRef, participantList, onScroll } =
-		useModalEventParticipant({ id })
+	const {
+		loading,
+		_parentRef,
+		_childRef,
+		participantList,
+		total,
+		onScroll,
+		onAddFriend,
+		onRemoveFriend,
+		onOpenModalRemoveFriend,
+	} = useModalEventParticipant({ id })
+	const { id: idMe } = getUserInfo()
+	const _renderStatusFriend = (item) => {
+		const { is_friend } = item || {}
+
+		const { state } = is_friend || {}
+		switch (state) {
+			case stateFriends.PENDING:
+				return (
+					<div
+						className={classes.statusFriend}
+						onClick={() => onRemoveFriend(item)}
+					>
+						<ProfileFriend />
+					</div>
+				)
+			case stateFriends.ACCEPTED:
+				return (
+					<div
+						className={classes.statusFriend}
+						onClick={() => onOpenModalRemoveFriend(item)}
+					>
+						<ProfileTick fill="#E55A0F" />
+					</div>
+				)
+			default:
+				return (
+					<div
+						className={classes.statusFriend}
+						onClick={() => onAddFriend(item)}
+					>
+						<ProfileFriendPlus />
+					</div>
+				)
+		}
+	}
 	return (
 		<CModal
 			onClose={onClose}
 			onCancel={onClose}
-			title={'Participants'}
+			title={`Participants (${total})`}
 			styles={{
 				content: {
 					width: 800,
@@ -50,7 +99,9 @@ const ModalEventParticipant = (_props: ModalEventParticipantProps) => {
 						>
 							{participantList.map((item: any) => {
 								const { user, id, user_id } = item || {}
+
 								const { avatar, name } = user || {}
+								const isMe = user_id === idMe
 								return (
 									<Flex key={id} className={classes.participantItem}>
 										<Link
@@ -62,6 +113,7 @@ const ModalEventParticipant = (_props: ModalEventParticipantProps) => {
 												<span className={classes.name}>{name}</span>
 											</Flex>
 										</Link>
+										{!isMe && _renderStatusFriend(item)}
 									</Flex>
 								)
 							})}
