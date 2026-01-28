@@ -23,7 +23,7 @@ import classes from './EventCoHost.module.scss'
 
 const EventCoHost = ({ id, user, onCallBack = () => null }) => {
 	const { onGetPath } = useLocalePath()
-	const { avatar: uAvatar } = user || {}
+	const { avatar: uAvatar, name, id: user_id } = user || {}
 	const {
 		openModal,
 		loading,
@@ -60,7 +60,18 @@ const EventCoHost = ({ id, user, onCallBack = () => null }) => {
 				footer={[<div key="back"></div>]}
 			>
 				<Flex vertical className={classes.participantList}>
-					{isArray(participantList, 1) ? (
+					<Flex className={classes.participantItem}>
+						<Link
+							href={onGetPath(`${mainRoutes.profile}/${user_id}`)}
+							target="_blank"
+						>
+							<Flex className={classes.left}>
+								<CAvatar src={uAvatar} />
+								<span className={classes.name}>{name}</span>
+							</Flex>
+						</Link>
+					</Flex>
+					{isArray(participantList, 1) &&
 						participantList.map((item: any) => {
 							const { user, id, user_id } = item || {}
 							const { avatar, name } = user || {}
@@ -91,12 +102,7 @@ const EventCoHost = ({ id, user, onCallBack = () => null }) => {
 									</Flex>
 								</Flex>
 							)
-						})
-					) : (
-						<Flex className={classes.notFound}>
-							This activity has no co-host
-						</Flex>
-					)}
+						})}
 				</Flex>
 			</CModal>
 		)
@@ -175,7 +181,7 @@ const EventCoHost = ({ id, user, onCallBack = () => null }) => {
 					>
 						Host by
 					</div>
-					<div>{total}</div>
+					<div>{(total || 0) + 1}</div>
 				</Flex>
 				<Flex className={classes.hostList}>
 					{isAdd && !loading && (
