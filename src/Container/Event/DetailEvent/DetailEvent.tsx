@@ -287,7 +287,7 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 			<Flex className={classes.top} vertical>
 				{_renderAction()}
 				<Flex className={classes.image}>
-					<CImage src={thumbnails?.[0] || ''} />
+					<CImage preview src={thumbnails?.[0] || ''} />
 				</Flex>
 				{!!expect_participant && (
 					<Flex className={classes.expectParticipant}>
