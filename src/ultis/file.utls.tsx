@@ -85,7 +85,7 @@ export const handleConverUrlToAudio = async (url) => {
 
 		return new File([blob], 'audio.mp3', { type: blob.type })
 	} catch (error) {
-		console.log('🌸 handleConverUrlToAudio error:', error)
+		console.log('🌸 handleConverUrlToAudio error:123123', error)
 	}
 }
 
