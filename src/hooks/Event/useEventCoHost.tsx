@@ -181,5 +181,6 @@ export default function useEventCoHost({
 		loadingCoHost,
 		onSetOpenModal: handleSetOpenModal,
 		onGetMenus: handleGetMenus,
+		onMenusClick: handleMenusClick,
 	}
 }

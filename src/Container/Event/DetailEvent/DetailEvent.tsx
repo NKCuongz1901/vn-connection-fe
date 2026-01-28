@@ -75,6 +75,10 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 		onCopy,
 		setId,
 	} = useDetailEvent({ id: _id })
+	console.log(
+		'🌸🌸🌸 TrieuNinhHan ~ :78 ~ DetailEvent ~ detailPost:',
+		detailPost,
+	)
 	const { detailLoad } = loading
 	const { loadingContext } = useLoading()
 	const { goBackOrPush } = useSafeBack()
@@ -332,6 +336,7 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 					<EventCoHost
 						id={id}
 						user={user}
+						detailPost={detailPost}
 						onCallBack={() =>
 							(_refKeyEventParticipant.current = randomString())
 						}

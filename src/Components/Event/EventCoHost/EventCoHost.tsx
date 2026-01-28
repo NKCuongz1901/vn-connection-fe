@@ -20,8 +20,9 @@ import StarIcon from '@/svg/Event/StarIcon'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './EventCoHost.module.scss'
+import { repeatOpt } from '@/Variable/select.variable'
 
-const EventCoHost = ({ id, user, onCallBack = () => null }) => {
+const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
 	const { onGetPath } = useLocalePath()
 	const { avatar: uAvatar, name, id: user_id } = user || {}
 	const {
@@ -32,7 +33,11 @@ const EventCoHost = ({ id, user, onCallBack = () => null }) => {
 		loadingCoHost,
 		onSetOpenModal,
 		onGetMenus,
+		onMenusClick,
 	} = useEventCoHost({ id, user, onCallBack })
+	const { repeat_type } = detailPost || {}
+	const { type } = repeat_type || {}
+	const isRepeat = type !== repeatOpt[0].value
 	const isAdd =
 		(!isArray(participantList, 3) &&
 			!!participantList.find((item) => item.user_id === getUserInfo('id'))) ||
@@ -92,13 +97,27 @@ const EventCoHost = ({ id, user, onCallBack = () => null }) => {
 										</Flex>
 									</Link>
 									<Flex className={classes.right}>
-										<Dropdown
-											menu={{ items: menus }}
-											trigger={['click']}
-											disabled={loadingCoHost}
-										>
-											<IconTrash className={classes.iconTrash} />
-										</Dropdown>
+										{isRepeat ? (
+											<Dropdown
+												menu={{ items: menus }}
+												trigger={['click']}
+												disabled={loadingCoHost}
+											>
+												<IconTrash className={classes.iconTrash} />
+											</Dropdown>
+										) : (
+											<div
+												onClick={() =>
+													onMenusClick({
+														key: 'ALL',
+														id: user_id,
+														isUpgrate: false,
+													})
+												}
+											>
+												<IconTrash className={classes.iconTrash} />
+											</div>
+										)}
 									</Flex>
 								</Flex>
 							)
@@ -159,13 +178,27 @@ const EventCoHost = ({ id, user, onCallBack = () => null }) => {
 
 		return (
 			<div className={classes.btnAddHost}>
-				<Dropdown
-					trigger={['click']}
-					menu={{ items: menus }}
-					disabled={loadingCoHost}
-				>
-					<CButton ctype="oranger">{isUpgrate ? 'Add' : 'Delete'}</CButton>
-				</Dropdown>
+				{isRepeat ? (
+					<Dropdown
+						trigger={['click']}
+						menu={{ items: menus }}
+						disabled={loadingCoHost}
+					>
+						<CButton ctype="oranger">{isUpgrate ? 'Add' : 'Delete'}</CButton>
+					</Dropdown>
+				) : (
+					<div
+						onClick={() =>
+							onMenusClick({
+								key: 'ALL',
+								id,
+								isUpgrate,
+							})
+						}
+					>
+						<CButton ctype="oranger">{isUpgrate ? 'Add' : 'Delete'}</CButton>
+					</div>
+				)}
 			</div>
 		)
 	}
