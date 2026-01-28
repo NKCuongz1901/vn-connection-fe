@@ -21,7 +21,7 @@ import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './EventCoHost.module.scss'
 
-const EventCoHost = ({ id, user }) => {
+const EventCoHost = ({ id, user, onCallBack = () => null }) => {
 	const { onGetPath } = useLocalePath()
 	const { avatar: uAvatar } = user || {}
 	const {
@@ -32,7 +32,7 @@ const EventCoHost = ({ id, user }) => {
 		loadingCoHost,
 		onSetOpenModal,
 		onGetMenus,
-	} = useEventCoHost({ id, user })
+	} = useEventCoHost({ id, user, onCallBack })
 	const isAdd =
 		(!isArray(participantList, 3) &&
 			!!participantList.find((item) => item.user_id === getUserInfo('id'))) ||

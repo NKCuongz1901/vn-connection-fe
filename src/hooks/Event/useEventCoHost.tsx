@@ -12,7 +12,11 @@ import { cloneDeep, delay } from '@/ultis/common.ults'
 import { paginationCommon } from '@/Variable/common.variable'
 import { PaginationType } from '@/interface/common/common.interface'
 
-export default function useEventCoHost({ id, user }: any) {
+export default function useEventCoHost({
+	id,
+	user,
+	onCallBack = () => null,
+}: any) {
 	const { openError, openConfirm, openSuccess } = useModal()
 	const { toggleLoadingContext } = useLoading()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
@@ -95,6 +99,7 @@ export default function useEventCoHost({ id, user }: any) {
 			if (code === 200) {
 				_paginationRefs.current.page = 1
 				await handleGetListParticipant()
+				onCallBack()
 				openSuccess({
 					message: isUpgrate
 						? 'Add co-host successfully'

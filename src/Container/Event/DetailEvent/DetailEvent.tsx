@@ -25,7 +25,7 @@ import { getDateInfo } from '@/ultis/date.ults'
 import { isEmptyObject } from '@/ultis/object.ults'
 import { goToGoogleMap, onPushState, useSafeBack } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
-import { formatNumberString } from '@/ultis/string.ults'
+import { formatNumberString, randomString } from '@/ultis/string.ults'
 
 import CButton from '@/Components/Custom/CButton'
 import CImage from '@/Components/Custom/CImage'
@@ -154,10 +154,6 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 			limit_participant,
 			categories,
 		} = detailPost || {}
-		console.log(
-			'🌸🌸🌸 TrieuNinhHan ~ :155 ~ _renderInfo ~ limit_participant:',
-			limit_participant,
-		)
 		const { type } = repeat_type || {}
 		const id = getUserInfo('id')
 		const isHost = id === user_id
@@ -332,7 +328,15 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 			(repeatOpt.find((i) => i.value === type)?.label || '') + ','
 		return (
 			<Flex className={classes.detail} vertical>
-				{id && <EventCoHost id={id} user={user} />}
+				{id && (
+					<EventCoHost
+						id={id}
+						user={user}
+						onCallBack={() =>
+							(_refKeyEventParticipant.current = randomString())
+						}
+					/>
+				)}
 
 				{id && (
 					<EventParticipant id={id} key={_refKeyEventParticipant.current} />
