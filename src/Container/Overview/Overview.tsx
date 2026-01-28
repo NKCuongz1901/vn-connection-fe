@@ -156,7 +156,7 @@ const Overview = () => {
 								</Flex>
 								<Flex className={classes.switchStatus}>
 									<span>
-										{totalHangout + Number(is_open_hangout)} People available to
+										{totalHangout + Number(is_open_hangout)} people available to
 										hangout now
 									</span>
 									<CButtonCreate
