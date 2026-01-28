@@ -173,6 +173,7 @@ export interface ConversationProps {
 	post: any
 	host: UserProps
 	friend: any
+	country_code?: string
 	join: {
 		id: string
 		user_id: string

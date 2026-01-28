@@ -102,7 +102,8 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		)
 	}
 	const _renderInfo = () => {
-		const { type, avatar, title, bio, address, host_id, join } = convInfo || {}
+		const { type, avatar, title, bio, address, host_id, join, country_code } =
+			convInfo || {}
 		const { type: typeJoin } = join || {}
 
 		const isCreateAnnou = getUserInfo('id') === host_id || typeJoin === 'ADMIN'
@@ -117,7 +118,10 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 					<Flex className={classes.commonInfo} vertical>
 						<div className={classes.name}>{title}</div>
 						<div className={classes.address}>{bio || ''}</div>
-						<Flex className={classes.address}>{address}</Flex>
+						<Flex className={classes.address}>
+							<div className={clsx(`flag:${country_code}`)} />
+							{address}
+						</Flex>
 					</Flex>
 				</Flex>
 				<Flex className={classes.endButton}>
