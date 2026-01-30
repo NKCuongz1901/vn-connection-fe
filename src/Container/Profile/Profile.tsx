@@ -311,14 +311,14 @@ const Profile = (props: ProfileProps) => {
 	}, [toJson(userData)])
 
 	const _renderLanguages = useCallback(() => {
-		const { user_languages, languages_can_speak } = userData || {}
+		const { user_languages, languages_can_speak_array } = userData || {}
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
 					<div className={classes.title}>Languages</div>
 					<Flex vertical gap={12}>
 						<Flex className={classes.languageName}>
-							<div>{languages_can_speak}</div>
+							<div>{(languages_can_speak_array || []).join(', ')}</div>
 							<div
 								className={clsx(
 									classes.proficiencyLevel,

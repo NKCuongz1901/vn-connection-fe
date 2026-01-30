@@ -123,7 +123,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 			who_i_am,
 			looking_for,
 			i_can_offer,
-			languages_can_speak,
+			languages_can_speak_array,
 			country_visited,
 			country_lived,
 			longitude,
@@ -225,13 +225,13 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 						<CSelectMuti
 							isRequired
 							isSimple
-							error={errors.languages_can_speak}
-							value={languages_can_speak}
+							error={errors.languages_can_speak_array}
+							value={languages_can_speak_array}
 							label="Native languages"
 							placeholder="Select your languages"
 							options={languageOpts}
 							prefix={<WorldIcon fill="#7987A4" />}
-							onChange={(e) => onChangeData('languages_can_speak', e)}
+							onChange={(e) => onChangeData('languages_can_speak_array', e)}
 						/>
 					</Flex>
 					<Flex vertical gap={4}>
