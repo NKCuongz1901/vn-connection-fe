@@ -71,19 +71,20 @@ const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
 							target="_blank"
 						>
 							<Flex className={classes.left}>
-								<CAvatar src={uAvatar} />
+								<CAvatarBandage src={uAvatar} />
 								<span className={classes.name}>{name}</span>
 							</Flex>
 						</Link>
 					</Flex>
 					{isArray(participantList, 1) &&
 						participantList.map((item: any) => {
-							const { user, id, user_id } = item || {}
+							const { isOnwer, isAdmin, user, id, user_id } = item || {}
 							const { avatar, name } = user || {}
 							const menus: ItemType[] = onGetMenus({
 								id: user_id,
 								isUpgrate: false,
 							})
+							const Content = isOnwer || isAdmin ? CAvatarBandage : CAvatar
 
 							return (
 								<Flex key={id} className={classes.participantItem}>
@@ -92,7 +93,10 @@ const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
 										target="_blank"
 									>
 										<Flex className={classes.left}>
-											<CAvatar src={avatar} />
+											<Content
+												src={avatar}
+												{...(isAdmin && { customeBandage: <StarIcon /> })}
+											/>{' '}
 											<span className={classes.name}>{name}</span>
 										</Flex>
 									</Link>
