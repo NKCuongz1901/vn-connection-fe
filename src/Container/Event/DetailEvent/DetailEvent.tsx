@@ -13,7 +13,6 @@ import {
 } from '@tabler/icons-react'
 import { Dropdown, Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
-import dayjs from 'dayjs'
 import { memo } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'

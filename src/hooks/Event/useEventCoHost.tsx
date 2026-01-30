@@ -39,7 +39,6 @@ export default function useEventCoHost({
 			const { page, limit } = _paginationRefs.current
 			const isNew = page === 1
 			if (isNew) {
-				setParticipantList([])
 			}
 			const params = {
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
