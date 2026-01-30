@@ -1,3 +1,4 @@
+'use client'
 import { Flex } from 'antd'
 import { memo } from 'react'
 

@@ -112,7 +112,7 @@ const ModalCRUDEvent = ({
 						placeholder="Number of people"
 						subLabel="Only add attendee number when you're sure people have confirmed."
 						maxLength={10}
-						prefix={<IconUsersGroup />}
+						prefix={<IconUsersGroup color="#7987a4" />}
 						onChange={onChangeValue('expect_participant')}
 					/>
 				</Flex>
@@ -226,7 +226,7 @@ const ModalCRUDEvent = ({
 						label="Where is my activity happening?"
 						placeholder="Enter location"
 						onSubmitModal={onChangeValue('address')}
-						prefix={<IconMapPinFilled />}
+						prefix={<IconMapPinFilled fill="#7987a4" />}
 					/>
 				</Flex>
 				<Flex className={classes.time} vertical>
@@ -260,7 +260,7 @@ const ModalCRUDEvent = ({
 						label="How many people can join?"
 						placeholder="Number of people"
 						maxLength={10}
-						prefix={<IconUsersGroup />}
+						prefix={<IconUsersGroup color="#7987a4" />}
 					/>
 				</Flex>
 				<Flex className={classes.desc}>
@@ -278,7 +278,7 @@ const ModalCRUDEvent = ({
 						placeholder="Select type repeat"
 						onChange={onChangeValue('type')}
 						maxLength={400}
-						prefix={<IconRepeat />}
+						prefix={<IconRepeat color="#7987a4" />}
 					/>
 				</Flex>
 				{type === 'MULTI_DAYS' && (
