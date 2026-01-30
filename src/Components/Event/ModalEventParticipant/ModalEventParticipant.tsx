@@ -1,22 +1,25 @@
-import React, { memo } from 'react'
-import Link from 'next/link'
 import { Flex, Skeleton } from 'antd'
+import Link from 'next/link'
+import { memo } from 'react'
 
 import useModalEventParticipant from '@/hooks/Event/useModalEventParticipant'
 
 import { arrayFrom } from '@/ultis/array.ults'
 import { useLocalePath } from '@/ultis/route.ults'
+import { getUserInfo } from '@/ultis/storage.ults'
 
-import classes from './ModalEventParticipant.module.scss'
-import CModal from '@/Components/Custom/CModal/CModal'
 import CAvatar from '@/Components/Custom/CAvatar'
+import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
+import CModal from '@/Components/Custom/CModal/CModal'
+import StarIcon from '@/svg/Event/StarIcon'
+import classes from './ModalEventParticipant.module.scss'
+
+import ProfileTick from '@/svg/FriendSvg/ProfileTick'
+import ProfileFriend from '@/svg/ProfileFriend'
+import ProfileFriendPlus from '@/svg/ProfileFriendPlus'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import { stateFriends } from '@/Variable/common.variable'
-import ProfileFriendPlus from '@/svg/ProfileFriendPlus'
-import ProfileFriend from '@/svg/ProfileFriend'
-import ProfileTick from '@/svg/FriendSvg/ProfileTick'
-import { getUserInfo } from '@/ultis/storage.ults'
 
 interface ModalEventParticipantProps {
 	id: string
@@ -98,10 +101,12 @@ const ModalEventParticipant = (_props: ModalEventParticipantProps) => {
 							onScroll={onScroll}
 						>
 							{participantList.map((item: any) => {
-								const { user, id, user_id } = item || {}
+								const { isOnwer, isAdmin, user, id, user_id } = item || {}
 
 								const { avatar, name } = user || {}
 								const isMe = user_id === idMe
+								const Content = isOnwer || isAdmin ? CAvatarBandage : CAvatar
+
 								return (
 									<Flex key={id} className={classes.participantItem}>
 										<Link
@@ -109,7 +114,10 @@ const ModalEventParticipant = (_props: ModalEventParticipantProps) => {
 											target="_blank"
 										>
 											<Flex className={classes.left}>
-												<CAvatar src={avatar} />
+												<Content
+													src={avatar}
+													{...(isAdmin && { customeBandage: <StarIcon /> })}
+												/>
 												<span className={classes.name}>{name}</span>
 											</Flex>
 										</Link>

@@ -8,6 +8,7 @@ export const mappingEventTitle = {
 export const participantType = {
 	OWNER: 'OWNER',
 	USER: 'USER',
+	ADMIN: 'ADMIN',
 }
 
 export const mappingTabBtn = {

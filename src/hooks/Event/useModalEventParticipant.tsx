@@ -2,15 +2,15 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useModal } from '@/context/ModalContext'
 
+import { addFriend, deleteFriend } from '@/apis/friendApis'
 import { getListParticipant } from '@/apis/postApis'
 
 import { uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
 
-import { paginationCommon } from '@/Variable/common.variable'
-
 import { PaginationType } from '@/interface/common/common.interface'
-import { addFriend, deleteFriend } from '@/apis/friendApis'
+import { paginationCommon } from '@/Variable/common.variable'
+import { participantType } from '@/Variable/event.variable'
 
 export default function useModalEventParticipant({ id }: any) {
 	const { openError, openConfirm, closeModal } = useModal()
@@ -45,7 +45,15 @@ export default function useModalEventParticipant({ id }: any) {
 				_paginationRefs.current.totalPage = totalPage
 				setParticipantList((prev: any[]) => {
 					const contents = isNew ? [] : prev
-					const dataShow = uniqueArray([...contents, ...rows], 'id') as any[]
+					const _rows = (rows || []).map((i) => {
+						const { type } = i || {}
+						return {
+							...i,
+							isAdmin: type === participantType.ADMIN,
+							isOnwer: type === participantType.OWNER,
+						}
+					})
+					const dataShow = uniqueArray([...contents, ..._rows], 'id') as any[]
 					return dataShow
 				})
 			}
