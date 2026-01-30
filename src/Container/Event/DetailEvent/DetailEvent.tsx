@@ -21,7 +21,7 @@ import useDetailEvent from '@/hooks/Event/useDetailEvent'
 
 import { isArray } from '@/ultis/array.ults'
 import { cloneDeep } from '@/ultis/common.ults'
-import { getDateInfo } from '@/ultis/date.ults'
+import { getDateFormat, getDateInfo } from '@/ultis/date.ults'
 import { isEmptyObject } from '@/ultis/object.ults'
 import { goToGoogleMap, onPushState, useSafeBack } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
@@ -75,10 +75,6 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 		onCopy,
 		setId,
 	} = useDetailEvent({ id: _id })
-	console.log(
-		'🌸🌸🌸 TrieuNinhHan ~ :78 ~ DetailEvent ~ detailPost:',
-		detailPost,
-	)
 	const { detailLoad } = loading
 	const { loadingContext } = useLoading()
 	const { goBackOrPush } = useSafeBack()
@@ -103,8 +99,10 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 			<Flex gap={10}>
 				{events.map((event) => {
 					const { id: idEvent, start_time } = event
-					const date = dayjs(start_time).format('ddd, D MMM').toUpperCase()
-					const time = dayjs(start_time).format('HH:ss').toUpperCase()
+					const date = getDateFormat(start_time, {
+						format: 'ddd, D MMM',
+					})
+					const time = getDateInfo(start_time).time.toUpperCase()
 					return (
 						<Flex
 							className={clsx(classes.eventRepeatBox, {
