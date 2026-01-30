@@ -119,7 +119,9 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 						<div className={classes.name}>{title}</div>
 						<div className={classes.address}>{bio || ''}</div>
 						<Flex className={classes.address}>
-							<div className={clsx(`flag:${country_code}`)} />
+							{!!country_code && (
+								<div className={clsx(`flag:${country_code}`)} />
+							)}
 							{address}
 						</Flex>
 					</Flex>
