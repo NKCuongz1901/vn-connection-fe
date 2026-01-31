@@ -179,7 +179,7 @@ export default function useEventCoHost({
 	useEffect(() => {
 		handleGetListParticipant()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	}, [id])
 
 	return {
 		total,

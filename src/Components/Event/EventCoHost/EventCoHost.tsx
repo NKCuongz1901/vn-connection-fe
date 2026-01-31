@@ -23,6 +23,7 @@ import classes from './EventCoHost.module.scss'
 import { repeatOpt } from '@/Variable/select.variable'
 
 const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
+	console.log('🌸🌸🌸 TrieuNinhHan ~ :26 ~ EventCoHost ~ id:', id)
 	const { onGetPath } = useLocalePath()
 	const { avatar: uAvatar, name, id: user_id } = user || {}
 	const {
