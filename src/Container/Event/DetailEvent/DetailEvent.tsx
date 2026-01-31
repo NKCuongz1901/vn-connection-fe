@@ -110,7 +110,7 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 							key={idEvent}
 							vertical
 							onClick={() => {
-								onPushState({}, idEvent)
+								onPushState({}, idEvent, { isReplace: true })
 								setId(idEvent)
 							}}
 						>

@@ -85,9 +85,13 @@ export const goToGoogleMap = ({ lat, lng }: { lat: number; lng: number }) => {
 	}
 }
 export const onPushState = (
-	params?: { [key: string]: any },
+	params?: Record<string, any>,
 	newId?: string,
+	options?: {
+		isReplace?: boolean
+	},
 ) => {
+	const { isReplace } = options || {}
 	let pathname = window.location.pathname
 
 	if (newId) {
@@ -97,8 +101,11 @@ export const onPushState = (
 	}
 
 	const query = params
-		? '?' + new URLSearchParams(params).toString()
-		: window.location.search
+		? new URLSearchParams(params).toString()
+		: window.location.search.replace('?', '')
 
-	window.history.pushState({}, '', pathname + query)
+	const url = pathname + (query ? `?${query}` : '')
+
+	const method = isReplace ? 'replaceState' : 'pushState'
+	window.history[method]({}, '', url)
 }
