@@ -305,7 +305,7 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 	const _renderDetail = () => {
 		const {
 			user,
-			limit_participant,
+			expect_participant,
 			start_time,
 			end_time,
 			address,
@@ -346,12 +346,6 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 
 				<Flex className={classes.detailInfo} vertical>
 					<Flex className={classes.detailInfoItem}>
-						<GroupPeopleIcon fill="#006B35" />
-						<span>
-							{formatNumberString(limit_participant)} attendees capacity
-						</span>
-					</Flex>
-					<Flex className={classes.detailInfoItem}>
 						<IconCalendarWeekFilled />
 						<span>
 							{weekdayStart}, {dmyStart} - {weekdayEnd}, {dmyEnd}
@@ -369,6 +363,15 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 						<span>
 							{typeRepeat} {timeStart} - {timeEnd}
 						</span>
+					</Flex>
+					<Flex className={classes.detailInfoItem}>
+						<GroupPeopleIcon fill="#006B35" />
+						{!!expect_participant && (
+							<span>
+								This activity normally has around{' '}
+								{formatNumberString(expect_participant)} people
+							</span>
+						)}
 					</Flex>
 				</Flex>
 			</Flex>
