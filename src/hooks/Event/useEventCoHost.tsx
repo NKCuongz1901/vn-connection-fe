@@ -11,8 +11,13 @@ import { cloneDeep, delay } from '@/ultis/common.ults'
 
 import { paginationCommon } from '@/Variable/common.variable'
 import { PaginationType } from '@/interface/common/common.interface'
+import { participantType } from '@/Variable/event.variable'
 
-export default function useEventCoHost({ id, user }: any) {
+export default function useEventCoHost({
+	id,
+	user,
+	onCallBack = () => null,
+}: any) {
 	const { openError, openConfirm, openSuccess } = useModal()
 	const { toggleLoadingContext } = useLoading()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
@@ -34,7 +39,6 @@ export default function useEventCoHost({ id, user }: any) {
 			const { page, limit } = _paginationRefs.current
 			const isNew = page === 1
 			if (isNew) {
-				setParticipantList([])
 			}
 			const params = {
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
@@ -51,7 +55,15 @@ export default function useEventCoHost({ id, user }: any) {
 				_paginationRefs.current.totalPage = totalPage
 				setParticipantList((prev: any[]) => {
 					const contents = isNew ? [] : prev
-					const dataShow = uniqueArray([...contents, ...rows], 'id') as any[]
+					const _rows = (rows || []).map((i) => {
+						const { type } = i || {}
+						return {
+							...i,
+							isAdmin: type === participantType.ADMIN,
+							isOnwer: type === participantType.OWNER,
+						}
+					})
+					const dataShow = uniqueArray([...contents, ..._rows], 'id') as any[]
 					return dataShow
 				})
 				setTotal(count)
@@ -95,6 +107,7 @@ export default function useEventCoHost({ id, user }: any) {
 			if (code === 200) {
 				_paginationRefs.current.page = 1
 				await handleGetListParticipant()
+				onCallBack()
 				openSuccess({
 					message: isUpgrate
 						? 'Add co-host successfully'
@@ -124,16 +137,16 @@ export default function useEventCoHost({ id, user }: any) {
 			: [
 					{
 						key: 'ONLY_THIS_EVENT',
-						label: 'This event only',
+						label: 'This activity only',
 						onClick: () =>
 							handleMenusClick({ key: 'ONLY_THIS_EVENT', id, isUpgrate }),
 					},
 					{
 						key: 'ALL',
-						label: 'All repeated events',
+						label: 'All repeated activities',
 						onClick: () => handleMenusClick({ key: 'ALL', id, isUpgrate }),
 					},
-			  ]
+				]
 		return menus
 	}
 	const handleMenusClick = ({
@@ -166,7 +179,7 @@ export default function useEventCoHost({ id, user }: any) {
 	useEffect(() => {
 		handleGetListParticipant()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	}, [id])
 
 	return {
 		total,
@@ -176,5 +189,6 @@ export default function useEventCoHost({ id, user }: any) {
 		loadingCoHost,
 		onSetOpenModal: handleSetOpenModal,
 		onGetMenus: handleGetMenus,
+		onMenusClick: handleMenusClick,
 	}
 }

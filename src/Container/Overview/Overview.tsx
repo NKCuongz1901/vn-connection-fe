@@ -2,7 +2,6 @@ import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { memo } from 'react'
 
-import { useLoading } from '@/context/LoadingContext'
 import useOverview from '@/hooks/Overview/useOverview'
 
 import { arrayFrom, isArray } from '@/ultis/array.ults'
@@ -13,10 +12,10 @@ import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
 import CAvatar from '@/Components/Custom/CAvatar'
 import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
 import CButton from '@/Components/Custom/CButton'
+import CButtonCreate from '@/Components/Custom/CButtonCreate'
 import CDatePickerRanger from '@/Components/Custom/CDatePickerRanger'
 import CInput from '@/Components/Custom/CInput'
 import CSelect from '@/Components/Custom/CSelect'
-import CSwitch from '@/Components/Custom/CSwitch'
 import EventTitle from '@/Components/Event/EventTitle'
 import ItemEvent from '@/Components/Event/ItemEvent'
 import ItemEventTicket from '@/Components/Event/ItemEventTicket'
@@ -24,7 +23,6 @@ import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
 import ModelChooseHangout from '@/Components/Hangout/ModelChooseHangout'
 import EventIcon from '@/svg/Event'
 import PencilIcon from '@/svg/Hangout/PencilIcon'
-import HappyIcon from '@/svg/HappyIcon'
 import MarkIcon from '@/svg/MarkIcon'
 import Message2Icon from '@/svg/Message2Icon'
 import NotFound from '@/svg/NotFound'
@@ -42,7 +40,6 @@ import { LEFT_FLAG } from '@/Variable/countryVariable'
 import classes from './Overview.module.scss'
 
 const Overview = () => {
-	const { loadingContext } = useLoading()
 	const { onChangeRoute } = useLocalePath()
 	const {
 		_childRef,
@@ -61,7 +58,6 @@ const Overview = () => {
 
 		setModal,
 		OnChangeTitleHangout,
-		onUpdateUserInfo,
 		onCRUDSuccess,
 		onScroll,
 
@@ -77,54 +73,58 @@ const Overview = () => {
 	const _renderFilter = () => {
 		const { radius, date, categories, title } = filters
 		return (
-			<Flex className={classes.filter}>
-				<Flex className={classes.search}>
-					<CInput
-						value={title}
-						placeholder="Search by keywords"
-						style={{ background: '#fff', borderRadius: 40, height: 44 }}
-						prefix={<SearchIcon />}
-						onChange={onChangeKeyword}
-					/>
+			<Flex vertical className={classes.renderFilter}>
+				<Flex className={classes.filter}>
+					<Flex className={classes.search}>
+						<CInput
+							value={title}
+							placeholder="Search by keywords"
+							style={{ background: '#fff', borderRadius: 40, height: 44 }}
+							prefix={<SearchIcon />}
+							onChange={onChangeKeyword}
+						/>
+					</Flex>
+					<Flex>
+						<CDatePickerRanger
+							isWhite
+							style={{ background: '#fff', borderRadius: 40 }}
+							disabled={loading.event}
+							value={date}
+							onChange={onChangeFilter('date')}
+						/>
+					</Flex>
+					<Flex className={classes.distance}>
+						<CSelect
+							isMaxRadius
+							isWhite
+							style={{ background: '#fff', borderRadius: 40 }}
+							disabled={loading.event}
+							value={radius}
+							options={radiusOpts}
+							placeholder="Choose distance"
+							prefix={<MarkIcon />}
+							onChange={onChangeFilter('radius')}
+						/>
+					</Flex>
 				</Flex>
-				<Flex>
-					<CDatePickerRanger
-						isWhite
-						style={{ background: '#fff', borderRadius: 40 }}
-						disabled={loading.event}
-						value={date}
-						onChange={onChangeFilter('date')}
-					/>
-				</Flex>
-				<Flex className={classes.distance}>
-					<CSelect
-						isMaxRadius
-						isWhite
-						style={{ background: '#fff', borderRadius: 40 }}
-						disabled={loading.event}
-						value={radius}
-						options={radiusOpts}
-						placeholder="Choose distance"
-						prefix={<MarkIcon />}
-						onChange={onChangeFilter('radius')}
-					/>
-				</Flex>
-				<Flex className={classes.distance}>
-					<CSelect
-						isMaxRadius
-						isWhite
-						style={{ background: '#fff', borderRadius: 40 }}
-						disabled={loading.event}
-						value={categories}
-						options={typeEvent}
-						placeholder="Categories"
-						prefix={
-							<Flex className={classes.prefixIcon}>
-								<HappyIcon fill="#fff" />
+				<Flex className={classes.categoryWrapper}>
+					{typeEvent.map((item) => {
+						const { value, label } = item
+						return (
+							<Flex
+								key={value}
+								className={clsx(classes.categoryItem, {
+									[classes.categoryActive]: (categories || []).includes(value),
+									[classes.disabled]: loading.event,
+								})}
+								onClick={() =>
+									!loading.event && onChangeFilter('categories')(value)
+								}
+							>
+								{label}
 							</Flex>
-						}
-						onChange={onChangeFilter('categories')}
-					/>
+						)
+					})}
 				</Flex>
 			</Flex>
 		)
@@ -156,17 +156,22 @@ const Overview = () => {
 								</Flex>
 								<Flex className={classes.switchStatus}>
 									<span>
-										{totalHangout + Number(is_open_hangout)} People available to
+										{totalHangout + Number(is_open_hangout)} people available to
 										hangout now
 									</span>
-									<CSwitch
+									<CButtonCreate
+										onClick={() => onChangeRoute(mainRoutes.hangout)}
+									>
+										Hangout now
+									</CButtonCreate>
+									{/* <CSwitch
 										value={is_open_hangout}
 										disabled={loadingContext}
 										ctype="success"
 										onChange={(value) =>
 											onUpdateUserInfo({ is_open_hangout: value })
 										}
-									/>
+									/> */}
 								</Flex>
 							</Flex>
 							<Flex
@@ -199,6 +204,7 @@ const Overview = () => {
 					<EventTitle
 						label={mappingEventTitle[type] || type}
 						number={totalMyEvent}
+						labelCreateBtn="Create activity"
 						icon={<EventIcon />}
 						onAddNew={(e) => {
 							e?.stopPropagation?.()
@@ -226,7 +232,7 @@ const Overview = () => {
 						<Flex className={classes.notData} vertical>
 							<EventIcon fill="#1e9037" />
 							<span className={classes.labelNoData}>
-								You haven't joined any events yet !
+								You haven't joined any activities yet !
 							</span>
 							<CButton
 								ctype="oranger"
@@ -250,6 +256,7 @@ const Overview = () => {
 					<EventTitle
 						label="My community"
 						number={total.network}
+						labelCreateBtn="Create community"
 						icon={<People />}
 						onAddNew={(e) => {
 							e?.stopPropagation?.()
@@ -286,9 +293,9 @@ const Overview = () => {
 													className={classes.contentSkeletonInput}
 												/>
 											</Flex>
-									  ))
+										))
 									: isArray(listNetwork, 1) &&
-									  listNetwork.map((i) => {
+										listNetwork.map((i) => {
 											const { id, avatar, userRole, title } = i || {}
 											return (
 												<Flex
@@ -310,7 +317,7 @@ const Overview = () => {
 													<div className={classes.communityLabel}>{title}</div>
 												</Flex>
 											)
-									  })}
+										})}
 							</Flex>
 						</>
 					)}
@@ -370,9 +377,9 @@ const Overview = () => {
 													className={classes.contentSkeletonInput2}
 												/>
 											</Flex>
-									  ))
+										))
 									: isArray(listChatRoom, 1) &&
-									  listChatRoom.map((i) => {
+										listChatRoom.map((i) => {
 											const { id, avatar, title, amount_of_user } = i || {}
 											return (
 												<Flex
@@ -401,7 +408,7 @@ const Overview = () => {
 													</div>
 												</Flex>
 											)
-									  })}
+										})}
 							</Flex>
 						</>
 					)}
@@ -491,7 +498,7 @@ const Overview = () => {
 							<Flex className={classes.eventNotFound} vertical>
 								<NotFound />
 								<span className={classes.eventNotFoundTitle}>
-									No events here yet
+									No activities here yet
 								</span>
 								<span className={classes.eventNotFoundLabel}>
 									Try another location or create a meetup to bring people
@@ -500,7 +507,6 @@ const Overview = () => {
 							</Flex>
 						)}
 					</Flex>
-					{_renderModal()}
 				</Flex>
 			</Flex>
 			{_renderModal()}

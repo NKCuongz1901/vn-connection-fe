@@ -25,6 +25,25 @@
 			}
 		}
 	}
+	.tabBtnWrapper {
+		min-height: 44px;
+		max-height: 44px;
+		.tabBtn {
+			color: #94a3b8;
+			font-size: 14px;
+			line-height: 20px; /* 142.857% */
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex: 1;
+			cursor: pointer;
+		}
+		.tabBtnActive {
+			border-bottom: 2px solid #006b35;
+			color: #006b35;
+			font-weight: 600;
+		}
+	}
 }
 
 @media (min-width: 0px) and (max-width: 769px) {

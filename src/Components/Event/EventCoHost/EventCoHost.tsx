@@ -20,10 +20,12 @@ import StarIcon from '@/svg/Event/StarIcon'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './EventCoHost.module.scss'
+import { repeatOpt } from '@/Variable/select.variable'
 
-const EventCoHost = ({ id, user }) => {
+const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
+	console.log('🌸🌸🌸 TrieuNinhHan ~ :26 ~ EventCoHost ~ id:', id)
 	const { onGetPath } = useLocalePath()
-	const { avatar: uAvatar } = user || {}
+	const { avatar: uAvatar, name, id: user_id } = user || {}
 	const {
 		openModal,
 		loading,
@@ -32,7 +34,11 @@ const EventCoHost = ({ id, user }) => {
 		loadingCoHost,
 		onSetOpenModal,
 		onGetMenus,
-	} = useEventCoHost({ id, user })
+		onMenusClick,
+	} = useEventCoHost({ id, user, onCallBack })
+	const { repeat_type } = detailPost || {}
+	const { type } = repeat_type || {}
+	const isRepeat = type !== repeatOpt[0].value
 	const isAdd =
 		(!isArray(participantList, 3) &&
 			!!participantList.find((item) => item.user_id === getUserInfo('id'))) ||
@@ -60,14 +66,26 @@ const EventCoHost = ({ id, user }) => {
 				footer={[<div key="back"></div>]}
 			>
 				<Flex vertical className={classes.participantList}>
-					{isArray(participantList, 1) ? (
+					<Flex className={classes.participantItem}>
+						<Link
+							href={onGetPath(`${mainRoutes.profile}/${user_id}`)}
+							target="_blank"
+						>
+							<Flex className={classes.left}>
+								<CAvatarBandage src={uAvatar} />
+								<span className={classes.name}>{name}</span>
+							</Flex>
+						</Link>
+					</Flex>
+					{isArray(participantList, 1) &&
 						participantList.map((item: any) => {
-							const { user, id, user_id } = item || {}
+							const { isOnwer, isAdmin, user, id, user_id } = item || {}
 							const { avatar, name } = user || {}
 							const menus: ItemType[] = onGetMenus({
 								id: user_id,
 								isUpgrate: false,
 							})
+							const Content = isOnwer || isAdmin ? CAvatarBandage : CAvatar
 
 							return (
 								<Flex key={id} className={classes.participantItem}>
@@ -76,25 +94,39 @@ const EventCoHost = ({ id, user }) => {
 										target="_blank"
 									>
 										<Flex className={classes.left}>
-											<CAvatar src={avatar} />
+											<Content
+												src={avatar}
+												{...(isAdmin && { customeBandage: <StarIcon /> })}
+											/>{' '}
 											<span className={classes.name}>{name}</span>
 										</Flex>
 									</Link>
 									<Flex className={classes.right}>
-										<Dropdown
-											menu={{ items: menus }}
-											trigger={['click']}
-											disabled={loadingCoHost}
-										>
-											<IconTrash className={classes.iconTrash} />
-										</Dropdown>
+										{isRepeat ? (
+											<Dropdown
+												menu={{ items: menus }}
+												trigger={['click']}
+												disabled={loadingCoHost}
+											>
+												<IconTrash className={classes.iconTrash} />
+											</Dropdown>
+										) : (
+											<div
+												onClick={() =>
+													onMenusClick({
+														key: 'ALL',
+														id: user_id,
+														isUpgrate: false,
+													})
+												}
+											>
+												<IconTrash className={classes.iconTrash} />
+											</div>
+										)}
 									</Flex>
 								</Flex>
 							)
-						})
-					) : (
-						<Flex className={classes.notFound}>This event has no co-host</Flex>
-					)}
+						})}
 				</Flex>
 			</CModal>
 		)
@@ -151,13 +183,27 @@ const EventCoHost = ({ id, user }) => {
 
 		return (
 			<div className={classes.btnAddHost}>
-				<Dropdown
-					trigger={['click']}
-					menu={{ items: menus }}
-					disabled={loadingCoHost}
-				>
-					<CButton ctype="oranger">{isUpgrate ? 'Add' : 'Delete'}</CButton>
-				</Dropdown>
+				{isRepeat ? (
+					<Dropdown
+						trigger={['click']}
+						menu={{ items: menus }}
+						disabled={loadingCoHost}
+					>
+						<CButton ctype="oranger">{isUpgrate ? 'Add' : 'Delete'}</CButton>
+					</Dropdown>
+				) : (
+					<div
+						onClick={() =>
+							onMenusClick({
+								key: 'ALL',
+								id,
+								isUpgrate,
+							})
+						}
+					>
+						<CButton ctype="oranger">{isUpgrate ? 'Add' : 'Delete'}</CButton>
+					</div>
+				)}
 			</div>
 		)
 	}
@@ -173,7 +219,7 @@ const EventCoHost = ({ id, user }) => {
 					>
 						Host by
 					</div>
-					<div>{total}</div>
+					<div>{(total || 0) + 1}</div>
 				</Flex>
 				<Flex className={classes.hostList}>
 					{isAdd && !loading && (

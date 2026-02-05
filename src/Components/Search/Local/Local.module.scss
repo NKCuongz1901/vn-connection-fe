@@ -90,12 +90,35 @@
 						height: 64px;
 						width: 64px;
 					}
-					.flag {
+					// .flag {
+					// 	position: absolute;
+					// 	right: -4px;
+					// 	bottom: 4px;
+					// 	height: 16px;
+					// 	width: 24px;
+					// }
+					.flagWrapper {
+						display: flex;
+						align-items: center;
+						justify-self: center;
+						overflow: hidden;
+						height: 20px;
+						width: 20px;
 						position: absolute;
 						right: -4px;
-						bottom: 4px;
-						height: 16px;
-						width: 24px;
+						bottom: 0px;
+						border-radius: 50%;
+						border: 1px solid #fff;
+						.flag {
+							transform: translateX(-6px);
+							min-height: 20px;
+							min-width: 30px;
+						}
+						.leftFlag {
+							width: unset;
+							left: 5px;
+							position: relative;
+						}
 					}
 				}
 				.userName {

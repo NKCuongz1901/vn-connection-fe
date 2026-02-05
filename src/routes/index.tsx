@@ -39,6 +39,7 @@ export const POST_ROUTES = {
 	sticker: 'sticker',
 	myEventInHome: 'post/my-event-in-home',
 	likeComment: 'comment/like',
+	myEventsJoined: 'post/my-events-joined',
 }
 export const CONVERSATION_ROUTES = {
 	name: 'conversation',
@@ -146,13 +147,13 @@ export const Menus = [
 		child: [],
 	},
 	{
-		title: 'My Events',
+		title: 'My Activities',
 		Icon: Event,
 		path: mainRoutes.event,
 		child: [],
 	},
 	{
-		title: 'Upcoming Events',
+		title: 'Upcoming Activities',
 		Icon: UpcomingEvent,
 		path: mainRoutes.upcomingEvent,
 		child: [],

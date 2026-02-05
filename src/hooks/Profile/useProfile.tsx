@@ -13,8 +13,12 @@ import { getUserInfo } from '@/ultis/storage.ults'
 
 import { CategoriFavOptProps } from '@/interface/Community/Community.interface'
 import { mainRoutes } from '@/routes/MainRoutes'
-
-export default function useProfile({ id }: { id?: string }) {
+interface useProfileProps {
+	id?: string
+	isMinimize?: boolean
+}
+export default function useProfile(props: useProfileProps) {
+	const { id } = props
 	const { openError } = useModal()
 	const { onChangeRoute } = useLocalePath()
 	const { onGetQuerry } = useQuery()

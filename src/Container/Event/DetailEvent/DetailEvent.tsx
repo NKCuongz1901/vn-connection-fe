@@ -12,17 +12,19 @@ import {
 	IconTicket,
 } from '@tabler/icons-react'
 import { Dropdown, Flex, Skeleton } from 'antd'
+import clsx from 'clsx'
 import { memo } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import useDetailEvent from '@/hooks/Event/useDetailEvent'
 
+import { isArray } from '@/ultis/array.ults'
 import { cloneDeep } from '@/ultis/common.ults'
-import { getDateInfo } from '@/ultis/date.ults'
+import { getDateFormat, getDateInfo } from '@/ultis/date.ults'
 import { isEmptyObject } from '@/ultis/object.ults'
-import { goToGoogleMap, useSafeBack } from '@/ultis/route.ults'
+import { goToGoogleMap, onPushState, useSafeBack } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
-import { formatNumberString } from '@/ultis/string.ults'
+import { formatNumberString, randomString } from '@/ultis/string.ults'
 
 import CButton from '@/Components/Custom/CButton'
 import CImage from '@/Components/Custom/CImage'
@@ -32,8 +34,10 @@ import EventComment from '@/Components/Event/EventComment'
 import EventParticipant from '@/Components/Event/EventParticipant'
 import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
 import ModalMyFriend from '@/Components/Friend/ModalMyFriend'
+import ClockIcon from '@/svg/ClockIcon'
 import GroupPeopleIcon from '@/svg/Event/GroupPeopleIcon'
 import GroupPeopleJoinIcon from '@/svg/Event/GroupPeopleJoinIcon'
+import GroupIcon from '@/svg/GroupIcon'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import { repeatOpt, ticketEntranceType } from '@/Variable/select.variable'
@@ -51,9 +55,10 @@ interface DetailEventProps {
 	type?: string
 	[key: string]: any
 }
-const DetailEvent = ({ id, type }: DetailEventProps) => {
+const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 	const {
 		_refKeyEventParticipant,
+		id,
 		detailPost,
 		loading,
 		loadingShare,
@@ -67,10 +72,12 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 		onShareFriend,
 		onGetDetailPost,
 		onCopy,
-	} = useDetailEvent({ id })
+		setId,
+	} = useDetailEvent({ id: _id })
 	const { detailLoad } = loading
 	const { loadingContext } = useLoading()
 	const { goBackOrPush } = useSafeBack()
+	const { events } = detailPost || {}
 	const _renderSkeleton = () => {
 		return (
 			<Flex className={classes.container} vertical>
@@ -82,6 +89,39 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 						style={{ width: '100%', height: i.value }}
 					/>
 				))}
+			</Flex>
+		)
+	}
+	const _renderEvents = () => {
+		if (!isArray(events, 2)) return
+		return (
+			<Flex gap={10}>
+				{events.map((event) => {
+					const { id: idEvent, start_time } = event
+					const date = getDateFormat(start_time, {
+						format: 'ddd, D MMM',
+					})
+					const time = getDateInfo(start_time).time.toUpperCase()
+					return (
+						<Flex
+							className={clsx(classes.eventRepeatBox, {
+								[classes.activeEventRepeatBox]: id === idEvent,
+							})}
+							key={idEvent}
+							vertical
+							onClick={() => {
+								onPushState({}, idEvent, { isReplace: true })
+								setId(idEvent)
+							}}
+						>
+							<div className="bold">{date}</div>
+							<Flex gap={4} align="center">
+								<ClockIcon />
+								{time}
+							</Flex>
+						</Flex>
+					)
+				})}
 			</Flex>
 		)
 	}
@@ -113,12 +153,15 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 			repeat_type,
 			amount_of_participant,
 			limit_participant,
+			categories,
 		} = detailPost || {}
 		const { type } = repeat_type || {}
 		const id = getUserInfo('id')
 		const isHost = id === user_id
 		const isRepeat = type !== repeatOpt[0].value
-		const isFull = amount_of_participant + 1 >= limit_participant
+		const isFull =
+			limit_participant !== null &&
+			amount_of_participant + 1 >= limit_participant
 		let ticketValue = ''
 		const [minEntr, maxEntr] = (ticket_entrance || '').split(':')
 		switch (ticket_entrance_type) {
@@ -138,7 +181,18 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 		return (
 			<Flex className={classes.info} vertical>
 				<Flex className={classes.title}>
-					<div className={classes.titleLabel}>{title}</div>
+					<Flex className={classes.titleInfo} vertical>
+						<div className={classes.titleLabel}>{title}</div>
+						{isArray(categories, 1) && (
+							<Flex className={classes.categories}>
+								{(categories || []).map((i) => (
+									<div key={i} className={classes.category}>
+										{i}
+									</div>
+								))}
+							</Flex>
+						)}
+					</Flex>
 					<Flex className={classes.btn}>
 						{isHost ? (
 							isRepeat ? (
@@ -148,7 +202,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 										disabled={loadingContext}
 										icon={<IconEdit />}
 									>
-										Edit event
+										Edit activity
 									</CButton>
 								</Dropdown>
 							) : (
@@ -160,7 +214,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 										onSetOpenModal({ type: 'edit', dataModal: detailPost })
 									}
 								>
-									Edit event
+									Edit activity
 								</CButton>
 							)
 						) : is_joined ? (
@@ -195,6 +249,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 						</CButton>
 					</Flex>
 				</Flex>
+				{_renderEvents()}
 				<Flex className={classes.price}>
 					<Flex className={classes.entr} vertical>
 						<Flex>
@@ -222,19 +277,25 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 		)
 	}
 	const _renderTop = () => {
-		const { thumbnails, repeat_type } = detailPost || {}
+		const { thumbnails, repeat_type, expect_participant } = detailPost || {}
 		const { type } = repeat_type || {}
 		const isRepeat = type !== repeatOpt[0].value
 		return (
 			<Flex className={classes.top} vertical>
 				{_renderAction()}
 				<Flex className={classes.image}>
-					<CImage src={thumbnails?.[0] || ''} />
+					<CImage preview src={thumbnails?.[0] || ''} />
 				</Flex>
+				{!!expect_participant && (
+					<Flex className={classes.expectParticipant}>
+						<GroupIcon />
+						<div>Joining: {formatNumberString(expect_participant)}</div>
+					</Flex>
+				)}
 				{isRepeat && (
 					<Flex className={classes.repeat}>
 						<IconRepeat className={classes.iconRepeat} />
-						<span>Repeated event</span>
+						<span>Repeated activity</span>
 					</Flex>
 				)}
 				{_renderInfo()}
@@ -244,7 +305,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 	const _renderDetail = () => {
 		const {
 			user,
-			limit_participant,
+			expect_participant,
 			start_time,
 			end_time,
 			address,
@@ -268,19 +329,22 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 			(repeatOpt.find((i) => i.value === type)?.label || '') + ','
 		return (
 			<Flex className={classes.detail} vertical>
-				{id && <EventCoHost id={id} user={user} />}
+				{id && (
+					<EventCoHost
+						id={id}
+						user={user}
+						detailPost={detailPost}
+						onCallBack={() =>
+							(_refKeyEventParticipant.current = randomString())
+						}
+					/>
+				)}
 
 				{id && (
 					<EventParticipant id={id} key={_refKeyEventParticipant.current} />
 				)}
 
 				<Flex className={classes.detailInfo} vertical>
-					<Flex className={classes.detailInfoItem}>
-						<GroupPeopleIcon fill="#006B35" />
-						<span>
-							{formatNumberString(limit_participant)} attendees capacity
-						</span>
-					</Flex>
 					<Flex className={classes.detailInfoItem}>
 						<IconCalendarWeekFilled />
 						<span>
@@ -299,6 +363,15 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 						<span>
 							{typeRepeat} {timeStart} - {timeEnd}
 						</span>
+					</Flex>
+					<Flex className={classes.detailInfoItem}>
+						<GroupPeopleIcon fill="#006B35" />
+						{!!expect_participant && (
+							<span>
+								This activity normally has around{' '}
+								{formatNumberString(expect_participant)} people
+							</span>
+						)}
 					</Flex>
 				</Flex>
 			</Flex>
@@ -329,12 +402,12 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 					const options = [
 						{
 							value: 'ONLY_THIS_EVENT',
-							label: 'Delete only this event',
+							label: 'Delete only this activity',
 							ctype: 'oranger',
 						},
 						{
 							value: 'ALL',
-							label: 'Delete all future event',
+							label: 'Delete all future activity',
 							ctype: 'disabled',
 						},
 					]
@@ -412,7 +485,7 @@ const DetailEvent = ({ id, type }: DetailEventProps) => {
 	}
 	return (
 		<div className={classes.wrapper}>
-			{detailLoad ? (
+			{detailLoad && isEmptyObject(detailPost) ? (
 				_renderSkeleton()
 			) : !isEmptyObject(detailPost) ? (
 				<Flex className={classes.container} vertical>

@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 
 interface getDateInfoOptionsProps {
 	type?: string
+	format?: string
 }
 export const getDateInfo = (
 	date: string | Date | number,
@@ -25,6 +26,26 @@ export const getDateInfo = (
 		time12h: d.format('hh:mm A'),
 		dmy: d.format('DD/MM/YYYY'),
 	}
+}
+export const getDateFormat = (
+	date: string | Date | number,
+	_options?: getDateInfoOptionsProps,
+) => {
+	const { format } = _options || {}
+	let parsedDate: dayjs.ConfigType = date
+
+	if (typeof date === 'string') {
+		const asNumber = Number(date)
+		if (!Number.isNaN(asNumber)) {
+			parsedDate = asNumber
+		}
+	}
+
+	const d = parsedDate ? dayjs(parsedDate) : dayjs()
+	if (format) {
+		return d.format(format)
+	}
+	return d.date() // số ngày trong tháng
 }
 
 export const getDiffFromNow = ({

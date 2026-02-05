@@ -11,6 +11,7 @@
 			padding: 12px 0;
 			.participantItem {
 				gap: 12px;
+				justify-content: space-between;
 				a {
 					color: inherit;
 				}
@@ -24,6 +25,11 @@
 						white-space: nowrap;
 						font-weight: 600;
 					}
+				}
+				.statusFriend {
+					cursor: pointer;
+					align-items: center;
+					display: flex;
 				}
 			}
 			.notFound {

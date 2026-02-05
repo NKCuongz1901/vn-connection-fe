@@ -10,10 +10,10 @@ import { useLocalePath } from '@/ultis/route.ults'
 import CAvatar from '@/Components/Custom/CAvatar'
 import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
 import GroupPeopleIcon from '@/svg/Event/GroupPeopleIcon'
+import StarIcon from '@/svg/Event/StarIcon'
 import ModalEventParticipant from '../ModalEventParticipant'
 
 import { mainRoutes } from '@/routes/MainRoutes'
-import { participantType } from '@/Variable/event.variable'
 
 import classes from './EventParticipant.module.scss'
 
@@ -34,10 +34,9 @@ const EventParticipant = ({ id }: EventParticipant) => {
 		return (
 			<>
 				{participantList?.slice(0, limit)?.map((item) => {
-					const { type, user, id, user_id } = item || {}
+					const { isOnwer, isAdmin, user, id, user_id } = item || {}
 					const { avatar } = user || {}
-					const isOnwer = type === participantType.OWNER
-					const Content = isOnwer ? CAvatarBandage : CAvatar
+					const Content = isOnwer || isAdmin ? CAvatarBandage : CAvatar
 
 					return (
 						<Link
@@ -45,7 +44,10 @@ const EventParticipant = ({ id }: EventParticipant) => {
 							href={onGetPath(`${mainRoutes.profile}/${user_id}`)}
 							target="_blank"
 						>
-							<Content src={avatar} />
+							<Content
+								src={avatar}
+								{...(isAdmin && { customeBandage: <StarIcon /> })}
+							/>
 						</Link>
 					)
 				})}

@@ -73,7 +73,7 @@ const MyFriend = (_props: MyFriendProps) => {
 											</Flex>
 										</Flex>
 									)
-							  })
+								})
 							: !loading && (
 									<Flex className={classes.notFound} vertical>
 										<NotFound />
@@ -86,7 +86,7 @@ const MyFriend = (_props: MyFriendProps) => {
 											<CButton ctype="oranger">Explore now</CButton>
 										</Flex> */}
 									</Flex>
-							  )}
+								)}
 						{loading &&
 							arrayFrom(3).map((_, index) => (
 								<Skeleton.Input

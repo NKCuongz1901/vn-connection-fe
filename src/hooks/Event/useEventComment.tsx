@@ -1,3 +1,4 @@
+import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
@@ -8,9 +9,11 @@ import {
 	getListCommentById,
 	sendCommentPost,
 } from '@/apis/postApis'
+import { handleUploadImage } from '@/apis/uploadApis'
 
-import { uniqueArray } from '@/ultis/array.ults'
+import { isArray, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
+import { handleParseFileImg } from '@/ultis/file.utls'
 import { getUserInfo } from '@/ultis/storage.ults'
 
 import { PaginationType } from '@/interface/common/common.interface'
@@ -21,7 +24,7 @@ interface useEventCommentProps {
 	[key: string]: any
 }
 export default function useEventComment({ id }: useEventCommentProps) {
-	const { openError } = useModal()
+	const { openError, openConfirm, closeModal } = useModal()
 	const { toggleLoadingContext, loadingContext } = useLoading()
 
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
@@ -33,6 +36,8 @@ export default function useEventComment({ id }: useEventCommentProps) {
 	const [loading, setLoading] = useState(false)
 	const [deleteLoading, setDeleteLoading] = useState<string[]>([])
 	const [total, setTotal] = useState(0)
+	const [fileList, setFileList] = useState([])
+
 	const handleChangeComment = (e) => {
 		const content = e.target.value
 		setCommentContent(content)
@@ -97,16 +102,43 @@ export default function useEventComment({ id }: useEventCommentProps) {
 
 		handleLoadMore()
 	}
+	const handleParsePayLoad = async () => {
+		toggleLoadingContext(true)
+		const _medias = fileList
+		let medias = []
+
+		if (_medias?.length > 0) {
+			const uploadPromises = _medias.map((media) =>
+				handleUploadImage(media.file, { isAll: true }),
+			)
+			const resList = await Promise.all(uploadPromises)
+
+			medias = (resList || []).map((i) => ({
+				url: i,
+				type: 'IMAGE',
+				fileName: null,
+				width: 692,
+				height: 1500,
+				ratio: 0.4613333333333333,
+				thumbnail: null,
+				duration: 0,
+			}))
+		}
+
+		return {
+			post_id: id,
+			content: commentContent,
+			medias: medias,
+		}
+	}
 	const handleSendCommentPost = async () => {
-		if (!commentContent.trim() || loadingContext) {
+		if ((!commentContent.trim() && !isArray(fileList, 1)) || loadingContext) {
 			return
 		}
+		const body = await handleParsePayLoad()
 		try {
 			toggleLoadingContext(true)
-			const res: any = await sendCommentPost({
-				post_id: id,
-				content: commentContent,
-			})
+			const res: any = await sendCommentPost(body)
 			const { code, results } = res || {}
 			if (code === 200) {
 				const { object } = results || {}
@@ -123,6 +155,7 @@ export default function useEventComment({ id }: useEventCommentProps) {
 				setCommentContent('')
 				setCommentList((prev: any[]) => [data, ...prev])
 				setTotal((prev) => prev + 1)
+				setFileList([])
 			}
 		} catch (error) {
 			openError(error)
@@ -154,6 +187,29 @@ export default function useEventComment({ id }: useEventCommentProps) {
 			setDeleteLoading((prev) => prev.filter((i) => i !== id))
 		}
 	}
+	const handleImportImg = debounce((_values) => {
+		const values = []
+
+		if (isArray(_values, 1)) {
+			_values.forEach((i) => {
+				const { imageUrl, file } = handleParseFileImg(i?.originFileObj) || {}
+				if (imageUrl) {
+					values.push({ imageUrl, file })
+				}
+			})
+		}
+		const maxItem = 5
+		setFileList((prev) => {
+			const combined = [...prev, ...values]
+			if ((combined || []).length > maxItem) {
+				openConfirm({
+					message: 'You can only upload up to 5 medias',
+					onAccept: () => closeModal(),
+				})
+			}
+			return combined.slice(0, maxItem)
+		})
+	}, 200)
 	useEffect(() => {
 		handleAutoLoadMore()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -172,11 +228,16 @@ export default function useEventComment({ id }: useEventCommentProps) {
 		commentContent,
 		total,
 		deleteLoading,
+
+		fileList,
+		setFileList,
+
 		// onGetDetailPost: handleGetComment,
 		onChangeComment: handleChangeComment,
 		onSendComment: handleSendCommentPost,
 		onDeletePost: handleDeletePost,
 		onScroll: handleScroll,
 		onKeyDown: handleKeyDown,
+		onImportImg: handleImportImg,
 	}
 }

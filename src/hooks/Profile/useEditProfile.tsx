@@ -54,7 +54,7 @@ const handleParseToData = (data, categoryNetworkOpts) => {
 		gender: genderOpts.find((i) => i.value === gender),
 		mode: modOpts.find((i) => i.value === mode),
 		i_am_interested_in,
-		languages_can_speak: languages_can_speak_array,
+		languages_can_speak_array: languages_can_speak_array,
 		country_visited: country_visited ? (country_visited || '').split(', ') : [],
 		who_i_am,
 		looking_for,
@@ -95,7 +95,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 	const [errors, setErrors] = useState({
 		about_me: '',
 		category_list: '',
-		languages_can_speak: '',
+		languages_can_speak_array: '',
 		country_visited: '',
 		country_lived: '',
 		name: '',
@@ -180,7 +180,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 	)
 
 	const handleValidate = useCallback((data) => {
-		const { languages_can_speak } = data || {}
+		const { languages_can_speak_array } = data || {}
 		const _errors: any = Object.fromEntries(
 			Object.entries({
 				// about_me: 'Please briefly describe yourself',
@@ -208,8 +208,9 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 			}),
 		)
 
-		if (!isArray(languages_can_speak, 1)) {
-			_errors.languages_can_speak = 'Please select the languages you can speak'
+		if (!isArray(languages_can_speak_array, 1)) {
+			_errors.languages_can_speak_array =
+				'Please select the languages you can speak'
 		}
 		if (isArray(Object.entries(_errors), 1)) {
 			setErrors(_errors)
@@ -268,7 +269,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 			birthday,
 			gender,
 			mode,
-			languages_can_speak,
+			languages_can_speak_array,
 			country_visited,
 			country_lived,
 			who_i_am,
@@ -296,7 +297,7 @@ export default function useEditProfile(props: ModalEditProfileProps) {
 			i_can_offer,
 			gender: gender?.value || gender || null,
 			mode: mode?.value || mode || null,
-			languages_can_speak: languages_can_speak.join(', '),
+			languages_can_speak_array: languages_can_speak_array,
 			birthday: birthday ? dayjs(birthday).toISOString() : '',
 			longitude,
 			latitude,

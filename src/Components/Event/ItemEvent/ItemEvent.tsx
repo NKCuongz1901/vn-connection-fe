@@ -43,25 +43,27 @@ const ItemEvent = ({ data, type }) => {
 		const { away, repeat_type } = data
 		const { type } = repeat_type || {}
 		return (
-			<Flex className={classes.spaceTime}>
-				<Flex className={classes.time}>
-					<IconClockFilled className={classes.iconClock} />
-					<span>{_start_time}</span>
-					<span>-</span>
-					<span>{_end_time}</span>
-				</Flex>
-				<Flex className={classes.spaceTimeRight}>
-					{type !== repeatOpt[0].value && (
-						<Flex className={classes.iconRepeatWrapper}>
-							<IconRepeat className={classes.iconRepeat} />
+			<div className={classes.spaceTimeWrap}>
+				<Flex className={classes.spaceTime}>
+					<Flex className={classes.time}>
+						<IconClockFilled className={classes.iconClock} />
+						<span>{_start_time}</span>
+						<span>-</span>
+						<span>{_end_time}</span>
+					</Flex>
+					<Flex className={classes.spaceTimeRight}>
+						{type !== repeatOpt[0].value && (
+							<Flex className={classes.iconRepeatWrapper}>
+								<IconRepeat className={classes.iconRepeat} />
+							</Flex>
+						)}
+						<Flex className={classes.away}>
+							<IconMap className={classes.iconMap} />
+							<span>{away} km away</span>
 						</Flex>
-					)}
-					<Flex className={classes.away}>
-						<IconMap className={classes.iconMap} />
-						<span>{away} km away</span>
 					</Flex>
 				</Flex>
-			</Flex>
+			</div>
 		)
 	}
 
@@ -99,7 +101,18 @@ const ItemEvent = ({ data, type }) => {
 			</Flex>
 		)
 	}
-
+	const _renderCategory = () => {
+		const { categories } = data
+		return (
+			<Flex className={classes.categories}>
+				{(categories || []).map((i) => (
+					<div key={i} className={classes.category}>
+						{i}
+					</div>
+				))}
+			</Flex>
+		)
+	}
 	return (
 		<Flex
 			className={classes.wrapper}
@@ -120,6 +133,7 @@ const ItemEvent = ({ data, type }) => {
 			</Flex>
 			{_renderSpaceTime()}
 			{_renderInfo()}
+			{_renderCategory()}
 		</Flex>
 	)
 }

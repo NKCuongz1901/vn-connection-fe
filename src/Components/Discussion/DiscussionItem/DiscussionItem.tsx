@@ -73,8 +73,15 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 						medias.map((item, index) => {
 							const { thumbnail, url } = item || {}
 							return (
-								<Flex key={index} className={classes.media}>
-									<CImage src={thumbnail || url} />
+								<Flex
+									key={index}
+									className={classes.media}
+									onClick={(e) => {
+										e.preventDefault()
+										e.stopPropagation()
+									}}
+								>
+									<CImage preview src={thumbnail || url} />
 								</Flex>
 							)
 						})

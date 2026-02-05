@@ -364,6 +364,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 			case 'MEMBER_JOIN':
 			case 'POST':
 			case 'OPEN_TALKROOM':
+			case 'OPEN_CHAT_CREATE':
 				return <></>
 			default:
 				return <Flex className={classes.memberAccept}>{type}</Flex>

@@ -24,7 +24,7 @@ interface useDetailEventProps {
 	id: string
 	[key: string]: any
 }
-export default function useDetailEvent({ id }: useDetailEventProps) {
+export default function useDetailEvent({ id: _id }: useDetailEventProps) {
 	const { openConfirm, openError, openSuccess, closeModal } = useModal()
 	const { toggleLoadingContext } = useLoading()
 	const { onChangeRoute } = useLocalePath()
@@ -32,6 +32,7 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 	const _refKeyEventParticipant = useRef(randomString())
 
 	const [detailPost, setDetailPost] = useState({}) as any
+	const [id, setId] = useState(_id)
 	const [loading, setLoading] = useState({ detailLoad: false })
 	const [loadingShare, setLoadingShare] = useState({}) as any
 	const [shareList, setShareList] = useState([]) as any
@@ -134,8 +135,8 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 				break
 			case 'leave':
 				openConfirm({
-					titleLabel: 'Leave event',
-					message: 'Are you sure want to leave event ?',
+					titleLabel: 'Leave activity',
+					message: 'Are you sure want to leave activity ?',
 					onAccept: () => {
 						handleJoinPost()
 						closeModal()
@@ -201,12 +202,12 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 			case 'cancel':
 				openConfirm({
 					message:
-						'We will send a message to inform the attendees that the event has been canceled',
+						'We will send a message to inform the attendees that the activity has been canceled',
 					onAccept: () => {
 						handleCancelEventConfirm()
 						closeModal()
 					},
-					titleLabel: 'Cancel event',
+					titleLabel: 'Cancel activity',
 				})
 				break
 			case 'ALL':
@@ -238,13 +239,13 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 					? [
 							{
 								key: 'extend',
-								label: 'Extend event',
+								label: 'Extend activity',
 								onClick: () =>
 									handleSetOpenModal({ type: 'extend', dataModal: detailPost }),
 							},
 							{
 								key: 'edit',
-								label: 'Edit event',
+								label: 'Edit activity',
 								onClick: () =>
 									!isRepeat &&
 									handleSetOpenModal({ type: 'edit', dataModal: detailPost }),
@@ -252,34 +253,34 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 									? [
 											{
 												key: 'ALL',
-												label: 'Edit all future events',
+												label: 'Edit all future activities',
 												onClick: () => handleMenusClick({ key: 'ALL' }),
 											},
 											{
 												key: 'ONLY_THIS_EVENT',
-												label: 'Edit only this event',
+												label: 'Edit only this activity',
 												onClick: () =>
 													handleMenusClick({ key: 'ONLY_THIS_EVENT' }),
 											},
-									  ]
+										]
 									: null,
 							},
-					  ]
+						]
 					: []),
 				{
 					key: 'share',
-					label: 'Share event',
+					label: 'Share activity',
 					onClick: () => handleMenusClick({ key: 'share' }),
 				},
 				...(isHost
 					? [
 							{
 								key: 'cancel',
-								label: 'Cancel event',
+								label: 'Cancel activity',
 								style: { color: '#F80024' },
 								onClick: () => handleMenusClick({ key: 'cancel' }),
 							},
-					  ]
+						]
 					: []),
 			]
 		},
@@ -292,12 +293,12 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 			return [
 				{
 					key: 'ALL',
-					label: 'Edit all future events',
+					label: 'Edit all future activities',
 					onClick: () => handleMenusClick({ key: 'ALL' }),
 				},
 				{
 					key: 'ONLY_THIS_EVENT',
-					label: 'Edit only this event',
+					label: 'Edit only this activity',
 					onClick: () => handleMenusClick({ key: 'ONLY_THIS_EVENT' }),
 				},
 			]
@@ -310,8 +311,12 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id])
 
+	useEffect(() => {
+		setId(_id)
+	}, [_id])
 	return {
 		_refKeyEventParticipant,
+		id,
 		loading,
 		loadingShare,
 		detailPost,
@@ -326,5 +331,6 @@ export default function useDetailEvent({ id }: useDetailEventProps) {
 		onShareFriend: handleShareFriend,
 		onGetDetailPost: handleGetDetailPost,
 		onCopy: handleCopy,
+		setId,
 	}
 }

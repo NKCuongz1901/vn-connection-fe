@@ -4,23 +4,28 @@ import { useCallback, useMemo, useState } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { deleteFriend } from '@/apis/friendApis'
+import { deleteFriend, updateFriend } from '@/apis/friendApis'
 import { blockUser } from '@/apis/userApis'
 import { isFunction } from '@/ultis/common.ults'
+import { UserProps } from '@/interface/User/User.interface'
+import { sendMessageById } from '@/apis/conversationApis'
 
-export default function useUserMoreAction({
-	id,
-	isFriend,
-	onCallback,
-}: {
+export default function useUserMoreAction(props: {
 	id: string
 	isFriend?: any
+	isNotBlock?: boolean
+	isProfile?: boolean
 	onCallback?: any
+	userData?: UserProps
 }) {
+	const { id, isFriend, isProfile, userData, onCallback } = props
 	const { toggleLoadingContext } = useLoading()
 	const { openError, openConfirm, openSuccess } = useModal()
 	const [loading, setLoading] = useState(false)
-	const [open, setOpen] = useState({ open: false, data: '' })
+	const [loadingShare, setLoadingShare] = useState({}) as any
+	const [shareList, setShareList] = useState({}) as any
+
+	const [open, setOpen] = useState({ type: null, data: '' })
 	const handleBlockUser = useCallback(async () => {
 		setLoading(true)
 		try {
@@ -42,7 +47,13 @@ export default function useUserMoreAction({
 		setLoading(true)
 		try {
 			toggleLoadingContext(true)
-			const res = await deleteFriend({ id: isFriend?.id })
+			const res = await (isProfile
+				? deleteFriend({ id: isFriend?.id })
+				: updateFriend({
+						id: isFriend?.id,
+						payload: { state: 'REJECTED' },
+					}))
+
 			if (res) {
 				openSuccess({
 					message: 'You have successfully unfriended this user.',
@@ -63,9 +74,16 @@ export default function useUserMoreAction({
 			setLoading(false)
 			toggleLoadingContext()
 		}
-	}, [isFriend, onCallback, openError, openSuccess, toggleLoadingContext])
+	}, [
+		isFriend,
+		isProfile,
+		onCallback,
+		openError,
+		openSuccess,
+		toggleLoadingContext,
+	])
 	const handleClose = useCallback(() => {
-		setOpen({ open: false, data: '' })
+		setOpen({ type: null, data: '' })
 	}, [])
 	const handleMenusClick = useCallback(
 		(type: string) => {
@@ -83,7 +101,10 @@ export default function useUserMoreAction({
 					})
 					break
 				case 'report':
-					setOpen({ open: true, data: id })
+					setOpen({ type: type, data: id })
+					break
+				case 'share':
+					setOpen({ type: type, data: id })
 					break
 				default:
 					break
@@ -100,14 +121,23 @@ export default function useUserMoreAction({
 							label: 'Unfriend',
 							onClick: () => handleMenusClick('unfriend'),
 						},
-				  ]
+					]
 				: []),
 
 			{
-				key: 'block',
-				label: 'Block',
-				onClick: () => handleMenusClick('block'),
+				key: 'share',
+				label: 'Share',
+				onClick: () => handleMenusClick('share'),
 			},
+			// ...(!isNotBlock
+			// 	? [
+			// 			{
+			// 				key: 'block',
+			// 				label: 'Block',
+			// 				onClick: () => handleMenusClick('block'),
+			// 			},
+			// 		]
+			// 	: []),
 
 			{
 				key: 'report',
@@ -118,6 +148,39 @@ export default function useUserMoreAction({
 		],
 		[handleMenusClick, isFriend],
 	)
+	const handleShareFriend = async (id) => {
+		setLoadingShare((prev: any) => ({ ...prev, [id]: true }))
 
-	return { loading, menus, open, onClose: handleClose }
+		try {
+			const { share_link } = userData || {} || {}
+			const payload = {
+				receiver_id: id,
+				message: {
+					content: share_link,
+					type: 'TEXT',
+				},
+			}
+			const res: any = await sendMessageById(payload)
+			const { code } = res || {}
+
+			if (code === 200) {
+				setShareList((prev: any) => ({ ...prev, [id]: true }))
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoadingShare((prev: any) => ({ ...prev, [id]: false }))
+		}
+	}
+
+	return {
+		loading,
+		menus,
+		open,
+		loadingShare,
+		shareList,
+
+		onClose: handleClose,
+		onShareFriend: handleShareFriend,
+	}
 }
