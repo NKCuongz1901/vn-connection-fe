@@ -187,7 +187,13 @@ const SettingConv = (props: SettingConvProps) => {
 					<>
 						{(medias || []).map((item) => (
 							<Flex key={item?.url} className={classes.mediaItem}>
-								<CImage src={item?.url} preview />
+								{item.type === 'IMAGE' ? (
+									<CImage src={item?.url} preview />
+								) : (
+									<video controls className={classes.mediaItem}>
+										<source src={item?.url} type="video/mp4" />
+									</video>
+								)}
 							</Flex>
 						))}
 						{arrayFrom(3).map((_, index) => (

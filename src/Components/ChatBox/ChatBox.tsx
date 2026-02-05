@@ -7,7 +7,7 @@ import { memo, useCallback, useState } from 'react'
 import useChatBox from '@/hooks/ChatBox/useChatBox'
 
 import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { handleParseFileImg } from '@/ultis/file.utls'
+import { handleParseFileImg, handleParseFileVideo } from '@/ultis/file.utls'
 import { getUserInfo } from '@/ultis/storage.ults'
 
 import HappyIcon from '@/svg/HappyIcon'
@@ -21,8 +21,9 @@ import CUploadMuti from '../Custom/CUploadMuti'
 
 import { specialTypeMessage } from '@/Variable/common.variable'
 
-import classes from './ChatBox.module.scss'
 import MoreIcon from '@/svg/MoreIcon'
+import classes from './ChatBox.module.scss'
+import { parseDayFromIsNewDate } from '@/ultis/date.ults'
 interface ChatBoxProps {
 	type?: string
 	itemList?: any[]
@@ -57,14 +58,26 @@ const ChatBox = ({
 		onGetMenus,
 	} = useChatBox({ onLoadMore, type, onActionMessage })
 	const [fileList, setFileList] = useState([])
-	const hangleImportImg = (_values) => {
-		const values: any[] = []
-		;(_values || []).forEach((i) => {
-			const { imageUrl, file } = handleParseFileImg(i?.originFileObj) || {}
-			if (imageUrl) {
-				values.push({ imageUrl, file })
+	const hangleImportImg = async (_values) => {
+		const values = []
+
+		for (const i of _values || []) {
+			const file = i?.originFileObj
+			if (!file) continue
+
+			if (file.type?.startsWith('image')) {
+				const { imageUrl } = handleParseFileImg(file)
+				if (imageUrl) values.push({ type: 'IMAGE', url: imageUrl, file })
+				continue
 			}
-		})
+
+			if (file.type?.startsWith('video')) {
+				const { videoUrl } = await handleParseFileVideo(file)
+				if (videoUrl) values.push({ type: 'VIDEO', url: videoUrl, file })
+				continue
+			}
+		}
+
 		setFileList(values)
 	}
 	const _renderParentItem = (parent) => {
@@ -167,47 +180,63 @@ const ChatBox = ({
 		}
 	}
 	const _renderItemChat = ({ item }) => {
-		const { id, user, isFirst, isLast, type, user_id, isTemp } = item || {}
+		const {
+			id,
+			user,
+			isFirst,
+			isLast,
+			isNewDate,
+			type,
+			user_id,
+			created_at,
+			isTemp,
+		} = item || {}
 
 		const isMe = getUserInfo('id') === user_id
 		const isMemberAction = specialTypeMessage.includes(type)
 		const isNot = isMe || isMemberAction
 		return (
-			<Flex
-				className={clsx(classes.itemChat, {
-					[classes.mt2]: isFirst,
-					[classes.isMe]: isMe,
-					[classes.isLast]: isLast,
-					[classes.isCenter]: isMemberAction,
-					[classes.isTemp]: isTemp,
-				})}
-				key={id}
-			>
-				<Flex className={classes.contentItem}>
-					{!isNot && (
-						<Flex className={classes.avatar}>
-							{isFirst && <CAvatar src={user?.avatar} />}
-						</Flex>
-					)}
-					<Flex className={classes.contentInfo} vertical>
-						{isFirst && !isNot && (
-							<Flex className={classes.name}>{user?.name}</Flex>
+			<Flex vertical key={id}>
+				{isNewDate && (
+					<Flex className={classes.date}>
+						{parseDayFromIsNewDate(created_at)}
+					</Flex>
+				)}
+				<Flex
+					className={clsx(classes.itemChat, {
+						[classes.mt2]: isFirst,
+						[classes.isMe]: isMe,
+						[classes.isLast]: isLast,
+						[classes.isCenter]: isMemberAction,
+						[classes.isTemp]: isTemp,
+					})}
+				>
+					<Flex className={classes.contentItem}>
+						{!isNot && (
+							<Flex className={classes.avatar}>
+								{isFirst && <CAvatar src={user?.avatar} />}
+							</Flex>
 						)}
-						<Flex className={classes.content}>
-							{!(isTemp || isMemberAction) && (
-								<Flex className={classes.moreIconWrapper}>
-									<Dropdown
-										trigger={['click']}
-										menu={{ items: onGetMenus({ item, isMe }) }}
-										disabled={isTemp || isMemberAction}
-									>
-										<Flex className={classes.moreIcon}>
-											<MoreIcon />
-										</Flex>
-									</Dropdown>
-								</Flex>
+						<Flex className={classes.contentInfo} vertical>
+							{isFirst && !isNot && (
+								<Flex className={classes.name}>{user?.name}</Flex>
 							)}
-							{_renderContentChat(item)}
+							<Flex className={classes.content}>
+								{!(isTemp || isMemberAction) && (
+									<Flex className={classes.moreIconWrapper}>
+										<Dropdown
+											trigger={['click']}
+											menu={{ items: onGetMenus({ item, isMe }) }}
+											disabled={isTemp || isMemberAction}
+										>
+											<Flex className={classes.moreIcon}>
+												<MoreIcon />
+											</Flex>
+										</Dropdown>
+									</Flex>
+								)}
+								{_renderContentChat(item)}
+							</Flex>
 						</Flex>
 					</Flex>
 				</Flex>
@@ -343,21 +372,31 @@ const ChatBox = ({
 			>
 				<Flex className={classes.chooseImg}>
 					<Flex className={classes.chooseImgContent}>
-						{fileList.map((i) => (
-							<Flex key={i.imageUrl} className={classes.chooseImgItem}>
-								<CImage preview={true} src={i.imageUrl} />
-								<Flex
-									className={classes.chooseImgCancel}
-									onClick={() =>
-										setFileList((prev) =>
-											prev.filter((prev) => prev.imageUrl !== i.imageUrl),
-										)
-									}
-								>
-									<IconCircleXFilled />
+						{fileList.map((i) => {
+							const { url, type } = i || {}
+							const isImg = type === 'IMAGE'
+							return (
+								<Flex key={url} className={classes.chooseImgItem}>
+									{isImg ? (
+										<CImage preview={true} src={url} />
+									) : (
+										<video controls>
+											<source src={url} type="video/mp4" />
+										</video>
+									)}
+									<Flex
+										className={classes.chooseImgCancel}
+										onClick={() =>
+											setFileList((prev) =>
+												prev.filter((prev) => prev.url !== url),
+											)
+										}
+									>
+										<IconCircleXFilled />
+									</Flex>
 								</Flex>
-							</Flex>
-						))}
+							)
+						})}
 					</Flex>
 					<CUploadMuti
 						fileList={fileList.map((i) => i.file)}

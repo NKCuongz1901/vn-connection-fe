@@ -12,7 +12,11 @@ import {
 	pinMessageById,
 	sendMessage,
 } from '@/apis/conversationApis'
-import { handleUploadImage } from '@/apis/uploadApis'
+import {
+	handleUploadAudio,
+	handleUploadImage,
+	handleUploadVideo,
+} from '@/apis/uploadApis'
 
 import { mappingMessageChat, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
@@ -20,8 +24,8 @@ import { getUserInfo } from '@/ultis/storage.ults'
 import { generateCustomUuid, randomString } from '@/ultis/string.ults'
 
 import { PaginationType } from '@/interface/common/common.interface'
-import { paginationCommon } from '@/Variable/common.variable'
 import { onPushState } from '@/ultis/route.ults'
+import { paginationCommon } from '@/Variable/common.variable'
 
 type useHangoutChatProps = {
 	convId: string
@@ -125,24 +129,28 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 		content,
 		medias: _medias,
 		parent,
+		audio,
 	}: {
 		type: string
 		content?: string
 		medias?: any[]
 		parent?: any
+		audio?: any
 	}) => {
 		try {
 			let type = _type
 			let medias = []
 			if (_medias?.length > 0) {
 				const uploadPromises = _medias.map((media) =>
-					handleUploadImage(media.file),
+					media?.type === 'IMAGE'
+						? handleUploadImage(media.file)
+						: handleUploadVideo(media.file),
 				)
 				const resList = await Promise.all(uploadPromises)
 				type = 'MEDIAS'
-				medias = (resList || []).map((i) => ({
-					url: i,
-					type: 'IMAGE',
+				medias = (_medias || []).map((i, index) => ({
+					url: resList[index],
+					type: i?.type || 'IMAGE',
 					fileName: null,
 					width: 692,
 					height: 1500,
@@ -150,6 +158,20 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 					thumbnail: null,
 					duration: 0,
 				}))
+			}
+			if (!!audio) {
+				const resAudio = await handleUploadAudio(audio)
+				type = 'MEDIAS'
+				medias.push({
+					url: resAudio,
+					fileName: null,
+					width: null,
+					height: null,
+					ratio: null,
+					type: 'AUDIO',
+					thumbnail: null,
+					duration: 3,
+				})
 			}
 			const parent_id = parent?.id
 			const _id = randomString()

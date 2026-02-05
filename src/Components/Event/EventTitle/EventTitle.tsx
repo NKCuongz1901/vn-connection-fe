@@ -8,11 +8,13 @@ import { memo } from 'react'
 import { formatNumberString } from '@/ultis/string.ults'
 
 import classes from './EventTitle.module.scss'
+import CButtonCreate from '@/Components/Custom/CButtonCreate'
 
 interface EventTitleProps {
 	label: string
 	number?: number | null | undefined
 	icon: any
+	labelCreateBtn?: string
 	onClick?: any
 	onAddNew?: any
 	hiddenAdd?: boolean
@@ -22,6 +24,7 @@ interface EventTitleProps {
 const EventTitle = ({
 	label,
 	number,
+	labelCreateBtn,
 	icon,
 	hiddenAdd = false,
 	hiddenNumber = false,
@@ -43,11 +46,16 @@ const EventTitle = ({
 						<IconChevronRight />
 					</Flex>
 				</Flex>
-				{!hiddenAdd && (
-					<Flex className={classes.buttonAdd} onClick={onAddNew}>
-						<IconSquareRoundedPlusFilled />
-					</Flex>
-				)}
+				{!hiddenAdd &&
+					(labelCreateBtn ? (
+						<CButtonCreate isIcon onClick={onAddNew}>
+							{labelCreateBtn}
+						</CButtonCreate>
+					) : (
+						<Flex className={classes.buttonAdd} onClick={onAddNew}>
+							<IconSquareRoundedPlusFilled />
+						</Flex>
+					))}
 			</Flex>
 		</div>
 	)

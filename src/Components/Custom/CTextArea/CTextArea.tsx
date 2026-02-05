@@ -5,11 +5,12 @@ import { Flex, Input } from 'antd'
 import { CTextAreaProps } from '@/interface/CComponent/CComponent.interface'
 
 import classes from './CTextArea.module.scss'
+import clsx from 'clsx'
 
 const { TextArea } = Input
 
 const CTextArea = (_props: CTextAreaProps) => {
-	const { error, label, isRequired, style, ...props } = _props
+	const { error, label, isRequired, isFullHeight, style, ...props } = _props
 	const status = error ? 'error' : ''
 
 	return (
@@ -21,7 +22,9 @@ const CTextArea = (_props: CTextAreaProps) => {
 			)}
 			<TextArea
 				allowClear
-				className={classes.wrapper}
+				className={clsx(classes.wrapper, {
+					[classes.fullHeight]: isFullHeight,
+				})}
 				style={{
 					borderRadius: 16,
 					background: '#f4f8fc',

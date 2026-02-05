@@ -8,16 +8,31 @@ import { memo, useCallback } from 'react'
 import useProfile from '@/hooks/Profile/useProfile'
 
 import { toJson } from '@/ultis/common.ults'
+import { getAge } from '@/ultis/date.ults'
 import { useLocalePath, useQuery, useSafeBack } from '@/ultis/route.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
+import CCounter from '@/Components/Custom/CCounter'
 import ModalEditProfile from '@/Components/Profile/ModalEditProfile'
 import UserMoreAction from '@/Components/User/UserMoreAction'
+import ArmHeartIcon from '@/svg/ArmHeartIcon'
+import ClockIconDivideTopIcon from '@/svg/ClockIconDivideTopIcon'
+import FavoriteIcon from '@/svg/FavoriteIcon'
 import ProfileCancelIcon from '@/svg/FriendSvg/ProfileCancelIcon'
 import ProfileTick from '@/svg/FriendSvg/ProfileTick'
 import ShareIcon from '@/svg/FriendSvg/ShareIcon'
+import GenderIcon from '@/svg/GenderIcon'
+import Heart from '@/svg/Heart'
+import HouseIcon from '@/svg/HouseIcon'
+import MarkIcon from '@/svg/MarkIcon'
+import Messenger from '@/svg/Messenger'
+import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
+import PinTickIcon from '@/svg/PinTickIcon'
+import ProfileCircleIcon from '@/svg/ProfileCircleIcon'
+import TwoUser from '@/svg/TwoUser'
+import WorldIcon from '@/svg/WorldIcon'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import {
@@ -27,21 +42,6 @@ import {
 	mappingMod,
 	stateFriends,
 } from '@/Variable/common.variable'
-
-import CCounter from '@/Components/Custom/CCounter'
-import ArmHeartIcon from '@/svg/ArmHeartIcon'
-import ClockIconDivideTopIcon from '@/svg/ClockIconDivideTopIcon'
-import FavoriteIcon from '@/svg/FavoriteIcon'
-import GenderIcon from '@/svg/GenderIcon'
-import Heart from '@/svg/Heart'
-import HouseIcon from '@/svg/HouseIcon'
-import MarkIcon from '@/svg/MarkIcon'
-import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
-import PinTickIcon from '@/svg/PinTickIcon'
-import ProfileCircleIcon from '@/svg/ProfileCircleIcon'
-import TwoUser from '@/svg/TwoUser'
-import WorldIcon from '@/svg/WorldIcon'
-import { getAge } from '@/ultis/date.ults'
 
 import {
 	mappingCountriesOptions,
@@ -60,7 +60,8 @@ interface ProfileProps {
 	id?: string
 	isMinimize?: boolean
 }
-const Profile = ({ id, isMinimize }: ProfileProps) => {
+const Profile = (props: ProfileProps) => {
+	const { isMinimize } = props
 	const { onGetQuerry } = useQuery()
 	const { redirect } = onGetQuerry()
 	const {
@@ -76,9 +77,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 		onMenusClick,
 		onOpenInbox,
 		onReDirect,
-	} = useProfile({
-		id,
-	})
+	} = useProfile(props)
 	const { goBackOrPush } = useSafeBack()
 	const { onChangeRoute } = useLocalePath()
 	const _renderButtonFriend = useCallback(() => {
@@ -95,7 +94,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 					>
 						<CButton ctype="disabled" style={{ height: 40 }}>
 							<Flex>
-								<ProfileTick />
+								<ProfileTick fill="#000" />
 							</Flex>
 							<span>Friend</span>
 						</CButton>
@@ -175,7 +174,9 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 							<Flex className={classes.icon}>
 								<UserMoreAction
 									id={id}
-									isFriend={is_friend}
+									isProfile
+									userData={userData}
+									isFriend={!isMinimize && is_friend}
 									onCallback={onGetUserProfile}
 								/>
 							</Flex>
@@ -236,7 +237,10 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 									style={{ height: 40 }}
 									onClick={onOpenInbox}
 								>
-									Inbox
+									<Flex>
+										<Messenger fill="#006B35" />
+									</Flex>
+									<span>Inbox</span>
 								</CButton>
 							</>
 						)}
@@ -299,7 +303,7 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
 					<div className={classes.title}>About me</div>
-					<div>{about_me}</div>
+					<div className={classes.aboutMe}>{about_me}</div>
 				</Flex>
 			</Flex>
 		)
@@ -307,14 +311,14 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 	}, [toJson(userData)])
 
 	const _renderLanguages = useCallback(() => {
-		const { user_languages, languages_can_speak } = userData || {}
+		const { user_languages, languages_can_speak_array } = userData || {}
 		return (
 			<Flex className={classes.contentBody}>
 				<Flex className={classes.content} vertical>
 					<div className={classes.title}>Languages</div>
 					<Flex vertical gap={12}>
 						<Flex className={classes.languageName}>
-							<div>{languages_can_speak}</div>
+							<div>{(languages_can_speak_array || []).join(', ')}</div>
 							<div
 								className={clsx(
 									classes.proficiencyLevel,
@@ -348,7 +352,10 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 	}, [toJson(userData)])
 
 	const _renderSumary = useCallback(() => {
-		const { amount_of_friend, gender, birthday, created_at } = userData || {}
+		const { id, amount_of_friend, gender, birthday, created_at, is_hide_age } =
+			userData || {}
+		const isHideAge = is_hide_age && id !== getUserInfo('id')
+
 		const content = [
 			{
 				label: 'Friends',
@@ -362,12 +369,16 @@ const Profile = ({ id, isMinimize }: ProfileProps) => {
 				id: 2,
 				Icon: GenderIcon,
 			},
-			{
-				label: 'Age',
-				value: getAge(birthday),
-				id: 3,
-				Icon: ProfileCircleIcon,
-			},
+			...(isHideAge
+				? []
+				: [
+						{
+							label: 'Age',
+							value: getAge(birthday),
+							id: 3,
+							Icon: ProfileCircleIcon,
+						},
+					]),
 			{
 				label: 'Member since',
 				value: created_at ? dayjs(created_at).format(formatDate.dmy) : '',

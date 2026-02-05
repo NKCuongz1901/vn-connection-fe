@@ -1,17 +1,25 @@
-import React, { memo } from 'react'
-import Link from 'next/link'
 import { Flex, Skeleton } from 'antd'
+import Link from 'next/link'
+import { memo } from 'react'
 
 import useModalEventParticipant from '@/hooks/Event/useModalEventParticipant'
 
 import { arrayFrom } from '@/ultis/array.ults'
 import { useLocalePath } from '@/ultis/route.ults'
+import { getUserInfo } from '@/ultis/storage.ults'
 
-import classes from './ModalEventParticipant.module.scss'
-import CModal from '@/Components/Custom/CModal/CModal'
 import CAvatar from '@/Components/Custom/CAvatar'
+import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
+import CModal from '@/Components/Custom/CModal/CModal'
+import StarIcon from '@/svg/Event/StarIcon'
+import classes from './ModalEventParticipant.module.scss'
+
+import ProfileTick from '@/svg/FriendSvg/ProfileTick'
+import ProfileFriend from '@/svg/ProfileFriend'
+import ProfileFriendPlus from '@/svg/ProfileFriendPlus'
 
 import { mainRoutes } from '@/routes/MainRoutes'
+import { stateFriends } from '@/Variable/common.variable'
 
 interface ModalEventParticipantProps {
 	id: string
@@ -21,13 +29,57 @@ interface ModalEventParticipantProps {
 const ModalEventParticipant = (_props: ModalEventParticipantProps) => {
 	const { id, onClose } = _props
 	const { onGetPath } = useLocalePath()
-	const { loading, _parentRef, _childRef, participantList, onScroll } =
-		useModalEventParticipant({ id })
+	const {
+		loading,
+		_parentRef,
+		_childRef,
+		participantList,
+		total,
+		onScroll,
+		onAddFriend,
+		onRemoveFriend,
+		onOpenModalRemoveFriend,
+	} = useModalEventParticipant({ id })
+	const { id: idMe } = getUserInfo()
+	const _renderStatusFriend = (item) => {
+		const { is_friend } = item || {}
+
+		const { state } = is_friend || {}
+		switch (state) {
+			case stateFriends.PENDING:
+				return (
+					<div
+						className={classes.statusFriend}
+						onClick={() => onRemoveFriend(item)}
+					>
+						<ProfileFriend />
+					</div>
+				)
+			case stateFriends.ACCEPTED:
+				return (
+					<div
+						className={classes.statusFriend}
+						onClick={() => onOpenModalRemoveFriend(item)}
+					>
+						<ProfileTick fill="#E55A0F" />
+					</div>
+				)
+			default:
+				return (
+					<div
+						className={classes.statusFriend}
+						onClick={() => onAddFriend(item)}
+					>
+						<ProfileFriendPlus />
+					</div>
+				)
+		}
+	}
 	return (
 		<CModal
 			onClose={onClose}
 			onCancel={onClose}
-			title={'Participants'}
+			title={`Participants (${total})`}
 			styles={{
 				content: {
 					width: 800,
@@ -49,8 +101,12 @@ const ModalEventParticipant = (_props: ModalEventParticipantProps) => {
 							onScroll={onScroll}
 						>
 							{participantList.map((item: any) => {
-								const { user, id, user_id } = item || {}
+								const { isOnwer, isAdmin, user, id, user_id } = item || {}
+
 								const { avatar, name } = user || {}
+								const isMe = user_id === idMe
+								const Content = isOnwer || isAdmin ? CAvatarBandage : CAvatar
+
 								return (
 									<Flex key={id} className={classes.participantItem}>
 										<Link
@@ -58,10 +114,14 @@ const ModalEventParticipant = (_props: ModalEventParticipantProps) => {
 											target="_blank"
 										>
 											<Flex className={classes.left}>
-												<CAvatar src={avatar} />
+												<Content
+													src={avatar}
+													{...(isAdmin && { customeBandage: <StarIcon /> })}
+												/>
 												<span className={classes.name}>{name}</span>
 											</Flex>
 										</Link>
+										{!isMe && _renderStatusFriend(item)}
 									</Flex>
 								)
 							})}

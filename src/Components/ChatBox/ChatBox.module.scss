@@ -25,6 +25,12 @@
 				width: 100%;
 			}
 		}
+		.date {
+			width: 100%;
+			justify-content: center;
+			font-weight: 600;
+			margin: 8px 0;
+		}
 		.itemChat {
 			max-width: 100%;
 			.contentItem {
@@ -333,7 +339,7 @@
 		bottom: 64px;
 		gap: 8px;
 		overflow-y: auto;
-		width: calc(100vw - 20px);
+		width: calc(100% - 20px);
 		.chooseImgItem {
 			position: relative;
 		}

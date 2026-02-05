@@ -1539,6 +1539,7 @@ export const specialTypeMessage = [
 	'MEMBER_JOIN',
 	'POST',
 	'OPEN_TALKROOM',
+	'OPEN_CHAT_CREATE',
 ]
 
 export const mappingTypeMessage = {

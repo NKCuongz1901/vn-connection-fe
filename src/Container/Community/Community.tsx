@@ -19,6 +19,7 @@ import { mainRoutes } from '@/routes/MainRoutes'
 import classes from './Community.module.scss'
 import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
 import { IconSquareRoundedPlusFilled } from '@tabler/icons-react'
+import CButtonCreate from '@/Components/Custom/CButtonCreate'
 
 const Community = () => {
 	const { onChangeRoute } = useLocalePath()
@@ -208,12 +209,12 @@ const Community = () => {
 						<div>My Community</div>
 					</Flex>
 					<div className={classes.bntAdd}>
-						<CButton
-							ctype="oranger"
+						<CButtonCreate
+							isIcon
 							onClick={() => setModal({ type: 'network', data: null })}
 						>
-							+ Create community
-						</CButton>
+							Create community
+						</CButtonCreate>
 					</div>
 					<Flex
 						className={classes.buttonAdd}

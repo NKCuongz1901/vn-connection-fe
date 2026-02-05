@@ -26,9 +26,14 @@ import CSelectMuti from '@/Components/Custom/CSelectMuti'
 import CSwitch from '@/Components/Custom/CSwitch'
 import CTextArea from '@/Components/Custom/CTextArea'
 import CUpload from '@/Components/Custom/CUpload'
+import Event from '@/svg/Event'
 
 import { daysOfWeek } from '@/Variable/common.variable'
-import { repeatOpt, ticketEntranceTypeOpt } from '@/Variable/select.variable'
+import {
+	repeatOpt,
+	ticketEntranceTypeOpt,
+	typeEvent,
+} from '@/Variable/select.variable'
 
 import classes from './ModalCRUDEvent.module.scss'
 
@@ -79,7 +84,7 @@ const ModalCRUDEvent = ({
 					<CInput
 						value={title}
 						error={error.title}
-						placeholder="Event title"
+						placeholder="Activities title"
 						onChange={onChangeValue('title')}
 					/>
 				</Flex>
@@ -88,12 +93,29 @@ const ModalCRUDEvent = ({
 	}
 	const _renderTopRight = () => {
 		const { ticketSw, pricingSw } = toggle
-		const { ticket_entrance_type, ticket_entrance, menu_price } = event
+		const {
+			ticket_entrance_type,
+			ticket_entrance,
+			menu_price,
+			expect_participant,
+		} = event
 		const { min: minEntr, max: maxEntr } = ticket_entrance
 		const { min: minPrice, max: maxPrice } = menu_price
 
 		return (
 			<>
+				<Flex className={classes.numberPeople}>
+					<CInput
+						value={expect_participant}
+						error={error.expect_participant}
+						label="Let people know how many are joining?"
+						placeholder="Number of people"
+						subLabel="Only add attendee number when you're sure people have confirmed."
+						maxLength={10}
+						prefix={<IconUsersGroup color="#7987a4" />}
+						onChange={onChangeValue('expect_participant')}
+					/>
+				</Flex>
 				<Flex className={classes.entrance} vertical>
 					<Flex className={classes.entranceOpt}>
 						<span className={classes.title}>Ticket entrance fee</span>
@@ -189,6 +211,7 @@ const ModalCRUDEvent = ({
 			repeat_type,
 			longitude,
 			latitude,
+			categories,
 		} = event
 		const { type, days, amount_of_repeat } = repeat_type
 		return (
@@ -200,14 +223,14 @@ const ModalCRUDEvent = ({
 						longitude={longitude}
 						latitude={latitude}
 						error={error.address}
-						label="Where is my event happening?"
+						label="Where is my activity happening?"
 						placeholder="Enter location"
 						onSubmitModal={onChangeValue('address')}
-						prefix={<IconMapPinFilled />}
+						prefix={<IconMapPinFilled fill="#7987a4" />}
 					/>
 				</Flex>
 				<Flex className={classes.time} vertical>
-					<span className={classes.title}>When is my event happening?</span>
+					<span className={classes.title}>When is my activity happening?</span>
 					<Flex className={classes.timePicker} vertical>
 						<CDatePicker
 							showTime
@@ -237,25 +260,25 @@ const ModalCRUDEvent = ({
 						label="How many people can join?"
 						placeholder="Number of people"
 						maxLength={10}
-						prefix={<IconUsersGroup />}
+						prefix={<IconUsersGroup color="#7987a4" />}
 					/>
 				</Flex>
 				<Flex className={classes.desc}>
 					<CSelect
 						disabled={!!id}
-						label="Does this event repeat"
+						label="Does this activity repeat"
 						value={type}
 						options={
 							sameDate
 								? repeatOpt
 								: repeatOpt.filter(
 										(i) => !['DAILY', 'MULTI_DAYS'].includes(i.value),
-								  )
+									)
 						}
 						placeholder="Select type repeat"
 						onChange={onChangeValue('type')}
 						maxLength={400}
-						prefix={<IconRepeat />}
+						prefix={<IconRepeat color="#7987a4" />}
 					/>
 				</Flex>
 				{type === 'MULTI_DAYS' && (
@@ -305,6 +328,20 @@ const ModalCRUDEvent = ({
 						maxLength={2000}
 					/>
 				</Flex>
+				<Flex className={classes.desc}>
+					<CSelectMuti
+						isRequired
+						isSimple
+						error={error.categories}
+						maxLength={3}
+						value={categories}
+						label="Activity Category"
+						placeholder="Select your languages"
+						options={typeEvent}
+						prefix={<Event fill="#7987A4" />}
+						onChange={onChangeValue('categories')}
+					/>
+				</Flex>
 			</>
 		)
 	}
@@ -321,7 +358,7 @@ const ModalCRUDEvent = ({
 			<CModal
 				onClose={onClose}
 				onCancel={onClose}
-				title={id ? 'Edit event' : 'Create event'}
+				title={id ? 'Edit activity' : 'Create activity'}
 				styles={{
 					content: {
 						width: 800,
@@ -335,7 +372,7 @@ const ModalCRUDEvent = ({
 							ctype="oranger"
 							style={{ width: 200 }}
 						>
-							{id ? 'Edit event' : 'Create event'}
+							{id ? 'Edit activity' : 'Create activity'}
 						</CButton>
 					</Flex>,
 				]}

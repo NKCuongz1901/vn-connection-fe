@@ -5,28 +5,21 @@ import dayjs from 'dayjs'
 import { useLoading } from '@/context/LoadingContext'
 import useEditProfile from '@/hooks/Profile/useEditProfile'
 
+import { isArray } from '@/ultis/array.ults'
+
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
+import CCheckRadio from '@/Components/Custom/CCheckRadio'
+import CCounter from '@/Components/Custom/CCounter'
 import CDatePicker from '@/Components/Custom/CDatePicker'
 import CInput from '@/Components/Custom/CInput'
 import CInputMap from '@/Components/Custom/CInputMap'
 import CModal from '@/Components/Custom/CModal/CModal'
+import CMultiSelect from '@/Components/Custom/CMultiSelect'
 import CSelect from '@/Components/Custom/CSelect'
 import CSelectMuti from '@/Components/Custom/CSelectMuti'
 import CTextArea from '@/Components/Custom/CTextArea'
 import CUpload from '@/Components/Custom/CUpload'
-
-import {
-	countryCodes,
-	formatDate,
-	genderOpts,
-	languageOpts,
-	levelOptions,
-	modOpts,
-} from '@/Variable/common.variable'
-
-import CCheckRadio from '@/Components/Custom/CCheckRadio'
-import CMultiSelect from '@/Components/Custom/CMultiSelect'
 import AddIcon from '@/svg/AddIcon'
 import ArmHeartIcon from '@/svg/ArmHeartIcon'
 import FavoriteIcon from '@/svg/FavoriteIcon'
@@ -38,7 +31,15 @@ import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
 import ProfileIcon from '@/svg/ProfileIcon'
 import TrashIcon from '@/svg/TrashIcon'
 import WorldIcon from '@/svg/WorldIcon'
-import { isArray } from '@/ultis/array.ults'
+
+import {
+	countryCodes,
+	formatDate,
+	genderOpts,
+	languageOpts,
+	levelOptions,
+	modOpts,
+} from '@/Variable/common.variable'
 import { CountriesOptions } from '@/Variable/countryVariable'
 import classes from './ModalEditProfile.module.scss'
 
@@ -103,7 +104,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					label="About"
 					error={errors.about_me}
 					value={about_me}
-					maxLength={200}
+					maxLength={2000}
 					rows={4}
 					placeholder="Write something about you"
 					onChange={(e) => onChangeData('about_me', e.target.value)}
@@ -122,7 +123,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 			who_i_am,
 			looking_for,
 			i_can_offer,
-			languages_can_speak,
+			languages_can_speak_array,
 			country_visited,
 			country_lived,
 			longitude,
@@ -224,13 +225,13 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 						<CSelectMuti
 							isRequired
 							isSimple
-							error={errors.languages_can_speak}
-							value={languages_can_speak}
+							error={errors.languages_can_speak_array}
+							value={languages_can_speak_array}
 							label="Native languages"
 							placeholder="Select your languages"
 							options={languageOpts}
 							prefix={<WorldIcon fill="#7987A4" />}
-							onChange={(e) => onChangeData('languages_can_speak', e)}
+							onChange={(e) => onChangeData('languages_can_speak_array', e)}
 						/>
 					</Flex>
 					<Flex vertical gap={4}>
@@ -300,7 +301,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							showSearch
 							isRequired
 							label="I am from"
-							placeholder="Enter name of countries"
+							placeholder="Select your countries"
 							filterOption={(input, option) =>
 								option?.name?.toLowerCase().includes(input.toLowerCase())
 							}
@@ -316,6 +317,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							suffixIcon={<IconChevronDown />}
 							prefixIcon={<Heart />}
 							label="Interested in"
+							placeholder="Enter your interests"
 							options={categoryNetworkOpts}
 							value={category_list || []}
 							error={errors.category_list}
@@ -328,7 +330,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							error={errors.country_lived}
 							value={country_lived}
 							label="Countries I've lived in"
-							placeholder="Select your languages"
+							placeholder="Which countries have you lived in?"
 							options={CountriesOptions}
 							onChange={(e) => onChangeData('country_lived', e)}
 						/>
@@ -338,8 +340,13 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 							isSimple
 							error={errors.country_visited}
 							value={country_visited}
-							label="Countries I've visited"
-							placeholder="Select your languages"
+							label={
+								<Flex gap={4} align="center">
+									Countries I've visited
+									<CCounter number={(country_visited || []).length} />
+								</Flex>
+							}
+							placeholder="Which countries have you visited?"
 							options={CountriesOptions}
 							onChange={(e) => onChangeData('country_visited', e)}
 						/>

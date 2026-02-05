@@ -14,6 +14,7 @@ export interface LocalProps {
 	languages_can_speak_array: string[]
 	online_time: string
 	country_code: string
+	i_am_from: string
 }
 
 export interface LocalResProps {

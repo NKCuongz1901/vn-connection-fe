@@ -51,7 +51,11 @@ const FriendItem = (_props: FriendItemProps) => {
 									onCancel({
 										id: idItem,
 										onCallback: () =>
-											onCallback({ tab: type, data: { id: idItem } }),
+											onCallback({
+												tab: type,
+												type: 'delete',
+												data: { id: idItem },
+											}),
 									})
 								}}
 							/>
@@ -66,7 +70,11 @@ const FriendItem = (_props: FriendItemProps) => {
 									onAccept({
 										id: idItem,
 										onCallback: () =>
-											onCallback({ tab: type, data: { id: idItem } }),
+											onCallback({
+												tab: type,
+												type: 'add',
+												data: { id: idItem },
+											}),
 									})
 								}}
 							/>
@@ -129,6 +137,7 @@ const FriendItem = (_props: FriendItemProps) => {
 				{contentOther}
 				<Flex>
 					<UserMoreAction
+						isNotBlock
 						id={id}
 						isFriend={type === optionFriends[0].value ? item : null}
 						iconDotsStyle={{ color: '#7987A4' }}

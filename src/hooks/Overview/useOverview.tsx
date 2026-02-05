@@ -93,9 +93,23 @@ export default function useOverview() {
 		switch (type) {
 			case 'radius':
 			case 'date':
-			case 'categories':
 				setFilters((prev) => ({ ...prev, [type]: value }))
 				_filterRef.current[type] = value
+				break
+			case 'categories':
+				setFilters((prev) => {
+					let { categories } = prev || {}
+					if (!isArray(categories, 1)) {
+						categories = []
+					}
+					if (categories.includes(value)) {
+						categories = categories.filter((i) => i !== value)
+					} else {
+						categories.push(value)
+					}
+					_filterRef.current[type] = categories
+					return { ...prev, [type]: categories }
+				})
 				break
 			default:
 				break
@@ -147,7 +161,7 @@ export default function useOverview() {
 				limit: !isNotLoading ? limit : 50,
 				type: mainRoutes.upcomingEvent,
 				radius,
-				...(categories && { categories: [categories] }),
+				...(categories && { categories: categories }),
 				...(title && { title }),
 				...dates,
 			})

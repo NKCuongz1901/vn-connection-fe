@@ -1,18 +1,21 @@
-import { IconDots } from '@tabler/icons-react'
+import { IconCircleXFilled, IconDots } from '@tabler/icons-react'
 import { Dropdown, Flex, Skeleton } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import clsx from 'clsx'
 import { memo } from 'react'
 
-import { arrayFrom } from '@/ultis/array.ults'
+import { arrayFrom, isArray } from '@/ultis/array.ults'
 import { getDateInfo } from '@/ultis/date.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
 import { copyToClipboard } from '@/ultis/string.ults'
 
 import CAvatar from '@/Components/Custom/CAvatar'
+import CImage from '@/Components/Custom/CImage'
 import CTextArea from '@/Components/Custom/CTextArea'
+import CUploadMuti from '@/Components/Custom/CUploadMuti'
 import useEventComment from '@/hooks/Event/useEventComment'
 import SendIcon from '@/svg/Event/SendIcon'
+import ImageIcon from '@/svg/ImageIcon'
 
 import classes from './EventComment.module.scss'
 
@@ -25,39 +28,76 @@ const EventComment = ({ id }) => {
 		total,
 		commentContent,
 		deleteLoading,
+		fileList,
+
+		setFileList,
 		onChangeComment,
 		onSendComment,
 		onDeletePost,
 		onScroll,
 		onKeyDown,
+		onImportImg,
 	} = useEventComment({
 		id,
 	})
 	const _renderSendCommentBox = () => {
 		return (
-			<Flex className={classes.commentBox}>
-				<CTextArea
-					allowClear={false}
-					placeholder="What's on my mind ?"
-					value={commentContent}
-					autoSize={{ minRows: 3, maxRows: 3 }}
-					onChange={onChangeComment}
-					onKeyDown={onKeyDown}
-				/>
-				<Flex
-					className={clsx(classes.iconSend, {
-						[classes.disabled]: !commentContent.trim(),
-					})}
-					onClick={onSendComment}
-				>
-					<SendIcon />
+			<Flex vertical className={classes.commentBoxWrapper}>
+				<Flex className={classes.chooseImgContent}>
+					{fileList.map((i) => (
+						<Flex key={i.imageUrl || i?.url} className={classes.chooseImgItem}>
+							<CImage preview={true} src={i.imageUrl || i?.url} />
+							<Flex
+								className={classes.chooseImgCancel}
+								onClick={() => {
+									setFileList((prev) =>
+										prev.filter((prev) => prev.imageUrl !== i.imageUrl),
+									)
+								}}
+							>
+								<IconCircleXFilled />
+							</Flex>
+						</Flex>
+					))}
+				</Flex>
+				<Flex className={classes.commentBox}>
+					<Flex className={classes.chooseImg} vertical>
+						<Flex className={classes.upload}>
+							<CUploadMuti
+								maxCount={0}
+								fileList={fileList.map((i) => i.file)}
+								onChange={({ file: _file, fileList: newList }) => {
+									onImportImg(newList)
+								}}
+							>
+								<ImageIcon />
+							</CUploadMuti>
+						</Flex>
+					</Flex>
+					<CTextArea
+						allowClear={false}
+						placeholder="What's on my mind ?"
+						value={commentContent}
+						autoSize={{ minRows: 3, maxRows: 3 }}
+						onChange={onChangeComment}
+						onKeyDown={onKeyDown}
+					/>
+					<Flex
+						className={clsx(classes.iconSend, {
+							[classes.disabled]:
+								!commentContent.trim() && !isArray(fileList, 1),
+						})}
+						onClick={onSendComment}
+					>
+						<SendIcon fill="#F0F3F9" />
+					</Flex>
 				</Flex>
 			</Flex>
 		)
 	}
 
 	const _renderItemComment = (item) => {
-		const { id, user, updated_at, user_id, content } = item || {}
+		const { id, user, updated_at, user_id, content, medias } = item || {}
 		const { avatar, name } = user || {}
 		const isMe = user_id === getUserInfo('id')
 		const { dmy } = getDateInfo(updated_at)
@@ -76,7 +116,7 @@ const EventComment = ({ id }) => {
 							style: { color: '#F80024' },
 							onClick: () => onDeletePost(id),
 						},
-				  ]
+					]
 				: []),
 		]
 
@@ -101,6 +141,20 @@ const EventComment = ({ id }) => {
 						</Flex>
 					</Flex>
 					<Flex className={classes.content}>{content}</Flex>
+					<Flex className={classes.medias}>
+						{isArray(medias, 1) ? (
+							medias.map((item, index) => {
+								const { thumbnail, url } = item || {}
+								return (
+									<Flex key={index} className={classes.media}>
+										<CImage src={thumbnail || url} />
+									</Flex>
+								)
+							})
+						) : (
+							<></>
+						)}
+					</Flex>
 				</Flex>
 			</Flex>
 		)

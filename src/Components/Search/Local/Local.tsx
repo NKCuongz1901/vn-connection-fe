@@ -28,7 +28,7 @@ import DotIcon from '@/svg/DotIcon'
 import MaleIcon from '@/svg/MaleIcon'
 import FeMaleIcon from '@/svg/FeMaleIcon'
 import GenderIcon from '@/svg/GenderIcon'
-import { mappingFlag } from '@/Variable/countryVariable'
+import { LEFT_FLAG, mappingFlag } from '@/Variable/countryVariable'
 
 const genderIcon = {
 	MALE: MaleIcon,
@@ -225,7 +225,8 @@ const Local = (props: LocalProps) => {
 		return (
 			<Flex className={classes.userList} onScroll={onScroll}>
 				{user.map((item) => {
-					const { id, avatar, name, country_code, age, gender } = item || {}
+					const { id, avatar, name, i_am_from, country_code, age, gender } =
+						item || {}
 					const IconGender = genderIcon[gender]
 					return (
 						<Flex key={id} vertical className={classes.user}>
@@ -235,12 +236,19 @@ const Local = (props: LocalProps) => {
 									className={classes.userAvatar}
 									onClick={() => onChangeRoute(`${mainRoutes.profile}/${id}`)}
 								/>
-								<div
-									className={clsx(
-										`flag:${mappingFlag[country_code] || country_code}`,
-										classes.flag,
-									)}
-								/>
+
+								<div className={classes.flagWrapper}>
+									<div
+										className={clsx(
+											`flag:${mappingFlag[i_am_from || country_code] || i_am_from || country_code}`,
+											classes.flag,
+											{
+												[classes.leftFlag]:
+													!!LEFT_FLAG[i_am_from || country_code],
+											},
+										)}
+									/>
+								</div>
 							</Flex>
 							<div className={classes.userName}> {name}</div>
 							<Flex align="center" gap={4}>

@@ -349,7 +349,7 @@ export default function useDiscussionDetail(
 										id,
 										is_verified,
 									},
-							  }
+								}
 							: item,
 					),
 				)
@@ -551,7 +551,6 @@ export default function useDiscussionDetail(
 				ratio: 0.4613333333333333,
 				thumbnail: null,
 				duration: 0,
-				...i,
 			}))
 		}
 

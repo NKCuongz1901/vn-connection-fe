@@ -12,8 +12,10 @@ interface CInputOthersProps {
 	label?: string
 	error?: string
 	desc?: string
+	subLabel?: string
 	isRequired?: boolean
 	isNotBold?: boolean
+	isFullHeight?: boolean
 	[key: string]: any
 }
 
@@ -36,15 +38,14 @@ interface CDatePickerOthersProps {
 }
 
 export interface CDatePickerProps
-	extends CDatePickerOthersProps,
-		DatePickerProps {}
+	extends CDatePickerOthersProps, DatePickerProps {}
 
 interface CSelectOthersProps {
 	isRequired?: boolean
 	isWhite?: boolean
 	isMaxRadius?: boolean
 	isSimple?: boolean
-	label?: string
+	label?: any
 	error?: string
 	[key: string]: any
 }
