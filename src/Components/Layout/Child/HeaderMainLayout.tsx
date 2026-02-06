@@ -9,8 +9,9 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { messaging } from '@/config/firebase'
 import { initFCM } from '@/config/firebase-messaging'
 
+import { logout } from '@/apis/authApis'
 import { getNotificationCount } from '@/apis/notificationApis'
-import { updateUserProfile } from '@/apis/userApis'
+import { getUserProfile, updateUserProfile } from '@/apis/userApis'
 
 import { useLocalePath } from '@/ultis/route.ults'
 import {
@@ -18,6 +19,7 @@ import {
 	handleRemoveAllCookie,
 	handleStorageCookie,
 	isLogin,
+	setSessionStorage,
 } from '@/ultis/storage.ults'
 
 import CButton from '@/Components/Custom/CButton'
@@ -27,7 +29,8 @@ import LogoSvg from '@/svg/LogoSvg'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 
-import { logout } from '@/apis/authApis'
+import { STORAGE_KEY } from '@/Variable/storage.variable'
+
 import './HeaderMainLayout.scss'
 
 interface HeaderMainLayoutProps {
@@ -125,10 +128,25 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
+
+	const handleStorageUserInfo = async () => {
+		try {
+			const res: any = await getUserProfile({
+				params: {
+					fields: ['$all'],
+				},
+			})
+			setSessionStorage({
+				key: STORAGE_KEY.USER,
+				data: res?.results?.object || {},
+			})
+		} catch {}
+	}
 	useEffect(() => {
 		// Sử dụng khối try...catch bên ngoài để bắt các lỗi đồng bộ
 		// xảy ra ngay lập tức trong quá trình khởi tạo hook.
 		try {
+			handleStorageUserInfo()
 			// Sửa lỗi TS1252: Chuyển Function Declaration thành Arrow Function Expression.
 			const setupFCM = async () => {
 				// Bọc logic bất đồng bộ trong try...catch để bắt lỗi mạng hoặc lỗi Firebase.

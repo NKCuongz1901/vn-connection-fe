@@ -18,6 +18,7 @@ export const AUTH_ROUTES = {
 	checkPhoneExists: '/auth/check_phone_exists',
 	sendOTP: '/auth/otp/send',
 	verifyOTP: '/auth/otp/verify',
+	checkOTP: 'auth/otp/check',
 	forgetPassword: '/auth/forget_password',
 	registerByPhone: '/auth/register_by_phone',
 	logout: '/auth/logout',

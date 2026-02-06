@@ -1,4 +1,5 @@
 'use client'
+import { IconSquareRoundedPlusFilled } from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
 import { memo } from 'react'
 
@@ -7,8 +8,11 @@ import useCommunity from '@/hooks/Community/useCommunity'
 import { arrayFrom, isArray } from '@/ultis/array.ults'
 import { useLocalePath } from '@/ultis/route.ults'
 
+import CheckEmail from '@/Components/CheckEmail'
+import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
 import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
 import CButton from '@/Components/Custom/CButton'
+import CButtonCreate from '@/Components/Custom/CButtonCreate'
 import CInput from '@/Components/Custom/CInput'
 import People from '@/svg/People'
 import PeopleSmileIcon from '@/svg/PeopleSmileIcon'
@@ -17,9 +21,6 @@ import SearchIcon from '@/svg/SearchIcon'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './Community.module.scss'
-import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
-import { IconSquareRoundedPlusFilled } from '@tabler/icons-react'
-import CButtonCreate from '@/Components/Custom/CButtonCreate'
 
 const Community = () => {
 	const { onChangeRoute } = useLocalePath()
@@ -31,9 +32,15 @@ const Community = () => {
 		networkSuggest,
 		keyword,
 		modal,
+		checkmail,
+
 		setModal,
+
 		setKeyword,
 		onGetNetwork,
+		onCheckEmail,
+		setCheckmail,
+		onCheckMailSubmit,
 	} = useCommunity({})
 	const _renderSearch = () => {
 		return (
@@ -209,16 +216,13 @@ const Community = () => {
 						<div>My Community</div>
 					</Flex>
 					<div className={classes.bntAdd}>
-						<CButtonCreate
-							isIcon
-							onClick={() => setModal({ type: 'network', data: null })}
-						>
+						<CButtonCreate isIcon onClick={() => onCheckEmail('network')}>
 							Create community
 						</CButtonCreate>
 					</div>
 					<Flex
 						className={classes.buttonAdd}
-						onClick={() => setModal({ type: 'network', data: null })}
+						onClick={() => onCheckEmail('network')}
 					>
 						<IconSquareRoundedPlusFilled />
 					</Flex>
@@ -230,6 +234,14 @@ const Community = () => {
 				</Flex>
 			</Flex>
 			{_renderModal()}
+			{!!checkmail?.open && (
+				<CheckEmail
+					onSubmit={() => {
+						onCheckMailSubmit()
+					}}
+					onClose={() => setCheckmail({ open: false, type: null })}
+				/>
+			)}
 		</div>
 	)
 }

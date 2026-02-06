@@ -79,3 +79,22 @@ export const handleRemoveAllCookie = () => {
 	// 	removeStorageCookie(i)
 	// })
 }
+export const setSessionStorage = ({ key, data }) => {
+	try {
+		sessionStorage.setItem(key, JSON.stringify(data))
+		return true
+	} catch (e) {
+		console.error('SessionStorage set error:', e)
+		return false
+	}
+}
+
+export const getSessionStorage = (key) => {
+	try {
+		const raw = sessionStorage.getItem(key)
+		return raw ? JSON.parse(raw) : null
+	} catch (e) {
+		console.error('SessionStorage get error:', e)
+		return null
+	}
+}

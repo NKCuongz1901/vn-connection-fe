@@ -1,4 +1,5 @@
 import { Flex, Input } from 'antd'
+import clsx from 'clsx'
 import { memo, useState } from 'react'
 
 import CButton from '@/Components/Custom/CButton'
@@ -17,6 +18,9 @@ interface VerifyOTPProps {
 	onAccept?: any
 	onSendAgain?: any
 	onChangeStep?: any
+	hiddenChangeStep?: boolean
+	className?: any
+	disabled?: boolean
 	[key: string]: any
 }
 
@@ -29,12 +33,15 @@ const VerifyOTP = ({
 	onInput,
 	onAccept,
 	onSendAgain,
+	hiddenChangeStep,
 	onChangeStep,
+	className,
+	disabled: _disabled,
 }: VerifyOTPProps) => {
-	const disabled = value.length < length
+	const disabled = value.length < length || _disabled
 	const [isSendAgain, setIsSendAgain] = useState(false)
 	return (
-		<div className={classes.wrapper}>
+		<div className={clsx(classes.wrapper, { [className]: !!className })}>
 			<Flex
 				vertical
 				gap={24}
@@ -85,9 +92,11 @@ const VerifyOTP = ({
 							</span>
 						)}
 					</Flex>
-					<span className={classes.send} onClick={() => onChangeStep(0)}>
-						Change your phone number
-					</span>
+					{!hiddenChangeStep && (
+						<span className={classes.send} onClick={() => onChangeStep(0)}>
+							Change your phone number
+						</span>
+					)}
 				</Flex>
 				<Flex className={classes.buttonWrapper}>
 					<CButton

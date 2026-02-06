@@ -8,6 +8,7 @@ import { arrayFrom, isArray } from '@/ultis/array.ults'
 import { useLocalePath } from '@/ultis/route.ults'
 import { formatNumberString } from '@/ultis/string.ults'
 
+import CheckEmail from '@/Components/CheckEmail/CheckEmail'
 import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
 import CAvatar from '@/Components/Custom/CAvatar'
 import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
@@ -55,6 +56,7 @@ const Overview = () => {
 		listNetwork,
 		listChatRoom,
 		defaultTitleHangout,
+		checkmail,
 
 		setModal,
 		OnChangeTitleHangout,
@@ -69,6 +71,9 @@ const Overview = () => {
 		onScrollUp,
 		onChangeFilter,
 		onChangeKeyword,
+		onCheckEmail,
+		setCheckmail,
+		onCheckMailSubmit,
 	} = useOverview()
 	const _renderFilter = () => {
 		const { radius, date, categories, title } = filters
@@ -208,7 +213,7 @@ const Overview = () => {
 						icon={<EventIcon />}
 						onAddNew={(e) => {
 							e?.stopPropagation?.()
-							setModal({ type: 'event', data: null })
+							onCheckEmail('event')
 						}}
 					/>
 				</Flex>
@@ -260,7 +265,7 @@ const Overview = () => {
 						icon={<People />}
 						onAddNew={(e) => {
 							e?.stopPropagation?.()
-							setModal({ type: 'network', data: null })
+							onCheckEmail('network')
 						}}
 					/>
 				</Flex>
@@ -510,6 +515,14 @@ const Overview = () => {
 				</Flex>
 			</Flex>
 			{_renderModal()}
+			{!!checkmail?.open && (
+				<CheckEmail
+					onSubmit={() => {
+						onCheckMailSubmit()
+					}}
+					onClose={() => setCheckmail({ open: false, type: null })}
+				/>
+			)}
 		</div>
 	)
 }

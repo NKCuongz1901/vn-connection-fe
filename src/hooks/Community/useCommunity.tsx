@@ -10,6 +10,8 @@ import { useModal } from '@/context/ModalContext'
 
 import { isArray } from '@/ultis/array.ults'
 import { delay } from '@/ultis/common.ults'
+import { getSessionStorage } from '@/ultis/storage.ults'
+import { STORAGE_KEY } from '@/Variable/storage.variable'
 
 import {
 	NetworkClubProps,
@@ -37,6 +39,7 @@ export default function useCommunity(_props: useCommunityProps) {
 	const [loadingClub, setLoadingClub] = useState(true)
 
 	const [modal, setModal] = useState({ type: '', data: null }) as any
+	const [checkmail, setCheckmail] = useState({ open: false, type: null })
 
 	const handleGetSelectOpt = async () => {
 		setLoading(true)
@@ -93,6 +96,25 @@ export default function useCommunity(_props: useCommunityProps) {
 		}
 	}
 
+	const handleCheckEmail = (type) => {
+		const { email } = getSessionStorage(STORAGE_KEY.USER) || {}
+		if (!email) {
+			setCheckmail({ open: true, type: type })
+		} else {
+			handleCheckMailSubmit(type)
+		}
+	}
+	const handleCheckMailSubmit = (_type?: string) => {
+		const { type } = checkmail || {}
+		const typeModal = _type || type
+		switch (typeModal) {
+			case 'event':
+			case 'network':
+				setModal({ type: typeModal, data: null })
+
+				break
+		}
+	}
 	useEffect(() => {
 		handleGetSelectOpt()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,6 +131,7 @@ export default function useCommunity(_props: useCommunityProps) {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [JSON.stringify(networkOpts), keyword])
+
 	return {
 		loadingClub,
 		loading,
@@ -117,7 +140,12 @@ export default function useCommunity(_props: useCommunityProps) {
 		keyword,
 		modal,
 		setModal,
+		checkmail,
+
 		setKeyword,
 		onGetNetwork: handleGetNetwork,
+		onCheckEmail: handleCheckEmail,
+		setCheckmail,
+		onCheckMailSubmit: handleCheckMailSubmit,
 	}
 }

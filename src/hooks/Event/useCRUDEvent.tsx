@@ -271,10 +271,6 @@ export default function useCRUDEvent({
 			const { min: minEntr, max: maxEntr } = ticket_entrance
 			const fieldEntrs = { minEntr, maxEntr }
 			if (ticket_entrance_type === ticketEntranceTypeOpt[0].value) {
-				console.log(
-					'🌸🌸🌸 TrieuNinhHan ~ :274 ~ handleValidate ~ minEntr:',
-					minEntr,
-				)
 				if (!convertStringToNumber(minEntr)) {
 					_error.minEntr = 'Price must be greater than 0'
 				}
@@ -283,10 +279,6 @@ export default function useCRUDEvent({
 				}
 			} else {
 				Object.entries(fieldEntrs).forEach(([key, value]) => {
-					console.log(
-						'🌸🌸🌸 TrieuNinhHan ~ :286 ~ handleValidate ~ value:',
-						value,
-					)
 					if (!convertStringToNumber(value)) {
 						_error[key] = 'Price must be greater than 0'
 					}
