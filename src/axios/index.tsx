@@ -35,7 +35,6 @@ let cachedFid: string | null = null
 
 axios.interceptors.request.use(
 	async (config) => {
-		// platform
 		config.headers['platform'] = 'WEB'
 		const info = await getBuildInfo()
 
