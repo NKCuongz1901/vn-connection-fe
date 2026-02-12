@@ -81,6 +81,9 @@ export default function useChatRoom(props: useChatRoomProps) {
 		try {
 			const { id, users_in_conversation } = convInfo || {}
 			const { id: memberId, amount_of_remind } = users_in_conversation[0] || {}
+			if (!memberId || !id) {
+				return
+			}
 			const res: any = await updateConvMember({
 				id,
 				memberId,
@@ -96,8 +99,7 @@ export default function useChatRoom(props: useChatRoomProps) {
 				})
 				return newData
 			})
-		} catch (error) {
-			openError(error)
+		} catch {
 		} finally {
 		}
 	}
@@ -134,7 +136,7 @@ export default function useChatRoom(props: useChatRoomProps) {
 													},
 												},
 											],
-									  }
+										}
 									: i,
 							),
 						)
