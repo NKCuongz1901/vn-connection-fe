@@ -1,17 +1,17 @@
 {
   "name": "source-nextjs-univini",
   "version": "0.1.0",
-  "buildVersion": "2026.02.27-027",
+  "buildVersion": "2026.02.27-028",
   "private": true,
   "scripts": {
     "increase-version": "sh scripts/increase-build-version.sh",
     "pre-build": "node scripts/generate-build-info.js",
     "dev": "npm run pre-build && next dev --turbo",
     "build": "npm run pre-build && next lint && next build",
-    "build-cicd": "npm run pre-build && next build",
-    "start": "npm run pre-build && next dev --turbo -p 3030",
+    "build:cicd": "npm run pre-build && next build",
+    "start": "next dev --turbo",
     "start:dev": "next start",
-    "start:prod": "next lint && npm run pre-build && next build && next start -p 3030",
+    "start:prod": "next start -p 3030",
     "lint": "next lint"
   },
   "dependencies": {
@@ -35,7 +35,8 @@
     "react-dom": "^18",
     "react-mentions": "^4.4.10",
     "sass": "^1.81.0",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "wavesurfer.js": "^7.12.1"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.16",

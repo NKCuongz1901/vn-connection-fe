@@ -2,12 +2,11 @@
 module.exports = {
     apps: [
         {
-            name: "web",              // tên app hiển thị trong pm2 list
-            script: "npm",            // chạy npm
-            args: "run start:prod",        // tương đương: npm run start
+            name: "web",
+            script: "node_modules/next/dist/bin/next",
+            args: "start -p 3030",
             env: {
-                NODE_ENV: "production", // môi trường production
-                PORT: 3030              // có thể set port ở đây (Next.js đọc biến PORT)
+                NODE_ENV: "production"
             }
         }
     ]
