@@ -134,7 +134,7 @@ axios.interceptors.response.use(
 					return axios(originalConfig)
 				}
 			} catch (refreshError: any) {
-				console.log('Failed to refresh token.', refreshError)
+				console.log('Failed to refresh token..', refreshError)
 				if (refreshError?.response?.data?.code === 409) {
 					handleRemoveAllCookie()
 				}
