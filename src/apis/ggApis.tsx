@@ -1,3 +1,4 @@
+import { FRIEND_ROUTES, MAP_ROUTES } from '@/routes'
 import axios from '../axios'
 
 // export const getAddressFromLatLng = async ({
@@ -38,4 +39,9 @@ export const getFullAddressFromLatLng = async ({
 			latitude: lat,
 			longitude: lng,
 		})
+}
+
+export const getAddressByText = async (payload: any) => {
+	const url = MAP_ROUTES.name
+	return await axios.post(url, payload)
 }

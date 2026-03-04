@@ -116,6 +116,9 @@ export const SEARCH_ROUTES = {
 	searchCategoryClubMatching: 'search-in-app/club-matching-categories',
 	searchCategoryUserMatching: 'search-in-app/user-matching-categories',
 }
+export const MAP_ROUTES = {
+	name: 'map/google/place/textsearch/json',
+}
 export const Menus = [
 	{
 		title: 'Overview',

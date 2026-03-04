@@ -26,7 +26,7 @@ const Search = () => {
 	const { user, event, club, data, total, location, type, onChangeValue } =
 		useSearch({})
 
-	const { address, longitude, latitude } = location
+	const { address, longitude, latitude, type: typeLocation } = location
 	const _renderInputMap = () => {
 		if (type) return
 		return (
@@ -48,7 +48,13 @@ const Search = () => {
 				<div
 					className={classes.titleUser}
 					onClick={() =>
-						onPushState({ t: 'user', longitude, latitude, address })
+						onPushState({
+							t: 'user',
+							longitude,
+							latitude,
+							address,
+							type: typeLocation,
+						})
 					}
 				>
 					<EventTitle
@@ -83,7 +89,13 @@ const Search = () => {
 				<div
 					className={classes.titleEvent}
 					onClick={() =>
-						onPushState({ t: 'event', longitude, latitude, address })
+						onPushState({
+							t: 'event',
+							longitude,
+							latitude,
+							address,
+							type: typeLocation,
+						})
 					}
 				>
 					<EventTitle
@@ -121,7 +133,7 @@ const Search = () => {
 					className={classes.titleEvent}
 					onClick={() =>
 						onChangeRoute(
-							`${mainRoutes.exploreInterest}?lat=${latitude}&lng=${longitude}`,
+							`${mainRoutes.exploreInterest}?lat=${latitude}&lng=${longitude}&address=${address}&type=${(typeLocation || []).join(',')}`,
 						)
 					}
 				>

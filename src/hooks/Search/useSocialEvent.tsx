@@ -21,13 +21,14 @@ interface useSocialEventProps {
 		longitude?: number | string
 		latitude?: number | string
 		address?: string
+		[key: string]: any
 	}
 	[key: string]: any
 }
 
 export default function useSocialEvent({ data }: useSocialEventProps) {
 	const { openError } = useModal()
-	const { longitude, latitude, address } = data || {}
+	const { longitude, latitude, address, type } = data || {}
 
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const _loadmore = useRef<boolean>(true)
@@ -89,6 +90,9 @@ export default function useSocialEvent({ data }: useSocialEventProps) {
 					latitude: Number(latitude),
 					longitude: Number(longitude),
 					google_title: address || '',
+					...(type && {
+						type: (type || '').split(','),
+					}),
 				})
 			}
 			const res: EventInAppResProps = (await getInappEvent({
