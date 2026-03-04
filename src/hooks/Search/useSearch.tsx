@@ -25,10 +25,6 @@ export default function useSearch({}: useSearchProps) {
 	const { openError } = useModal()
 	const { onGetQuerry } = useQuery()
 	const { t, longitude, latitude, address, type: typeSearch } = onGetQuerry()
-	console.log(
-		'🌸🌸🌸 TrieuNinhHan ~ :28 ~ useSearch ~  onGetQuerry():',
-		onGetQuerry(),
-	)
 	const [location, setLocation] = useState({
 		address: '',
 		longitude: 0,
@@ -69,10 +65,6 @@ export default function useSearch({}: useSearchProps) {
 		let _total = 0
 		try {
 			const { latitude, longitude, address, type } = location
-			console.log(
-				'🌸🌸🌸 TrieuNinhHan ~ :66 ~ handleGetInAppLocal ~ location:',
-				location,
-			)
 			const res: LocalResProps = (await getInappLocal({
 				fields: ['$all'],
 				...(latitude && longitude && { latitude, longitude }),
