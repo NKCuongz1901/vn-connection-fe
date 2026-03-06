@@ -91,7 +91,9 @@ export default function useSettingConv({
 				setMedias((prev: any[]) => {
 					const contents = isNew ? [] : prev
 					const resData = (_rows || []).flatMap((item) =>
-						(item?.medias || []).filter((i) => i.type === 'IMAGE'),
+						(item?.medias || []).filter((i) =>
+							['IMAGE', 'VIDEO'].includes(i.type),
+						),
 					)
 					const newData = uniqueArray([...contents, ...resData], 'url') || []
 					return newData
