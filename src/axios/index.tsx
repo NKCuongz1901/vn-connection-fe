@@ -100,7 +100,7 @@ const refreshToken = async () => {
 				return newAccessToken
 			}
 		} catch (error: any) {
-			console.error('Unable to refresh token....', error)
+			console.error('Unable to refresh token', error)
 			if (error?.response?.data?.code === 434) {
 				handleRemoveAllCookie()
 			}
