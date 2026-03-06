@@ -473,22 +473,24 @@ export default function useChatRoomInboxChat({
 			const _prev = cloneDeep(prev)
 			const { message_id, user_id, id, reaction_id } = data || {}
 			const findItem = (_prev || []).find((i) => i.id === message_id)
-			let reactions = findItem?.reactions || []
-			const type = reactions.find((i) => i.id === id) ? 'remove' : 'add'
-			reactions = reactions.filter((i) => i?.user_id !== user_id)
-			if (type === 'add') {
-				reactions.push({
-					id: id,
-					user_id: user_id,
-					reaction_id: reaction_id,
-					created_at: +new Date(),
-					reaction: reactList.current[reaction_id],
-					user: {
-						id: user_id,
-					},
-				})
+			if (!!findItem) {
+				let reactions = findItem?.reactions || []
+				const type = reactions.find((i) => i.id === id) ? 'remove' : 'add'
+				reactions = reactions.filter((i) => i?.user_id !== user_id)
+				if (type === 'add') {
+					reactions.push({
+						id: id,
+						user_id: user_id,
+						reaction_id: reaction_id,
+						created_at: +new Date(),
+						reaction: reactList.current[reaction_id],
+						user: {
+							id: user_id,
+						},
+					})
+				}
+				findItem.reactions = reactions
 			}
-			findItem.reactions = reactions
 			return _prev
 		})
 		try {
