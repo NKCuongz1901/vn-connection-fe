@@ -7,9 +7,9 @@ import { useModal } from '@/context/ModalContext'
 import { handleUploadImage } from '@/apis/uploadApis'
 import { updateUserProfile } from '@/apis/userApis'
 
-import { isArray } from '@/ultis/array.ults'
-import { cloneDeep, toJson } from '@/ultis/common.ults'
-import { handleParseFileImg } from '@/ultis/file.utls'
+import { isArray } from '@/ultis/array'
+import { cloneDeep, toJson } from '@/ultis/common'
+import { handleParseFileImg } from '@/ultis/file'
 
 import { genderOpts, languageOpts, modOpts } from '@/Variable/common.variable'
 

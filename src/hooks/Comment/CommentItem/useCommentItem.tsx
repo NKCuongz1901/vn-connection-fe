@@ -13,10 +13,10 @@ import {
 } from '@/apis/postApis'
 import { handleUploadImage } from '@/apis/uploadApis'
 
-import { isArray, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay, toJson } from '@/ultis/common.ults'
-import { handleParseFileImg } from '@/ultis/file.utls'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { isArray, uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay, toJson } from '@/ultis/common'
+import { handleParseFileImg } from '@/ultis/file'
+import { getUserInfo } from '@/ultis/storage'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'

@@ -4,8 +4,8 @@ import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { memo } from 'react'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { onPushState, useLocalePath, useSafeBack } from '@/ultis/route.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
+import { onPushState, useLocalePath, useSafeBack } from '@/ultis/route'
 
 import ModalUpdateProfile from '@/Components/ChatRoom/ModalUpdateProfile'
 import CAvatar from '@/Components/Custom/CAvatar'

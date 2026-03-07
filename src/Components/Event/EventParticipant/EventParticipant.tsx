@@ -4,8 +4,8 @@ import { memo } from 'react'
 
 import useEventParticipant from '@/hooks/Event/useEventParticipant'
 
-import { arrayFrom } from '@/ultis/array.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { arrayFrom } from '@/ultis/array'
+import { useLocalePath } from '@/ultis/route'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CAvatarBandage from '@/Components/Custom/CAvatarBandage'

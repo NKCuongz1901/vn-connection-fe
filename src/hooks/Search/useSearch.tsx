@@ -5,9 +5,9 @@ import { getFullAddressFromLatLng } from '@/apis/ggApis'
 
 import { useModal } from '@/context/ModalContext'
 
-import { useQuery } from '@/ultis/route.ults'
-import { randomString } from '@/ultis/string.ults'
-import { getCurrentLocation } from '@/ultis/common.ults'
+import { useQuery } from '@/ultis/route'
+import { randomString } from '@/ultis/string'
+import { getCurrentLocation } from '@/ultis/common'
 
 import { NetworkItemProps } from '@/interface/Community/Community.interface'
 import { LocalProps, LocalResProps } from '@/interface/Search/Search.interface'

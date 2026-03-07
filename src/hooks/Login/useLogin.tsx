@@ -6,10 +6,10 @@ import { useModal } from '@/context/ModalContext'
 
 import { loginByPhone } from '@/apis/authApis'
 
-import { delay, formatPhone, toJson } from '@/ultis/common.ults'
-import { useLocalePath } from '@/ultis/route.ults'
-import { handleStorageCookie, isLogin } from '@/ultis/storage.ults'
-import { randomString } from '@/ultis/string.ults'
+import { delay, formatPhone, toJson } from '@/ultis/common'
+import { useLocalePath } from '@/ultis/route'
+import { handleStorageCookie, isLogin } from '@/ultis/storage'
+import { randomString } from '@/ultis/string'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 

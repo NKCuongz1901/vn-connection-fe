@@ -10,10 +10,10 @@ import {
 	updateRoleUser,
 } from '@/apis/conversationApis'
 
-import { isArray, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common.ults'
-import { handleGoToPage, useLocalePath } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { isArray, uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common'
+import { handleGoToPage, useLocalePath } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { ClubMemberProps } from '@/interface/Community/Community.interface'

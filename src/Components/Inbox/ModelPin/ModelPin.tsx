@@ -7,8 +7,8 @@ import { useEffect, useRef, useState } from 'react'
 
 import { getPinMessageById, pinMessageById } from '@/apis/conversationApis'
 
-import { cloneDeep, toJson } from '@/ultis/common.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { cloneDeep, toJson } from '@/ultis/common'
+import { getUserInfo } from '@/ultis/storage'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CImage from '@/Components/Custom/CImage'

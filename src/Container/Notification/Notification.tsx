@@ -5,8 +5,8 @@ import { memo } from 'react'
 
 import useNotification from '@/hooks/Notification/useNotification'
 
-import { arrayFrom } from '@/ultis/array.ults'
-import { getDiffFromNow } from '@/ultis/date.ults'
+import { arrayFrom } from '@/ultis/array'
+import { getDiffFromNow } from '@/ultis/date'
 
 import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
 import CButton from '@/Components/Custom/CButton'

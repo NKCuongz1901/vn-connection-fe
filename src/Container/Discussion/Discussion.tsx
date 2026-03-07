@@ -4,9 +4,9 @@ import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { memo, useCallback } from 'react'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { toJson } from '@/ultis/common.ults'
-import { parseNumberToShort } from '@/ultis/string.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
+import { toJson } from '@/ultis/common'
+import { parseNumberToShort } from '@/ultis/string'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'

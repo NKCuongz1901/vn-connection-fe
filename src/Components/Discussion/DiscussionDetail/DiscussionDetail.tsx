@@ -3,7 +3,7 @@ import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { forwardRef } from 'react'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
 
 import CommentItem from '@/Components/Comment/CommentItem'
 import CButton from '@/Components/Custom/CButton'

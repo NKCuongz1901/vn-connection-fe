@@ -1,7 +1,7 @@
 import { Flex } from 'antd'
 import { memo } from 'react'
 
-import { getDiffFromNow } from '@/ultis/date.ults'
+import { getDiffFromNow } from '@/ultis/date'
 
 import CModal from '@/Components/Custom/CModal/CModal'
 

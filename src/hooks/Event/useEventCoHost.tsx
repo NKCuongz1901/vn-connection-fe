@@ -6,8 +6,8 @@ import { useModal } from '@/context/ModalContext'
 
 import { getListParticipant, updateMemberPost } from '@/apis/postApis'
 
-import { uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay } from '@/ultis/common.ults'
+import { uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay } from '@/ultis/common'
 
 import { paginationCommon } from '@/Variable/common.variable'
 import { PaginationType } from '@/interface/common/common.interface'

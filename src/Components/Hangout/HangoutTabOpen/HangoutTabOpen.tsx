@@ -3,7 +3,7 @@ import { forwardRef } from 'react'
 
 import useHangoutTabOpen from '@/hooks/Hangout/useHangoutTabOpen'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
 
 import CButton from '@/Components/Custom/CButton'
 import CSelect from '@/Components/Custom/CSelect'

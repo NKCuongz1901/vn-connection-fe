@@ -12,7 +12,7 @@ import { memo } from 'react'
 
 import useCRUDEvent from '@/hooks/Event/useCRUDEvent'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
 
 import CButton from '@/Components/Custom/CButton'
 import CCheckRadio from '@/Components/Custom/CCheckRadio'

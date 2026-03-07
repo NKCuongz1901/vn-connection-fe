@@ -6,9 +6,9 @@ import { memo } from 'react'
 
 import useEventCoHost from '@/hooks/Event/useEventCoHost'
 
-import { isArray } from '@/ultis/array.ults'
-import { useLocalePath } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { isArray } from '@/ultis/array'
+import { useLocalePath } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CAvatarBandage from '@/Components/Custom/CAvatarBandage'

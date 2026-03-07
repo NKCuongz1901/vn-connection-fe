@@ -5,8 +5,8 @@ import { useModal } from '@/context/ModalContext'
 import { addFriend, deleteFriend } from '@/apis/friendApis'
 import { getListParticipant } from '@/apis/postApis'
 
-import { uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay } from '@/ultis/common.ults'
+import { uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay } from '@/ultis/common'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'

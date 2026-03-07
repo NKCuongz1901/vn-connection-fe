@@ -7,9 +7,9 @@ import useFriendItem from '../Friend/useFriendItem'
 import { createConversation, getCategoryList } from '@/apis/conversationApis'
 import { getUserProfile } from '@/apis/userApis'
 
-import { delay } from '@/ultis/common.ults'
-import { useLocalePath, useQuery } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { delay } from '@/ultis/common'
+import { useLocalePath, useQuery } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
 
 import { CategoriFavOptProps } from '@/interface/Community/Community.interface'
 import { mainRoutes } from '@/routes/MainRoutes'

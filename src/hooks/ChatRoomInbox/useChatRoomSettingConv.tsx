@@ -10,11 +10,11 @@ import {
 	updateConvMember,
 } from '@/apis/conversationApis'
 
-import { uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay } from '@/ultis/common.ults'
-import { onPushState } from '@/ultis/route.ults'
-import { removeStorageCookie } from '@/ultis/storage.ults'
-import { randomString } from '@/ultis/string.ults'
+import { uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay } from '@/ultis/common'
+import { onPushState } from '@/ultis/route'
+import { removeStorageCookie } from '@/ultis/storage'
+import { randomString } from '@/ultis/string'
 
 import { paginationCommon } from '@/Variable/common.variable'
 import { PaginationType } from '@/interface/common/common.interface'

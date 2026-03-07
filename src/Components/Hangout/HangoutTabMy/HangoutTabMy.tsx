@@ -5,7 +5,7 @@ import { forwardRef } from 'react'
 
 import useHangoutTabMy from '@/hooks/Hangout/useHangoutTabMy'
 
-import { arrayFrom } from '@/ultis/array.ults'
+import { arrayFrom } from '@/ultis/array'
 
 import CButton from '@/Components/Custom/CButton'
 import ItemHangout from '../ItemHangout'

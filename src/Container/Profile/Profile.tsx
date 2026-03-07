@@ -7,10 +7,10 @@ import { memo, useCallback } from 'react'
 
 import useProfile from '@/hooks/Profile/useProfile'
 
-import { toJson } from '@/ultis/common.ults'
-import { getAge } from '@/ultis/date.ults'
-import { useLocalePath, useQuery, useSafeBack } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { toJson } from '@/ultis/common'
+import { getAge } from '@/ultis/date'
+import { useLocalePath, useQuery, useSafeBack } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'

@@ -6,9 +6,9 @@ import { memo, useCallback, useState } from 'react'
 
 import useChatBox from '@/hooks/ChatBox/useChatBox'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { handleParseFileImg, handleParseFileVideo } from '@/ultis/file.utls'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
+import { handleParseFileImg, handleParseFileVideo } from '@/ultis/file'
+import { getUserInfo } from '@/ultis/storage'
 
 import HappyIcon from '@/svg/HappyIcon'
 import ImageIcon from '@/svg/ImageIcon'
@@ -23,7 +23,7 @@ import { specialTypeMessage } from '@/Variable/common.variable'
 
 import MoreIcon from '@/svg/MoreIcon'
 import classes from './ChatBox.module.scss'
-import { parseDayFromIsNewDate } from '@/ultis/date.ults'
+import { parseDayFromIsNewDate } from '@/ultis/date'
 interface ChatBoxProps {
 	type?: string
 	itemList?: any[]

@@ -10,8 +10,8 @@ import {
 } from 'react'
 import { io, Socket } from 'socket.io-client'
 
-import { getStorageCookie, getUserInfo } from '@/ultis/storage.ults'
-import { useQuery } from '@/ultis/route.ults'
+import { getStorageCookie, getUserInfo } from '@/ultis/storage'
+import { useQuery } from '@/ultis/route'
 
 const SocketContext = createContext<{
 	socket: Socket | null

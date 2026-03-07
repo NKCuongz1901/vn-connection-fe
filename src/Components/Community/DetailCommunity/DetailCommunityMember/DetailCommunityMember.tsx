@@ -6,8 +6,8 @@ import { forwardRef } from 'react'
 
 import useDetailCommunityMember from '@/hooks/Community/useDetailCommunityMember'
 
-import { arrayFrom } from '@/ultis/array.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { arrayFrom } from '@/ultis/array'
+import { getUserInfo } from '@/ultis/storage'
 
 import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
 import CInput from '@/Components/Custom/CInput'

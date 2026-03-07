@@ -6,7 +6,7 @@ import { memo } from 'react'
 
 import useSearch from '@/hooks/Search/useSearch'
 
-import { onPushState, useLocalePath } from '@/ultis/route.ults'
+import { onPushState, useLocalePath } from '@/ultis/route'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CImage from '@/Components/Custom/CImage'

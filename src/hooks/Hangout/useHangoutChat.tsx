@@ -17,11 +17,11 @@ import {
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { mappingMessageChat, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay } from '@/ultis/common.ults'
-import { onPushState } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
-import { randomString } from '@/ultis/string.ults'
+import { mappingMessageChat, uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay } from '@/ultis/common'
+import { onPushState } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
+import { randomString } from '@/ultis/string'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'

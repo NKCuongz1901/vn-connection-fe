@@ -7,9 +7,9 @@ import { memo } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import useHangout from '@/hooks/Hangout/useHangout'
 
-import { isArray } from '@/ultis/array.ults'
-import { onPushState } from '@/ultis/route.ults'
-import { randomString } from '@/ultis/string.ults'
+import { isArray } from '@/ultis/array'
+import { onPushState } from '@/ultis/route'
+import { randomString } from '@/ultis/string'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'

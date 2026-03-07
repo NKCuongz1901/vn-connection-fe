@@ -7,9 +7,9 @@ import { useModal } from '@/context/ModalContext'
 import { createDiscussion, editDiscussion } from '@/apis/discussionApis'
 import { handleUploadImage } from '@/apis/uploadApis'
 
-import { isArray } from '@/ultis/array.ults'
-import { cloneDeep } from '@/ultis/common.ults'
-import { handleParseFileImg } from '@/ultis/file.utls'
+import { isArray } from '@/ultis/array'
+import { cloneDeep } from '@/ultis/common'
+import { handleParseFileImg } from '@/ultis/file'
 
 interface useModalCRUDDiscussionProps {
 	conversation_id?: string

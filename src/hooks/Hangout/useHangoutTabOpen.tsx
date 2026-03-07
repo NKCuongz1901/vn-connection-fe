@@ -11,8 +11,8 @@ import { paginationCommon } from '@/Variable/common.variable'
 import { getHangoutSearch, getUserOpenHangoutNow } from '@/apis/hangoutApi'
 import { useModal } from '@/context/ModalContext'
 import { PaginationType } from '@/interface/common/common.interface'
-import { uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay, toJson } from '@/ultis/common.ults'
+import { uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay, toJson } from '@/ultis/common'
 
 export default function useHangoutTabOpen(ref) {
 	const { openError } = useModal()

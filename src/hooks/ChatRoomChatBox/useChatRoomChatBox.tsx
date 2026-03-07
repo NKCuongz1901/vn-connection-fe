@@ -9,8 +9,8 @@ import { useModal } from '@/context/ModalContext'
 import { getReact, textToSpeech, translate } from '@/apis/conversationApis'
 import { handleUploadFile } from '@/apis/uploadApis'
 
-import { playAudio, stopAudio } from '@/ultis/file.utls'
-import { copyToClipboard } from '@/ultis/string.ults'
+import { playAudio, stopAudio } from '@/ultis/file'
+import { copyToClipboard } from '@/ultis/string'
 
 import { ReactionPtops } from '@/interface/Conversation/Conversation.interface'
 

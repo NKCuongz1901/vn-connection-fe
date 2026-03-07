@@ -4,7 +4,7 @@ import { forwardRef } from 'react'
 
 import useDetailCommunityDiscussion from '@/hooks/Community/useDetailCommunityDiscussion'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'

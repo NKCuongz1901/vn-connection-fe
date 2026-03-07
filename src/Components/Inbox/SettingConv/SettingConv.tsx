@@ -6,9 +6,9 @@ import { memo, useMemo } from 'react'
 
 import useSettingConv from '@/hooks/Inbox/useSettingConv'
 
-import { arrayFrom } from '@/ultis/array.ults'
-import { toJson } from '@/ultis/common.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { arrayFrom } from '@/ultis/array'
+import { toJson } from '@/ultis/common'
+import { getUserInfo } from '@/ultis/storage'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'

@@ -2,9 +2,9 @@ import { IconClockFilled, IconMap, IconRepeat } from '@tabler/icons-react'
 import { Flex } from 'antd'
 import { memo } from 'react'
 
-import { getDateInfo } from '@/ultis/date.ults'
-import { useLocalePath } from '@/ultis/route.ults'
-import { formatNumberString } from '@/ultis/string.ults'
+import { getDateInfo } from '@/ultis/date'
+import { useLocalePath } from '@/ultis/route'
+import { formatNumberString } from '@/ultis/string'
 
 import CImage from '@/Components/Custom/CImage'
 import GroupIcon from '@/svg/GroupIcon'

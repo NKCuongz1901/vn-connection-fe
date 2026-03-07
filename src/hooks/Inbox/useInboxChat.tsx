@@ -18,13 +18,13 @@ import {
 	handleUploadVideo,
 } from '@/apis/uploadApis'
 
-import { mappingMessageChat, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay } from '@/ultis/common.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
-import { generateCustomUuid, randomString } from '@/ultis/string.ults'
+import { mappingMessageChat, uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay } from '@/ultis/common'
+import { getUserInfo } from '@/ultis/storage'
+import { generateCustomUuid, randomString } from '@/ultis/string'
 
 import { PaginationType } from '@/interface/common/common.interface'
-import { onPushState } from '@/ultis/route.ults'
+import { onPushState } from '@/ultis/route'
 import { paginationCommon } from '@/Variable/common.variable'
 
 type useHangoutChatProps = {

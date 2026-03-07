@@ -2,7 +2,7 @@
 import React, { memo } from 'react'
 
 import Profile from '@/Container/Profile'
-import { useLocalePath } from '@/ultis/route.ults'
+import { useLocalePath } from '@/ultis/route'
 
 const Page = () => {
 	const { onGetParam } = useLocalePath()

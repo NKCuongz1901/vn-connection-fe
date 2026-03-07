@@ -4,9 +4,9 @@ import { useModal } from '@/context/ModalContext'
 
 import { getInappLocal } from '@/apis/searchApis'
 
-import { isArray, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common.ults'
-import { randomString } from '@/ultis/string.ults'
+import { isArray, uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common'
+import { randomString } from '@/ultis/string'
 
 import { paginationMore } from '@/Variable/common.variable'
 

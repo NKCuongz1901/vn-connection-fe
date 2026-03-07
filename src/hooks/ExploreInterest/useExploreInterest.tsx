@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useModal } from '@/context/ModalContext'
 
-import { isArray, uniqueArray } from '@/ultis/array.ults'
+import { isArray, uniqueArray } from '@/ultis/array'
 import {
 	cloneDeep,
 	delay,
 	getCurrentLocation,
 	handleScrollCallback,
-} from '@/ultis/common.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
+} from '@/ultis/common'
+import { getUserInfo } from '@/ultis/storage'
 
 import {
 	inviteAllJoinConv,
@@ -25,7 +25,7 @@ import {
 	getInappCategoryUserMatching,
 } from '@/apis/searchApis'
 
-import { useQuery } from '@/ultis/route.ults'
+import { useQuery } from '@/ultis/route'
 
 import { paginationCommon } from '@/Variable/common.variable'
 import { radiusOpts } from '@/Variable/select.variable'

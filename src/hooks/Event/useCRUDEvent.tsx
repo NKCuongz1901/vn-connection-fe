@@ -7,11 +7,11 @@ import { useModal } from '@/context/ModalContext'
 import { createPost, editPost } from '@/apis/postApis'
 import { handleUploadImage } from '@/apis/uploadApis'
 
-import { isArray } from '@/ultis/array.ults'
-import { cloneDeep } from '@/ultis/common.ults'
-import { handleParseFileImg } from '@/ultis/file.utls'
-import { useLocalePath } from '@/ultis/route.ults'
-import { convertStringToNumber, formatNumberString } from '@/ultis/string.ults'
+import { isArray } from '@/ultis/array'
+import { cloneDeep } from '@/ultis/common'
+import { handleParseFileImg } from '@/ultis/file'
+import { useLocalePath } from '@/ultis/route'
+import { convertStringToNumber, formatNumberString } from '@/ultis/string'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import {

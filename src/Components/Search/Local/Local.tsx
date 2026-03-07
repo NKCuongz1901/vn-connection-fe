@@ -5,8 +5,8 @@ import { memo } from 'react'
 
 import useLocal from '@/hooks/Search/useLocal'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
+import { useLocalePath } from '@/ultis/route'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'

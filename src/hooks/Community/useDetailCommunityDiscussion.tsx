@@ -19,11 +19,11 @@ import {
 } from '@/apis/discussionApis'
 import { blockUser } from '@/apis/userApis'
 
-import { isArray, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay } from '@/ultis/common.ults'
-import { useQuery } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
-import { copyToClipboard, randomString } from '@/ultis/string.ults'
+import { isArray, uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay } from '@/ultis/common'
+import { useQuery } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
+import { copyToClipboard, randomString } from '@/ultis/string'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'

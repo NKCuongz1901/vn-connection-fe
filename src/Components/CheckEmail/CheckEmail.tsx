@@ -7,9 +7,9 @@ import { useModal } from '@/context/ModalContext'
 import { checkOTP, sendOTP, verifyOTP } from '@/apis/authApis'
 import { updateUserProfile } from '@/apis/userApis'
 
-import { isArray } from '@/ultis/array.ults'
-import { isEmail } from '@/ultis/common.ults'
-import { getSessionStorage, setSessionStorage } from '@/ultis/storage.ults'
+import { isArray } from '@/ultis/array'
+import { isEmail } from '@/ultis/common'
+import { getSessionStorage, setSessionStorage } from '@/ultis/storage'
 
 import VerifyOTP from '../Auth/VerifyOTP'
 import CButton from '../Custom/CButton'

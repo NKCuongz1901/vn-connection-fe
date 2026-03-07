@@ -18,11 +18,11 @@ import { useLoading } from '@/context/LoadingContext'
 
 import { blockUser } from '@/apis/userApis'
 
-import { isArray, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common.ults'
-import { useLocalePath, useSafeBack } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
-import { copyToClipboard } from '@/ultis/string.ults'
+import { isArray, uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common'
+import { useLocalePath, useSafeBack } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
+import { copyToClipboard } from '@/ultis/string'
 
 import { paginationCommon } from '@/Variable/common.variable'
 

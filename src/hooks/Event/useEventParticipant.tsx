@@ -4,8 +4,8 @@ import { useModal } from '@/context/ModalContext'
 
 import { getListParticipant } from '@/apis/postApis'
 
-import { uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay } from '@/ultis/common.ults'
+import { uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay } from '@/ultis/common'
 
 import { paginationCommon } from '@/Variable/common.variable'
 

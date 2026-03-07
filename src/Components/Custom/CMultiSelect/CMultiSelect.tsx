@@ -5,7 +5,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react'
 
 import { useModal } from '@/context/ModalContext'
 
-import { isArray } from '@/ultis/array.ults'
+import { isArray } from '@/ultis/array'
 
 import CButton from '../CButton'
 import CImage from '../CImage'

@@ -6,7 +6,7 @@ import { memo, useCallback } from 'react'
 
 import useLogin from '@/hooks/Login/useLogin'
 import { useLoading } from '@/context/LoadingContext'
-import { useLocalePath } from '@/ultis/route.ults'
+import { useLocalePath } from '@/ultis/route'
 
 import CButton from '@/Components/Custom/CButton'
 import CInputPassword from '@/Components/Custom/CInputPassword'

@@ -5,9 +5,9 @@ import clsx from 'clsx'
 
 import useModalViewMember from '@/hooks/ChatRoomInbox/useModalViewMember'
 
-import { arrayFrom } from '@/ultis/array.ults'
-import { useLocalePath } from '@/ultis/route.ults'
-import { formatNumberString } from '@/ultis/string.ults'
+import { arrayFrom } from '@/ultis/array'
+import { useLocalePath } from '@/ultis/route'
+import { formatNumberString } from '@/ultis/string'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CInput from '@/Components/Custom/CInput'

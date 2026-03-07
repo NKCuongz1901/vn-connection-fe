@@ -11,9 +11,9 @@ import {
 } from '@/apis/conversationApis'
 import { handleUploadImage } from '@/apis/uploadApis'
 
-import { isArray } from '@/ultis/array.ults'
-import { handleParseFileImg } from '@/ultis/file.utls'
-import { useLocalePath } from '@/ultis/route.ults'
+import { isArray } from '@/ultis/array'
+import { handleParseFileImg } from '@/ultis/file'
+import { useLocalePath } from '@/ultis/route'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 

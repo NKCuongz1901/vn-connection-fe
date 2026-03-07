@@ -2,7 +2,7 @@
 
 import { memo } from 'react'
 
-import { useQuery } from '@/ultis/route.ults'
+import { useQuery } from '@/ultis/route'
 
 import DetailCommunity from '@/Container/Community/DetailCommunity'
 

@@ -9,8 +9,8 @@ import { memo, useCallback, useState } from 'react'
 import { sendHangout } from '@/apis/hangoutApi'
 import { joinPost } from '@/apis/postApis'
 
-import { isArray } from '@/ultis/array.ults'
-import { getAge, getDiffFromNow } from '@/ultis/date.ults'
+import { isArray } from '@/ultis/array'
+import { getAge, getDiffFromNow } from '@/ultis/date'
 
 import CButton from '@/Components/Custom/CButton'
 import CImage from '@/Components/Custom/CImage'

@@ -11,10 +11,10 @@ import {
 } from '@/apis/hangoutApi'
 import { getUserProfile, updateUserProfile } from '@/apis/userApis'
 
-import { delay } from '@/ultis/common.ults'
-import { onPushState, useQuery } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
-import { randomString } from '@/ultis/string.ults'
+import { delay } from '@/ultis/common'
+import { onPushState, useQuery } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
+import { randomString } from '@/ultis/string'
 
 type userDataProps = {
 	is_open_hangout: boolean

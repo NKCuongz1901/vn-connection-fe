@@ -1,4 +1,4 @@
-import { convertParams } from '@/ultis/object.ults'
+import { convertParams } from '@/ultis/object'
 import axios from '../axios'
 
 import { POST_ROUTES } from '@/routes'

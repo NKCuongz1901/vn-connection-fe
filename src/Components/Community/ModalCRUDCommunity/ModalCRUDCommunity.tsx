@@ -9,7 +9,7 @@ import { memo, useCallback } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import useCRUDCommunity from '@/hooks/Community/useCRUDCommunity'
 
-import { toJson } from '@/ultis/common.ults'
+import { toJson } from '@/ultis/common'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'

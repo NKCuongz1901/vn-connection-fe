@@ -4,9 +4,9 @@ import { ItemType } from 'antd/es/menu/interface'
 import clsx from 'clsx'
 import { memo } from 'react'
 
-import { isArray } from '@/ultis/array.ults'
-import { getDiffFromNow } from '@/ultis/date.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { isArray } from '@/ultis/array'
+import { getDiffFromNow } from '@/ultis/date'
+import { useLocalePath } from '@/ultis/route'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CImage from '@/Components/Custom/CImage'

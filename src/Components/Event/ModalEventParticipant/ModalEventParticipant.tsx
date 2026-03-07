@@ -4,9 +4,9 @@ import { memo } from 'react'
 
 import useModalEventParticipant from '@/hooks/Event/useModalEventParticipant'
 
-import { arrayFrom } from '@/ultis/array.ults'
-import { useLocalePath } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { arrayFrom } from '@/ultis/array'
+import { useLocalePath } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CAvatarBandage from '@/Components/Custom/CAvatarBandage'

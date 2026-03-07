@@ -2,7 +2,7 @@
 import { Flex } from 'antd'
 import { memo } from 'react'
 
-import { randomString } from '@/ultis/string.ults'
+import { randomString } from '@/ultis/string'
 
 import classes from './Icons.module.scss'
 

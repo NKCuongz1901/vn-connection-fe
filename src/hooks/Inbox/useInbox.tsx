@@ -11,16 +11,16 @@ import {
 } from '@/apis/conversationApis'
 import { getFriends } from '@/apis/friendApis'
 
-import { isArray, uniqueArray } from '@/ultis/array.ults'
+import { isArray, uniqueArray } from '@/ultis/array'
 import {
 	cloneDeep,
 	delay,
 	handleScrollCallback,
 	toJson,
-} from '@/ultis/common.ults'
-import { onPushState, useQuery } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
-import { randomString } from '@/ultis/string.ults'
+} from '@/ultis/common'
+import { onPushState, useQuery } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
+import { randomString } from '@/ultis/string'
 
 import { optionFriends, paginationCommon } from '@/Variable/common.variable'
 

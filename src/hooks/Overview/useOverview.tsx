@@ -10,9 +10,9 @@ import { getUserOpenHangout } from '@/apis/hangoutApi'
 import { getListPost, getmyEventInHome } from '@/apis/postApis'
 import { getUserProfile, updateUserProfile } from '@/apis/userApis'
 
-import { isArray, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay } from '@/ultis/common.ults'
-import { getSessionStorage, getUserInfo } from '@/ultis/storage.ults'
+import { isArray, uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay } from '@/ultis/common'
+import { getSessionStorage, getUserInfo } from '@/ultis/storage'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { NetworkItemProps } from '@/interface/Community/Community.interface'

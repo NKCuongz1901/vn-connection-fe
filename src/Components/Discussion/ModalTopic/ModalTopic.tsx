@@ -3,7 +3,7 @@ import { memo } from 'react'
 
 import useDiscussionTopic from '@/hooks/Discussion/useDiscussionTopic'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
 
 import CInput from '@/Components/Custom/CInput'
 import CModal from '@/Components/Custom/CModal/CModal'

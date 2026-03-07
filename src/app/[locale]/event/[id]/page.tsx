@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 
-import { useQuery } from '@/ultis/route.ults'
+import { useQuery } from '@/ultis/route'
 
 import DetailEvent from '@/Container/Event/DetailEvent'
 

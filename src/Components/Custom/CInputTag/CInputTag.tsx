@@ -15,8 +15,8 @@ import { Mention, MentionsInput } from 'react-mentions'
 
 import { getMemberInConv } from '@/apis/conversationApis'
 
-import { arrayFrom, isArray, uniqueArray } from '@/ultis/array.ults'
-import { handleScrollCallback } from '@/ultis/common.ults'
+import { arrayFrom, isArray, uniqueArray } from '@/ultis/array'
+import { handleScrollCallback } from '@/ultis/common'
 
 import People from '@/svg/People'
 import CAvatar from '../CAvatar'

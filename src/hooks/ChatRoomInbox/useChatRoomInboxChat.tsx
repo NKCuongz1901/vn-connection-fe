@@ -21,16 +21,16 @@ import {
 	handleUploadVideo,
 } from '@/apis/uploadApis'
 
-import { mappingMessageChat, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay } from '@/ultis/common.ults'
-import { isEmptyObject } from '@/ultis/object.ults'
-import { onPushState } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { mappingMessageChat, uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay } from '@/ultis/common'
+import { isEmptyObject } from '@/ultis/object'
+import { onPushState } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
 import {
 	generateCustomUuid,
 	parseMentions,
 	randomString,
-} from '@/ultis/string.ults'
+} from '@/ultis/string'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { ReactionPtops } from '@/interface/Conversation/Conversation.interface'

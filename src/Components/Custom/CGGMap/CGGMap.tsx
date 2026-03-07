@@ -13,8 +13,8 @@ import { memo, useEffect, useRef, useState } from 'react'
 
 import { getAddressByText, getFullAddressFromLatLng } from '@/apis/ggApis'
 
-import { getCurrentLocation } from '@/ultis/common.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { getCurrentLocation } from '@/ultis/common'
+import { getUserInfo } from '@/ultis/storage'
 
 import CButton from '../CButton'
 import CInput from '../CInput'

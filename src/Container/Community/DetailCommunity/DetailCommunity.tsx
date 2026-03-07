@@ -22,7 +22,7 @@ import People from '@/svg/People'
 import TopicIcon from '@/svg/TopicIcon'
 
 import classes from './DetailCommunity.module.scss'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { getUserInfo } from '@/ultis/storage'
 
 const mappingTabsBtnTop = {
 	member: 'member',

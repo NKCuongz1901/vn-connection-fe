@@ -13,14 +13,14 @@ import { logout } from '@/apis/authApis'
 import { getNotificationCount } from '@/apis/notificationApis'
 import { getUserProfile, updateUserProfile } from '@/apis/userApis'
 
-import { useLocalePath } from '@/ultis/route.ults'
+import { useLocalePath } from '@/ultis/route'
 import {
 	getStorageCookie,
 	handleRemoveAllCookie,
 	handleStorageCookie,
 	isLogin,
 	setSessionStorage,
-} from '@/ultis/storage.ults'
+} from '@/ultis/storage'
 
 import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'

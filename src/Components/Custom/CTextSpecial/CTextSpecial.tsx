@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
 import { mainRoutes } from '@/routes/MainRoutes'
-import { useLocalePath } from '@/ultis/route.ults'
+import { useLocalePath } from '@/ultis/route'
 
 import classes from './CTextSpecial.module.scss'
 

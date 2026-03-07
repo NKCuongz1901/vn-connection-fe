@@ -4,8 +4,8 @@ import { Dropdown, Flex, Skeleton } from 'antd'
 import Link from 'next/link'
 import { memo } from 'react'
 
-import { isArray } from '@/ultis/array.ults'
-import { goToGoogleMap, onPushState, useLocalePath } from '@/ultis/route.ults'
+import { isArray } from '@/ultis/array'
+import { goToGoogleMap, onPushState, useLocalePath } from '@/ultis/route'
 
 import ChatBox from '@/Components/ChatBox'
 import CAvatar from '@/Components/Custom/CAvatar'
