@@ -33,6 +33,7 @@ npm run dev
 3. Common type
 4. Function
 5. Build change
+5. Build change 2
 
 ## Rule commit code
 
