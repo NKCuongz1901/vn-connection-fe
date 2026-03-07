@@ -84,7 +84,7 @@ export default function useEventParticipant({ id }: any) {
 	useEffect(() => {
 		handleGetListParticipant()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	}, [id])
 	useEffect(() => {
 		handleAutoLoadMore()
 		// eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,4 +1,5 @@
 import {
+	AutoCompleteProps,
 	CheckboxProps,
 	DatePickerProps,
 	InputProps,
@@ -56,3 +57,6 @@ interface ExtendProps {
 }
 export interface CSliderRangerProps extends ExtendProps, SliderRangeProps {}
 export interface CCheckboxProps extends ExtendProps, CheckboxProps {}
+
+export interface CAutoCompleteProps
+	extends CInputOthersProps, AutoCompleteProps {}

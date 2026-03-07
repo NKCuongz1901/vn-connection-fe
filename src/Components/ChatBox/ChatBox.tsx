@@ -145,14 +145,30 @@ const ChatBox = ({
 						)}
 					</Flex>
 				)
-			case 'MEDIAS':
+			case 'MEDIAS': {
+				let Content = null
+				switch (medias?.[0].type) {
+					default:
+						Content = (medias || []).map((media, index) => {
+							const { type } = media || {}
+							const isImg = type === 'IMAGE'
+							return (
+								<Flex className={classes.media} key={index}>
+									{isImg ? (
+										<CImage preview src={media.url} />
+									) : (
+										<video controls>
+											<source src={media.url} type="video/mp4" />
+										</video>
+									)}
+								</Flex>
+							)
+						})
+				}
 				return (
 					<Flex className={classes.medias} vertical>
-						{(medias || []).map((media, index) => (
-							<Flex className={classes.media} key={index}>
-								<CImage src={media.url} />
-							</Flex>
-						))}
+						{Content}
+
 						{isLast && (
 							<div className={classes.time}>
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
@@ -160,6 +176,7 @@ const ChatBox = ({
 						)}
 					</Flex>
 				)
+			}
 			case 'MEMBER_ACCEPT':
 			case 'TITLE_CHANGE':
 			case 'ADDRESS':

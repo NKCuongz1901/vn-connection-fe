@@ -18,6 +18,7 @@ export const AUTH_ROUTES = {
 	checkPhoneExists: '/auth/check_phone_exists',
 	sendOTP: '/auth/otp/send',
 	verifyOTP: '/auth/otp/verify',
+	checkOTP: 'auth/otp/check',
 	forgetPassword: '/auth/forget_password',
 	registerByPhone: '/auth/register_by_phone',
 	logout: '/auth/logout',
@@ -114,6 +115,9 @@ export const SEARCH_ROUTES = {
 	searchCategoryClub: 'search-in-app/category-club',
 	searchCategoryClubMatching: 'search-in-app/club-matching-categories',
 	searchCategoryUserMatching: 'search-in-app/user-matching-categories',
+}
+export const MAP_ROUTES = {
+	name: 'map/google/place/textsearch/json',
 }
 export const Menus = [
 	{

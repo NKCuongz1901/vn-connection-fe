@@ -2,16 +2,16 @@
 
 import { SearchOutlined } from '@ant-design/icons'
 import {
-	Autocomplete,
+	// Autocomplete,
 	GoogleMap,
 	Marker,
 	useLoadScript,
 } from '@react-google-maps/api'
 import { IconMapPinFilled } from '@tabler/icons-react'
-import { Flex } from 'antd'
+import { AutoComplete, Flex } from 'antd'
 import { memo, useEffect, useRef, useState } from 'react'
 
-import { getFullAddressFromLatLng } from '@/apis/ggApis'
+import { getAddressByText, getFullAddressFromLatLng } from '@/apis/ggApis'
 
 import { getCurrentLocation } from '@/ultis/common.ults'
 import { getUserInfo } from '@/ultis/storage.ults'
@@ -21,6 +21,8 @@ import CInput from '../CInput'
 import CModal from '../CModal/CModal'
 
 import classes from './CGGMap.module.scss'
+import { DefaultOptionType } from 'antd/es/select'
+import CAutoComplete from '../CAutoComplete'
 
 const libraries: any = ['places']
 
@@ -48,7 +50,7 @@ const CGGMap = (_props: CGGMapProps) => {
 		lng: longitude,
 	})
 	const [searchValue, setSearchValue] = useState('')
-
+	const [options, setOptions] = useState([])
 	const handlePlaceChanged = () => {
 		const place = autoCompleteRef.current?.getPlace()
 		if (!place?.geometry) return
@@ -103,6 +105,37 @@ const CGGMap = (_props: CGGMapProps) => {
 			console.log('error:', error)
 		}
 	}
+	const handleGetLocation = async () => {
+		try {
+			setOptions([])
+
+			const res: any = await getAddressByText({ text: searchValue })
+			const { results } = res?.results?.object
+
+			setOptions(
+				(results || []).map((i) => ({
+					...i,
+					label: i.formatted_address,
+					value: i.place_id,
+				})),
+			)
+		} catch {}
+	}
+	const handleChoose = (value: string, option: DefaultOptionType) => {
+		if (option) {
+			const { formatted_address, geometry, types } = option || {}
+			const { location } = geometry || {}
+			const {} = option
+			setTimeout(() => {
+				onSubmit({
+					display_name: formatted_address,
+					...location,
+					type: types,
+				})
+				onClose()
+			}, 0)
+		}
+	}
 	useEffect(() => {
 		if (!(defaultCenter.lat && defaultCenter.lng)) {
 			handleSetDefaultCenter()
@@ -114,6 +147,17 @@ const CGGMap = (_props: CGGMapProps) => {
 			handleGetAddress(marker)
 		}
 	}, [marker])
+	useEffect(() => {
+		if (!searchValue) return
+
+		const timer = setTimeout(() => {
+			handleGetLocation()
+		}, 500)
+
+		return () => clearTimeout(timer)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [searchValue])
+
 	if (!isLoaded) return <div></div>
 
 	return (
@@ -145,17 +189,13 @@ const CGGMap = (_props: CGGMapProps) => {
 				]}
 			>
 				<div className={classes.wrapper}>
-					<Autocomplete
-						onLoad={(ref) => (autoCompleteRef.current = ref)}
-						onPlaceChanged={handlePlaceChanged}
-					>
-						<CInput
-							placeholder="What address do you need to find?"
-							value={searchValue}
-							onChange={(e) => setSearchValue(e.target.value)}
-							prefix={<SearchOutlined className={classes.searchIcon} />}
-						/>
-					</Autocomplete>
+					<CAutoComplete
+						placeholder="What address do you need to find?"
+						options={options || []}
+						onSelect={handleChoose}
+						onSearch={(text) => setSearchValue(text)}
+						prefix={<SearchOutlined className={classes.searchIcon} />}
+					/>
 
 					<Flex vertical className={classes.mapWrapper}>
 						{defaultCenter.lat && defaultCenter.lng ? (

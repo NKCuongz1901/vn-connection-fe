@@ -24,11 +24,12 @@ const searchType = {
 export default function useSearch({}: useSearchProps) {
 	const { openError } = useModal()
 	const { onGetQuerry } = useQuery()
-	const { t, longitude, latitude, address } = onGetQuerry()
+	const { t, longitude, latitude, address, type: typeSearch } = onGetQuerry()
 	const [location, setLocation] = useState({
 		address: '',
 		longitude: 0,
 		latitude: 0,
+		type: [],
 	})
 
 	const [user, setUser] = useState<LocalProps[]>([])
@@ -48,6 +49,7 @@ export default function useSearch({}: useSearchProps) {
 					address: _value.display_name,
 					longitude: _value.lng,
 					latitude: _value.lat,
+					type: _value.type,
 				})
 				break
 
@@ -62,11 +64,12 @@ export default function useSearch({}: useSearchProps) {
 		setLoading((prev) => ({ ...prev, user: true }))
 		let _total = 0
 		try {
-			const { latitude, longitude, address } = location
+			const { latitude, longitude, address, type } = location
 			const res: LocalResProps = (await getInappLocal({
 				fields: ['$all'],
 				...(latitude && longitude && { latitude, longitude }),
 				...(address && { google_title: address }),
+				type,
 				page: 1,
 				limit: 20,
 			})) as any
@@ -88,11 +91,12 @@ export default function useSearch({}: useSearchProps) {
 		setLoading((prev) => ({ ...prev, event: true }))
 		let _total = 0
 		try {
-			const { latitude, longitude, address } = location
+			const { latitude, longitude, address, type } = location
 			const res: any = (await getInappEvent({
 				fields: ['$all'],
 				...(latitude && longitude && { latitude, longitude }),
 				...(address && { google_title: address }),
+				type,
 				page: 1,
 				limit: 20,
 			})) as any
@@ -195,6 +199,7 @@ export default function useSearch({}: useSearchProps) {
 			longitude,
 			latitude,
 			address,
+			type: typeSearch,
 		},
 		setType,
 		onChangeValue: handleChangeValue,

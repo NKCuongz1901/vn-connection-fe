@@ -93,7 +93,7 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 		)
 	}
 	const _renderEvents = () => {
-		if (!isArray(events, 2)) return
+		if (!isArray(events, 1)) return
 		return (
 			<Flex gap={10}>
 				{events.map((event) => {
@@ -364,15 +364,16 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 							{typeRepeat} {timeStart} - {timeEnd}
 						</span>
 					</Flex>
-					<Flex className={classes.detailInfoItem}>
-						<GroupPeopleIcon fill="#006B35" />
-						{!!expect_participant && (
+					{!!expect_participant && (
+						<Flex className={classes.detailInfoItem}>
+							<GroupPeopleIcon fill="#006B35" />
+
 							<span>
 								This activity normally has around{' '}
 								{formatNumberString(expect_participant)} people
 							</span>
-						)}
-					</Flex>
+						</Flex>
+					)}
 				</Flex>
 			</Flex>
 		)

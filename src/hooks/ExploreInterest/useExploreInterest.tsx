@@ -52,7 +52,7 @@ export default function useExploreInterest({}: any) {
 	const { openError } = useModal()
 	const [activeTab, setActiveTab] = useState('club')
 	const { onGetQuerry } = useQuery()
-	const { lat, lng } = onGetQuerry()
+	const { lat, lng, address, type } = onGetQuerry()
 
 	const firstTime = useRef(true)
 
@@ -66,10 +66,11 @@ export default function useExploreInterest({}: any) {
 	})
 
 	const [filters, setFilters] = useState({
-		address: '',
+		address: address || '',
 		latitude: Number(lat) || null,
 		longitude: Number(lng) || null,
 		radius: radiusOpts[radiusOpts.length - 1].value,
+		type,
 	})
 
 	const [statusClub, setStatusClub] = useState({
@@ -188,7 +189,7 @@ export default function useExploreInterest({}: any) {
 		let res: any
 		try {
 			if (!!lat && !!Number(lat) && !!lng && !!Number(lng)) {
-				res = handleGetAddress({ lat, lng })
+				// res = await handleGetAddress({ lat, lng })
 			} else {
 				res = await getCurrentLocation()
 				if (res) {
@@ -210,6 +211,10 @@ export default function useExploreInterest({}: any) {
 				fields: ['$all'],
 				latitude: latitude ?? lat ?? (_latitude || 0),
 				longitude: longitude ?? lng ?? (_longitude || 0),
+				google_title: address || '',
+				...(type && {
+					type: (type || '').split(','),
+				}),
 				radius,
 			}
 			setTabsData({
@@ -249,7 +254,7 @@ export default function useExploreInterest({}: any) {
 										conversation_id: id,
 									},
 								],
-						  }
+							}
 						: i,
 				),
 			)
@@ -270,7 +275,7 @@ export default function useExploreInterest({}: any) {
 								...i,
 								amount_of_user: i.amount_of_user - 1,
 								users_in_conversation: [],
-						  }
+							}
 						: i,
 				)
 			})

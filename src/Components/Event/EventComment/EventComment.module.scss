@@ -89,7 +89,7 @@
 			height: 1px;
 		}
 		.commentWrapper {
-			height: calc(100vh - 150px);
+			height: calc(100dvh - 150px);
 			.commentList {
 				overflow: auto;
 				.commentItem {

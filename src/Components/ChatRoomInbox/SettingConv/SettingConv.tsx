@@ -67,7 +67,7 @@ const SettingConv = (props: SettingConvProps) => {
 	}
 	const _renderBody1 = () => {
 		const fill = '#7987A4'
-		const { is_accept_notification, user_id } = join
+		const { is_accept_notification, user_id } = join || {}
 		return (
 			<Flex className={classes.body} vertical>
 				{/* {_renderItem({
@@ -190,17 +190,18 @@ const SettingConv = (props: SettingConvProps) => {
 								{item.type === 'IMAGE' ? (
 									<CImage src={item?.url} preview />
 								) : (
-									<video controls className={classes.mediaItem}>
+									<video controls>
 										<source src={item?.url} type="video/mp4" />
 									</video>
 								)}
 							</Flex>
 						))}
-						{arrayFrom(3).map((_, index) => (
-							<Flex className={classes.mediaItem} key={index}>
-								<Skeleton.Input className={classes.skeleton} />
-							</Flex>
-						))}
+						{loading.medias &&
+							arrayFrom(3).map((_, index) => (
+								<Flex className={classes.mediaItem} key={index}>
+									<Skeleton.Input className={classes.skeleton} />
+								</Flex>
+							))}
 						{_loadmore.current && !loading.medias && (
 							<Flex className={classes.loadMore}>
 								<CButton ctype="oranger" onClick={onLoadMore}>

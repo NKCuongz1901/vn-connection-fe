@@ -89,12 +89,16 @@
 				flex-wrap: wrap;
 				gap: 8px;
 				.mediaItem {
-					width: 109px;
+					width: calc(50% - 4px);
 					height: 109px;
 					border-radius: 16px;
 					overflow: hidden;
 					img {
 						object-fit: cover;
+					}
+					video {
+						width: 100%;
+						height: 100%;
 					}
 					.skeleton {
 						width: 100%;
@@ -105,6 +109,87 @@
 					width: 100%;
 					align-items: center;
 					justify-content: center;
+				}
+			}
+		}
+	}
+}
+
+@media (min-width: 377px) and (max-width: 769px) {
+	.wrapper {
+		.container {
+			.header {
+				.iconBackHeader {
+				}
+				.avatar {
+				}
+				.name {
+				}
+			}
+			.session {
+				.body {
+					.bodyItem {
+						.icon {
+						}
+					}
+					.disabled {
+					}
+				}
+			}
+			.medias {
+				.mediasHeader {
+					.mediaBackIcon {
+					}
+				}
+				.mediaListWrapper {
+					.mediaItem {
+						img {
+						}
+						.skeleton {
+						}
+					}
+					.loadMore {
+					}
+				}
+			}
+		}
+	}
+}
+@media (min-width: 0px) and (max-width: 376px) {
+	.wrapper {
+		.container {
+			.header {
+				.iconBackHeader {
+				}
+				.avatar {
+				}
+				.name {
+				}
+			}
+			.session {
+				.body {
+					.bodyItem {
+						.icon {
+						}
+					}
+					.disabled {
+					}
+				}
+			}
+			.medias {
+				.mediasHeader {
+					.mediaBackIcon {
+					}
+				}
+				.mediaListWrapper {
+					.mediaItem {
+						img {
+						}
+						.skeleton {
+						}
+					}
+					.loadMore {
+					}
 				}
 			}
 		}

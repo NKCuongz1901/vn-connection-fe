@@ -33,7 +33,13 @@ export const verifyOTP = async (payload: {
 }) => {
 	return await axios.post(AUTH_ROUTES.verifyOTP, payload)
 }
-
+export const checkOTP = async (payload: {
+	phone: string
+	prefix_phone: string
+	[key: string]: any
+}) => {
+	return await axios.post(AUTH_ROUTES.checkOTP, payload)
+}
 export const forgetPasswordByPhone = async (payload: {
 	uid: string
 	password: string

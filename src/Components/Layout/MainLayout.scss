@@ -19,7 +19,7 @@
 	min-width: 1440px;
 	.bodyMainLayout {
 		background-color: #f4f7fc;
-		height: calc(100vh - 80px);
+		height: calc(100dvh - 84px);
 		width: 100%;
 		.sideBarMainLayoutWrapper {
 			.sideBarMainLayout {
@@ -87,7 +87,7 @@
 			max-height: 56px;
 		}
 		.bodyMainLayout {
-			height: calc(100vh - 56px);
+			height: calc(100dvh - 56px);
 			.sideBarMainLayoutWrapper {
 				z-index: 2;
 				position: absolute;

@@ -10,16 +10,16 @@ import { getUserOpenHangout } from '@/apis/hangoutApi'
 import { getListPost, getmyEventInHome } from '@/apis/postApis'
 import { getUserProfile, updateUserProfile } from '@/apis/userApis'
 
-import { PaginationType } from '@/interface/common/common.interface'
 import { isArray, uniqueArray } from '@/ultis/array.ults'
 import { cloneDeep, delay } from '@/ultis/common.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { getSessionStorage, getUserInfo } from '@/ultis/storage.ults'
 
-import { paginationCommon } from '@/Variable/common.variable'
-import { mainRoutes } from '@/routes/MainRoutes'
-
+import { PaginationType } from '@/interface/common/common.interface'
 import { NetworkItemProps } from '@/interface/Community/Community.interface'
 import { ConversationChatRoomProps } from '@/interface/Conversation/Conversation.interface'
+import { mainRoutes } from '@/routes/MainRoutes'
+import { paginationCommon } from '@/Variable/common.variable'
+import { STORAGE_KEY } from '@/Variable/storage.variable'
 
 type userDataProps = {
 	is_open_hangout: boolean
@@ -53,6 +53,7 @@ export default function useOverview() {
 	const timeoutRef = useRef<any>()
 	const _loadmore = useRef({ myevent: true, network: true })
 	const [modal, setModal] = useState({ type: '', data: null }) as any
+	const [checkmail, setCheckmail] = useState({ open: false, type: null })
 	const [userData, setUserData] = useState<userDataProps>({
 		is_open_hangout: false,
 		title_open_hangout: '',
@@ -381,6 +382,26 @@ export default function useOverview() {
 		}
 	}
 
+	const handleCheckEmail = (type) => {
+		const { email } = getSessionStorage(STORAGE_KEY.USER) || {}
+		if (!email) {
+			setCheckmail({ open: true, type: type })
+		} else {
+			handleCheckMailSubmit(type)
+		}
+	}
+	const handleCheckMailSubmit = (_type?: string) => {
+		const { type } = checkmail || {}
+		const typeModal = _type || type
+		switch (typeModal) {
+			case 'event':
+			case 'network':
+				setModal({ type: typeModal, data: null })
+
+				break
+		}
+	}
+
 	const handleLoadMore = async () => {
 		if (!_loadmore.current.myevent || loadingMyEvent) return
 		const { limit } = _paginationRefs.current
@@ -443,6 +464,7 @@ export default function useOverview() {
 			}
 		}
 	}
+
 	useEffect(() => {
 		handleGetUserProfile()
 		handleGetMyEvent()
@@ -487,6 +509,7 @@ export default function useOverview() {
 		listNetwork,
 		listChatRoom,
 		defaultTitleHangout,
+		checkmail,
 
 		OnChangeTitleHangout: handleOnChangeTitleHangout,
 		onUpdateUserInfo: handleUpdateUserInfo,
@@ -495,5 +518,8 @@ export default function useOverview() {
 		onScrollUp: handleScrollUp,
 		onChangeFilter: handleChangeFilter,
 		onChangeKeyword: handleChangeKeyword,
+		onCheckEmail: handleCheckEmail,
+		setCheckmail,
+		onCheckMailSubmit: handleCheckMailSubmit,
 	}
 }
