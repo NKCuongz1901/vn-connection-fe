@@ -71,7 +71,8 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 				<Flex className={classes.medias}>
 					{isArray(medias, 1) ? (
 						medias.map((item, index) => {
-							const { thumbnail, url } = item || {}
+							const { thumbnail, url, type } = item || {}
+							const isImg = type === 'IMAGE'
 							return (
 								<Flex
 									key={index}
@@ -81,7 +82,13 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 										e.stopPropagation()
 									}}
 								>
-									<CImage preview src={thumbnail || url} />
+									{isImg ? (
+										<CImage preview src={thumbnail || url} />
+									) : (
+										<video controls>
+											<source src={url} type="video/mp4" />
+										</video>
+									)}
 								</Flex>
 							)
 						})

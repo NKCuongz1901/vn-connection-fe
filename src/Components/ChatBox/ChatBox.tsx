@@ -416,6 +416,7 @@ const ChatBox = ({
 						})}
 					</Flex>
 					<CUploadMuti
+						accept="image/*,video/*"
 						fileList={fileList.map((i) => i.file)}
 						onChange={({ file: _file, fileList: newList }) => {
 							hangleImportImg(newList)

@@ -99,6 +99,10 @@
 								height: 140px;
 								border-radius: 16px;
 								overflow: hidden;
+								:global(.ant-image),
+								video {
+									width: 100%;
+								}
 							}
 							:global(.ant-image) {
 								height: 140px;
@@ -351,6 +355,10 @@
 			top: 0;
 			color: #fff;
 			cursor: pointer;
+		}
+		video {
+			width: 100px;
+			height: 80px;
 		}
 		:global(.ant-image) {
 			width: 100px;
