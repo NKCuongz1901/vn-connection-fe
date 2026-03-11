@@ -130,9 +130,21 @@
 			.address {
 				color: #48546b;
 			}
+			.infoRightBottom {
+				justify-content: space-between;
+			}
 			.ticketType {
 				color: #e55a0f;
 				font-weight: 600;
+			}
+			.peopleJoin {
+				font-weight: 600;
+				color: #006b35;
+				gap: 4px;
+				svg {
+					height: 20px;
+					width: 20px;
+				}
 			}
 		}
 	}
