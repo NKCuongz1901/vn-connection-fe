@@ -82,6 +82,7 @@ import UpcomingEvent from '@/svg/UpcomingEvent'
 import VolumeIcon from '@/svg/VolumeIcon'
 import WarningIcon from '@/svg/WarningIcon'
 import WorldIcon from '@/svg/WorldIcon'
+import NotActiveHangoutIcon from '@/svg/NotActiveHangoutIcon'
 
 const Icons = () => {
 	const icons = [
@@ -339,6 +340,11 @@ const Icons = () => {
 		{
 			ICON: StarIcon,
 			name: '@/svg/Event/StarIcon',
+			key: randomString(),
+		},
+		{
+			ICON: NotActiveHangoutIcon,
+			name: '@/svg/Event/NotActiveHangoutIcon',
 			key: randomString(),
 		},
 	]
