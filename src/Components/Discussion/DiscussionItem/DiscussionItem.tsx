@@ -18,6 +18,7 @@ import ShareIconSvg from '@/svg/ShareIconSvg'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './DiscussionItem.module.scss'
+const DEFAULT_FALLBACK = '/images/defaultCover.png'
 
 interface DiscussionItemProps {
 	item: any
@@ -85,7 +86,7 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 									{isImg ? (
 										<CImage preview src={thumbnail || url} />
 									) : (
-										<video controls>
+										<video preload="none" controls poster={DEFAULT_FALLBACK}>
 											<source src={url} type="video/mp4" />
 										</video>
 									)}

@@ -19,7 +19,7 @@ import NotFound from '@/svg/NotFound'
 import ProfileIcon from '@/svg/ProfileIcon'
 
 import { genderOpts } from '@/Variable/common.variable'
-import { languages, radiusOpts } from '@/Variable/select.variable'
+import { languages, radiusAnyOpts } from '@/Variable/select.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './Local.module.scss'
@@ -99,7 +99,7 @@ const Local = (props: LocalProps) => {
 						<CSelect
 							value={radius}
 							placeholder="Choose distance"
-							options={radiusOpts}
+							options={radiusAnyOpts}
 							onChange={onChangeValue('distance')}
 						/>
 					</Flex>
