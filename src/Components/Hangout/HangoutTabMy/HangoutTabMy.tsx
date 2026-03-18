@@ -21,7 +21,7 @@ function HangoutTabMy(props, ref) {
 				<Flex className={classes.infoPeople}>
 					<Flex className={classes.people}>
 						<span className={classes.title}>{label}</span>
-						<span className={classes.number}>{data?.length || 0}</span>
+						<div className={classes.number}>{data?.length || 0}</div>
 					</Flex>
 				</Flex>
 				<Flex className={classes.hangoutWrapper}>
@@ -40,14 +40,14 @@ function HangoutTabMy(props, ref) {
 									active
 									className={classes.skeleton}
 								/>
-						  ))
+							))
 						: loadMore.current[id] && (
 								<Flex className={classes.loadmore}>
 									<CButton ctype="oranger" onClick={onLoadMore}>
 										Load more
 									</CButton>
 								</Flex>
-						  )}
+							)}
 				</Flex>
 			</div>
 		)
