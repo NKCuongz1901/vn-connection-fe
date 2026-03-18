@@ -34,6 +34,7 @@ import {
 	ticketEntranceTypeOpt,
 	typeEvent,
 } from '@/Variable/select.variable'
+import { DATE_FORMAT } from '@/Variable/date.variable'
 
 import classes from './ModalCRUDEvent.module.scss'
 
@@ -233,7 +234,8 @@ const ModalCRUDEvent = ({
 					<span className={classes.title}>When is my activity happening?</span>
 					<Flex className={classes.timePicker} vertical>
 						<CDatePicker
-							showTime
+							showTime={{ format: 'HH:mm' }}
+							format={DATE_FORMAT.currentTime}
 							placeholder="Start time"
 							value={start_time}
 							error={error.start_time}
@@ -242,7 +244,8 @@ const ModalCRUDEvent = ({
 							suffixIcon={<IconClockFilled />}
 						/>
 						<CDatePicker
-							showTime
+							showTime={{ format: 'HH:mm' }}
+							format={DATE_FORMAT.currentTime}
 							placeholder="End time"
 							value={end_time}
 							error={error.end_time}
