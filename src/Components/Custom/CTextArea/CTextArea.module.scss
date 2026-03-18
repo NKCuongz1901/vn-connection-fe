@@ -1,11 +1,20 @@
 .layout {
 	width: 100%;
-
+	position: relative;
 	.wrapper {
 		align-items: center;
 		textarea {
 			resize: none;
 		}
+	}
+	.suffixWrapper {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: absolute;
+		right: 8px;
+		top: 50%;
+		transform: translateY(-50%);
 	}
 }
 .wrapper :global(.ant-input) {
