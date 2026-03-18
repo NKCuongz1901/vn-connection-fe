@@ -9,11 +9,11 @@ import {
 	getListCommentById,
 	sendCommentPost,
 } from '@/apis/postApis'
-import { handleUploadImage } from '@/apis/uploadApis'
+import { handleUploadImage, handleUploadVideo } from '@/apis/uploadApis'
 
 import { isArray, uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay } from '@/ultis/common'
-import { handleParseFileImg } from '@/ultis/file'
+import { handleParseFileImg, handleParseFileVideo } from '@/ultis/file'
 import { getUserInfo } from '@/ultis/storage'
 
 import { PaginationType } from '@/interface/common/common.interface'
@@ -50,7 +50,7 @@ export default function useEventComment({ id }: useEventCommentProps) {
 			const isNew = page === 1
 			const res: any = await getListCommentById({
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
-				where: { post_id: id },
+				where: { post_id: id, parent_id: null },
 				page,
 				limit,
 			})
@@ -69,12 +69,30 @@ export default function useEventComment({ id }: useEventCommentProps) {
 					) as any[]
 					return dataShow
 				})
-				setTotal(count)
 			}
 		} catch (error) {
 			openError(error)
 		} finally {
 			setLoading(false)
+		}
+	}
+	const handleGetCommentTotal = async () => {
+		try {
+			const res: any = await getListCommentById({
+				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
+				where: { post_id: id },
+				page: 1,
+				limit: 1,
+			})
+			const { code, results } = res || {}
+
+			if (code === 200) {
+				const { count } = results?.objects || {}
+
+				setTotal(count)
+			}
+		} catch {
+		} finally {
 		}
 	}
 	const handleLoadMore = async () => {
@@ -109,13 +127,14 @@ export default function useEventComment({ id }: useEventCommentProps) {
 
 		if (_medias?.length > 0) {
 			const uploadPromises = _medias.map((media) =>
-				handleUploadImage(media.file, { isAll: true }),
+				media?.type === 'IMAGE'
+					? handleUploadImage(media.file)
+					: handleUploadVideo(media.file),
 			)
 			const resList = await Promise.all(uploadPromises)
-
-			medias = (resList || []).map((i) => ({
-				url: i,
-				type: 'IMAGE',
+			medias = (_medias || []).map((i, index) => ({
+				url: resList[index],
+				type: i?.type || 'IMAGE',
 				fileName: null,
 				width: 692,
 				height: 1500,
@@ -124,7 +143,6 @@ export default function useEventComment({ id }: useEventCommentProps) {
 				duration: 0,
 			}))
 		}
-
 		return {
 			post_id: id,
 			content: commentContent,
@@ -187,16 +205,25 @@ export default function useEventComment({ id }: useEventCommentProps) {
 			setDeleteLoading((prev) => prev.filter((i) => i !== id))
 		}
 	}
-	const handleImportImg = debounce((_values) => {
+
+	const handleImportImg = debounce(async (_values) => {
 		const values = []
 
-		if (isArray(_values, 1)) {
-			_values.forEach((i) => {
-				const { imageUrl, file } = handleParseFileImg(i?.originFileObj) || {}
-				if (imageUrl) {
-					values.push({ imageUrl, file })
-				}
-			})
+		for (const i of _values || []) {
+			const file = i?.originFileObj
+			if (!file) continue
+
+			if (file.type?.startsWith('image')) {
+				const { imageUrl } = handleParseFileImg(file)
+				if (imageUrl) values.push({ type: 'IMAGE', url: imageUrl, file })
+				continue
+			}
+
+			if (file.type?.startsWith('video')) {
+				const { videoUrl } = await handleParseFileVideo(file)
+				if (videoUrl) values.push({ type: 'VIDEO', url: videoUrl, file })
+				continue
+			}
 		}
 		const maxItem = 5
 		setFileList((prev) => {
@@ -210,6 +237,20 @@ export default function useEventComment({ id }: useEventCommentProps) {
 			return combined.slice(0, maxItem)
 		})
 	}, 200)
+
+	const handleAction = ({ key, value }) => {
+		switch (key) {
+			case 'delete':
+				setCommentList((prev: any[]) => prev.filter((i) => i.id !== value))
+				setTotal((prev) => prev - 1)
+				break
+			case 'reply':
+				setTotal((prev) => prev + 1)
+				break
+			default:
+				break
+		}
+	}
 	useEffect(() => {
 		handleAutoLoadMore()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -217,6 +258,7 @@ export default function useEventComment({ id }: useEventCommentProps) {
 
 	useEffect(() => {
 		handleGetListCommentById()
+		handleGetCommentTotal()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id])
 
@@ -239,5 +281,6 @@ export default function useEventComment({ id }: useEventCommentProps) {
 		onScroll: handleScroll,
 		onKeyDown: handleKeyDown,
 		onImportImg: handleImportImg,
+		onAction: handleAction,
 	}
 }

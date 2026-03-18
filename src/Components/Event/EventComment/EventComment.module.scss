@@ -49,7 +49,8 @@
 					border-radius: 16px;
 					overflow: hidden;
 				}
-				img {
+				img,
+				video {
 					object-fit: contain;
 					height: 80px;
 					width: fit-content;
@@ -140,7 +141,8 @@
 								:global(.ant-image) {
 									// width: auto;
 								}
-								img {
+								img,
+								video {
 									border-radius: 16px;
 									height: 220px;
 									width: fit-content;
