@@ -24,7 +24,7 @@ npm run dev
 7. Variable
 8. Define variable
 9. Define type/interface
-10. Update Build
+10. Update Build 2
 
 ## Rule passing props down
 
