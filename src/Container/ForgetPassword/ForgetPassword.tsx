@@ -67,7 +67,6 @@ const ForgetPassword = ({
 			case 1:
 				return (
 					<VerifyOTP
-						disabled={disabled}
 						title={steps[step]}
 						phone={formatPhone(prefix, phone)}
 						value={otp}
