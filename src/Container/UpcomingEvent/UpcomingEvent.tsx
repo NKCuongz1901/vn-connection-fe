@@ -2,8 +2,8 @@
 import { Flex, Skeleton } from 'antd'
 import { memo, useCallback, useState } from 'react'
 
-import { arrayFrom } from '@/ultis/array.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { arrayFrom } from '@/ultis/array'
+import { useLocalePath } from '@/ultis/route'
 
 import EventTitle from '@/Components/Event/EventTitle'
 import ItemEvent from '@/Components/Event/ItemEvent'

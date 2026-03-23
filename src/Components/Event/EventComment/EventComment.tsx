@@ -4,11 +4,12 @@ import { ItemType } from 'antd/es/menu/interface'
 import clsx from 'clsx'
 import { memo } from 'react'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { getDateInfo } from '@/ultis/date.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
-import { copyToClipboard } from '@/ultis/string.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
+import { getDateInfo } from '@/ultis/date'
+import { getUserInfo } from '@/ultis/storage'
+import { copyToClipboard } from '@/ultis/string'
 
+import CCommentItem from '@/Components/Comment/CCommentItem'
 import CAvatar from '@/Components/Custom/CAvatar'
 import CImage from '@/Components/Custom/CImage'
 import CTextArea from '@/Components/Custom/CTextArea'
@@ -16,8 +17,9 @@ import CUploadMuti from '@/Components/Custom/CUploadMuti'
 import useEventComment from '@/hooks/Event/useEventComment'
 import SendIcon from '@/svg/Event/SendIcon'
 import ImageIcon from '@/svg/ImageIcon'
-
 import classes from './EventComment.module.scss'
+
+import { DEFAULT_FALLBACK } from '@/Variable/common.variable'
 
 const EventComment = ({ id }) => {
 	const {
@@ -37,6 +39,7 @@ const EventComment = ({ id }) => {
 		onScroll,
 		onKeyDown,
 		onImportImg,
+		onAction,
 	} = useEventComment({
 		id,
 	})
@@ -44,26 +47,39 @@ const EventComment = ({ id }) => {
 		return (
 			<Flex vertical className={classes.commentBoxWrapper}>
 				<Flex className={classes.chooseImgContent}>
-					{fileList.map((i) => (
-						<Flex key={i.imageUrl || i?.url} className={classes.chooseImgItem}>
-							<CImage preview={true} src={i.imageUrl || i?.url} />
-							<Flex
-								className={classes.chooseImgCancel}
-								onClick={() => {
-									setFileList((prev) =>
-										prev.filter((prev) => prev.imageUrl !== i.imageUrl),
-									)
-								}}
-							>
-								<IconCircleXFilled />
+					{fileList.map((i) => {
+						const { url, type } = i || {}
+						const isImg = type === 'IMAGE'
+						return (
+							<Flex key={i?.url} className={classes.chooseImgItem}>
+								<Flex key={i?.url} className={classes.media}>
+									{isImg ? (
+										<CImage preview={true} src={i?.url} />
+									) : (
+										<video preload="none" controls poster={DEFAULT_FALLBACK}>
+											<source src={url} type="video/mp4" />
+										</video>
+									)}
+								</Flex>
+								<Flex
+									className={classes.chooseImgCancel}
+									onClick={() => {
+										setFileList((prev) =>
+											prev.filter((prev) => prev.url !== i.url),
+										)
+									}}
+								>
+									<IconCircleXFilled />
+								</Flex>
 							</Flex>
-						</Flex>
-					))}
+						)
+					})}
 				</Flex>
 				<Flex className={classes.commentBox}>
 					<Flex className={classes.chooseImg} vertical>
 						<Flex className={classes.upload}>
 							<CUploadMuti
+								accept="image/*,video/*"
 								maxCount={0}
 								fileList={fileList.map((i) => i.file)}
 								onChange={({ file: _file, fileList: newList }) => {
@@ -144,10 +160,17 @@ const EventComment = ({ id }) => {
 					<Flex className={classes.medias}>
 						{isArray(medias, 1) ? (
 							medias.map((item, index) => {
-								const { thumbnail, url } = item || {}
+								const { thumbnail, url, type } = item || {}
+								const isImg = type === 'IMAGE'
 								return (
 									<Flex key={index} className={classes.media}>
-										<CImage src={thumbnail || url} />
+										{isImg ? (
+											<CImage preview src={thumbnail || url} />
+										) : (
+											<video preload="none" controls poster={DEFAULT_FALLBACK}>
+												<source src={url} type="video/mp4" />
+											</video>
+										)}
 									</Flex>
 								)
 							})
@@ -159,6 +182,7 @@ const EventComment = ({ id }) => {
 			</Flex>
 		)
 	}
+
 	return (
 		<div className={classes.wrapper}>
 			<Flex className={classes.container} vertical>
@@ -175,7 +199,10 @@ const EventComment = ({ id }) => {
 						className={classes.commentList}
 						onScroll={onScroll}
 					>
-						{commentList.map((item) => _renderItemComment(item))}
+						{/* {commentList.map((item) => _renderItemComment(item))} */}
+						{commentList.map((item) => (
+							<CCommentItem item={item} key={item.id} onAction={onAction} />
+						))}
 						{loading &&
 							arrayFrom(3).map((_, index) => (
 								<Flex key={index} className={classes.skeletonWrapper}>

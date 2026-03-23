@@ -7,9 +7,9 @@ import { memo } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import useHangout from '@/hooks/Hangout/useHangout'
 
-import { isArray } from '@/ultis/array.ults'
-import { onPushState } from '@/ultis/route.ults'
-import { randomString } from '@/ultis/string.ults'
+import { isArray } from '@/ultis/array'
+import { onPushState } from '@/ultis/route'
+import { randomString } from '@/ultis/string'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
@@ -23,6 +23,7 @@ import PencilIcon from '@/svg/Hangout/PencilIcon'
 import Party from '@/svg/Party'
 
 import classes from './Hangout.module.scss'
+import NotActiveHangoutIcon from '@/svg/NotActiveHangoutIcon'
 
 const Hangout = () => {
 	const { loadingContext } = useLoading()
@@ -107,6 +108,25 @@ const Hangout = () => {
 		)
 	}
 
+	const _renderNoActiveHangout = () => {
+		return (
+			<Flex vertical className={classes.noActiveHangout}>
+				<NotActiveHangoutIcon />
+				<div className={classes.title}>What do you want to do</div>
+				<div className={classes.desc}>
+					Become available to find someone hanging out now!
+				</div>
+				<CButton
+					loading={loadingContext}
+					ctype="oranger"
+					onClick={() => onUpdateUserInfo({ is_open_hangout: true })}
+				>
+					Avaiable now
+				</CButton>
+			</Flex>
+		)
+	}
+
 	const _renderBottom = () => {
 		const arr = ['Open hangout', 'My hangouts']
 		return (
@@ -126,7 +146,11 @@ const Hangout = () => {
 				</Flex>
 
 				{currentPage === 0 ? (
-					userData.is_open_hangout && <HangoutTabOpen ref={_tabsOpenRef} />
+					userData.is_open_hangout ? (
+						<HangoutTabOpen ref={_tabsOpenRef} />
+					) : (
+						_renderNoActiveHangout()
+					)
 				) : (
 					<>
 						<HangoutTabMy

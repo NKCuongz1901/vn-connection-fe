@@ -6,8 +6,8 @@ import { memo } from 'react'
 
 import useCommentItem from '@/hooks/Comment/CommentItem/useCommentItem'
 
-import { isArray } from '@/ultis/array.ults'
-import { getDiffFromNow } from '@/ultis/date.ults'
+import { isArray } from '@/ultis/array'
+import { getDiffFromNow } from '@/ultis/date'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'

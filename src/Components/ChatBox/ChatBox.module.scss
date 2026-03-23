@@ -99,6 +99,10 @@
 								height: 140px;
 								border-radius: 16px;
 								overflow: hidden;
+								:global(.ant-image),
+								video {
+									width: 100%;
+								}
 							}
 							:global(.ant-image) {
 								height: 140px;
@@ -206,7 +210,8 @@
 
 	.chatBox {
 		width: 100%;
-		height: 64px;
+		max-height: 100px;
+		height: fit-content;
 		display: flex;
 		padding: 12px 16px;
 		justify-content: center;
@@ -336,7 +341,7 @@
 		position: absolute;
 		z-index: 10;
 		left: 16px;
-		bottom: 64px;
+		top: -72px;
 		gap: 8px;
 		overflow-y: auto;
 		width: calc(100% - 20px);
@@ -351,6 +356,10 @@
 			top: 0;
 			color: #fff;
 			cursor: pointer;
+		}
+		video {
+			width: 100px;
+			height: 80px;
 		}
 		:global(.ant-image) {
 			width: 100px;

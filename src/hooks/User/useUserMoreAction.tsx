@@ -6,7 +6,7 @@ import { useModal } from '@/context/ModalContext'
 
 import { deleteFriend, updateFriend } from '@/apis/friendApis'
 import { blockUser } from '@/apis/userApis'
-import { isFunction } from '@/ultis/common.ults'
+import { isFunction } from '@/ultis/common'
 import { UserProps } from '@/interface/User/User.interface'
 import { sendMessageById } from '@/apis/conversationApis'
 

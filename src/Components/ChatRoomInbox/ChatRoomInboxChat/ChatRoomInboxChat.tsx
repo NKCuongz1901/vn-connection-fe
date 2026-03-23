@@ -4,7 +4,7 @@ import { memo } from 'react'
 
 import useChatRoomInboxChat from '@/hooks/ChatRoomInbox/useChatRoomInboxChat'
 
-import { onPushState } from '@/ultis/route.ults'
+import { onPushState } from '@/ultis/route'
 
 import ChatRoomChatBox from '@/Components/ChatRoomChatBox'
 import CAvatar from '@/Components/Custom/CAvatar'

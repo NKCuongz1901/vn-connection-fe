@@ -5,8 +5,8 @@ import { memo, useMemo } from 'react'
 
 import useRegisterAndReset from '@/hooks/RegisterAndReset/useRegisterAndReset'
 import { useLoading } from '@/context/LoadingContext'
-import { formatPhone } from '@/ultis/common.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { formatPhone } from '@/ultis/common'
+import { useLocalePath } from '@/ultis/route'
 
 import ChangePassword from '@/Components/Auth/ChangePassword'
 import VerifyOTP from '@/Components/Auth/VerifyOTP'

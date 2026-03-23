@@ -170,11 +170,11 @@ export const radiusOpts = [
 ]
 
 export const radiusAnyOpts = [
+	...radiusOpts,
 	{
-		value: 'Any',
+		value: '',
 		label: 'Any',
 	},
-	...radiusOpts,
 ]
 
 export const mappingNotiTypes = {

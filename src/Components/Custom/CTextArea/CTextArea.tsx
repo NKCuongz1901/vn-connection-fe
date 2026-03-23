@@ -10,7 +10,8 @@ import clsx from 'clsx'
 const { TextArea } = Input
 
 const CTextArea = (_props: CTextAreaProps) => {
-	const { error, label, isRequired, isFullHeight, style, ...props } = _props
+	const { error, label, isRequired, isFullHeight, style, suffix, ...props } =
+		_props
 	const status = error ? 'error' : ''
 
 	return (
@@ -33,6 +34,11 @@ const CTextArea = (_props: CTextAreaProps) => {
 				status={status}
 				{...props}
 			/>
+			{suffix && (
+				<div className={classes.suffixWrapper}>
+					<div className={classes.suffixContainer}>{suffix}</div>
+				</div>
+			)}
 			{error && <span className="error">{error}</span>}
 		</Flex>
 	)

@@ -8,9 +8,9 @@ import { useModal } from '@/context/ModalContext'
 
 import { getFriends } from '@/apis/friendApis'
 
-import { isArray, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, isMobile, toJson } from '@/ultis/common.ults'
-import { useLocalePath, useQuery } from '@/ultis/route.ults'
+import { isArray, uniqueArray } from '@/ultis/array'
+import { cloneDeep, isMobile, toJson } from '@/ultis/common'
+import { useLocalePath, useQuery } from '@/ultis/route'
 
 import CInput from '@/Components/Custom/CInput'
 import FriendItem from '@/Components/Friend/FriendItem'

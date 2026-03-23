@@ -16,7 +16,14 @@
 				font-weight: 600;
 			}
 			.number {
-				color: #006b35;
+				height: 20px;
+				padding: 0 8px;
+				justify-content: center;
+				align-items: center;
+				color: #1e9037;
+				border-radius: 99px;
+				background: #fff;
+				display: flex;
 			}
 		}
 		.radius {

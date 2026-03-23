@@ -6,7 +6,7 @@ import { memo } from 'react'
 
 import useChatRoomSettingConv from '@/hooks/ChatRoomInbox/useChatRoomSettingConv'
 
-import { arrayFrom } from '@/ultis/array.ults'
+import { arrayFrom } from '@/ultis/array'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'

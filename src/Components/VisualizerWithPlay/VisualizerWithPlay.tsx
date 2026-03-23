@@ -4,7 +4,7 @@ import { Flex } from 'antd'
 import clsx from 'clsx'
 import { memo, useRef } from 'react'
 
-import { getUserInfo } from '@/ultis/storage.ults'
+import { getUserInfo } from '@/ultis/storage'
 
 import PlayIcon from '@/svg/PlayIcon'
 

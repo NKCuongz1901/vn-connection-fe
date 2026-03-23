@@ -8,9 +8,9 @@ import {
 
 import { useModal } from '@/context/ModalContext'
 
-import { isArray } from '@/ultis/array.ults'
-import { delay } from '@/ultis/common.ults'
-import { getSessionStorage } from '@/ultis/storage.ults'
+import { isArray } from '@/ultis/array'
+import { delay } from '@/ultis/common'
+import { getSessionStorage } from '@/ultis/storage'
 import { STORAGE_KEY } from '@/Variable/storage.variable'
 
 import {

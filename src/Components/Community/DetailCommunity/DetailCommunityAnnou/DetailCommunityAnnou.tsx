@@ -3,9 +3,9 @@ import { Dropdown, Flex, Skeleton } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import { memo } from 'react'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { getDiffFromNow } from '@/ultis/date.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
+import { getDiffFromNow } from '@/ultis/date'
+import { useLocalePath } from '@/ultis/route'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CImage from '@/Components/Custom/CImage'

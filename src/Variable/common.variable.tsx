@@ -1,4 +1,5 @@
 import { PaginationType } from '@/interface/common/common.interface'
+export const DEFAULT_FALLBACK = '/images/defaultCover.png'
 
 export const countryCodes = [
 	{

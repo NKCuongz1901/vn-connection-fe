@@ -6,7 +6,7 @@ import {
 	handleRemoveAllCookie,
 	handleStorageCookie,
 	isPersistCookie,
-} from '@/ultis/storage.ults'
+} from '@/ultis/storage'
 
 import { getFid } from '@/config/firebase'
 

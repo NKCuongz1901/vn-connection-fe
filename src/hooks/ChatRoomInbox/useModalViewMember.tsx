@@ -5,15 +5,15 @@ import { useModal } from '@/context/ModalContext'
 import { getMember, getMemberAroundMe } from '@/apis/conversationApis'
 import { getFullAddressFromLatLng } from '@/apis/ggApis'
 
-import { isArray, uniqueArray } from '@/ultis/array.ults'
+import { isArray, uniqueArray } from '@/ultis/array'
 import {
 	cloneDeep,
 	delay,
 	getCurrentLocation,
 	handleScrollCallback,
-} from '@/ultis/common.ults'
-import { getStorageCookie } from '@/ultis/storage.ults'
-import { randomString } from '@/ultis/string.ults'
+} from '@/ultis/common'
+import { getStorageCookie } from '@/ultis/storage'
+import { randomString } from '@/ultis/string'
 
 import { paginationCommon } from '@/Variable/common.variable'
 

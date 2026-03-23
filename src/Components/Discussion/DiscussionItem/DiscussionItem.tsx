@@ -4,9 +4,9 @@ import { ItemType } from 'antd/es/menu/interface'
 import clsx from 'clsx'
 import { memo } from 'react'
 
-import { isArray } from '@/ultis/array.ults'
-import { getDiffFromNow } from '@/ultis/date.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { isArray } from '@/ultis/array'
+import { getDiffFromNow } from '@/ultis/date'
+import { useLocalePath } from '@/ultis/route'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CImage from '@/Components/Custom/CImage'
@@ -18,6 +18,7 @@ import ShareIconSvg from '@/svg/ShareIconSvg'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './DiscussionItem.module.scss'
+const DEFAULT_FALLBACK = '/images/defaultCover.png'
 
 interface DiscussionItemProps {
 	item: any
@@ -71,7 +72,8 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 				<Flex className={classes.medias}>
 					{isArray(medias, 1) ? (
 						medias.map((item, index) => {
-							const { thumbnail, url } = item || {}
+							const { thumbnail, url, type } = item || {}
+							const isImg = type === 'IMAGE'
 							return (
 								<Flex
 									key={index}
@@ -81,7 +83,13 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 										e.stopPropagation()
 									}}
 								>
-									<CImage preview src={thumbnail || url} />
+									{isImg ? (
+										<CImage preview src={thumbnail || url} />
+									) : (
+										<video preload="none" controls poster={DEFAULT_FALLBACK}>
+											<source src={url} type="video/mp4" />
+										</video>
+									)}
 								</Flex>
 							)
 						})

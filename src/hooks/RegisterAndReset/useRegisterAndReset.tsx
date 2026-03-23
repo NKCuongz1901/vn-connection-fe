@@ -12,9 +12,9 @@ import {
 	verifyOTP,
 } from '@/apis/authApis'
 
-import { isArray } from '@/ultis/array.ults'
-import { formatPhone, toJson } from '@/ultis/common.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { isArray } from '@/ultis/array'
+import { formatPhone, toJson } from '@/ultis/common'
+import { useLocalePath } from '@/ultis/route'
 
 import { OTP_TYPE, OTPType } from '@/Variable/common.variable'
 import { passwordRegex } from '@/Variable/regex.variable'

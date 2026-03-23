@@ -5,9 +5,9 @@ import { getNotificationList, readNotification } from '@/apis/notificationApis'
 import { useModal } from '@/context/ModalContext'
 import { PaginationType } from '@/interface/common/common.interface'
 import { NotiItemProp } from '@/interface/Notification/Notification.interface'
-import { isArray, uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { isArray, uniqueArray } from '@/ultis/array'
+import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common'
+import { useLocalePath } from '@/ultis/route'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 

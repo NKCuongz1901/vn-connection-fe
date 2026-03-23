@@ -3,6 +3,7 @@ import { memo, useEffect, useRef, useState } from 'react'
 
 import classes from './CImage.module.scss'
 import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
+import { convertImageUrl } from '@/ultis/file'
 
 const MAX_RETRY = 4
 const RETRY_DELAY = 2000
@@ -10,27 +11,6 @@ const DEFAULT_FALLBACK = '/images/defaultCover.png'
 
 type CImageProps = ImageProps & {
 	sizeType?: TYPE_SIZE_IMAGE
-}
-
-// chỉ convert URL dạng: /{small|medium|large}/images/...
-const VALID_PREFIX_REGEX = /(small|medium|large)\/images\//
-const WEBP_REGEX = /\.webp(\?.*)?$/i
-
-const convertImageUrl = (url?: string, sizeType?: TYPE_SIZE_IMAGE) => {
-	if (!url) return url
-	if (!VALID_PREFIX_REGEX.test(url)) return url
-
-	const target = sizeType ?? TYPE_SIZE_IMAGE.small
-
-	let converted = url.replace(/(small|medium|large)\//, `${target}/`)
-
-	if (target === TYPE_SIZE_IMAGE.origin) {
-		converted = converted
-			.replace(/(small|medium|large)\//, 'images/')
-			.replace(WEBP_REGEX, '.jpg$1')
-	}
-
-	return converted
 }
 
 const CImage = (_props: CImageProps) => {

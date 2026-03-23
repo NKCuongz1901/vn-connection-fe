@@ -134,6 +134,20 @@
 					}
 				}
 			}
+			.noActiveHangout {
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+				.title {
+					font-size: 20px;
+					font-weight: 600;
+				}
+				.desc {
+					color: #48546b;
+
+					font-size: 14px;
+				}
+			}
 		}
 	}
 	.minify {

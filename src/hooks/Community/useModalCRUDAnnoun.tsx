@@ -8,10 +8,10 @@ import { createAnnoun } from '@/apis/conversationApis'
 import { editDiscussion } from '@/apis/discussionApis'
 import { handleUploadImage } from '@/apis/uploadApis'
 
-import { isArray } from '@/ultis/array.ults'
-import { cloneDeep } from '@/ultis/common.ults'
-import { handleParseFileImg } from '@/ultis/file.utls'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { isArray } from '@/ultis/array'
+import { cloneDeep } from '@/ultis/common'
+import { handleParseFileImg } from '@/ultis/file'
+import { getUserInfo } from '@/ultis/storage'
 
 interface useModalCRUDAnnounProps {
 	data?: any

@@ -1,5 +1,5 @@
-import { getStorageCookie, getUserInfo } from '@/ultis/storage.ults'
-import { generateCustomUuid } from '@/ultis/string.ults'
+import { getStorageCookie, getUserInfo } from '@/ultis/storage'
+import { generateCustomUuid } from '@/ultis/string'
 import { useCallback, useRef, useState } from 'react'
 import { io, Socket } from 'socket.io-client'
 

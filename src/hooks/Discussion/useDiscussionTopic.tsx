@@ -9,7 +9,7 @@ import {
 	likeCategory,
 } from '@/apis/discussionApis'
 
-import { cloneDeep, delay } from '@/ultis/common.ults'
+import { cloneDeep, delay } from '@/ultis/common'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'

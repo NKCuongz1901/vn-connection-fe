@@ -5,8 +5,8 @@ import { memo } from 'react'
 
 import useCommunity from '@/hooks/Community/useCommunity'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
+import { useLocalePath } from '@/ultis/route'
 
 import CheckEmail from '@/Components/CheckEmail'
 import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'

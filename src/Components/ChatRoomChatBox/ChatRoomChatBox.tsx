@@ -6,11 +6,11 @@ import { memo, useCallback, useState } from 'react'
 
 import useChatRoomChatBox from '@/hooks/ChatRoomChatBox/useChatRoomChatBox'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { parseDayFromIsNewDate } from '@/ultis/date.ults'
-import { handleParseFileImg, handleParseFileVideo } from '@/ultis/file.utls'
-import { useLocalePath } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
+import { parseDayFromIsNewDate } from '@/ultis/date'
+import { handleParseFileImg, handleParseFileVideo } from '@/ultis/file'
+import { useLocalePath } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
 
 import CcIcon from '@/svg/CcIcon'
 import DotIcon from '@/svg/DotIcon'

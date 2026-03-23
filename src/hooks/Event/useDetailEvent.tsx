@@ -12,10 +12,10 @@ import {
 	joinPost,
 } from '@/apis/postApis'
 
-import { delay } from '@/ultis/common.ults'
-import { useLocalePath } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
-import { copyToClipboard, randomString } from '@/ultis/string.ults'
+import { delay } from '@/ultis/common'
+import { useLocalePath } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
+import { copyToClipboard, randomString } from '@/ultis/string'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import { repeatOpt } from '@/Variable/select.variable'

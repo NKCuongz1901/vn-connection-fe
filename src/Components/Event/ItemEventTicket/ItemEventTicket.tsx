@@ -2,8 +2,8 @@ import { IconChevronRight } from '@tabler/icons-react'
 import { Flex } from 'antd'
 import { memo } from 'react'
 
-import { getDateInfo } from '@/ultis/date.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { getDateInfo } from '@/ultis/date'
+import { useLocalePath } from '@/ultis/route'
 
 import BreakLineEvent from '@/svg/Event/BreakLineEvent'
 import MapIcon from '@/svg/MapIcon'

@@ -5,11 +5,11 @@ import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
 import { createDiscussion, editDiscussion } from '@/apis/discussionApis'
-import { handleUploadImage } from '@/apis/uploadApis'
+import { handleUploadImage, handleUploadVideo } from '@/apis/uploadApis'
 
-import { isArray } from '@/ultis/array.ults'
-import { cloneDeep } from '@/ultis/common.ults'
-import { handleParseFileImg } from '@/ultis/file.utls'
+import { isArray } from '@/ultis/array'
+import { cloneDeep } from '@/ultis/common'
+import { handleParseFileImg, handleParseFileVideo } from '@/ultis/file'
 
 interface useModalCRUDDiscussionProps {
 	conversation_id?: string
@@ -112,13 +112,20 @@ export default function useModalCRUDDiscussion({
 
 		if (_medias?.length > 0) {
 			const uploadPromises = _medias.map((media) =>
-				handleUploadImage(media.file, { isAll: true }),
+				media?.type === 'IMAGE'
+					? handleUploadImage(media.file)
+					: handleUploadVideo(media.file),
 			)
 			const resList = await Promise.all(uploadPromises)
-
-			medias = (resList || []).map((i) => ({
-				url: i,
-				type: 'IMAGE',
+			medias = (_medias || []).map((i, index) => ({
+				url: resList[index],
+				type: i?.type || 'IMAGE',
+				fileName: null,
+				width: 692,
+				height: 1500,
+				ratio: 0.4613333333333333,
+				thumbnail: null,
+				duration: 0,
 			}))
 		}
 
@@ -129,16 +136,24 @@ export default function useModalCRUDDiscussion({
 			...(conversation_id ? { conversation_id } : { category_id }),
 		}
 	}
-	const handleImportImg = debounce((_values) => {
+	const handleImportImg = debounce(async (_values) => {
 		const values = []
 
-		if (isArray(_values, 1)) {
-			_values.forEach((i) => {
-				const { imageUrl, file } = handleParseFileImg(i?.originFileObj) || {}
-				if (imageUrl) {
-					values.push({ imageUrl, file })
-				}
-			})
+		for (const i of _values || []) {
+			const file = i?.originFileObj
+			if (!file) continue
+
+			if (file.type?.startsWith('image')) {
+				const { imageUrl } = handleParseFileImg(file)
+				if (imageUrl) values.push({ type: 'IMAGE', url: imageUrl, file })
+				continue
+			}
+
+			if (file.type?.startsWith('video')) {
+				const { videoUrl } = await handleParseFileVideo(file)
+				if (videoUrl) values.push({ type: 'VIDEO', url: videoUrl, file })
+				continue
+			}
 		}
 		const maxItem = 5 - (dataSubmit?.medias?.length || 0)
 		setFileList((prev) => {

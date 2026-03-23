@@ -4,9 +4,9 @@ import { memo } from 'react'
 
 import useOverview from '@/hooks/Overview/useOverview'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { useLocalePath } from '@/ultis/route.ults'
-import { formatNumberString } from '@/ultis/string.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
+import { useLocalePath } from '@/ultis/route'
+import { formatNumberString } from '@/ultis/string'
 
 import CheckEmail from '@/Components/CheckEmail/CheckEmail'
 import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'

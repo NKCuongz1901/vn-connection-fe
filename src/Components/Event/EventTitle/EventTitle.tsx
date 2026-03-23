@@ -5,7 +5,7 @@ import {
 import { Flex } from 'antd'
 import { memo } from 'react'
 
-import { formatNumberString } from '@/ultis/string.ults'
+import { formatNumberString } from '@/ultis/string'
 
 import classes from './EventTitle.module.scss'
 import CButtonCreate from '@/Components/Custom/CButtonCreate'

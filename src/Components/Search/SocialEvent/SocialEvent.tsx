@@ -5,8 +5,8 @@ import { memo } from 'react'
 
 import useSocialEvent from '@/hooks/Search/useSocialEvent'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
+import { useLocalePath } from '@/ultis/route'
 
 import CButton from '@/Components/Custom/CButton'
 import CDatePickerRanger from '@/Components/Custom/CDatePickerRanger'

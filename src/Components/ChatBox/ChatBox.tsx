@@ -6,9 +6,11 @@ import { memo, useCallback, useState } from 'react'
 
 import useChatBox from '@/hooks/ChatBox/useChatBox'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { handleParseFileImg, handleParseFileVideo } from '@/ultis/file.utls'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
+import { isMobile } from '@/ultis/common'
+import { parseDayFromIsNewDate } from '@/ultis/date'
+import { handleParseFileImg, handleParseFileVideo } from '@/ultis/file'
+import { getUserInfo } from '@/ultis/storage'
 
 import HappyIcon from '@/svg/HappyIcon'
 import ImageIcon from '@/svg/ImageIcon'
@@ -16,14 +18,13 @@ import ReplyIcon from '@/svg/ReplyIcon'
 import SendIcon from '@/svg/SendIcon'
 import CAvatar from '../Custom/CAvatar'
 import CImage from '../Custom/CImage'
-import CInput from '../Custom/CInput'
+import CTextArea from '../Custom/CTextArea'
 import CUploadMuti from '../Custom/CUploadMuti'
 
 import { specialTypeMessage } from '@/Variable/common.variable'
 
 import MoreIcon from '@/svg/MoreIcon'
 import classes from './ChatBox.module.scss'
-import { parseDayFromIsNewDate } from '@/ultis/date.ults'
 interface ChatBoxProps {
 	type?: string
 	itemList?: any[]
@@ -373,8 +374,9 @@ const ChatBox = ({
 			<Flex
 				className={clsx(classes.chatBox)}
 				onKeyDown={(e) => {
-					if (e.key === 'Enter') {
+					if (!isMobile() && e.key === 'Enter' && !e.shiftKey) {
 						e.preventDefault()
+
 						if (!!text.trim()) {
 							setText('')
 							setReply(null)
@@ -387,35 +389,36 @@ const ChatBox = ({
 					}
 				}}
 			>
-				<Flex className={classes.chooseImg}>
-					<Flex className={classes.chooseImgContent}>
-						{fileList.map((i) => {
-							const { url, type } = i || {}
-							const isImg = type === 'IMAGE'
-							return (
-								<Flex key={url} className={classes.chooseImgItem}>
-									{isImg ? (
-										<CImage preview={true} src={url} />
-									) : (
-										<video controls>
-											<source src={url} type="video/mp4" />
-										</video>
-									)}
-									<Flex
-										className={classes.chooseImgCancel}
-										onClick={() =>
-											setFileList((prev) =>
-												prev.filter((prev) => prev.url !== url),
-											)
-										}
-									>
-										<IconCircleXFilled />
-									</Flex>
+				<Flex className={classes.chooseImgContent}>
+					{fileList.map((i) => {
+						const { url, type } = i || {}
+						const isImg = type === 'IMAGE'
+						return (
+							<Flex key={url} className={classes.chooseImgItem}>
+								{isImg ? (
+									<CImage preview={true} src={url} />
+								) : (
+									<video controls>
+										<source src={url} type="video/mp4" />
+									</video>
+								)}
+								<Flex
+									className={classes.chooseImgCancel}
+									onClick={() =>
+										setFileList((prev) =>
+											prev.filter((prev) => prev.url !== url),
+										)
+									}
+								>
+									<IconCircleXFilled />
 								</Flex>
-							)
-						})}
-					</Flex>
+							</Flex>
+						)
+					})}
+				</Flex>
+				<Flex className={classes.chooseImg}>
 					<CUploadMuti
+						accept="image/*,video/*"
 						fileList={fileList.map((i) => i.file)}
 						onChange={({ file: _file, fileList: newList }) => {
 							hangleImportImg(newList)
@@ -424,9 +427,10 @@ const ChatBox = ({
 						<ImageIcon />
 					</CUploadMuti>
 				</Flex>
-				<CInput
+				<CTextArea
 					allowClear={false}
 					value={text}
+					autoSize={{ minRows: 2, maxRows: 3 }}
 					style={{ height: 40 }}
 					suffix={_renderIconHappy()}
 					placeholder="Enter your text ..."

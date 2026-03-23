@@ -2,12 +2,13 @@ import { IconClockFilled, IconMap, IconRepeat } from '@tabler/icons-react'
 import { Flex } from 'antd'
 import { memo } from 'react'
 
-import { getDateInfo } from '@/ultis/date.ults'
-import { useLocalePath } from '@/ultis/route.ults'
-import { formatNumberString } from '@/ultis/string.ults'
+import { getDateInfo } from '@/ultis/date'
+import { useLocalePath } from '@/ultis/route'
+import { formatNumberString } from '@/ultis/string'
 
 import CImage from '@/Components/Custom/CImage'
 import GroupIcon from '@/svg/GroupIcon'
+import People from '@/svg/People'
 
 import { repeatOpt, ticketEntranceType } from '@/Variable/select.variable'
 
@@ -68,7 +69,13 @@ const ItemEvent = ({ data, type }) => {
 	}
 
 	const _renderInfo = () => {
-		const { address, title, ticket_entrance, ticket_entrance_type } = data
+		const {
+			address,
+			title,
+			ticket_entrance,
+			ticket_entrance_type,
+			amount_of_participant,
+		} = data
 		let ticketValue = ''
 		const [minEntr, maxEntr] = (ticket_entrance || '').split(':')
 		switch (ticket_entrance_type) {
@@ -86,6 +93,7 @@ const ItemEvent = ({ data, type }) => {
 				break
 		}
 		const { weekday, day, month } = handleShowTime()
+		const peopleJoin = (amount_of_participant || 0) + 1
 		return (
 			<Flex className={classes.info}>
 				<Flex className={classes.infoLeft} vertical>
@@ -96,7 +104,13 @@ const ItemEvent = ({ data, type }) => {
 				<Flex className={classes.infoRight} vertical>
 					<span className={classes.title}>{title}</span>
 					<span className={classes.address}>{address}</span>
-					<span className={classes.ticketType}>{ticketValue}</span>
+					<Flex className={classes.infoRightBottom}>
+						<span className={classes.ticketType}>{ticketValue}</span>
+						<Flex className={classes.peopleJoin}>
+							<People fill="#006b35" />
+							{formatNumberString(peopleJoin)}
+						</Flex>
+					</Flex>
 				</Flex>
 			</Flex>
 		)

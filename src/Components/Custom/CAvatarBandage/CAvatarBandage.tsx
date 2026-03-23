@@ -6,6 +6,7 @@ import HostIcon from '@/svg/HostIcon'
 import CAvatar from '../CAvatar'
 
 import classes from './CAvatarBandage.module.scss'
+import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
 
 interface CAvatarBandageProps {
 	customeBandage?: any
@@ -32,7 +33,7 @@ const CAvatarBandage = (_props: CAvatarBandageProps & AvatarProps) => {
 
 	return (
 		<div className={classes.wrapper}>
-			<CAvatar {...props} />
+			<CAvatar sizeType={TYPE_SIZE_IMAGE.small} {...props} />
 			{!isHidden && _renderBandage()}
 		</div>
 	)

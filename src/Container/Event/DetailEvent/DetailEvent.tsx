@@ -18,13 +18,13 @@ import { memo } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import useDetailEvent from '@/hooks/Event/useDetailEvent'
 
-import { isArray } from '@/ultis/array.ults'
-import { cloneDeep } from '@/ultis/common.ults'
-import { getDateFormat, getDateInfo } from '@/ultis/date.ults'
-import { isEmptyObject } from '@/ultis/object.ults'
-import { goToGoogleMap, onPushState, useSafeBack } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
-import { formatNumberString, randomString } from '@/ultis/string.ults'
+import { isArray } from '@/ultis/array'
+import { cloneDeep } from '@/ultis/common'
+import { getDateFormat, getDateInfo } from '@/ultis/date'
+import { isEmptyObject } from '@/ultis/object'
+import { goToGoogleMap, onPushState, useSafeBack } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
+import { formatNumberString, randomString } from '@/ultis/string'
 
 import CButton from '@/Components/Custom/CButton'
 import CImage from '@/Components/Custom/CImage'
@@ -43,6 +43,7 @@ import { mainRoutes } from '@/routes/MainRoutes'
 import { repeatOpt, ticketEntranceType } from '@/Variable/select.variable'
 
 import classes from './DetailEvent.module.scss'
+import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
 
 const skeletonItems = [
 	{ id: '2', value: 333 },
@@ -284,7 +285,11 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 			<Flex className={classes.top} vertical>
 				{_renderAction()}
 				<Flex className={classes.image}>
-					<CImage preview src={thumbnails?.[0] || ''} />
+					<CImage
+						sizeType={TYPE_SIZE_IMAGE.large}
+						preview
+						src={thumbnails?.[0] || ''}
+					/>
 				</Flex>
 				{!!expect_participant && (
 					<Flex className={classes.expectParticipant}>

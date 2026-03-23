@@ -5,7 +5,7 @@ import classes from './DownloadApp.module.scss'
 
 import IconApp from './IconApp'
 import CButton from '../Custom/CButton'
-import { isIOS } from '@/ultis/common.ults'
+import { isIOS } from '@/ultis/common'
 
 const DownloadApp = () => {
 	const link = isIOS()

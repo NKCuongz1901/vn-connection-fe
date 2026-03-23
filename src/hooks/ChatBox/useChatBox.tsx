@@ -4,7 +4,7 @@ import { getListSticket } from '@/apis/postApis'
 
 import { useModal } from '@/context/ModalContext'
 import { ItemType } from 'antd/es/menu/interface'
-import { copyToClipboard } from '@/ultis/string.ults'
+import { copyToClipboard } from '@/ultis/string'
 
 type useHangoutChatProps = {
 	type?: string

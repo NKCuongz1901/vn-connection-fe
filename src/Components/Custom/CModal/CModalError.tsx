@@ -1,8 +1,8 @@
 import { Flex } from 'antd'
 import { memo } from 'react'
 
-import { useLocalePath } from '@/ultis/route.ults'
-import { handleRemoveAllCookie } from '@/ultis/storage.ults'
+import { useLocalePath } from '@/ultis/route'
+import { handleRemoveAllCookie } from '@/ultis/storage'
 
 import { CModalProps } from '@/interface/CComponent/CComponent.interface'
 import CButton from '../CButton'

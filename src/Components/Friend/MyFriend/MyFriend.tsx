@@ -4,7 +4,7 @@ import { memo } from 'react'
 
 import useMyFriend from '@/hooks/Friend/useMyFriend'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CInput from '@/Components/Custom/CInput'

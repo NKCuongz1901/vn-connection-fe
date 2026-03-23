@@ -13,8 +13,8 @@ import { useModal } from '@/context/ModalContext'
 
 import { getMyCurrentHangout, getMyPastHangout } from '@/apis/hangoutApi'
 
-import { uniqueArray } from '@/ultis/array.ults'
-import { cloneDeep, toJson } from '@/ultis/common.ults'
+import { uniqueArray } from '@/ultis/array'
+import { cloneDeep, toJson } from '@/ultis/common'
 
 import { paginationCommon } from '@/Variable/common.variable'
 

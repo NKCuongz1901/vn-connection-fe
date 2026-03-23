@@ -14,9 +14,9 @@ import CModal from '@/Components/Custom/CModal/CModal'
 import CSelect from '@/Components/Custom/CSelect'
 import FeedbackIcon from '@/svg/FeedbackIcon'
 import ImageIcon from '@/svg/ImageIcon'
-import { isArray } from '@/ultis/array.ults'
-import { isEmail } from '@/ultis/common.ults'
-import { handleParseFileImg, handleUploadMedia } from '@/ultis/file.utls'
+import { isArray } from '@/ultis/array'
+import { isEmail } from '@/ultis/common'
+import { handleParseFileImg, handleUploadMedia } from '@/ultis/file'
 
 import CImage from '../CImage'
 import CUploadMuti from '../CUploadMuti'
@@ -24,7 +24,7 @@ import CUploadMuti from '../CUploadMuti'
 import { topicReportOpt } from '@/Variable/select.variable'
 
 import classes from './ModalReport.module.scss'
-import { getUserInfo } from '@/ultis/storage.ults'
+import { getUserInfo } from '@/ultis/storage'
 import CTextArea from '../CTextArea'
 
 interface ModalReportProps {

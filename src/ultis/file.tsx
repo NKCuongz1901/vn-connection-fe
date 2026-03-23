@@ -1,4 +1,5 @@
 import { handleUploadImage } from '@/apis/uploadApis'
+import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
 
 export const handleParseFileImg = (file) => {
 	try {
@@ -196,4 +197,26 @@ export const handleCreateAudio = async (url) => {
 	const blob = await res.blob()
 	const file = new File([blob], 'audio.mp3', { type: blob.type })
 	return file
+}
+
+// chỉ convert URL dạng: /{small|medium|large}/images/...
+
+const VALID_PREFIX_REGEX = /(small|medium|large)\/images\//
+const WEBP_REGEX = /\.webp(\?.*)?$/i
+
+export const convertImageUrl = (url?: any, sizeType?: TYPE_SIZE_IMAGE) => {
+	if (!url) return url
+	if (!VALID_PREFIX_REGEX.test(url)) return url
+
+	const target = sizeType ?? TYPE_SIZE_IMAGE.medium
+
+	let converted = url.replace(/(small|medium|large)\//, `${target}/`)
+
+	if (target === TYPE_SIZE_IMAGE.origin) {
+		converted = converted
+			.replace(/(small|medium|large)\//, 'images/')
+			.replace(WEBP_REGEX, '.jpg$1')
+	}
+
+	return converted
 }

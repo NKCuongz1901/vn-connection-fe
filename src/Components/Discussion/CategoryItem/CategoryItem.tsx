@@ -1,7 +1,7 @@
 import { Flex } from 'antd'
 import { memo } from 'react'
 
-import { parseNumberToShort } from '@/ultis/string.ults'
+import { parseNumberToShort } from '@/ultis/string'
 
 import CButton from '@/Components/Custom/CButton'
 import CImage from '@/Components/Custom/CImage'

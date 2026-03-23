@@ -5,7 +5,7 @@ import dayjs from 'dayjs'
 import { useLoading } from '@/context/LoadingContext'
 import useEditProfile from '@/hooks/Profile/useEditProfile'
 
-import { isArray } from '@/ultis/array.ults'
+import { isArray } from '@/ultis/array'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'

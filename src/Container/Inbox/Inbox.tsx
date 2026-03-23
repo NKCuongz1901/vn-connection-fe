@@ -6,12 +6,12 @@ import { Fragment, memo, useCallback } from 'react'
 
 import useInbox from '@/hooks/Inbox/useInbox'
 
-import { arrayFrom, isArray } from '@/ultis/array.ults'
-import { toJson } from '@/ultis/common.ults'
-import { getDiffFromNow } from '@/ultis/date.ults'
-import { onPushState } from '@/ultis/route.ults'
-import { getUserInfo } from '@/ultis/storage.ults'
-import { randomString } from '@/ultis/string.ults'
+import { arrayFrom, isArray } from '@/ultis/array'
+import { toJson } from '@/ultis/common'
+import { getDiffFromNow } from '@/ultis/date'
+import { onPushState } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
+import { randomString } from '@/ultis/string'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CInput from '@/Components/Custom/CInput'

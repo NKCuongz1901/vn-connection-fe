@@ -6,8 +6,8 @@ import { useModal } from '@/context/ModalContext'
 
 import { getConvMembersById } from '@/apis/conversationApis'
 
-import { arrayFrom } from '@/ultis/array.ults'
-import { useLocalePath } from '@/ultis/route.ults'
+import { arrayFrom } from '@/ultis/array'
+import { useLocalePath } from '@/ultis/route'
 
 import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
 import StarIcon from '@/svg/Event/StarIcon'
