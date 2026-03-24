@@ -1,4 +1,4 @@
-import { FRIEND_ROUTES, MAP_ROUTES } from '@/routes'
+import { MAP_ROUTES } from '@/routes'
 import axios from '../axios'
 
 // export const getAddressFromLatLng = async ({

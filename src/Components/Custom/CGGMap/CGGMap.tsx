@@ -8,7 +8,7 @@ import {
 	useLoadScript,
 } from '@react-google-maps/api'
 import { IconMapPinFilled } from '@tabler/icons-react'
-import { AutoComplete, Flex } from 'antd'
+import { Flex } from 'antd'
 import { memo, useEffect, useRef, useState } from 'react'
 
 import { getAddressByText, getFullAddressFromLatLng } from '@/apis/ggApis'
@@ -17,12 +17,11 @@ import { getCurrentLocation } from '@/ultis/common'
 import { getUserInfo } from '@/ultis/storage'
 
 import CButton from '../CButton'
-import CInput from '../CInput'
 import CModal from '../CModal/CModal'
 
-import classes from './CGGMap.module.scss'
 import { DefaultOptionType } from 'antd/es/select'
 import CAutoComplete from '../CAutoComplete'
+import classes from './CGGMap.module.scss'
 
 const libraries: any = ['places']
 
@@ -51,6 +50,7 @@ const CGGMap = (_props: CGGMapProps) => {
 	})
 	const [searchValue, setSearchValue] = useState('')
 	const [options, setOptions] = useState([])
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const handlePlaceChanged = () => {
 		const place = autoCompleteRef.current?.getPlace()
 		if (!place?.geometry) return

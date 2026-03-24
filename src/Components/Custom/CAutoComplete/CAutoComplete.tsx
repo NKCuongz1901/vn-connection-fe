@@ -1,6 +1,6 @@
 'use client'
 
-import { AutoComplete, Flex, Input } from 'antd'
+import { AutoComplete, Flex } from 'antd'
 import { forwardRef, memo } from 'react'
 
 import { CAutoCompleteProps } from '@/interface/CComponent/CComponent.interface'
