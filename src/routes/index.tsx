@@ -41,6 +41,7 @@ export const POST_ROUTES = {
 	myEventInHome: 'post/my-event-in-home',
 	likeComment: 'comment/like',
 	myEventsJoined: 'post/my-events-joined',
+	myEventsPassed: 'post/my-events-passed',
 }
 export const CONVERSATION_ROUTES = {
 	name: 'conversation',

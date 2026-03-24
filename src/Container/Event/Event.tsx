@@ -1,20 +1,24 @@
 'use client'
 import { Flex, Skeleton } from 'antd'
+import clsx from 'clsx'
 import { memo, useCallback, useState } from 'react'
 
+import useEvent from '@/hooks/Event/useEvent'
+
 import { arrayFrom } from '@/ultis/array'
-import { useLocalePath } from '@/ultis/route'
+import { onPushState, useLocalePath, useSafeBack } from '@/ultis/route'
 
 import EventTitle from '@/Components/Event/EventTitle'
 import ItemEvent from '@/Components/Event/ItemEvent'
 import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
+import ArrrowLeftIcon from '@/svg/ArrrowLeftIcon'
+import ClockIcon from '@/svg/ClockIcon'
 import EventIcon from '@/svg/Event'
+import PassEvent from './PassEvent'
 
 import { mappingEventTitle } from '@/Variable/event.variable'
 
-import useEvent from '@/hooks/Event/useEvent'
 import classes from './Event.module.scss'
-import clsx from 'clsx'
 
 const mappingTabBtn = {
 	interested: 'interested',
@@ -38,10 +42,14 @@ interface openModalProps {
 const Event = (_props: EventProps) => {
 	const { type, onCRUDSuccess, hiddenAdd = false } = _props
 	const { onChangeRoute } = useLocalePath()
+	const { goBackOrPush } = useSafeBack()
+
 	const {
 		loading,
 		total,
 		tabActive,
+
+		pageId,
 
 		listPost,
 		_parentRef,
@@ -72,8 +80,25 @@ const Event = (_props: EventProps) => {
 		return Content
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [openModal])
+	const _renderPassEvent = () => {
+		return (
+			<Flex vertical className={classes.wrapper} onClick={() => goBackOrPush()}>
+				<Flex>
+					<ArrrowLeftIcon />
+				</Flex>
+			</Flex>
+		)
+	}
+	if (pageId === 'pass-event') {
+		return <PassEvent />
+	}
 	return (
 		<Flex ref={_parentRef} className={classes.wrapper} vertical>
+			<Flex className={classes.passEvent}>
+				<div onClick={() => onPushState({ pageId: 'pass-event' })}>
+					<ClockIcon />
+				</div>
+			</Flex>
 			{false && (
 				<Flex className={classes.title} onClick={() => onChangeRoute(type)}>
 					<EventTitle

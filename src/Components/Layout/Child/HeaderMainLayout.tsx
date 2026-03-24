@@ -17,6 +17,7 @@ import { useLocalePath } from '@/ultis/route'
 import {
 	getStorageCookie,
 	handleRemoveAllCookie,
+	handleRemoveAllSession,
 	handleStorageCookie,
 	isLogin,
 	setSessionStorage,
@@ -240,6 +241,7 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 			console.error('🔥 Lỗi trong quá trình logout', error)
 		} finally {
 			handleRemoveAllCookie()
+			handleRemoveAllSession()
 			onChangeRoute(mainRoutes.login)
 		}
 	}

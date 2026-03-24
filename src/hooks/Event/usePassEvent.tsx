@@ -2,32 +2,32 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useModal } from '@/context/ModalContext'
 
-import { getListPost, getMyEventsJoined } from '@/apis/postApis'
+import { getMyEventsPassed } from '@/apis/postApis'
 
 import { isArray, uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay } from '@/ultis/common'
-import { useQuery } from '@/ultis/route'
+import { getSessionStorage, setSessionStorage } from '@/ultis/storage'
+
+import { paginationCommon } from '@/Variable/common.variable'
 
 import { PaginationType } from '@/interface/common/common.interface'
-import { mainRoutes } from '@/routes/MainRoutes'
-import { paginationCommon } from '@/Variable/common.variable'
-import { mappingTabBtn } from '@/Variable/event.variable'
+import { FIRST_ACTION_KEY, STORAGE_KEY } from '@/Variable/storage.variable'
 
-export default function useEvent({ type, onCRUDSuccess }: any) {
+export default function usePassEvent() {
 	const { openError } = useModal()
-	const { onGetQuerry } = useQuery()
-	const { pageId } = onGetQuerry()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const _parentRef = useRef<HTMLDivElement | null>(null)
 	const _childRef = useRef<HTMLDivElement | null>(null)
+
 	const [listPost, setListPost] = useState([]) as any[]
 	const [loadmore, setLoadMore] = useState(true)
-	const [total, setTotal] = useState({
-		[mappingTabBtn.interested]: 0,
-		[mappingTabBtn.my]: 0,
-	})
+	const [total, setTotal] = useState(0)
 	const [loading, setLoading] = useState(false)
-	const [tabActive, setTabActive] = useState(mappingTabBtn.interested)
+	const [modal, setModal] = useState<{
+		type: string
+		data?: any
+	}>({ type: null, data: null })
+
 	const handleGetListPost = async (isNotLoading = false) => {
 		setLoading(true)
 		try {
@@ -39,17 +39,12 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 			if (isNew) {
 				setListPost([])
 			}
-			const params = {
-				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
-				page: !isNotLoading ? page : 1,
-				limit: !isNotLoading ? limit : 50,
-				type,
-				radius: 20,
-			}
 
-			const res: any = await (
-				tabActive === mappingTabBtn.my ? getListPost : getMyEventsJoined
-			)(params)
+			const res: any = await getMyEventsPassed({
+				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
+				page: page,
+				limit: limit,
+			})
 
 			const { code, results } = res || {}
 			await delay(1000)
@@ -63,34 +58,13 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 					const dataShow = uniqueArray([...contents, ...rows], 'id') as any[]
 					return dataShow
 				})
-				setTotal((prev) => ({ ...prev, [tabActive]: count }))
+				setTotal(count || 0)
 			}
 		} catch (error) {
 			openError(error)
 		} finally {
 			setLoading(false)
 		}
-	}
-
-	const handleGetTotal = async () => {
-		try {
-			const params = {
-				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
-				page: 1,
-				limit: 1,
-				type,
-				radius: 20,
-			}
-
-			const [listPostRes, myEventsRes]: any = await Promise.all([
-				getListPost(params),
-				getMyEventsJoined(params),
-			])
-			setTotal({
-				[mappingTabBtn.interested]: myEventsRes?.pagination?.total,
-				[mappingTabBtn.my]: listPostRes?.pagination?.total,
-			})
-		} catch {}
 	}
 
 	const handleLoadMore = async () => {
@@ -108,14 +82,7 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 			}
 		}
 	}
-	const handleCreateSuccess = (item) => {
-		if (type === mainRoutes.event) {
-			handleGetListPost(true)
-		}
-		if (onCRUDSuccess) {
-			onCRUDSuccess({ key: 'create', value: item })
-		}
-	}
+
 	const handleScroll = (e: any) => {
 		const clientHeight = e.target.clientHeight
 		const scrollHeight = e.target.scrollHeight
@@ -126,15 +93,32 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 		handleLoadMore()
 	}
 
-	useEffect(() => {
-		handleGetTotal()
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	const handleCheckRemind = () => {
+		const { [FIRST_ACTION_KEY.PASS_EVENT]: passEvent } =
+			getSessionStorage(STORAGE_KEY.FIRST_ACTION) || {}
+		if (!passEvent) {
+			setModal({ type: 'confirm', data: null })
+		}
+	}
+
+	const handleCloseModal = () => {
+		const { type } = modal || {}
+		if (type === 'confirm') {
+			const data = getSessionStorage(STORAGE_KEY.FIRST_ACTION) || {}
+			setSessionStorage({
+				key: STORAGE_KEY.FIRST_ACTION,
+				data: { ...data, [FIRST_ACTION_KEY.PASS_EVENT]: true },
+			})
+		}
+		setModal({ type: null, data: null })
+	}
+
 	useEffect(() => {
 		_paginationRefs.current.page = 1
 		handleGetListPost()
+		handleCheckRemind()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [tabActive])
+	}, [])
 
 	useEffect(() => {
 		handleAutoLoadMore()
@@ -143,16 +127,15 @@ export default function useEvent({ type, onCRUDSuccess }: any) {
 
 	return {
 		loading,
-		tabActive,
-
-		pageId,
 
 		_parentRef,
 		_childRef,
+
 		total,
 		listPost,
+		modal,
+
 		onScroll: handleScroll,
-		onSuccess: handleCreateSuccess,
-		setTabActive,
+		onCloseModal: handleCloseModal,
 	}
 }

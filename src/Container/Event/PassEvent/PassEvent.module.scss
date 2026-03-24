@@ -4,16 +4,16 @@
 	width: 100%;
 	gap: 12px;
 	overflow: overlay;
-	.passEvent {
-		justify-content: flex-end;
-		& :first-child {
-			cursor: pointer;
-		}
-		svg {
-			height: 32px;
-			width: 32px;
-			cursor: pointer;
-		}
+	.iconBack {
+		padding: 6px;
+		gap: 10px;
+		background: #fff;
+		border-radius: 50%;
+		height: 32px;
+		width: 32px;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
 	}
 	.title {
 		width: 100%;
@@ -57,6 +57,29 @@
 	}
 }
 
+.wrapperModal {
+	.title {
+		color: #0f1729;
+		text-align: center;
+
+		font-size: 20px;
+		font-weight: 600;
+		line-height: 26px; /* 130% */
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+	}
+	.containerModal {
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		color: #48546b;
+	}
+	.modalIcon {
+		align-items: center;
+		justify-content: center;
+	}
+}
 @media (min-width: 0px) and (max-width: 769px) {
 	.wrapper {
 		padding: 24px 8px !important;

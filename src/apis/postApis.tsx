@@ -148,3 +148,11 @@ export const getMyEventsJoined = async (params: any = {}) => {
 		params: convertParams(params),
 	})
 }
+
+export const getMyEventsPassed = async (params: any = {}) => {
+	const url = POST_ROUTES.myEventsPassed
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}

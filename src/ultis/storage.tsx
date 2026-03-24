@@ -79,6 +79,7 @@ export const handleRemoveAllCookie = () => {
 	// 	removeStorageCookie(i)
 	// })
 }
+export const handleRemoveAllSession = () => sessionStorage.clear()
 export const setSessionStorage = ({ key, data }) => {
 	try {
 		sessionStorage.setItem(key, JSON.stringify(data))
