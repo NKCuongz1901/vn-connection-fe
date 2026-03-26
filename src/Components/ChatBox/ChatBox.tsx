@@ -19,6 +19,7 @@ import SendIcon from '@/svg/SendIcon'
 import CAvatar from '../Custom/CAvatar'
 import CImage from '../Custom/CImage'
 import CTextArea from '../Custom/CTextArea'
+import CTextSpecial from '../Custom/CTextSpecial'
 import CUploadMuti from '../Custom/CUploadMuti'
 
 import { specialTypeMessage } from '@/Variable/common.variable'
@@ -120,6 +121,7 @@ const ChatBox = ({
 		created_at,
 		parent,
 		user,
+		mentions,
 	}) => {
 		const { name } = user || {}
 		switch (type) {
@@ -127,7 +129,8 @@ const ChatBox = ({
 				return (
 					<div className={classes.text}>
 						{_renderParentItem(parent)}
-						<div>{content}</div>
+						<CTextSpecial data={content} mentions={mentions} />
+
 						{isLast && (
 							<div className={classes.time}>
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}

@@ -26,11 +26,7 @@ import { cloneDeep, delay } from '@/ultis/common'
 import { isEmptyObject } from '@/ultis/object'
 import { onPushState } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
-import {
-	generateCustomUuid,
-	parseMentions,
-	randomString,
-} from '@/ultis/string'
+import { generateCustomUuid, parseMentions, randomString } from '@/ultis/string'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { ReactionPtops } from '@/interface/Conversation/Conversation.interface'
@@ -285,12 +281,13 @@ export default function useChatRoomInboxChat({
 				id: convId,
 				fields: ['$all'],
 			})
-			const { join } = res?.results?.object || {}
+			const { join, amount_of_user } = res?.results?.object || {}
 			const { amount_of_remind } = join || {}
 			if (!amount_of_remind || amount_of_remind < 2) {
 				onChangeModal({ type: 'noti' })
 			}
 			setConvInfo(res?.results?.object)
+			setTotal((prev) => ({ ...prev, member: amount_of_user }))
 		} catch (error) {
 			openError(error)
 			onPushState({})
@@ -308,9 +305,8 @@ export default function useChatRoomInboxChat({
 				page: 1,
 				limit: 50,
 			})
-			const { rows, count } = res?.results?.objects || {}
+			const { rows } = res?.results?.objects || {}
 			setMember(rows)
-			setTotal((prev) => ({ ...prev, member: count }))
 		} catch (error) {
 			openError(error)
 		} finally {
