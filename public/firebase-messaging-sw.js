@@ -5,13 +5,27 @@ importScripts(
 	'https://www.gstatic.com/firebasejs/9.6.10/firebase-messaging-compat.js',
 )
 
-firebase.initializeApp({
+const swUrl = new URL(self.location.href)
+const params = swUrl.searchParams
+
+const defaultFirebaseConfig = {
 	apiKey: 'AIzaSyBVk2djUST-4cMXuHNhmr2z9hM4VpjacXg',
 	authDomain: 'univini-develop.firebaseapp.com',
 	projectId: 'univini-develop',
 	storageBucket: 'univini-develop.firebasestorage.app',
 	messagingSenderId: '34059510604',
 	appId: '1:34059510604:web:9df3c716ba1274850fe5e9',
+}
+
+firebase.initializeApp({
+	apiKey: params.get('apiKey') || defaultFirebaseConfig.apiKey,
+	authDomain: params.get('authDomain') || defaultFirebaseConfig.authDomain,
+	projectId: params.get('projectId') || defaultFirebaseConfig.projectId,
+	storageBucket:
+		params.get('storageBucket') || defaultFirebaseConfig.storageBucket,
+	messagingSenderId:
+		params.get('messagingSenderId') || defaultFirebaseConfig.messagingSenderId,
+	appId: params.get('appId') || defaultFirebaseConfig.appId,
 })
 
 const messaging = firebase.messaging()
