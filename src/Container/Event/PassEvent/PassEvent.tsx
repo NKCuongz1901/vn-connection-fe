@@ -5,12 +5,13 @@ import { memo } from 'react'
 import usePassEvent from '@/hooks/Event/usePassEvent'
 
 import { arrayFrom } from '@/ultis/array'
+import { useSafeBack } from '@/ultis/route'
 
 import CButton from '@/Components/Custom/CButton'
 import CModal from '@/Components/Custom/CModal/CModal'
 import EventTitle from '@/Components/Event/EventTitle'
 import ItemEvent from '@/Components/Event/ItemEvent'
-import ClockIcon from '@/svg/ClockIcon'
+import ArrrowLeftIcon from '@/svg/ArrrowLeftIcon'
 import FeedbackIcon from '@/svg/FeedbackIcon'
 
 import { mainRoutes } from '@/routes/MainRoutes'
@@ -18,6 +19,7 @@ import { mainRoutes } from '@/routes/MainRoutes'
 import classes from './PassEvent.module.scss'
 
 const PassEvent = () => {
+	const { goBackOrPush } = useSafeBack()
 	const {
 		loading,
 
@@ -61,7 +63,7 @@ const PassEvent = () => {
 							<Flex className={classes.modalIcon}>
 								<FeedbackIcon />
 							</Flex>
-							<Flex className={classes.title}>Pass activities</Flex>
+							<Flex className={classes.title}>Past activities</Flex>
 							<Flex className={classes.containerModal} vertical>
 								Past activities are kept here for 3 months after the end
 							</Flex>
@@ -75,13 +77,14 @@ const PassEvent = () => {
 
 	return (
 		<Flex ref={_parentRef} className={classes.wrapper} vertical>
-			<div>
+			<div className={classes.eventTitle} onClick={() => goBackOrPush()}>
 				<EventTitle
 					hiddenAdd
-					label={'Pass activities'}
+					label={'Past activities'}
 					number={total}
 					labelCreateBtn="Create activity"
-					icon={<ClockIcon />}
+					icon={<ArrrowLeftIcon />}
+					endIcon={<div></div>}
 				/>
 			</div>
 			<Flex ref={_childRef} className={classes.wrapperItem} onScroll={onScroll}>

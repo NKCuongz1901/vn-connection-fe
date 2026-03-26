@@ -14,6 +14,7 @@ interface EventTitleProps {
 	label: string
 	number?: number | null | undefined
 	icon: any
+	endIcon?: any
 	labelCreateBtn?: string
 	onClick?: any
 	onAddNew?: any
@@ -26,6 +27,7 @@ const EventTitle = ({
 	number,
 	labelCreateBtn,
 	icon,
+	endIcon,
 	hiddenAdd = false,
 	hiddenNumber = false,
 	onClick,
@@ -43,7 +45,7 @@ const EventTitle = ({
 						</Flex>
 					)}
 					<Flex className={classes.arrowIcon} onClick={onClick}>
-						<IconChevronRight />
+						{endIcon || <IconChevronRight />}
 					</Flex>
 				</Flex>
 				{!hiddenAdd &&

@@ -89,13 +89,13 @@ const Event = (_props: EventProps) => {
 			</Flex>
 		)
 	}
-	if (pageId === 'pass-event') {
+	if (pageId === 'past-event') {
 		return <PassEvent />
 	}
 	return (
 		<Flex ref={_parentRef} className={classes.wrapper} vertical>
 			<Flex className={classes.passEvent}>
-				<div onClick={() => onPushState({ pageId: 'pass-event' })}>
+				<div onClick={() => onPushState({ pageId: 'past-event' })}>
 					<ClockIcon />
 				</div>
 			</Flex>
