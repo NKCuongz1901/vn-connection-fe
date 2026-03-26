@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import { useLocalePath } from '@/ultis/route'
@@ -12,10 +12,14 @@ interface CTextSpecialProps extends React.HTMLAttributes<HTMLDivElement> {
 	mentions?: any[]
 }
 
-const CTextSpecial = ({ data, mentions, ...rest }: CTextSpecialProps) => {
+const CTextSpecial = ({
+	data: _data,
+	mentions,
+	...rest
+}: CTextSpecialProps) => {
 	const { onOpenNewRoute } = useLocalePath()
 	const [nodes, setNodes] = useState([])
-
+	const data = useMemo(() => _data.trim(), [_data])
 	const process = useCallback(() => {
 		if (!data) return []
 
