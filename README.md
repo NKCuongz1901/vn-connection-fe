@@ -24,7 +24,7 @@ npm run dev
 7. Variable
 8. Define variable
 9. Define type/interface
-10. Update Build
+10. Update Build 2
 
 ## Rule passing props down
 
@@ -33,6 +33,7 @@ npm run dev
 3. Common type
 4. Function
 5. Build change
+5. Build change 2
 
 ## Rule commit code
 
