@@ -1,5 +1,4 @@
 import { ItemType } from 'antd/es/menu/interface'
-import { debounce } from 'lodash'
 import {
 	useCallback,
 	useEffect,
@@ -17,24 +16,12 @@ import {
 	getDiscussDetail,
 	likeDiscuss,
 } from '@/apis/discussionApis'
-import {
-	deleteCommentPost,
-	getListCommentById,
-	likeComment,
-	sendCommentPost,
-} from '@/apis/postApis'
-import { handleUploadImage } from '@/apis/uploadApis'
 import { blockUser } from '@/apis/userApis'
 
-import { isArray, unique, uniqueArray } from '@/ultis/array'
-import { cloneDeep, delay } from '@/ultis/common'
-import { handleParseFileImg } from '@/ultis/file'
 import { onPushState, useQuery } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
 import { copyToClipboard, randomString } from '@/ultis/string'
 
-import { PaginationType } from '@/interface/common/common.interface'
-import { paginationCommon } from '@/Variable/common.variable'
 interface useDiscussionDetailProps {
 	discussId: string
 	onActionProps?: any
@@ -48,29 +35,18 @@ export default function useDiscussionDetail(
 	}: useDiscussionDetailProps,
 	ref,
 ) {
-	const { openError, openSuccess, openConfirm, closeModal } = useModal()
-	const { toggleLoadingContext, loadingContext } = useLoading()
+	const { openError, openSuccess, openConfirm } = useModal()
+	const { toggleLoadingContext } = useLoading()
 	const { onGetQuerry } = useQuery()
 	const { category_id } = onGetQuerry()
-	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
-	const _paginationRecommendRefs = useRef<PaginationType>(
-		cloneDeep(paginationCommon),
-	)
-	const _loadmore = useRef<boolean>(true)
-	const _keyDiscuss = useRef(randomString())
-	const [modal, setModal] = useState({ type: '', data: null }) as any
+	const eventCommentRef = useRef<{ [key: string]: any }>({})
 
-	const [commentContent, setCommentContent] = useState('')
+	const [modal, setModal] = useState({ type: '', data: null }) as any
 
 	const [loadingShare, setLoadingShare] = useState({}) as any
 
 	const [shareList, setShareList] = useState([]) as any
-	const [commentList, setCommentList] = useState<any[]>([])
-	const [totalComment, setTotalComment] = useState<number>(0)
 	const [discussDetail, setDiscussDetail] = useState<any>(null)
-	const [fileList, setFileList] = useState([])
-	const [editList, setEditList] = useState([])
-	const [deleteLoading, setDeleteLoading] = useState<string[]>([])
 
 	const [loading, setLoading] = useState({
 		discuss: true,
@@ -111,71 +87,11 @@ export default function useDiscussionDetail(
 			setLoading((prev) => ({ ...prev, discuss: false }))
 		}
 	}
-	const handleGetComment = async (isNotLoading = false) => {
-		setLoading((prev) => ({ ...prev, commentList: true }))
-
-		try {
-			const { page, limit } = _paginationRefs.current
-			let isNew = page === 1
-			if (isNotLoading) {
-				isNew = false
-			} else {
-				if (isNew) {
-					setCommentList([])
-				}
-			}
-			const res: any = await getListCommentById({
-				fields: [
-					'$all',
-					{ user: ['name', 'avatar', 'id'] },
-					{
-						medias: [
-							'thumbnail',
-							'duration',
-							'url',
-							'width',
-							'height',
-							'ratio',
-							'type',
-						],
-					},
-				],
-				where: {
-					post_id: discussId,
-					parent_id: null,
-				},
-				page,
-				limit,
-			})
-			const { code, results } = res || {}
-			await delay(1000)
-			if (code === 200) {
-				const { rows, count } = results?.objects || {}
-				if (!isNotLoading) {
-					_loadmore.current = isArray(rows, limit)
-				}
-				setTotalComment(count || 0)
-				setCommentList((prev: any[]) => {
-					const contents = isNew && !isNotLoading ? [] : prev
-					const dataShow = uniqueArray([...contents, ...rows], 'id') as any[]
-					return dataShow
-				})
-			}
-		} catch (error) {
-			openError(error)
-		} finally {
-			setLoading((prev) => ({ ...prev, commentList: false }))
-		}
-	}
 
 	const handleLoadMore = useCallback(async () => {
-		if (!_loadmore.current || loading.commentList) return
-		const { limit } = _paginationRefs.current
-		const currentPage = Math.trunc((commentList || []).length / limit)
-		_paginationRefs.current.page = currentPage + 1
-		await handleGetComment()
+		eventCommentRef.current?.onLoadMore()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [JSON.stringify(commentList), loading.commentList])
+	}, [eventCommentRef.current?.onLoadMore])
 	const handleScroll = (e: any) => {
 		const clientHeight = e.target.clientHeight
 		const scrollHeight = e.target.scrollHeight
@@ -255,106 +171,6 @@ export default function useDiscussionDetail(
 			case 'edit':
 				handleGetDetailDiscuss()
 				onActionProps({ key: 'edit', value: { id: discussId } })
-				break
-			default:
-				break
-		}
-	}
-
-	const handleLikeComment = async (id: string) => {
-		if (loading.like) return
-		try {
-			setLoading((prev) => ({ ...prev, like: true }))
-			const res: any = await likeComment({ id })
-			if (res) {
-				const { status } = res?.results?.object
-				setCommentList((prev) =>
-					prev.map((item) => {
-						if (item.id === id) {
-							return {
-								...item,
-								is_liked: status === 'like',
-								amount_of_like:
-									(item.amount_of_like || 0) + (status === 'like' ? 1 : -1),
-							}
-						}
-						return item
-					}),
-				)
-			}
-		} catch (error) {
-			openError(error)
-		} finally {
-			setLoading((prev) => ({ ...prev, like: false }))
-		}
-	}
-
-	const handleDeleteComment = async (id: string) => {
-		try {
-			setDeleteLoading((prev) => [...prev, id])
-			const res: any = await deleteCommentPost(id)
-			const { code } = res || {}
-			if (code === 200) {
-				setTotalComment((pre) => pre - 1)
-				setCommentList((prev: any[]) => prev.filter((i) => i.id !== id))
-				setDiscussDetail((prev) => ({
-					...prev,
-					amount_of_comment: (prev.amount_of_comment || 0) - 1,
-				}))
-			}
-		} catch (error) {
-			openError(error)
-		} finally {
-			setDeleteLoading((prev) => prev.filter((i) => i !== id))
-		}
-	}
-
-	const handleActionCommentItem = ({ key, value }) => {
-		switch (key) {
-			case 'like':
-				handleLikeComment(value)
-				break
-			case 'delete':
-				handleDeleteComment(value)
-				break
-			case 'deleteChildComment':
-				setCommentList((prev) =>
-					prev.map((item) => {
-						if (item.id === value) {
-							return {
-								...item,
-								amount_of_replies: (item.amount_of_replies || 0) - 1,
-							}
-						}
-						return item
-					}),
-				)
-				break
-			case 'edit':
-				setEditList((prev) => unique([...prev, value]))
-				break
-			case 'cancelEdit':
-				setEditList((prev) => prev.filter((i) => i !== value))
-				break
-			case 'updateComment':
-				const { name, avatar, id, is_verified } = getUserInfo()
-				setCommentList((prev) =>
-					(prev || []).map((item) =>
-						item.id === value?.id
-							? {
-									...value,
-									user: {
-										name,
-										avatar,
-										id,
-										is_verified,
-									},
-								}
-							: item,
-					),
-				)
-				setEditList((prev) => prev.filter((i) => i !== value?.id))
-
 				break
 			default:
 				break
@@ -444,65 +260,7 @@ export default function useDiscussionDetail(
 
 		return menus
 	}
-	const handleMenusClickCommentItem = ({ key, value }) => {
-		switch (key) {
-			case 'share':
-				setModal({ type: key, data: value })
-				break
-			case 'block':
-				openConfirm({
-					message: 'Do you want to block this user?',
-					onAccept: () => handleBlockUser(value.user_id),
-				})
-				break
-			case 'report':
-				setModal({ type: 'reportCommentItem', data: value })
-				break
-			default:
-				break
-		}
-	}
-	const handleGetMenusCommentItem = (item: { id: string; user_id: string }) => {
-		const { user_id } = item
-		const isMe = user_id === getUserInfo()?.id
 
-		const menus: ItemType[] = []
-		if (isMe) {
-			menus.push(
-				{
-					key: 'edit',
-					label: 'Edit',
-					onClick: () =>
-						handleActionCommentItem({
-							key: 'edit',
-							value: item.id,
-						}),
-				},
-				{
-					key: 'delete',
-					label: 'Delete',
-					style: { color: '#F80024' },
-					onClick: () =>
-						handleActionCommentItem({
-							key: 'delete',
-							value: item.id,
-						}),
-				},
-			)
-		} else {
-			menus.push({
-				key: 'report',
-				label: 'Report',
-				onClick: () =>
-					handleMenusClickCommentItem({
-						key: 'report',
-						value: cloneDeep(item),
-					}),
-			})
-		}
-
-		return menus
-	}
 	const handleShareFriend = async (id) => {
 		setLoadingShare((prev: any) => ({ ...prev, [id]: true }))
 
@@ -527,84 +285,7 @@ export default function useDiscussionDetail(
 			setLoadingShare((prev: any) => ({ ...prev, [id]: false }))
 		}
 	}
-	const handleChangeComment = (e) => {
-		const content = e.target.value
-		setCommentContent(content)
-	}
-	const handleParsePayLoad = async () => {
-		toggleLoadingContext(true)
-		const _medias = fileList
-		let medias = []
 
-		if (_medias?.length > 0) {
-			const uploadPromises = _medias.map((media) =>
-				handleUploadImage(media.file, { isAll: true }),
-			)
-			const resList = await Promise.all(uploadPromises)
-
-			medias = (resList || []).map((i) => ({
-				url: i,
-				type: 'IMAGE',
-				fileName: null,
-				width: 692,
-				height: 1500,
-				ratio: 0.4613333333333333,
-				thumbnail: null,
-				duration: 0,
-			}))
-		}
-
-		return {
-			post_id: discussId,
-			content: commentContent,
-			medias: medias,
-		}
-	}
-	const handleSendCommentPost = async () => {
-		if ((!commentContent.trim() && !isArray(fileList, 1)) || loadingContext) {
-			return
-		}
-		const body = await handleParsePayLoad()
-		try {
-			const res: any = await sendCommentPost({
-				...body,
-			})
-			const { code, results } = res || {}
-			if (code === 200) {
-				const { object } = results || {}
-				const { name, avatar, id, is_verified } = getUserInfo()
-				const data = {
-					...object,
-					user: {
-						name,
-						avatar,
-						id,
-						is_verified,
-					},
-				}
-				setCommentContent('')
-				setCommentList((prev: any[]) => [data, ...prev])
-				setTotalComment((prev) => prev + 1)
-				setDiscussDetail((prev) => ({
-					...prev,
-					amount_of_comment: (prev.amount_of_comment || 0) + 1,
-				}))
-				setFileList([])
-			}
-		} catch (error) {
-			openError(error)
-		} finally {
-			toggleLoadingContext()
-		}
-	}
-	const handleKeyDown = (e) => {
-		if (e.key === 'Enter' && !e.shiftKey) {
-			e.preventDefault() // nếu cần chặn mặc định (như xuống dòng)
-			e.stopPropagation()
-			handleSendCommentPost()
-			// Thực hiện hành động tại đây
-		}
-	}
 	const handleChangeUrl = ({ key, value: _value }) => {
 		switch (key) {
 			case 'back':
@@ -626,29 +307,6 @@ export default function useDiscussionDetail(
 				break
 		}
 	}
-	const handleImportImg = debounce((_values) => {
-		const values = []
-
-		if (isArray(_values, 1)) {
-			_values.forEach((i) => {
-				const { imageUrl, file } = handleParseFileImg(i?.originFileObj) || {}
-				if (imageUrl) {
-					values.push({ imageUrl, file })
-				}
-			})
-		}
-		const maxItem = 5
-		setFileList((prev) => {
-			const combined = [...prev, ...values]
-			if ((combined || []).length > maxItem) {
-				openConfirm({
-					message: 'You can only upload up to 5 medias',
-					onAccept: () => closeModal(),
-				})
-			}
-			return combined.slice(0, maxItem)
-		})
-	}, 200)
 
 	useImperativeHandle(
 		ref,
@@ -662,37 +320,25 @@ export default function useDiscussionDetail(
 
 	useEffect(() => {
 		handleGetDetailDiscuss()
-		handleGetComment()
+		// handleGetComment()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [discussId])
 
 	return {
-		loading,
-		loadingShare,
-		deleteLoading,
-		shareList,
-		commentList,
+		eventCommentRef,
 
-		modal,
-		setModal,
+		loadingShare,
+		loading,
+		shareList,
 		discussDetail,
-		totalComment,
-		commentContent,
-		fileList,
-		editList,
-		setEditList,
-		setFileList,
-		onGetMenus: handleGetMenus,
-		onGetMenusCommentItem: handleGetMenusCommentItem,
-		onCopy: handleCopy,
+		modal,
+
+		setModal,
 		onShareFriend: handleShareFriend,
-		onScroll: handleScroll,
-		onAction: handleAction,
+		onCopy: handleCopy,
 		onChangeUrl: handleChangeUrl,
-		onSendComment: handleSendCommentPost,
-		onKeyDown: handleKeyDown,
-		onChangeComment: handleChangeComment,
-		onActionCommentItem: handleActionCommentItem,
-		onImportImg: handleImportImg,
+		onGetMenus: handleGetMenus,
+		onAction: handleAction,
+		onScroll: handleScroll,
 	}
 }

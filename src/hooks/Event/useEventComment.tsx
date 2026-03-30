@@ -1,5 +1,11 @@
 import { debounce } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
+import {
+	useCallback,
+	useEffect,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
@@ -23,7 +29,7 @@ interface useEventCommentProps {
 	id: string
 	[key: string]: any
 }
-export default function useEventComment({ id }: useEventCommentProps) {
+export default function useEventComment({ id }: useEventCommentProps, ref) {
 	const { openError, openConfirm, closeModal } = useModal()
 	const { toggleLoadingContext, loadingContext } = useLoading()
 
@@ -95,14 +101,25 @@ export default function useEventComment({ id }: useEventCommentProps) {
 		} finally {
 		}
 	}
-	const handleLoadMore = async () => {
+	const handleLoadMore = useCallback(async () => {
 		const isLoadMore =
 			_paginationRefs.current.page < _paginationRefs.current.totalPage
 
 		if (!isLoadMore || loading) return
 		_paginationRefs.current.page += 1
 		await handleGetListCommentById()
-	}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [JSON.stringify(commentList), loading])
+
+	useImperativeHandle(
+		ref,
+		() => ({
+			...(ref.current || {}),
+			onLoadMore: handleLoadMore,
+		}),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[handleLoadMore],
+	)
 
 	const handleAutoLoadMore = () => {
 		if (_parentRef.current && _childRef.current) {

@@ -1,5 +1,5 @@
 import { ItemType } from 'antd/es/menu/interface'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
@@ -30,6 +30,7 @@ export default function useDetailEvent({ id: _id }: useDetailEventProps) {
 	const { onChangeRoute } = useLocalePath()
 
 	const _refKeyEventParticipant = useRef(randomString())
+	const eventCommentRef = useRef<{ [key: string]: any }>({})
 
 	const [detailPost, setDetailPost] = useState({}) as any
 	const [id, setId] = useState(_id)
@@ -223,6 +224,22 @@ export default function useDetailEvent({ id: _id }: useDetailEventProps) {
 			callback: openSuccess({ message: 'Link copied successfully! ' }),
 		})
 	}
+
+	const handleLoadMore = useCallback(async () => {
+		eventCommentRef.current?.onLoadMore()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [eventCommentRef.current?.onLoadMore])
+
+	const handleScroll = (e: any) => {
+		const clientHeight = e.target.clientHeight
+		const scrollHeight = e.target.scrollHeight
+		const scrollTop = Math.abs(e.target.scrollTop)
+		const isReachedEnd = scrollTop + clientHeight >= scrollHeight - 50
+		if (!isReachedEnd) return
+
+		handleLoadMore()
+	}
+
 	const postMenus: ItemType[] = useMemo(
 		() => {
 			const { user_id, repeat_type } = detailPost || {}
@@ -316,6 +333,8 @@ export default function useDetailEvent({ id: _id }: useDetailEventProps) {
 	}, [_id])
 	return {
 		_refKeyEventParticipant,
+		eventCommentRef,
+
 		id,
 		loading,
 		loadingShare,
@@ -332,5 +351,6 @@ export default function useDetailEvent({ id: _id }: useDetailEventProps) {
 		onGetDetailPost: handleGetDetailPost,
 		onCopy: handleCopy,
 		setId,
+		onScroll: handleScroll,
 	}
 }

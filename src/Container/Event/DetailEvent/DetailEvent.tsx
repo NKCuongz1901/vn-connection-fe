@@ -58,6 +58,8 @@ interface DetailEventProps {
 }
 const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 	const {
+		eventCommentRef,
+
 		_refKeyEventParticipant,
 		id,
 		detailPost,
@@ -74,6 +76,7 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 		onGetDetailPost,
 		onCopy,
 		setId,
+		onScroll,
 	} = useDetailEvent({ id: _id })
 	const { detailLoad } = loading
 	const { loadingContext } = useLoading()
@@ -490,7 +493,7 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 		)
 	}
 	return (
-		<div className={classes.wrapper}>
+		<div className={classes.wrapper} onScroll={onScroll}>
 			{detailLoad && isEmptyObject(detailPost) ? (
 				_renderSkeleton()
 			) : !isEmptyObject(detailPost) ? (
@@ -499,7 +502,7 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 					{_renderDetail()}
 					{_renderDesc()}
 					<Flex className={classes.comment}>
-						<EventComment id={id} />
+						<EventComment id={id} ref={eventCommentRef} />
 					</Flex>
 					{_renderModal()}
 				</Flex>

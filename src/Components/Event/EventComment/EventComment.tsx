@@ -2,7 +2,7 @@ import { IconCircleXFilled, IconDots } from '@tabler/icons-react'
 import { Dropdown, Flex, Skeleton } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import clsx from 'clsx'
-import { memo } from 'react'
+import { forwardRef } from 'react'
 
 import { arrayFrom, isArray } from '@/ultis/array'
 import { getDateInfo } from '@/ultis/date'
@@ -21,7 +21,7 @@ import classes from './EventComment.module.scss'
 
 import { DEFAULT_FALLBACK } from '@/Variable/common.variable'
 
-const EventComment = ({ id }) => {
+const EventComment = ({ id }, ref) => {
 	const {
 		_parentRef,
 		_childRef,
@@ -40,9 +40,12 @@ const EventComment = ({ id }) => {
 		onKeyDown,
 		onImportImg,
 		onAction,
-	} = useEventComment({
-		id,
-	})
+	} = useEventComment(
+		{
+			id,
+		},
+		ref,
+	)
 	const _renderSendCommentBox = () => {
 		return (
 			<Flex vertical className={classes.commentBoxWrapper}>
@@ -218,4 +221,4 @@ const EventComment = ({ id }) => {
 	)
 }
 
-export default memo(EventComment)
+export default forwardRef(EventComment)
