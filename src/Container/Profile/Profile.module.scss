@@ -10,12 +10,15 @@
 			width: 100%;
 			height: 220px;
 			position: relative;
-			img {
+			.coverImg {
 				width: 100%;
 				height: 220px;
-				position: absolute;
-				z-index: 0;
-				object-fit: cover;
+				:global(.ant-image) {
+					width: 100%;
+				}
+				img {
+					object-fit: cover;
+				}
 			}
 			.header {
 				width: 100%;
@@ -56,7 +59,15 @@
 					.avatar {
 						position: relative;
 						bottom: 40px;
+						height: 96px;
+						width: 96px;
+						border-radius: 50%;
+						overflow: hidden;
+						img {
+							object-fit: cover;
+						}
 					}
+
 					.status {
 						white-space: nowrap;
 						left: 50%;
@@ -172,6 +183,9 @@
 }
 
 @media (min-width: 0px) and (max-width: 769px) {
+	.wrapper {
+		padding: 12px !important;
+	}
 	.infoWrapper {
 		flex-direction: column;
 		.endButton {

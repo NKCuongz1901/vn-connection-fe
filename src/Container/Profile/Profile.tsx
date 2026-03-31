@@ -12,9 +12,9 @@ import { getAge } from '@/ultis/date'
 import { useLocalePath, useQuery, useSafeBack } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
 
-import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
 import CCounter from '@/Components/Custom/CCounter'
+import CImage from '@/Components/Custom/CImage'
 import ModalEditProfile from '@/Components/Profile/ModalEditProfile'
 import UserMoreAction from '@/Components/User/UserMoreAction'
 import ArmHeartIcon from '@/svg/ArmHeartIcon'
@@ -153,11 +153,9 @@ const Profile = (props: ProfileProps) => {
 		return (
 			<Flex className={classes.totalInfo} vertical>
 				<Flex className={classes.cover}>
-					<img
-						className={classes.coverImg}
-						src={cover || '/images/defaultCover.png'}
-						alt=""
-					/>
+					<div className={classes.coverImg}>
+						<CImage preview src={cover || '/images/defaultCover.png'} alt="" />
+					</div>
 					<Flex className={classes.header}>
 						{!isMinimize ? (
 							<Flex className={classes.icon}>
@@ -186,7 +184,9 @@ const Profile = (props: ProfileProps) => {
 				<Flex className={classes.infoWrapper}>
 					<Flex className={classes.info}>
 						<Flex className={classes.avatarWrapper}>
-							<CAvatar className={classes.avatar} size={96} src={avatar} />
+							<div className={classes.avatar}>
+								<CImage preview src={avatar} />
+							</div>
 							<Flex className={classes.status}>{mappingMod[mode]}</Flex>
 						</Flex>
 						<Flex className={classes.commonInfo} vertical>
