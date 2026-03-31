@@ -218,7 +218,7 @@ const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
 					>
 						Host by
 					</div>
-					<div>{(total || 0) + 1}</div>
+					<div style={{ display: 'none' }}>{(total || 0) + 1}</div>
 				</Flex>
 				<Flex className={classes.hostList}>
 					{isAdd && !loading && (
