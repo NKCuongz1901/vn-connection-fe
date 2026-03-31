@@ -6,6 +6,7 @@ import { memo } from 'react'
 
 import { arrayFrom, isArray } from '@/ultis/array'
 import { onPushState, useLocalePath, useSafeBack } from '@/ultis/route'
+import { formatNumberString } from '@/ultis/string'
 
 import ModalUpdateProfile from '@/Components/ChatRoom/ModalUpdateProfile'
 import CAvatar from '@/Components/Custom/CAvatar'
@@ -128,11 +129,13 @@ const ChatRoom = () => {
 							<div className={classes.chatRoomTitle}>{title}</div>
 							<Flex className={classes.totalMem}>
 								{!!isArray(users_in_conversation, 1) && <TickIcon />}
-								<div>{amount_of_user} members</div>
+								<div>{formatNumberString(amount_of_user)} members</div>
 							</Flex>
 							<Flex className={classes.totalOnl}>
 								<div className={classes.online} />
-								<div>{amount_of_user_online} members online</div>
+								<div>
+									{formatNumberString(amount_of_user_online)} members online
+								</div>
 							</Flex>
 						</Flex>
 					)

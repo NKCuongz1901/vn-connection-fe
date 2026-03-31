@@ -5,6 +5,7 @@ import { memo } from 'react'
 import useChatRoomInboxChat from '@/hooks/ChatRoomInbox/useChatRoomInboxChat'
 
 import { onPushState } from '@/ultis/route'
+import { formatNumberString } from '@/ultis/string'
 
 import ChatRoomChatBox from '@/Components/ChatRoomChatBox'
 import CAvatar from '@/Components/Custom/CAvatar'
@@ -71,7 +72,7 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 									setModal({ type: 'member', data: { id: convId } })
 								}
 							>
-								({total.member}
+								({formatNumberString(total.member)}
 								<People />)
 							</Flex>
 						</Flex>
