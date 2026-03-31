@@ -61,7 +61,7 @@ const ItemHangout = ({
 	const { value: time, unit } = start_time
 		? getDiffFromNow({
 				input: Number(start_time),
-		  })
+			})
 		: { value: 30, unit: 'minute' }
 
 	const handleSendHangout = useCallback(
@@ -112,7 +112,7 @@ const ItemHangout = ({
 			<Flex className={classes.moreImages} vertical>
 				<span>{participants.length - 3} + </span>
 
-				<span>People</span>
+				<span>Other</span>
 			</Flex>
 		)
 	}
