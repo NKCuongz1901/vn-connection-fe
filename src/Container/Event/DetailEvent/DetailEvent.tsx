@@ -388,6 +388,7 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 	}
 	const _renderDesc = () => {
 		const { description } = detailPost
+		if (!description) return null
 		return (
 			<Flex className={classes.desc} vertical>
 				<div className={classes.title}>Details</div>
