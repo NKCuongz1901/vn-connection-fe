@@ -8,6 +8,7 @@ import {
 	getConvInfoById,
 	getConvMembersById,
 	getConvMessById,
+	getMessageById,
 	getPinMessageById,
 	pinMessageById,
 	sendMessage,
@@ -20,6 +21,7 @@ import {
 
 import { mappingMessageChat, uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay } from '@/ultis/common'
+import { isEmptyObject } from '@/ultis/object'
 import { getUserInfo } from '@/ultis/storage'
 import { generateCustomUuid, randomString } from '@/ultis/string'
 
@@ -40,6 +42,7 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 	const [convInfo, setConvInfo] = useState<{ [key: string]: any }>({})
 	const [members, setMember] = useState<any[]>([])
 	const [messList, setMessList] = useState<any[]>([])
+	const messListRef = useRef(messList)
 
 	const [modal, setModal] = useState({ type: '', data: null }) as any
 	const [openSetting, setOpenSetting] = useState(false)
@@ -175,9 +178,11 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 			}
 			const parent_id = parent?.id
 			const _id = randomString()
+			const message_local_id = generateCustomUuid()
 			const message = {
 				type,
-				message_local_id: generateCustomUuid(),
+				message_local_id,
+
 				...(parent_id && { parent_id }),
 				...(medias.length > 0 && { medias }),
 			} as {
@@ -194,6 +199,7 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 				user_id: getUserInfo('id'),
 				id: _id,
 				_id,
+				message_local_id,
 				isTemp: true,
 				...(parent && { parent }),
 			}
@@ -214,20 +220,23 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 			const _data = res?.results?.object || {}
 			setMessList((prev: any[]) => {
 				const contents = prev
-				const newData = uniqueArray(
-					[
-						{
-							user_id: _data.sender_id,
-							user: _data?.sender,
-							..._data,
-							_id,
-							...(parent && { parent }),
-						},
-						...contents,
-					],
-					'_id',
+				const newMess = {
+					user_id: _data.sender_id,
+					user: _data?.sender,
+					..._data,
+					message_local_id,
+					...(parent && { parent }),
+				}
+				const idx = (contents || []).findIndex(
+					(i) => i.message_local_id === message_local_id,
 				)
-				const dataShow = mappingMessageChat(newData)
+				if (idx > -1) {
+					contents[idx] = newMess
+				} else {
+					contents.push(newMess)
+				}
+
+				const dataShow = mappingMessageChat(contents)
 
 				return dataShow
 			})
@@ -361,13 +370,25 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 				break
 		}
 	}
+	const handleGetMessageById = useCallback(async (id: string) => {
+		try {
+			const res: any = await getMessageById({ id, fields: ['$all'] })
+			return res?.results?.object
+		} catch {}
+	}, [])
 
 	const handleParseDataSocket = useCallback(
-		(data) => {
+		async (data) => {
 			try {
-				const { conversation_id, type, sender } = data || {}
+				const { conversation_id, type, sender, message_local_id, parent_id } =
+					data || {}
 				let { content, content_en } = data || {}
 				if (conversation_id !== convId) return
+				let { parent: _parent, ...parent } =
+					messListRef.current.find((i) => i.id === parent_id) || {}
+				if (parent_id && isEmptyObject(parent)) {
+					parent = await handleGetMessageById(parent_id)
+				}
 				setMessList((prev: any[]) => {
 					const contents = prev
 					switch (type) {
@@ -379,21 +400,24 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 						default:
 							break
 					}
-					const newData = uniqueArray(
-						[
-							{
-								user_id: data.sender_id,
-								user: data?.sender,
-								...data,
-								...(parent && { parent }),
-								content,
-								content_en,
-							},
-							...contents,
-						],
-						'id',
+					const newMess = {
+						user_id: data.sender_id,
+						user: data?.sender,
+						...data,
+						...(parent && { parent }),
+						content,
+						content_en,
+					}
+					const idx = (contents || []).findIndex(
+						(i) => i.message_local_id === message_local_id,
 					)
-					const dataShow = mappingMessageChat(newData)
+					if (idx > -1) {
+						contents[idx] = newMess
+					} else {
+						contents.push(newMess)
+					}
+
+					const dataShow = mappingMessageChat(contents)
 
 					return dataShow
 				})
@@ -401,6 +425,7 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 				console.log('error:', error)
 			}
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[convId],
 	)
 
@@ -422,6 +447,10 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 			socket.off('message', handleParseDataSocket)
 		}
 	}, [convId, handleParseDataSocket, socket])
+
+	useEffect(() => {
+		messListRef.current = messList
+	}, [messList])
 
 	return {
 		_scrollRef,

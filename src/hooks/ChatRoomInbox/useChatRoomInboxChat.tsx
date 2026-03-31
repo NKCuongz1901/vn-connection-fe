@@ -206,9 +206,10 @@ export default function useChatRoomInboxChat({
 			}
 			const parent_id = parent?.id
 			const _id = randomString()
+			const message_local_id = generateCustomUuid()
 			const message = {
 				type,
-				message_local_id: generateCustomUuid(),
+				message_local_id,
 				...(parent_id && { parent_id }),
 				...(medias.length > 0 && { medias }),
 			} as {
@@ -229,6 +230,7 @@ export default function useChatRoomInboxChat({
 				mentions,
 				type,
 				user_id: getUserInfo('id'),
+				message_local_id,
 				id: _id,
 				_id,
 				isTemp: true,
@@ -252,20 +254,23 @@ export default function useChatRoomInboxChat({
 			const _data = res?.results?.object || {}
 			setMessList((prev: any[]) => {
 				const contents = prev
-				const newData = uniqueArray(
-					[
-						{
-							user_id: _data.sender_id,
-							user: _data?.sender,
-							..._data,
-							_id,
-							...(parent && { parent }),
-						},
-						...contents,
-					],
-					'_id',
+				const newMess = {
+					user_id: _data.sender_id,
+					user: _data?.sender,
+					..._data,
+					message_local_id,
+					...(parent && { parent }),
+				}
+				const idx = (contents || []).findIndex(
+					(i) => i.message_local_id === message_local_id,
 				)
-				const dataShow = mappingMessageChat(newData)
+				if (idx > -1) {
+					contents[idx] = newMess
+				} else {
+					contents.push(newMess)
+				}
+
+				const dataShow = mappingMessageChat(contents)
 
 				return dataShow
 			})
@@ -420,7 +425,8 @@ export default function useChatRoomInboxChat({
 	const handleParseDataSocket = useCallback(
 		async (data) => {
 			try {
-				const { conversation_id, type, sender, parent_id } = data || {}
+				const { conversation_id, type, sender, parent_id, message_local_id } =
+					data || {}
 				let { content, content_en } = data || {}
 				if (conversation_id !== convId) return
 				let { parent: _parent, ...parent } =
@@ -439,21 +445,24 @@ export default function useChatRoomInboxChat({
 						default:
 							break
 					}
-					const newData = uniqueArray(
-						[
-							{
-								user_id: data.sender_id,
-								user: data?.sender,
-								...data,
-								...(parent && { parent }),
-								content,
-								content_en,
-							},
-							...contents,
-						],
-						'id',
+					const newMess = {
+						user_id: data.sender_id,
+						user: data?.sender,
+						...data,
+						...(parent && { parent }),
+						content,
+						content_en,
+					}
+					const idx = (contents || []).findIndex(
+						(i) => i.message_local_id === message_local_id,
 					)
-					const dataShow = mappingMessageChat(newData)
+					if (idx > -1) {
+						contents[idx] = newMess
+					} else {
+						contents.push(newMess)
+					}
+
+					const dataShow = mappingMessageChat(contents)
 
 					return dataShow
 				})
