@@ -200,7 +200,7 @@ export default function useCRUDEvent({
 				case 'start_time':
 				case 'end_time':
 					if (dayjs(_value).isBefore(dayjs())) {
-						value = null
+						value = dayjs(Date())
 					}
 					break
 				case 'categories':
