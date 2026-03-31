@@ -135,7 +135,8 @@ export default function useCRUDEvent({
 	}
 
 	const handleChangeValue = (_key: string) => (_value: any) => {
-		const { repeat_type, ticket_entrance, menu_price } = cloneDeep(event)
+		const { repeat_type, ticket_entrance, menu_price, start_time, end_time } =
+			cloneDeep(event)
 		try {
 			let value = _value
 			let key = _key
@@ -199,8 +200,24 @@ export default function useCRUDEvent({
 					break
 				case 'start_time':
 				case 'end_time':
-					if (dayjs(_value).isBefore(dayjs())) {
-						value = dayjs(Date())
+					{
+						if (dayjs(_value).isBefore(dayjs())) {
+							value = dayjs(Date())
+						}
+						const isEndTime = key === 'end_time'
+						if (isEndTime) {
+							if (!!start_time && dayjs(value).isBefore(start_time)) {
+								return openError(
+									'The end time of event is not valid. This time have to be after the start time',
+								)
+							}
+						} else {
+							if (!!end_time && dayjs(end_time).isBefore(value)) {
+								return openError(
+									'The start time of event is not valid. This time have to be before the end time',
+								)
+							}
+						}
 					}
 					break
 				case 'categories':
