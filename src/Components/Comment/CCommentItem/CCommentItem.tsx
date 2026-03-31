@@ -198,7 +198,7 @@ const CCommentItem = (props: CommentItemProps) => {
 							})}
 							onClick={() => onSetHiddenReply(true)}
 						>
-							Hidden replies
+							Hide replies
 						</div>
 						{!loading.commentList && !!_loadmore.current && (
 							<>
