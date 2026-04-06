@@ -23,6 +23,10 @@ export const AUTH_ROUTES = {
 	registerByPhone: '/auth/register_by_phone',
 	logout: '/auth/logout',
 }
+
+export const SYSTEM = {
+	systemSettings: '/system-settings',
+}
 export const USER_ROUTES = {
 	profile: '/user/profile',
 	user: '/user',

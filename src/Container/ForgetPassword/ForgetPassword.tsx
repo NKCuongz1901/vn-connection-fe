@@ -44,8 +44,18 @@ const ForgetPassword = ({
 		type,
 		steps,
 	})
-	const { title, prefix, phone, otp, password, confirmPassword, name } =
-		accountInfo
+	const {
+		title,
+		prefix,
+		phone,
+		otp,
+		password,
+		confirmPassword,
+		name,
+		email,
+		invite_code,
+		checked,
+	} = accountInfo
 	const isRegister = useMemo(() => type === OTP_TYPE.REGISTER, [type])
 
 	const _renderContent = () => {
@@ -82,15 +92,18 @@ const ForgetPassword = ({
 					<ChangePassword
 						disabled={disabled}
 						isRegister={isRegister}
+						checked={checked}
 						password={password}
 						confirmPassword={confirmPassword}
 						name={name}
+						email={email}
+						invite_code={invite_code}
 						errors={errors}
 						title={steps[step]}
 						note="Make sure it's at least 8 characters long and includes a mix of letters, numbers, and symbols"
 						onChangePassword={onChangeData('password')}
 						onChangeConfirmPassword={onChangeData('confirmPassword')}
-						onChangeCommonData={onChangeData('name')}
+						onChangeCommonData={onChangeData}
 						onAccept={onSubmitPass}
 					/>
 				)

@@ -1,6 +1,7 @@
 import axios from '../axios'
 
-import { AUTH_ROUTES } from '@/routes'
+import { AUTH_ROUTES, SYSTEM } from '@/routes'
+import { convertParams } from '@/ultis/object'
 import { OTPType } from '@/Variable/common.variable'
 
 export const loginByPhone = async (payload: {
@@ -61,4 +62,16 @@ export const registerByPhone = async (payload: {
 	[key: string]: any
 }) => {
 	return await axios.post(AUTH_ROUTES.registerByPhone, payload)
+}
+
+export const getSystemSettings = async ({
+	params = {},
+}: {
+	params?: { [key: string]: any }
+}) => {
+	const url = SYSTEM.systemSettings
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
 }

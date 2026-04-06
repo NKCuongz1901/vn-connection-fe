@@ -2,6 +2,7 @@ export const mainRoutes = {
 	home: '/overview',
 	login: 'login',
 	forgetPassword: 'forget-password',
+	policyTerm: 'policy-term',
 	register: 'register',
 	hangout: 'hangout',
 	community: 'community',

@@ -13,7 +13,7 @@ const CInputPassword = (_props: CInputProps) => {
 	return (
 		<Flex vertical gap={4}>
 			{label && (
-				<span>
+				<span className="bold">
 					{label} {isRequired && <span className="error">*</span>}
 				</span>
 			)}

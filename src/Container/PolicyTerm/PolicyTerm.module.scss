@@ -1,0 +1,20 @@
+.wrapper {
+	align-items: center;
+	max-width: 768px;
+	padding: 24px;
+	display: flex;
+	.container {
+		align-items: center;
+
+		.title {
+			font-size: 32px;
+			align-items: center;
+			font-weight: 600;
+		}
+		.content {
+			gap: 12px;
+			display: flex;
+			flex-direction: column;
+		}
+	}
+}

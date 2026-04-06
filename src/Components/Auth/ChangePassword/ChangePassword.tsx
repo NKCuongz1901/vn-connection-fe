@@ -7,6 +7,9 @@ import ImageChangePassword from './ImageChangePassword'
 
 import classes from './ChangePassword.module.scss'
 import CInput from '@/Components/Custom/CInput'
+import CCheckbox from '@/Components/Custom/CCheckbox'
+import Link from 'next/link'
+import { mainRoutes } from '@/routes/MainRoutes'
 
 interface ChangePasswordProps {
 	disabled?: boolean
@@ -28,9 +31,12 @@ interface ChangePasswordProps {
 
 const ChangePassword = ({
 	disabled,
+	checked,
 	isRegister,
 	password,
 	name,
+	email,
+	invite_code,
 	confirmPassword,
 	errors,
 	title = 'Change your password',
@@ -61,7 +67,7 @@ const ChangePassword = ({
 							label={'Name'}
 							error={errors?.name}
 							placeholder={'Your name [5-30] letter'}
-							onChange={(e) => onChangeCommonData(e.target.value)}
+							onChange={(e) => onChangeCommonData('name')(e.target.value)}
 							minLength={5}
 							maxLength={30}
 						/>
@@ -79,6 +85,55 @@ const ChangePassword = ({
 						label="Confirm password"
 						onChange={(e) => onChangeConfirmPassword(e.target.value)}
 					/>
+					{isRegister && (
+						<CInput
+							isRequired
+							value={email}
+							label={'Email'}
+							error={errors?.email}
+							placeholder={'Email (Optional)'}
+							onChange={(e) => onChangeCommonData('email')(e.target.value)}
+						/>
+					)}
+					{isRegister && (
+						<CInput
+							isRequired
+							value={invite_code}
+							label={'Referral Code'}
+							error={errors?.invite_code}
+							placeholder={'Referral Code (Optional)'}
+							onChange={(e) =>
+								onChangeCommonData('invite_code')(e.target.value)
+							}
+						/>
+					)}
+					{isRegister && (
+						<Flex align="center" gap={4}>
+							<CCheckbox
+								value={checked}
+								onChange={() => onChangeCommonData('checked')(!checked)}
+							/>
+							<div>
+								{' '}
+								I agree to the app's{' '}
+								<Link
+									href={`${mainRoutes.policyTerm}?type=TERMS`}
+									className={classes.highlight}
+									target="_blank"
+								>
+									Terms
+								</Link>{' '}
+								and{' '}
+								<Link
+									href={`${mainRoutes.policyTerm}?type=TERMS`}
+									className={classes.highlight}
+									target="_blank"
+								>
+									Privacy Policy
+								</Link>
+							</div>
+						</Flex>
+					)}
 				</Flex>
 
 				<Flex className={classes.buttonWrapper}>

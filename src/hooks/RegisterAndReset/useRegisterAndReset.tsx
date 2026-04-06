@@ -17,7 +17,7 @@ import { formatPhone, toJson } from '@/ultis/common'
 import { useLocalePath } from '@/ultis/route'
 
 import { OTP_TYPE, OTPType } from '@/Variable/common.variable'
-import { passwordRegex } from '@/Variable/regex.variable'
+import { emailRegex, passwordRegex } from '@/Variable/regex.variable'
 import { forgetPasswordStep } from '@/Variable/step.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
@@ -31,7 +31,7 @@ export default function useRegisterAndReset({
 	const { toggleLoadingContext } = useLoading()
 	const { openError, openSuccess } = useModal()
 	const { onChangeRoute } = useLocalePath()
-	const [step, setStep] = useState(0)
+	const [step, setStep] = useState(2)
 	const [accountInfo, setAccountInfo] = useState({
 		title: 'Verify Phone Number',
 		otp: '',
@@ -41,7 +41,11 @@ export default function useRegisterAndReset({
 		prefix: '+84',
 		uid: '',
 		name: '',
+		invite_code: '',
+		email: '',
+
 		type,
+		checked: false,
 	})
 	const [errors, setErrors] = useState({})
 	const [isValidate, setIsValidate] = useState(false)
@@ -135,7 +139,7 @@ export default function useRegisterAndReset({
 
 	const handleSubmitPass = useCallback(async () => {
 		const isRegister = type === OTP_TYPE.REGISTER
-		const { uid, password, name } = accountInfo
+		const { uid, password, name, email, invite_code } = accountInfo
 		toggleLoadingContext(true)
 
 		try {
@@ -148,8 +152,8 @@ export default function useRegisterAndReset({
 					...payload,
 					name: name,
 					// name: formatPhone(prefix, phone),
-					email: '',
-					invite_code: '',
+					email: email || '',
+					invite_code: invite_code || '',
 				}
 			}
 			const data: any = isRegister
@@ -171,7 +175,15 @@ export default function useRegisterAndReset({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toJson(accountInfo), step])
 	const handleValidate = useCallback(() => {
-		const { phone, password, confirmPassword, name } = accountInfo
+		const {
+			phone,
+			password,
+			confirmPassword,
+			name,
+			email,
+			invite_code,
+			checked,
+		} = accountInfo || {}
 		const error: { [key: string]: any } = {}
 		let value = false
 		const isRegister = type === OTP_TYPE.REGISTER
@@ -185,11 +197,16 @@ export default function useRegisterAndReset({
 			case 2:
 				error.confirmPassword = null
 				error.name = null
-
+				error.email = null
+				error.invite_code = null
 				if (
 					passwordRegex.test(password) &&
 					password === confirmPassword &&
-					(!isRegister || name.trim().length > 5)
+					(!isRegister ||
+						(name.trim().length > 5 &&
+							(!email || emailRegex.test(email)) &&
+							(!invite_code || invite_code.length === 8) &&
+							checked))
 				) {
 					value = true
 					break
@@ -198,8 +215,20 @@ export default function useRegisterAndReset({
 				if (password !== confirmPassword && confirmPassword) {
 					error.confirmPassword = 'Confirm password do not match'
 				}
-				if (name && name.trim().length < 5 && isRegister) {
-					error.name = 'Please enter both your first and last name'
+				if (isRegister) {
+					if (name && name.trim().length < 5) {
+						error.name = 'Please enter both your first and last name'
+					}
+					if (!!email) {
+						if (!emailRegex.test(email)) {
+							error.email = 'Invalid email'
+						}
+					}
+					if (!!invite_code) {
+						if (invite_code.length !== 8) {
+							error.invite_code = 'Referral code must be 8 characters'
+						}
+					}
 				}
 				break
 
