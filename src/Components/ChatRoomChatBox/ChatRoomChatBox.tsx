@@ -276,6 +276,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 				)
 			case 'MEDIAS': {
 				let Content = null
+				const isMulti = isArray(medias, 2)
 				switch (medias?.[0].type) {
 					case 'AUDIO':
 						Content = (medias || []).map((media, index) => (
@@ -333,8 +334,15 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 									</Flex>
 								</Flex>
 							)}
-							<Flex className={classes.mediaContent}>
-								{Content}
+							<Flex className={classes.mediasWrapper}>
+								<Flex
+									className={
+										isMulti ? classes.multiMediaContent : classes.mediaContent
+									}
+									vertical
+								>
+									{Content}
+								</Flex>
 								{_renderReactView(reactions)}
 							</Flex>
 						</Flex>

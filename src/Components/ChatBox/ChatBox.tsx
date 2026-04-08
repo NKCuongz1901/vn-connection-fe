@@ -151,6 +151,7 @@ const ChatBox = ({
 				)
 			case 'MEDIAS': {
 				let Content = null
+				const isMulti = isArray(medias, 2)
 				switch (medias?.[0].type) {
 					default:
 						Content = (medias || []).map((media, index) => {
@@ -170,8 +171,13 @@ const ChatBox = ({
 						})
 				}
 				return (
-					<Flex className={classes.medias} vertical>
-						{Content}
+					<Flex className={classes.mediasWrapper} vertical>
+						<Flex
+							className={isMulti ? classes.multiMedias : classes.medias}
+							vertical
+						>
+							{Content}
+						</Flex>
 
 						{isLast && (
 							<div className={classes.time}>

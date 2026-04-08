@@ -233,7 +233,7 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 				if (idx > -1) {
 					contents[idx] = newMess
 				} else {
-					contents.push(newMess)
+					contents.unshift(newMess)
 				}
 
 				const dataShow = mappingMessageChat(contents)
@@ -414,7 +414,7 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 					if (idx > -1) {
 						contents[idx] = newMess
 					} else {
-						contents.push(newMess)
+						contents.unshift(newMess)
 					}
 
 					const dataShow = mappingMessageChat(contents)

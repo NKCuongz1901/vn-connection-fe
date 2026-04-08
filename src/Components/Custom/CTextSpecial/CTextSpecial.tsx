@@ -19,7 +19,7 @@ const CTextSpecial = ({
 }: CTextSpecialProps) => {
 	const { onOpenNewRoute } = useLocalePath()
 	const [nodes, setNodes] = useState([])
-	const data = useMemo(() => _data.trim(), [_data])
+	const data = useMemo(() => (_data || '').trim(), [_data])
 	const process = useCallback(() => {
 		if (!data) return []
 

@@ -90,44 +90,91 @@
 						.sticker {
 							// padding: 0 12px;
 						}
-						.medias {
-							flex-wrap: wrap;
-							gap: 2px;
-							border-radius: 16px;
-							overflow: hidden;
-							.media {
-								height: 140px;
+						.mediasWrapper {
+							.medias {
+								flex-wrap: wrap;
+								gap: 2px;
 								border-radius: 16px;
 								overflow: hidden;
-								:global(.ant-image),
-								video {
-									width: 100%;
+								width: fit-content;
+								.media {
+									border-radius: 16px;
+									overflow: hidden;
+
+									:global(.ant-image),
+									video {
+										max-width: 150px;
+										height: auto;
+										width: 150px;
+									}
+								}
+								:global(.ant-image) {
+									height: 140px;
+								}
+								:global(.ant-flex) {
+									justify-content: flex-start;
+								}
+								img {
+									object-fit: cover;
+									border-radius: 16px;
+									overflow: hidden;
+								}
+								.time {
+									padding: 0 12px;
 								}
 							}
-							:global(.ant-image) {
-								height: 140px;
-							}
-							:global(.ant-flex) {
-								justify-content: flex-start;
-							}
-							img {
-								object-fit: cover;
+							.multiMedias {
+								width: 240px;
+								flex-direction: row;
+								flex-wrap: wrap;
+								gap: 4px;
 								border-radius: 16px;
 								overflow: hidden;
+								.media {
+									overflow: hidden;
+									width: fit-content;
+									:global(.ant-image),
+									video {
+										max-width: calc(120px - 2px);
+										height: auto;
+										width: calc(120px - 2px);
+										min-width: calc(120px - 2px);
+									}
+								}
+								& > :last-child {
+									flex: 1;
+									:global(.ant-image),
+									video {
+										max-width: 100%;
+										width: 100%;
+										min-width: 100%;
+									}
+								}
+								:global(.ant-image) {
+									height: 140px;
+								}
+								:global(.ant-flex) {
+									justify-content: flex-start;
+								}
+								img {
+									object-fit: cover;
+									// border-radius: 16px;
+									overflow: hidden;
+								}
+								.time {
+									padding: 0 12px;
+								}
 							}
 							.time {
-								padding: 0 12px;
+								margin-top: 4px;
+								font-size: 10px;
+								font-weight: 400;
+								color: #48546b;
+								padding: 0;
 							}
-						}
-						.time {
-							margin-top: 4px;
-							font-size: 10px;
-							font-weight: 400;
-							color: #48546b;
-							padding: 0;
-						}
-						.memberAccept {
-							color: #135a19;
+							.memberAccept {
+								color: #135a19;
+							}
 						}
 					}
 				}
