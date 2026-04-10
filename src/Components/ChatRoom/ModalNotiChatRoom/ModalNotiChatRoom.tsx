@@ -10,8 +10,12 @@ import classes from './ModalNotiChatRoom.module.scss'
 const rules = [
 	{
 		title: 'No External Chat Links',
-		label:
-			'Do not share links that lead to other platforms or groups with similar features outside UniVini.',
+		label: (
+			<span>
+				<span style={{ color: '#E55A0F' }}>Do not share links </span>that lead
+				to other platforms or groups with similar features outside UniVini.
+			</span>
+		),
 	},
 	{
 		title: 'No Nudity or Harassment',

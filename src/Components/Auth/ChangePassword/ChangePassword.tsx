@@ -87,7 +87,6 @@ const ChangePassword = ({
 					/>
 					{isRegister && (
 						<CInput
-							isRequired
 							value={email}
 							label={'Email'}
 							error={errors?.email}
@@ -97,7 +96,6 @@ const ChangePassword = ({
 					)}
 					{isRegister && (
 						<CInput
-							isRequired
 							value={invite_code}
 							label={'Referral Code'}
 							error={errors?.invite_code}
