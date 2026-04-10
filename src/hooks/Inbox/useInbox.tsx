@@ -12,12 +12,7 @@ import {
 import { getFriends } from '@/apis/friendApis'
 
 import { isArray, uniqueArray } from '@/ultis/array'
-import {
-	cloneDeep,
-	delay,
-	handleScrollCallback,
-	toJson,
-} from '@/ultis/common'
+import { cloneDeep, delay, handleScrollCallback, toJson } from '@/ultis/common'
 import { onPushState, useQuery } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
 import { randomString } from '@/ultis/string'
@@ -134,6 +129,30 @@ export default function useInbox() {
 		} finally {
 			setLoadingConv((prev) => ({ ...prev, personal: false }))
 		}
+	}
+
+	const handleUpdateListConv = (id: string, is_read: boolean) => {
+		setListConvPersonal((prev: any[]) => {
+			const idx = (prev || []).findIndex((conv) => conv.id === id)
+			if (idx > -1) {
+				prev[idx].is_read = is_read
+			}
+			return prev
+		})
+		setListConv((prev: any[]) => {
+			const idx = (prev || []).findIndex((conv) => conv.id === id)
+			if (idx > -1) {
+				prev[idx].is_read = is_read
+			}
+			return prev
+		})
+		setListConvStranger((prev: any[]) => {
+			const idx = (prev || []).findIndex((conv) => conv.id === id)
+			if (idx > -1) {
+				prev[idx].is_read = is_read
+			}
+			return prev
+		})
 	}
 
 	const handleLoadMore = useCallback(() => {
@@ -388,5 +407,6 @@ export default function useInbox() {
 		onScrollFriend: handleScrollFriend,
 		onScrollConv: handleScrollConv,
 		onCreateConv: handleCreateConv,
+		onUpdateListConv: handleUpdateListConv,
 	}
 }

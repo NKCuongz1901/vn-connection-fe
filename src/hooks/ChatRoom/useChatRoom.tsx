@@ -46,7 +46,7 @@ export default function useChatRoom(props: useChatRoomProps) {
 	const handleGetListChatRoom = async (isNotLoading = false) => {
 		setLoading((prev) => ({ ...prev, chatroom: true }))
 		try {
-			const { page, limit } = _paginationRefs.current
+			const { page } = _paginationRefs.current
 			let isNew = page === 1
 			if (isNotLoading) {
 				isNew = false
@@ -57,7 +57,7 @@ export default function useChatRoom(props: useChatRoomProps) {
 			const res: any = await getChatRoomList({
 				fields: ['$all'],
 				page: !isNotLoading ? page : 1,
-				limit: !isNotLoading ? limit : 50,
+				limit: !isNotLoading ? 50 : 50,
 				order: [['created_at', 'desc']],
 			})
 			const { code, results } = res || {}

@@ -18,6 +18,7 @@
 			.searchContainer {
 				width: 100%;
 				padding: 8px 16px 16px 16px;
+				gap: 4px;
 				.searchTypes {
 					.searchType {
 						cursor: pointer;
@@ -65,7 +66,7 @@
 				align-items: center;
 			}
 			.convList {
-				padding: 0 16px 16px 16px;
+				padding: 0 4px 16px 4px;
 				height: calc(100% - 44px);
 				overflow: auto;
 				width: 100%;
@@ -75,6 +76,8 @@
 				height: 60px;
 				width: 100%;
 				cursor: pointer;
+				padding: 0 12px;
+				border-radius: 16px;
 				.convItem {
 					padding: 8px 0;
 					width: 100%;
@@ -99,6 +102,7 @@
 							}
 							.long {
 								width: 208px;
+								color: #7b88a6;
 							}
 							.time {
 								align-items: center;
@@ -120,6 +124,9 @@
 						}
 					}
 				}
+			}
+			.activeItem {
+				background: #e7f5e9;
 			}
 			.skeletonWrapper {
 				width: 100%;

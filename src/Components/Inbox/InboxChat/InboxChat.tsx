@@ -26,6 +26,7 @@ interface InboxChatProps {
 	convId: string
 	isNoHeader?: boolean
 	type?: 'inbox' | 'chatrom'
+	onUpdateListConv?: (id: string, status: boolean) => void
 }
 const InboxChat = (props: InboxChatProps) => {
 	const { convId, isNoHeader, type } = props
@@ -48,7 +49,7 @@ const InboxChat = (props: InboxChatProps) => {
 		onLoadMore,
 		onGetPinMessage,
 		onActionSettingConv,
-	} = useInboxChat({ convId })
+	} = useInboxChat(props)
 	const userInChat = useMemo(() => {
 		return (members || []).find((i) => i.user_id !== getUserInfo()?.id)
 		// eslint-disable-next-line react-hooks/exhaustive-deps

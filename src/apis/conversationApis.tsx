@@ -349,3 +349,9 @@ export const getLanguageList = async (params) => {
 		params: convertParams(params),
 	})
 }
+
+export const getMessageReadMessage = async (id: string) => {
+	const url = `${CONVERSATION_ROUTES.readMessage}/${id}`
+
+	return await axios.get(url, {})
+}

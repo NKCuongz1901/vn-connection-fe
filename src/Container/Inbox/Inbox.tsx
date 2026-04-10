@@ -48,6 +48,7 @@ const Inbox = () => {
 		onScrollFriend,
 		onScrollConv,
 		onCreateConv,
+		onUpdateListConv,
 	} = useInbox()
 
 	const _renderLastMessage = useCallback((last_message) => {
@@ -71,16 +72,16 @@ const Inbox = () => {
 		)
 	}
 
-	const _renderConvItem = useCallback((item) => {
+	const _renderConvItem = (item) => {
 		const meId = getUserInfo()?.id
 		const {
 			id,
 			last_message,
 			last_time_chat,
 			users_in_conversation: users,
+			is_read,
+			activeItem,
 		} = item
-		const { read_user_ids } = last_message || {}
-		const isRead = (read_user_ids || []).includes(meId)
 		const otherUser = users.find((user) => user?.user?.id !== meId) || {}
 		const { avatar, name } = otherUser?.user || { name: 'Deleted account' }
 		const { value: timeAgo, unit } = getDiffFromNow({
@@ -88,7 +89,7 @@ const Inbox = () => {
 		})
 		return (
 			<Flex
-				className={classes.convItem}
+				className={clsx(classes.convItem)}
 				onClick={() => {
 					key.current = randomString()
 					onPushState({ id })
@@ -97,14 +98,18 @@ const Inbox = () => {
 				<CAvatar src={avatar} />
 				<Flex className={classes.info} vertical>
 					<Flex className={classes.infoTop}>
-						<div className={clsx(classes.name, { [classes.long]: isRead })}>
+						<div
+							className={clsx(classes.name, {
+								[classes.long]: !!is_read && !activeItem,
+							})}
+						>
 							{name}
 						</div>
 						<Flex className={classes.time}>
 							<span>
 								{timeAgo} {unit ? unit + 's ago' : ''}
 							</span>
-							{!isRead && <span className={classes.unread} />}
+							{!is_read && !activeItem && <span className={classes.unread} />}
 						</Flex>
 					</Flex>
 					{_renderLastMessage(last_message)}
@@ -112,7 +117,7 @@ const Inbox = () => {
 			</Flex>
 		)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	}
 	const _renderNewMessageRq = useCallback(() => {
 		if (!isArray(listConvStranger, 1)) return
 		return (
@@ -146,8 +151,13 @@ const Inbox = () => {
 				{enable && _renderNewMessageRq()}
 				<Flex className={classes.convList} vertical onScroll={onScroll}>
 					{listConvPersonal.map((conv) => (
-						<Flex key={conv.id} className={classes.convItemWrapper}>
-							{_renderConvItem(conv)}
+						<Flex
+							key={conv.id}
+							className={clsx(classes.convItemWrapper, {
+								[classes.activeItem]: conv.id === convId,
+							})}
+						>
+							{_renderConvItem({ ...conv, activeItem: conv.id === convId })}
 						</Flex>
 					))}
 					{loadingConv.personal && (
@@ -206,9 +216,14 @@ const Inbox = () => {
 		return (
 			<Flex vertical className={classes.searchFriend} onScroll={onScrollConv}>
 				{isArray(listConv, 1) ? (
-					listConv.map((item) => (
-						<Flex key={item.id} className={classes.convItemWrapper}>
-							{_renderConvItem(item)}
+					listConv.map((conv) => (
+						<Flex
+							key={conv.id}
+							className={clsx(classes.convItemWrapper, {
+								[classes.activeItem]: conv.id === convId,
+							})}
+						>
+							{_renderConvItem({ ...conv, activeItem: conv.id === convId })}
 						</Flex>
 					))
 				) : loadingConv.conv ? (
@@ -285,8 +300,13 @@ const Inbox = () => {
 				</Flex>
 				<Flex className={classes.convList} vertical>
 					{listConvStranger.map((conv) => (
-						<Flex key={conv.id} className={classes.convItemWrapper}>
-							{_renderConvItem(conv)}
+						<Flex
+							key={conv.id}
+							className={clsx(classes.convItemWrapper, {
+								[classes.activeItem]: conv.id === convId,
+							})}
+						>
+							{_renderConvItem({ ...conv, activeItem: conv.id === convId })}
 						</Flex>
 					))}
 				</Flex>
@@ -307,7 +327,12 @@ const Inbox = () => {
 				</Flex>
 				<Flex className={classes.chatContainer}>
 					{convId && (
-						<InboxChat key={key.current} convId={convId} type="inbox" />
+						<InboxChat
+							key={key.current}
+							convId={convId}
+							type="inbox"
+							onUpdateListConv={onUpdateListConv}
+						/>
 					)}
 				</Flex>
 			</Flex>

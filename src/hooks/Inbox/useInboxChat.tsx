@@ -9,6 +9,7 @@ import {
 	getConvMembersById,
 	getConvMessById,
 	getMessageById,
+	getMessageReadMessage,
 	getPinMessageById,
 	pinMessageById,
 	sendMessage,
@@ -31,14 +32,17 @@ import { paginationCommon } from '@/Variable/common.variable'
 
 type useHangoutChatProps = {
 	convId: string
+	[key: string]: any
+	onUpdateListConv?: (id: string, status: boolean) => void
 }
-export default function useInboxChat({ convId }: useHangoutChatProps) {
+export default function useInboxChat(props: useHangoutChatProps) {
+	const { convId, onUpdateListConv = () => null } = props
 	const { openError } = useModal()
 	const { socket } = useSocket()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const _loadmore = useRef<boolean>(true)
 	const _scrollRef = useRef<HTMLDivElement>(null)
-
+	const timeoutRef = useRef(null) as any
 	const [convInfo, setConvInfo] = useState<{ [key: string]: any }>({})
 	const [members, setMember] = useState<any[]>([])
 	const [messList, setMessList] = useState<any[]>([])
@@ -383,7 +387,10 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 				const { conversation_id, type, sender, message_local_id, parent_id } =
 					data || {}
 				let { content, content_en } = data || {}
-				if (conversation_id !== convId) return
+				if (conversation_id !== convId) {
+					return onUpdateListConv(conversation_id, false)
+				}
+				clearTimeout(timeoutRef.current)
 				let { parent: _parent, ...parent } =
 					messListRef.current.find((i) => i.id === parent_id) || {}
 				if (parent_id && isEmptyObject(parent)) {
@@ -421,6 +428,9 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 
 					return dataShow
 				})
+				timeoutRef.current = setTimeout(() => {
+					handleReadMessage(conversation_id)
+				}, 2000)
 			} catch (error) {
 				console.log('error:', error)
 			}
@@ -429,14 +439,24 @@ export default function useInboxChat({ convId }: useHangoutChatProps) {
 		[convId],
 	)
 
+	const handleReadMessage = async (convId: string) => {
+		try {
+			const res: any = await getMessageReadMessage(convId)
+			if (res) {
+				onUpdateListConv(convId, true)
+			}
+		} catch {}
+	}
+
 	useEffect(() => {
 		_paginationRefs.current.page = 1
 		handleGetInfoConv()
 		handleGetListMessById()
 		handleGetMembersConv()
 		handleGetPinMessage()
+		handleReadMessage(convId)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [convId])
+	}, [JSON.stringify(convId)])
 
 	useEffect(() => {
 		if (!socket) return
