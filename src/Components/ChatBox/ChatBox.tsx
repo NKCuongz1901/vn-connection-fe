@@ -27,6 +27,8 @@ import { specialTypeMessage } from '@/Variable/common.variable'
 import MoreIcon from '@/svg/MoreIcon'
 import classes from './ChatBox.module.scss'
 interface ChatBoxProps {
+	isDisabledChat?: boolean
+	loadingPage?: boolean
 	type?: string
 	itemList?: any[]
 	onLoadMore?: any
@@ -37,6 +39,8 @@ interface ChatBoxProps {
 	[key: string]: any
 }
 const ChatBox = ({
+	isDisabledChat,
+	loadingPage,
 	type,
 	itemList,
 	onLoadMore,
@@ -379,94 +383,104 @@ const ChatBox = ({
 						</Flex>
 					))}
 			</Flex>
-			{reply && _renderReply()}
-			<Flex
-				className={clsx(classes.chatBox)}
-				onKeyDown={(e) => {
-					if (!isMobile() && e.key === 'Enter' && !e.shiftKey) {
-						e.preventDefault()
+			{!isDisabledChat ? (
+				<>
+					{reply && _renderReply()}
+					<Flex
+						className={clsx(classes.chatBox)}
+						onKeyDown={(e) => {
+							if (!isMobile() && e.key === 'Enter' && !e.shiftKey) {
+								e.preventDefault()
 
-						if (!!text.trim()) {
-							setText('')
-							setReply(null)
-							onSendMessage({
-								type: 'TEXT',
-								content: text,
-								parent: reply,
-							})
-						}
-					}
-				}}
-			>
-				<Flex className={classes.chooseImgContent}>
-					{fileList.map((i) => {
-						const { url, type } = i || {}
-						const isImg = type === 'IMAGE'
-						return (
-							<Flex key={url} className={classes.chooseImgItem}>
-								{isImg ? (
-									<CImage preview={true} src={url} />
-								) : (
-									<video controls>
-										<source src={url} type="video/mp4" />
-									</video>
-								)}
-								<Flex
-									className={classes.chooseImgCancel}
-									onClick={() =>
-										setFileList((prev) =>
-											prev.filter((prev) => prev.url !== url),
-										)
-									}
-								>
-									<IconCircleXFilled />
-								</Flex>
-							</Flex>
-						)
-					})}
-				</Flex>
-				<Flex className={classes.chooseImg}>
-					<CUploadMuti
-						accept="image/*,video/*"
-						fileList={fileList.map((i) => i.file)}
-						onChange={({ file: _file, fileList: newList }) => {
-							hangleImportImg(newList)
+								if (!!text.trim()) {
+									setText('')
+									setReply(null)
+									onSendMessage({
+										type: 'TEXT',
+										content: text,
+										parent: reply,
+									})
+								}
+							}
 						}}
 					>
-						<ImageIcon />
-					</CUploadMuti>
-				</Flex>
-				<CTextArea
-					allowClear={false}
-					value={text}
-					autoSize={{ minRows: 2, maxRows: 3 }}
-					style={{ height: 40 }}
-					suffix={_renderIconHappy()}
-					placeholder="Enter your text ..."
-					onChange={(e) => setText(e.target.value)}
-					disabled={fileList?.length > 0}
-					ref={_refInput}
-				/>
-				<Flex
-					className={classes.sendButton}
-					onClick={() => {
-						if (!!text.trim() || isArray(fileList, 1)) {
-							setText('')
-							setReply(null)
-							onSendMessage({
-								type: 'TEXT',
-								content: text,
-								parent: reply,
-								medias: fileList,
-							})
-							setFileList([])
-						}
-					}}
-				>
-					<SendIcon />
-				</Flex>
-			</Flex>
-			{_renderSticketList()}
+						<Flex className={classes.chooseImgContent}>
+							{fileList.map((i) => {
+								const { url, type } = i || {}
+								const isImg = type === 'IMAGE'
+								return (
+									<Flex key={url} className={classes.chooseImgItem}>
+										{isImg ? (
+											<CImage preview={true} src={url} />
+										) : (
+											<video controls>
+												<source src={url} type="video/mp4" />
+											</video>
+										)}
+										<Flex
+											className={classes.chooseImgCancel}
+											onClick={() =>
+												setFileList((prev) =>
+													prev.filter((prev) => prev.url !== url),
+												)
+											}
+										>
+											<IconCircleXFilled />
+										</Flex>
+									</Flex>
+								)
+							})}
+						</Flex>
+						<Flex className={classes.chooseImg}>
+							<CUploadMuti
+								accept="image/*,video/*"
+								fileList={fileList.map((i) => i.file)}
+								onChange={({ file: _file, fileList: newList }) => {
+									hangleImportImg(newList)
+								}}
+							>
+								<ImageIcon />
+							</CUploadMuti>
+						</Flex>
+						<CTextArea
+							allowClear={false}
+							value={text}
+							autoSize={{ minRows: 2, maxRows: 3 }}
+							style={{ height: 40 }}
+							suffix={_renderIconHappy()}
+							placeholder="Enter your text ..."
+							onChange={(e) => setText(e.target.value)}
+							disabled={fileList?.length > 0}
+							ref={_refInput}
+						/>
+						<Flex
+							className={classes.sendButton}
+							onClick={() => {
+								if (!!text.trim() || isArray(fileList, 1)) {
+									setText('')
+									setReply(null)
+									onSendMessage({
+										type: 'TEXT',
+										content: text,
+										parent: reply,
+										medias: fileList,
+									})
+									setFileList([])
+								}
+							}}
+						>
+							<SendIcon />
+						</Flex>
+					</Flex>
+					{_renderSticketList()}
+				</>
+			) : (
+				!loadingPage && (
+					<Flex className={clsx(classes.chatBox, classes.deletedChat)}>
+						Unavailable to send message for this person
+					</Flex>
+				)
+			)}
 		</div>
 	)
 }

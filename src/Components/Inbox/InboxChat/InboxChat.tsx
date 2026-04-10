@@ -25,9 +25,11 @@ const mappingType = {
 interface InboxChatProps {
 	convId: string
 	isNoHeader?: boolean
+	type?: 'inbox' | 'chatrom'
 }
 const InboxChat = (props: InboxChatProps) => {
-	const { convId, isNoHeader } = props
+	const { convId, isNoHeader, type } = props
+
 	const {
 		_scrollRef,
 		messList,
@@ -51,6 +53,10 @@ const InboxChat = (props: InboxChatProps) => {
 		return (members || []).find((i) => i.user_id !== getUserInfo()?.id)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toJson(members)])
+	const isDeletedUser = useMemo(() => {
+		return !userInChat && type === 'inbox'
+	}, [type, userInChat])
+
 	const _renderHeader = () => {
 		if (!!isNoHeader) return
 		return (
@@ -61,7 +67,7 @@ const InboxChat = (props: InboxChatProps) => {
 					<>
 						<Flex className={classes.userInChat}>
 							<CAvatar src={userInChat?.user?.avatar || ''} />
-							<span>{userInChat?.user?.name}</span>
+							<span>{userInChat?.user?.name || 'The user of UniVini'}</span>
 						</Flex>
 						<Flex className={classes.action}>
 							<Flex
@@ -145,6 +151,8 @@ const InboxChat = (props: InboxChatProps) => {
 				{isArray(pinList, 1) && _renderPin()}
 				<Flex className={classes.chatBox}>
 					<ChatBox
+						loadingPage={loadingPage}
+						isDisabledChat={isDeletedUser}
 						type="inbox"
 						itemList={messList}
 						loading={loading}

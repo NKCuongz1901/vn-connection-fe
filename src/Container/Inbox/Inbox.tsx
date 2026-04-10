@@ -82,7 +82,7 @@ const Inbox = () => {
 		const { read_user_ids } = last_message || {}
 		const isRead = (read_user_ids || []).includes(meId)
 		const otherUser = users.find((user) => user?.user?.id !== meId) || {}
-		const { avatar, name } = otherUser?.user || {}
+		const { avatar, name } = otherUser?.user || { name: 'Deleted account' }
 		const { value: timeAgo, unit } = getDiffFromNow({
 			input: Number(last_time_chat),
 		})
@@ -306,7 +306,9 @@ const Inbox = () => {
 					{_renderStranger()}
 				</Flex>
 				<Flex className={classes.chatContainer}>
-					{convId && <InboxChat key={key.current} convId={convId} />}
+					{convId && (
+						<InboxChat key={key.current} convId={convId} type="inbox" />
+					)}
 				</Flex>
 			</Flex>
 		</div>
