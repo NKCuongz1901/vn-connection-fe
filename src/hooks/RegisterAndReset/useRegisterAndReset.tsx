@@ -31,7 +31,7 @@ export default function useRegisterAndReset({
 	const { toggleLoadingContext } = useLoading()
 	const { openError, openSuccess } = useModal()
 	const { onChangeRoute } = useLocalePath()
-	const [step, setStep] = useState(2)
+	const [step, setStep] = useState(0)
 	const [accountInfo, setAccountInfo] = useState({
 		title: 'Verify Phone Number',
 		otp: '',
