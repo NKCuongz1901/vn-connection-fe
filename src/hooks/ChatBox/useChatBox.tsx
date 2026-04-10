@@ -50,7 +50,7 @@ export default function useChatBox({
 	}
 	const handleCopy = (data) => {
 		copyToClipboard(data, {
-			callback: openSuccess({ message: 'Link copied successfully! ' }),
+			callback: openSuccess({ message: 'Copied successfully! ' }),
 		})
 	}
 	const handleActionMessage = ({ key, value }) => {
@@ -115,7 +115,7 @@ export default function useChatBox({
 							style: { color: '#F80024' },
 							onClick: () => onActionMessage({ key: 'delete', value: item }),
 						},
-				  ]
+					]
 				: []),
 		]
 		return menus
