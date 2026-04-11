@@ -57,6 +57,9 @@
 
 					.menuItemActive {
 						color: #006b35;
+						path {
+							fill: #006b35;
+						}
 					}
 				}
 			}
@@ -76,7 +79,7 @@
 		overflow: auto;
 	}
 }
-@media (min-width: 0px) and (max-width: 769px) {
+@media (min-width: 0px) and (max-width: 1024px) {
 	.wrapperMainLayout {
 		max-width: 100%;
 		min-width: 100%;

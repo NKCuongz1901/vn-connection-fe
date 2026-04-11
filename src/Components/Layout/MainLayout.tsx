@@ -31,6 +31,9 @@ const MainLayout = (props: MainLayoutProps) => {
 	const toggleMenus = useCallback(() => {
 		setOpenMenu((prev) => !prev)
 	}, [])
+	const handleMenuNavigate = useCallback(() => {
+		setOpenMenu(false)
+	}, [])
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (ref.current && !ref.current.contains(event.target as Node)) {
@@ -67,12 +70,17 @@ const MainLayout = (props: MainLayoutProps) => {
 					<Flex vertical className="sideBarMainLayoutItem">
 						{Menus.map((menu) => {
 							const { title, Icon, path } = menu
-							const active = pathname.startsWith(path)
+							const active = Boolean(path) && pathname.startsWith(path)
+
 							return (
-								<Link key={title} href={onGetPath(path)}>
+								<Link
+									key={title}
+									href={onGetPath(path)}
+									onClick={handleMenuNavigate}
+								>
 									<Flex
 										gap={12}
-										className={`menuItem ${active && 'menuItemActive'}`}
+										className={`menuItem ${active ? 'menuItemActive' : ''}`}
 									>
 										<div className="iconItemMenu">
 											<Icon fill={active ? '#006b35' : '#94A3B8'} />
