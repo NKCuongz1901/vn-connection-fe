@@ -168,7 +168,7 @@ const CGGMap = (_props: CGGMapProps) => {
 				title={title || 'Location'}
 				styles={{
 					content: {
-						width: 800,
+						width: 'min(800px, calc(100vw - 32px))',
 					},
 				}}
 				footer={[
@@ -196,6 +196,18 @@ const CGGMap = (_props: CGGMapProps) => {
 						onSearch={(text) => setSearchValue(text)}
 						prefix={<SearchOutlined className={classes.searchIcon} />}
 					/>
+					<Flex justify="flex-end" className={classes.actions}>
+						<CButton
+							ctype="disabled"
+							style={{ width: 'fit-content' }}
+							onClick={(event) => {
+								event.stopPropagation()
+								handleSetDefaultCenter()
+							}}
+						>
+							Use current location
+						</CButton>
+					</Flex>
 
 					<Flex vertical className={classes.mapWrapper}>
 						{defaultCenter.lat && defaultCenter.lng ? (

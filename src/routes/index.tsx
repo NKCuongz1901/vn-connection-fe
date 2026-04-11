@@ -10,8 +10,13 @@ import People from '@/svg/People'
 import SearchNormal from '@/svg/SearchNormal'
 import TwoUser from '@/svg/TwoUser'
 import UpcomingEvent from '@/svg/UpcomingEvent'
+import { IconMapPinFilled } from '@tabler/icons-react'
 
 import { mainRoutes } from './MainRoutes'
+
+const MyLocationIcon = ({ fill = '#94A3B8' }) => (
+	<IconMapPinFilled size={20} color={fill} />
+)
 
 export const AUTH_ROUTES = {
 	loginPhone: '/auth/login_by_phone',
@@ -184,6 +189,12 @@ export const Menus = [
 		title: 'Inbox',
 		Icon: Messenger,
 		path: mainRoutes.inbox,
+		child: [],
+	},
+	{
+		title: 'My Location',
+		Icon: MyLocationIcon,
+		path: mainRoutes.myLocation,
 		child: [],
 	},
 	{

@@ -13,6 +13,7 @@ export const mainRoutes = {
 	search: 'search',
 	inbox: 'inbox',
 	friend: 'friend',
+	myLocation: 'my-location',
 	dating: 'dating',
 	profile: 'profile',
 	exploreInterest: 'explore-interest',
