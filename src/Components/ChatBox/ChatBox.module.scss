@@ -394,6 +394,10 @@
 			object-fit: cover;
 		}
 	}
+	.parentItemDisabled {
+		pointer-events: none;
+		opacity: 0.7;
+	}
 	.chooseImgContent {
 		position: absolute;
 		z-index: 10;
@@ -425,5 +429,19 @@
 		img {
 			object-fit: cover;
 		}
+	}
+}
+
+.jumpHighlight {
+	animation: jumpHighlightFlash 1.5s ease;
+	border-radius: 8px;
+}
+
+@keyframes jumpHighlightFlash {
+	0% {
+		background: rgba(0, 107, 53, 0.24);
+	}
+	100% {
+		background: transparent;
 	}
 }

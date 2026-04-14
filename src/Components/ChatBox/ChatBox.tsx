@@ -2,7 +2,7 @@ import { IconCircleXFilled } from '@tabler/icons-react'
 import { Dropdown, Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
-import { memo, useCallback, useState } from 'react'
+import { memo, useCallback, useLayoutEffect, useRef, useState } from 'react'
 
 import useChatBox from '@/hooks/ChatBox/useChatBox'
 
@@ -18,6 +18,7 @@ import ReplyIcon from '@/svg/ReplyIcon'
 import SendIcon from '@/svg/SendIcon'
 import CAvatar from '../Custom/CAvatar'
 import CImage from '../Custom/CImage'
+import CLoading from '../Custom/CLoading/CLoading'
 import CTextArea from '../Custom/CTextArea'
 import CTextSpecial from '../Custom/CTextSpecial'
 import CUploadMuti from '../Custom/CUploadMuti'
@@ -36,6 +37,8 @@ interface ChatBoxProps {
 	_scrollRef?: any
 	loading?: boolean
 	onActionMessage?: any
+	onEnsureMessageLoaded?: (id: string) => Promise<boolean>
+	loadingEnsureMessage?: boolean
 	[key: string]: any
 }
 const ChatBox = ({
@@ -48,6 +51,8 @@ const ChatBox = ({
 	_scrollRef,
 	loading,
 	onActionMessage,
+	onEnsureMessageLoaded,
+	loadingEnsureMessage,
 }: ChatBoxProps) => {
 	const {
 		_refInput,
@@ -64,6 +69,52 @@ const ChatBox = ({
 		onGetMenus,
 	} = useChatBox({ onLoadMore, type, onActionMessage })
 	const [fileList, setFileList] = useState([])
+	const messageRefs = useRef<Record<string, HTMLDivElement | null>>({})
+	const [jumpHighlightId, setJumpHighlightId] = useState('')
+	const [pendingScroll, setPendingScroll] = useState<{
+		id: string
+		attempt: number
+	} | null>(null)
+	const isJumpingRef = useRef(false)
+
+	const handleEnsureMessageLoaded = async (parentId?: string) => {
+		if (!parentId || isJumpingRef.current) return
+		isJumpingRef.current = true
+		try {
+			let canScroll = !!messageRefs.current[parentId]
+			if (!canScroll && onEnsureMessageLoaded) {
+				canScroll = await onEnsureMessageLoaded(parentId)
+			}
+			if (!canScroll) return
+			setPendingScroll({ id: parentId, attempt: 0 })
+		} finally {
+			isJumpingRef.current = false
+		}
+	}
+	useLayoutEffect(() => {
+		if (!pendingScroll) return
+		const { id, attempt } = pendingScroll
+		const targetEl = messageRefs.current[id]
+
+		if (!targetEl) {
+			if (attempt >= 20) {
+				setPendingScroll(null)
+				return
+			}
+			const t = setTimeout(() => {
+				setPendingScroll((prev) =>
+					prev ? { ...prev, attempt: prev.attempt + 1 } : prev,
+				)
+			}, 30)
+			return () => clearTimeout(t)
+		}
+
+		targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+		setJumpHighlightId(id)
+		const timeoutId = setTimeout(() => setJumpHighlightId(''), 1500)
+		setPendingScroll(null)
+		return () => clearTimeout(timeoutId)
+	}, [pendingScroll, itemList])
 	const hangleImportImg = async (_values) => {
 		const values = []
 
@@ -108,8 +159,23 @@ const ChatBox = ({
 				break
 		}
 		return (
-			<Flex className={classes.parentItem}>
-				<ReplyIcon />
+			<Flex
+				className={clsx(classes.parentItem, {
+					[classes.parentItemDisabled]: loadingEnsureMessage,
+				})}
+				onClick={() => {
+					if (loadingEnsureMessage) return
+					handleEnsureMessageLoaded(parent?.id)
+				}}
+				style={{
+					cursor: loadingEnsureMessage
+						? 'wait'
+						: parent?.id
+							? 'pointer'
+							: 'default',
+				}}
+			>
+				{loadingEnsureMessage ? <CLoading /> : <ReplyIcon />}
 				<Flex className={classes.parentItemInfo} vertical>
 					<div className={classes.parentItemName}>{user?.name}</div>
 					{node}
@@ -227,7 +293,16 @@ const ChatBox = ({
 		const isMemberAction = specialTypeMessage.includes(type)
 		const isNot = isMe || isMemberAction
 		return (
-			<Flex vertical key={id}>
+			<Flex
+				vertical
+				key={id}
+				ref={(el) => {
+					messageRefs.current[id] = el as HTMLDivElement
+				}}
+				className={clsx({
+					[classes.jumpHighlight]: jumpHighlightId === id,
+				})}
+			>
 				{isNewDate && (
 					<Flex className={classes.date}>
 						{parseDayFromIsNewDate(created_at)}
