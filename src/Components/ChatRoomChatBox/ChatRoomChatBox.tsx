@@ -2,7 +2,7 @@ import { IconCircleXFilled } from '@tabler/icons-react'
 import { Dropdown, Flex, Menu, Skeleton } from 'antd'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
-import { memo, useCallback, useState } from 'react'
+import { memo, useCallback, useRef, useState } from 'react'
 
 import useChatRoomChatBox from '@/hooks/ChatRoomChatBox/useChatRoomChatBox'
 
@@ -47,9 +47,19 @@ interface ChatRoomChatBoxProps {
 	onActionMessage?: any
 	onAddReact?: any
 	[key: string]: any
+	onEnsureMessageLoaded?: (id: string) => Promise<boolean>
+	loadingEnsureMessage?: boolean
 }
 const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
-	const { itemList, onSendMessage, _scrollRef, loading, convId } = props
+	const {
+		itemList,
+		onSendMessage,
+		_scrollRef,
+		loading,
+		convId,
+		onEnsureMessageLoaded,
+		loadingEnsureMessage,
+	} = props
 	const { onChangeRoute } = useLocalePath()
 	const {
 		listTranslateLoading,
@@ -90,6 +100,40 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 	} = useChatRoomChatBox(props)
 
 	const [fileList, setFileList] = useState([])
+	const messageRefs = useRef<Record<string, HTMLDivElement | null>>({})
+	const [jumpHighlightId, setJumpHighlightId] = useState('')
+	const isJumpingRef = useRef(false)
+
+	const handleEnsureMessageLoaded = async (parentId?: string) => {
+		if (!parentId || isJumpingRef.current) return
+
+		isJumpingRef.current = true
+		try {
+			let targetEl = messageRefs.current[parentId]
+
+			if (!targetEl && onEnsureMessageLoaded) {
+				const isLoaded = await onEnsureMessageLoaded(parentId)
+				if (isLoaded) {
+					await new Promise((resolve) =>
+						requestAnimationFrame(() => resolve(null)),
+					)
+					targetEl = messageRefs.current[parentId]
+				}
+			}
+
+			if (!targetEl) return
+
+			targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+			setJumpHighlightId(parentId)
+			setTimeout(() => {
+				setJumpHighlightId('')
+			}, 1500)
+		} finally {
+			isJumpingRef.current = false
+		}
+	}
+
 	const handleImportMedia = async (_values) => {
 		const values = []
 
@@ -135,10 +179,25 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 				break
 		}
 		return (
-			<Flex className={classes.parentItem}>
-				<ReplyIcon />
+			<Flex
+				className={clsx(classes.parentItem, {
+					[classes.parentItemDisabled]: loadingEnsureMessage,
+				})}
+				onClick={() => {
+					if (loadingEnsureMessage) return
+					handleEnsureMessageLoaded(parent?.id)
+				}}
+				style={{
+					cursor: loadingEnsureMessage
+						? 'wait'
+						: parent?.id
+							? 'pointer'
+							: 'default',
+				}}
+			>
+				{loadingEnsureMessage ? <CLoading /> : <ReplyIcon />}
 				<Flex className={classes.parentItemInfo} vertical>
-					<div className={classes.parentItemName}>{user?.name}</div>
+					<div className={classes.replyName}>{user?.name}</div>
 					{node}
 				</Flex>
 			</Flex>
@@ -431,7 +490,16 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		const loadingSpToText = !!listSpToTextLoading[id]
 
 		return (
-			<Flex vertical key={id}>
+			<Flex
+				vertical
+				key={id}
+				ref={(el) => {
+					messageRefs.current[id] = el as HTMLDivElement
+				}}
+				className={clsx({
+					[classes.jumpHighlight]: jumpHighlightId === id,
+				})}
+			>
 				{isNewDate && (
 					<Flex className={classes.date}>
 						{parseDayFromIsNewDate(created_at)}
