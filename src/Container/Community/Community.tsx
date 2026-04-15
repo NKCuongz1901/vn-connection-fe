@@ -1,12 +1,13 @@
 'use client'
 import { IconSquareRoundedPlusFilled } from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
+import clsx from 'clsx'
 import { memo } from 'react'
 
 import useCommunity from '@/hooks/Community/useCommunity'
 
 import { arrayFrom, isArray } from '@/ultis/array'
-import { useLocalePath } from '@/ultis/route'
+import { onPushState, useLocalePath, useQuery } from '@/ultis/route'
 
 import CheckEmail from '@/Components/CheckEmail'
 import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
@@ -17,6 +18,7 @@ import CInput from '@/Components/Custom/CInput'
 import People from '@/svg/People'
 import PeopleSmileIcon from '@/svg/PeopleSmileIcon'
 import SearchIcon from '@/svg/SearchIcon'
+import GroupCommunity from './GroupCommunity'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 
@@ -24,7 +26,9 @@ import classes from './Community.module.scss'
 
 const Community = () => {
 	const { onChangeRoute } = useLocalePath()
-
+	const { onGetQuerry } = useQuery()
+	const { group_id } = onGetQuerry() || {}
+	const isGr = group_id !== null && group_id !== undefined
 	const {
 		loadingClub,
 		loading,
@@ -73,28 +77,40 @@ const Community = () => {
 				{(networkClub || []).map((club) => {
 					const { id, count, data } = club
 					const { id: idClub, name } = id
+					const lastIndex = data.length
 					return (
 						<Flex key={idClub} vertical className={classes.networkClub}>
 							<Flex className={classes.networkTitle}>
 								<div className={classes.networkName}>{name}</div>
 								<Flex className={classes.networkCount}>{count}</Flex>
 							</Flex>
-							<Flex className={classes.networkList}>
+							<Flex
+								className={classes.networkList}
+								onScroll={(e) => console.log('object', e)}
+							>
 								{isArray(data, 1) ? (
-									data.map((item) => {
+									data.map((item, index) => {
 										const { id, avatar, userRole, title } = item || {}
+										const isMore = index === lastIndex - 1 && lastIndex < count
 										return (
 											<Flex
 												key={id}
 												vertical
 												className={classes.communityItem}
 												onClick={() =>
-													onChangeRoute(`${mainRoutes.community}/${id}`)
+													isMore
+														? onPushState({ group_id: idClub })
+														: onChangeRoute(`${mainRoutes.community}/${id}`)
 												}
 											>
-												<div>
+												<div className={classes.wrapperAvatar}>
+													{isMore && (
+														<Flex className={classes.more}>
+															+{count - index}
+														</Flex>
+													)}
 													<CAvatarBandage
-														isHidden={userRole !== 'OWNER'}
+														isHidden={userRole !== 'OWNER' || isMore}
 														src={avatar}
 														className={classes.communityAva}
 														classBandage={classes.communityBandage}
@@ -209,7 +225,10 @@ const Community = () => {
 	}
 	return (
 		<div className={classes.wrapper}>
-			<Flex vertical className={classes.container}>
+			<Flex
+				vertical
+				className={clsx(classes.container, { [classes.hidden]: !!isGr })}
+			>
 				<Flex className={classes.header}>
 					<Flex gap={8}>
 						<People fill="#1E9037" />
@@ -227,12 +246,13 @@ const Community = () => {
 						<IconSquareRoundedPlusFilled />
 					</Flex>
 				</Flex>
-				<Flex className={classes.content} vertical>
+				<Flex className={clsx(classes.content)} vertical>
 					{_renderSearch()}
 					{_renderNetworkClub()}
 					{_renderNetworkSuggest()}
 				</Flex>
 			</Flex>
+			{isGr && <GroupCommunity id={group_id} />}
 			{_renderModal()}
 			{!!checkmail?.open && (
 				<CheckEmail

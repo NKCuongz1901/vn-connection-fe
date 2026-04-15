@@ -14,6 +14,13 @@
 			color: #0f1729;
 			font-size: 18px;
 			font-weight: 600;
+			.back {
+				display: flex;
+				height: fit-content;
+				cursor: pointer;
+				svg {
+				}
+			}
 			button {
 				height: 32px;
 				font-size: 12px;
@@ -31,6 +38,7 @@
 			background: #fff;
 			border-radius: 16px;
 			gap: 12px;
+			overflow: auto;
 			.search {
 				width: 100%;
 			}
@@ -60,12 +68,16 @@
 					}
 					.networkList {
 						padding: 0 16px;
-						overflow-x: auto;
+						overflow-y: auto;
 						gap: 24px;
 						height: 100%;
+						flex-wrap: wrap;
 						.communityItem {
-							justify-content: space-between;
 							cursor: pointer;
+							width: 132px;
+							align-items: center;
+							gap: 8px;
+
 							.wrapperAvatar {
 								position: relative;
 								.more {
@@ -98,7 +110,8 @@
 								line-clamp: 2; /* new standard */
 								word-break: break-word;
 								text-align: center;
-								max-width: 80px;
+								max-width: 132px;
+								min-width: 132px;
 								font-weight: 600;
 								font-size: 12px;
 							}
@@ -130,6 +143,28 @@
 				}
 			}
 		}
+		.skeletonWrapper {
+			gap: 8px;
+			width: 132px;
+			align-items: center;
+			.skeletonAva {
+				height: 80px;
+				width: 80px;
+				span {
+					height: 100%;
+					width: 100%;
+				}
+			}
+			.skeleton {
+				width: 132px;
+
+				span {
+					height: 14px;
+					min-width: 132px;
+					max-width: 132px;
+				}
+			}
+		}
 		.title {
 			font-weight: 600;
 			font-size: 18px;
@@ -137,9 +172,6 @@
 		.note {
 			color: #48546b;
 		}
-	}
-	.hidden {
-		display: none;
 	}
 }
 
@@ -153,6 +185,67 @@
 				}
 				.buttonAdd {
 					display: flex;
+				}
+			}
+			.content {
+				.networkClubWrapper {
+					.networkClub {
+						.networkTitle {
+							.networkName {
+							}
+							.networkCount {
+							}
+						}
+						.networkList {
+							.communityItem {
+								width: 80px;
+								align-items: center;
+								.wrapperAvatar {
+									.more {
+									}
+								}
+								.communityAva {
+									height: 80px;
+									width: 80px;
+								}
+								.communityBandage {
+									height: 24px;
+									width: 24px;
+									right: -2px;
+								}
+								.communityLabel {
+									max-width: 80px;
+									min-width: 80px;
+								}
+							}
+							.notNetwork {
+								button {
+								}
+							}
+						}
+					}
+				}
+			}
+			.skeletonWrapper {
+				gap: 8px;
+				width: 80px;
+				align-items: center;
+				.skeletonAva {
+					height: 80px;
+					width: 80px;
+					span {
+						height: 100%;
+						width: 100%;
+					}
+				}
+				.skeleton {
+					width: 80px;
+
+					span {
+						height: 14px;
+						min-width: 80px;
+						max-width: 80px;
+					}
 				}
 			}
 		}
