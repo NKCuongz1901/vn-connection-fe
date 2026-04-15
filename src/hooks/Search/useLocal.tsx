@@ -12,6 +12,7 @@ import { paginationMore } from '@/Variable/common.variable'
 
 import { LocalProps, LocalResProps } from '@/interface/Search/Search.interface'
 import { PaginationType } from '@/interface/common/common.interface'
+import { radiusOpts } from '@/Variable/select.variable'
 
 interface useLocalProps {
 	data: {
@@ -37,7 +38,7 @@ export default function useLocal({ data }: useLocalProps) {
 		gender_array: [],
 		age_range: [18, 81],
 		languages_can_speak_array: [],
-		radius: 20,
+		radius: radiusOpts.at(-1).value,
 		keyword: '',
 	})
 
@@ -85,7 +86,7 @@ export default function useLocal({ data }: useLocalProps) {
 					...prev,
 					gender_array: [],
 					age_range: [18, 81],
-					radius: 20,
+					radius: radiusOpts.at(-1).value,
 				}))
 				return
 			case 'resetLanguage':

@@ -69,7 +69,7 @@ export default function useExploreInterest({}: any) {
 		address: address || '',
 		latitude: Number(lat) || null,
 		longitude: Number(lng) || null,
-		radius: radiusOpts[radiusOpts.length - 1].value,
+		radius: radiusOpts.at(-1).value,
 		type,
 	})
 

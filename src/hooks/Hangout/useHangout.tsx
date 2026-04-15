@@ -15,6 +15,7 @@ import { delay } from '@/ultis/common'
 import { onPushState, useQuery } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
 import { randomString } from '@/ultis/string'
+import { radiusOpts } from '@/Variable/select.variable'
 
 type userDataProps = {
 	is_open_hangout: boolean
@@ -52,7 +53,7 @@ export default function useHangout() {
 		try {
 			const res: any = await getUserOpenHangout({
 				fields: ['$all'],
-				radius: 50,
+				radius: radiusOpts.at(-1).value,
 			})
 			if (res) {
 				const { pagination, results } = res || {}

@@ -15,6 +15,7 @@ import {
 	EventInAppResProps,
 } from '@/interface/Search/Search.interface'
 import { PaginationType } from '@/interface/common/common.interface'
+import { radiusOpts } from '@/Variable/select.variable'
 
 interface useSocialEventProps {
 	data: {
@@ -38,7 +39,7 @@ export default function useSocialEvent({ data }: useSocialEventProps) {
 
 	const [filter, setFilter] = useState({
 		date: null,
-		radius: 20,
+		radius: radiusOpts.at(-1).value,
 		keyword: '',
 		is_free: false,
 	})

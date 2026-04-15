@@ -13,6 +13,7 @@ import { useModal } from '@/context/ModalContext'
 import { PaginationType } from '@/interface/common/common.interface'
 import { uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay, toJson } from '@/ultis/common'
+import { radiusOpts } from '@/Variable/select.variable'
 
 export default function useHangoutTabOpen(ref) {
 	const { openError } = useModal()
@@ -24,7 +25,7 @@ export default function useHangoutTabOpen(ref) {
 	const [loading, setLoading] = useState({ open: false, search: false })
 	const loadMore = useRef({ open: true, search: false })
 	const [total, setTotal] = useState({ open: 0, search: 0 })
-	const [radius, setRadius] = useState(10)
+	const [radius, setRadius] = useState(radiusOpts.at(-1).value)
 	const isMounted = useRef(false)
 	const hangoutList = useMemo(
 		() => [...openHangoutSearch, ...openHangoutList],

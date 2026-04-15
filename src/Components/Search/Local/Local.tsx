@@ -18,17 +18,17 @@ import FilterIcon from '@/svg/FilterIcon'
 import NotFound from '@/svg/NotFound'
 import ProfileIcon from '@/svg/ProfileIcon'
 
-import { genderOpts } from '@/Variable/common.variable'
-import { languages, radiusAnyOpts } from '@/Variable/select.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
+import { genderOpts } from '@/Variable/common.variable'
+import { languages, radiusOpts } from '@/Variable/select.variable'
 
-import classes from './Local.module.scss'
-import clsx from 'clsx'
 import DotIcon from '@/svg/DotIcon'
-import MaleIcon from '@/svg/MaleIcon'
 import FeMaleIcon from '@/svg/FeMaleIcon'
 import GenderIcon from '@/svg/GenderIcon'
+import MaleIcon from '@/svg/MaleIcon'
 import { LEFT_FLAG, mappingFlag } from '@/Variable/countryVariable'
+import clsx from 'clsx'
+import classes from './Local.module.scss'
 
 const genderIcon = {
 	MALE: MaleIcon,
@@ -99,7 +99,7 @@ const Local = (props: LocalProps) => {
 						<CSelect
 							value={radius}
 							placeholder="Choose distance"
-							options={radiusAnyOpts}
+							options={radiusOpts}
 							onChange={onChangeValue('distance')}
 						/>
 					</Flex>
