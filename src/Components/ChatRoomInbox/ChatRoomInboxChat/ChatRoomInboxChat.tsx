@@ -10,6 +10,7 @@ import { formatNumberString } from '@/ultis/string'
 import ChatRoomChatBox from '@/Components/ChatRoomChatBox'
 import CAvatar from '@/Components/Custom/CAvatar'
 import ArrrowRightIcon from '@/svg/ArrrowRightIcon'
+import BookIcon from '@/svg/BookIcon'
 import MoreIcon from '@/svg/MoreIcon'
 import People from '@/svg/People'
 import PinIcon from '@/svg/PinIcon'
@@ -30,7 +31,7 @@ interface ChatRoomInboxChatProps {
 	onChangeModal?: any
 }
 const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
-	const { convId, isNoHeader } = props
+	const { convId, isNoHeader, onChangeModal = () => null } = props
 	const {
 		_scrollRef,
 
@@ -77,6 +78,14 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 							</Flex>
 						</Flex>
 						<Flex className={classes.action}>
+							<Flex
+								className={classes.iconMore}
+								onClick={() => {
+									onChangeModal({ type: 'rule' })
+								}}
+							>
+								<BookIcon />
+							</Flex>
 							<Flex
 								className={classes.iconMore}
 								onClick={() => {

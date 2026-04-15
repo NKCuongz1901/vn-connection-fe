@@ -37,6 +37,15 @@ const DetailChatRoom = (props: DetailChatRoomProps) => {
 					<ModalNotiChatRoom open {...propsModal} onSubmit={onSetTimesJoin} />
 				)
 				break
+			case 'rule':
+				Content = (
+					<ModalNotiChatRoom
+						open
+						{...propsModal}
+						onSubmit={() => setModal({})}
+					/>
+				)
+				break
 			default:
 				break
 		}
