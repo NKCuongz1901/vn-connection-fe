@@ -123,7 +123,7 @@ const ChangePassword = ({
 								</Link>{' '}
 								and{' '}
 								<Link
-									href={`${mainRoutes.policyTerm}?type=TERMS`}
+									href={`${mainRoutes.policyTerm}?type=POLICY`}
 									className={classes.highlight}
 									target="_blank"
 								>
