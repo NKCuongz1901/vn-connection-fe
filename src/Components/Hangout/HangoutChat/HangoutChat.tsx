@@ -41,6 +41,7 @@ const HangoutChat = ({ postId, onAction }) => {
 		onEditLocation,
 		onActionPart,
 		onLoadMore,
+		onActionMessage,
 	} = useHangoutChat({ postId, onAction })
 	const { latitude, longitude } = hangoutInfo || {}
 
@@ -210,6 +211,7 @@ const HangoutChat = ({ postId, onAction }) => {
 						onLoadMore={onLoadMore}
 						_scrollRef={_scrollRef}
 						onSendMessage={onSendMessage}
+						onActionMessage={onActionMessage}
 					/>
 				</Flex>
 				{modal?.type && _renderModal()}

@@ -9,6 +9,7 @@ import {
 	updateHangoutById,
 } from '@/apis/hangoutApi'
 import {
+	deleteCommentPost,
 	getListCommentById,
 	getListParticipant,
 	sendCommentPost,
@@ -189,7 +190,7 @@ export default function useHangoutChat({
 		type: _type,
 		content,
 		medias: _medias,
-		parent: _,
+		parent,
 		audio,
 	}: {
 		type: string
@@ -199,6 +200,7 @@ export default function useHangoutChat({
 		audio?: any
 	}) => {
 		try {
+			const { _id: parent_id } = parent || {}
 			let type = _type
 			let medias = []
 			if (_medias?.length > 0) {
@@ -242,6 +244,7 @@ export default function useHangoutChat({
 				id: _id,
 				_id,
 				isTemp: true,
+				...(parent && { parent }),
 			}
 			setCommentList((prev: any[]) => {
 				const contents = prev
@@ -258,11 +261,15 @@ export default function useHangoutChat({
 				content,
 				medias,
 				type,
+				...(parent_id && { parent_id }),
 			})
 			const _data = res?.results?.object || {}
 			setCommentList((prev: any[]) => {
 				const contents = prev
-				const newData = uniqueArray([{ ..._data, _id }, ...contents], '_id')
+				const newData = uniqueArray(
+					[{ ..._data, _id, ...(parent && { parent }) }, ...contents],
+					'_id',
+				)
 				const dataShow = mappingMessageChat(newData)
 
 				return dataShow
@@ -390,6 +397,37 @@ export default function useHangoutChat({
 			toggleLoadingContext(false)
 		}
 	}
+	const handleDeleteMessage = async (value) => {
+		const { id } = value || {}
+		try {
+			setCommentList((prev) =>
+				prev.map((i) => (i.id === id ? { ...i, isTemp: true } : i)),
+			)
+			const res: any = await deleteCommentPost(id)
+			if (res?.results?.object) {
+				setCommentList((prev) => {
+					const _data = prev.filter((i) => i.id !== id)
+					return mappingMessageChat(_data)
+				})
+			}
+		} catch (error) {
+			openError(error)
+			setCommentList((prev) =>
+				prev.map((i) => (i.id === id ? { ...i, isTemp: false } : i)),
+			)
+		} finally {
+		}
+	}
+
+	const handleActionMessage = async ({ key, value }) => {
+		switch (key) {
+			case 'delete':
+				handleDeleteMessage(value)
+				break
+			default:
+				break
+		}
+	}
 	useEffect(() => {
 		_paginationRefs.current.page = 1
 		handleGetInfoHangout()
@@ -420,5 +458,6 @@ export default function useHangoutChat({
 		onEditLocation: handleEditLocation,
 		onActionPart: handleActionPart,
 		onLoadMore: handleLoadMore,
+		onActionMessage: handleActionMessage,
 	}
 }
