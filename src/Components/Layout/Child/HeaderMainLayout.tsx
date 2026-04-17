@@ -27,6 +27,7 @@ import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
 import Notification from '@/Container/Notification'
 import LogoSvg from '@/svg/LogoSvg'
+import CAvatar from '@/Components/Custom/CAvatar'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 
@@ -46,6 +47,7 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 	const [login, setLogin] = useState(false)
 	const [show, setShow] = useState(false)
 	const [count, setCount] = useState(0)
+	const [user, setUser] = useState(null)
 
 	const userMenus: ItemType[] = useMemo(
 		() => [
@@ -141,6 +143,7 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 				key: STORAGE_KEY.USER,
 				data: res?.results?.object || {},
 			})
+			setUser(res?.results?.object || {})
 		} catch {}
 	}
 	useEffect(() => {
@@ -294,7 +297,11 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 
 						<Dropdown menu={{ items: userMenus }} trigger={['click']}>
 							<Flex className="headerIcon">
-								<IconUserCircle />
+								{user?.avatar ? (
+									<CAvatar src={user.avatar} size={40} />
+								) : (
+									<IconUserCircle />
+								)}
 							</Flex>
 						</Dropdown>
 					</>
