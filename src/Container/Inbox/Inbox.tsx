@@ -100,7 +100,7 @@ const Inbox = () => {
 					<Flex className={classes.infoTop}>
 						<div
 							className={clsx(classes.name, {
-								[classes.long]: !!is_read && !activeItem,
+								[classes.long]: !!is_read || !!activeItem,
 							})}
 						>
 							{name}
