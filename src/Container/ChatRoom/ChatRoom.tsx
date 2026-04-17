@@ -20,6 +20,8 @@ import { LEFT_FLAG } from '@/Variable/countryVariable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './ChatRoom.module.scss'
+import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
+import BookIcon from '@/svg/BookIcon'
 
 const tabOpts = [
 	{ value: 'language', label: 'Language' },
@@ -36,6 +38,8 @@ const ChatRoom = () => {
 		id,
 		tab,
 		listChatRoom,
+		modal,
+		setModal,
 		setTab,
 		onSuccess,
 		setOpenModal,
@@ -45,9 +49,17 @@ const ChatRoom = () => {
 	const _renderBack = () => {
 		if (isChatRoomDetail) return
 		return (
-			<Flex className={classes.title} onClick={() => goBackOrPush()}>
-				<ArrrowLeftIcon />
-				<span>All chat rooms</span>
+			<Flex justify="space-between">
+				<Flex className={classes.title} onClick={() => goBackOrPush()}>
+					<ArrrowLeftIcon />
+					<span>All chat rooms</span>
+				</Flex>
+				<Flex
+					className={classes.iconBook}
+					onClick={() => setModal({ type: 'rule' })}
+				>
+					<BookIcon fill="#E55A0F" />
+				</Flex>
 			</Flex>
 		)
 	}
@@ -164,6 +176,35 @@ const ChatRoom = () => {
 				return <></>
 		}
 	}
+
+	const _renderModal = () => {
+		const { type } = modal || {}
+		let Content = <></>
+		const propsModal = {
+			open: true,
+			onCancel: () => {
+				setModal({})
+			},
+			onClose: () => {
+				setModal({})
+			},
+		}
+		switch (type) {
+			case 'rule':
+				Content = (
+					<ModalNotiChatRoom
+						open
+						{...propsModal}
+						onSubmit={() => setModal({})}
+					/>
+				)
+				break
+			default:
+				break
+		}
+		return Content
+	}
+
 	return (
 		<div className={classes.wrapper}>
 			<Flex
@@ -185,6 +226,7 @@ const ChatRoom = () => {
 						}
 					/>
 				)}
+				{_renderModal()}
 			</Flex>
 		</div>
 	)

@@ -13,7 +13,7 @@ import { getUserInfo } from '@/ultis/storage'
 import { PaginationType } from '@/interface/common/common.interface'
 import { ConversationChatRoomProps } from '@/interface/Conversation/Conversation.interface'
 import { UserProps } from '@/interface/User/User.interface'
-import { paginationCommon } from '@/Variable/common.variable'
+import { paginationMore } from '@/Variable/common.variable'
 
 interface useChatRoomProps {
 	tabOpts: { value: string; label: string }[]
@@ -25,7 +25,7 @@ export default function useChatRoom(props: useChatRoomProps) {
 	const { onGetQuerry } = useQuery()
 	const { type, id } = onGetQuerry()
 
-	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
+	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationMore))
 
 	const [tab, setTab] = useState(tabOpts[0].value)
 	const [loading, setLoading] = useState({
@@ -35,7 +35,15 @@ export default function useChatRoom(props: useChatRoomProps) {
 	const [listChatRoom, setListChatRoom] = useState<ConversationChatRoomProps[]>(
 		[],
 	)
-
+	const [modal, setModal] = useState<{
+		type?: string
+		data?: any
+		title?: string
+	}>({
+		type: '',
+		data: null,
+		title: null,
+	})
 	const [_profile, setProfile] = useState<UserProps>(null)
 	const [openModal, setOpenModal] = useState(false)
 
@@ -175,9 +183,10 @@ export default function useChatRoom(props: useChatRoomProps) {
 					fields: ['$all'],
 				},
 			})
-			const { languages_can_speak, avatar } = res?.results?.object || {}
+			console.log('🌸🌸🌸 TrieuNinhHan ~ :186 ~ handleGetProfile ~ res:', res)
+			const { languages_can_speak_array, avatar } = res?.results?.object || {}
 
-			if (!languages_can_speak || !avatar) {
+			if (!isArray(languages_can_speak_array, 1) || !avatar) {
 				setOpenModal(true)
 			}
 			setProfile(res?.results?.object)
@@ -198,6 +207,8 @@ export default function useChatRoom(props: useChatRoomProps) {
 		isChatRoomDetail,
 		tab,
 		listChatRoom,
+		modal,
+		setModal,
 		setTab,
 		onSuccess: handleSuccess,
 		setOpenModal,
