@@ -55,7 +55,7 @@ const InboxChat = (props: InboxChatProps) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toJson(members)])
 	const isDeletedUser = useMemo(() => {
-		return !userInChat && type === 'inbox'
+		return !userInChat?.user && type === 'inbox'
 	}, [type, userInChat])
 
 	const _renderHeader = () => {
