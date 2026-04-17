@@ -55,6 +55,7 @@ const ItemHangout = ({
 	const {
 		name,
 		languages_can_speak,
+		languages_can_speak_array,
 		gender,
 		birthday: age,
 	} = (user ? user : item) || {}
@@ -151,7 +152,10 @@ const ItemHangout = ({
 							{name}, {_age || getAge(age)}
 							{GENDER[gender]}
 						</Flex>
-						<div>{languages_can_speak}</div>
+						<div>
+							{(languages_can_speak_array || []).join(', ') ||
+								languages_can_speak}
+						</div>
 					</Flex>
 					{!isHiddenButton && (
 						<CButton

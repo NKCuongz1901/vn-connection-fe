@@ -154,6 +154,7 @@ export default function useHangout() {
 							'phone',
 							'avatar',
 							'languages_can_speak',
+							'languages_can_speak_array',
 							'birthday',
 							'id',
 							'gender',

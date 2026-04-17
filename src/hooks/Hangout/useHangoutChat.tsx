@@ -91,7 +91,7 @@ export default function useHangoutChat({
 							label: 'Report Hangout',
 							onClick: () => handleMenusClick({ key: 'report' }),
 						},
-				  ]
+					]
 				: []),
 			{
 				key: 'edit',
@@ -286,6 +286,7 @@ export default function useHangoutChat({
 								'phone',
 								'avatar',
 								'languages_can_speak',
+								'languages_can_speak_array',
 								'birthday',
 								'id',
 								'gender',
@@ -337,6 +338,7 @@ export default function useHangoutChat({
 							'phone',
 							'avatar',
 							'languages_can_speak',
+							'languages_can_speak_array',
 							'birthday',
 							'id',
 							'gender',
