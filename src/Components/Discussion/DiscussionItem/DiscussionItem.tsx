@@ -86,7 +86,11 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 									{isImg ? (
 										<CImage preview src={thumbnail || url} />
 									) : (
-										<video preload="none" controls poster={DEFAULT_FALLBACK}>
+										<video
+											preload="none"
+											controls
+											poster={thumbnail || DEFAULT_FALLBACK}
+										>
 											<source src={url} type="video/mp4" />
 										</video>
 									)}

@@ -124,7 +124,7 @@ const CCommentItem = (props: CommentItemProps) => {
 													<video
 														preload="none"
 														controls
-														poster={DEFAULT_FALLBACK}
+														poster={thumbnail || DEFAULT_FALLBACK}
 													>
 														<source src={url} type="video/mp4" />
 													</video>
@@ -393,7 +393,7 @@ const CCommentItem = (props: CommentItemProps) => {
 													<video
 														preload="none"
 														controls
-														poster={DEFAULT_FALLBACK}
+														poster={thumbnail || DEFAULT_FALLBACK}
 													>
 														<source src={url} type="video/mp4" />
 													</video>

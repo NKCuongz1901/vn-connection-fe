@@ -93,30 +93,41 @@ const ModalCRUDAnnoun = (props: ModalCRUDAnnounProps) => {
 						/>
 						<Flex className={classes.chooseImg} vertical>
 							<Flex className={classes.chooseImgContent} vertical>
-								{[...medias, ...fileList].map((i) => (
-									<Flex
-										key={i.imageUrl || i?.url}
-										className={classes.chooseImgItem}
-									>
-										<CImage preview={true} src={i.imageUrl || i?.url} />
+								{[...medias, ...fileList].map((i) => {
+									const { type, url } = i || {}
+									const isImg = type === 'IMAGE'
+									return (
 										<Flex
-											className={classes.chooseImgCancel}
-											onClick={() => {
-												setFileList((prev) =>
-													prev.filter((prev) => prev.imageUrl !== i.imageUrl),
-												)
-												onChangeValue('removeImg')(i)
-											}}
+											key={i.imageUrl || i?.url}
+											className={classes.chooseImgItem}
 										>
-											<IconCircleXFilled />
+											{isImg ? (
+												<CImage preview={true} src={i.imageUrl || i?.url} />
+											) : (
+												<video controls>
+													<source src={url} type="video/mp4" />
+												</video>
+											)}
+											<Flex
+												className={classes.chooseImgCancel}
+												onClick={() => {
+													setFileList((prev) =>
+														prev.filter((prev) => prev.imageUrl !== i.imageUrl),
+													)
+													onChangeValue('removeImg')(i)
+												}}
+											>
+												<IconCircleXFilled />
+											</Flex>
 										</Flex>
-									</Flex>
-								))}
+									)
+								})}
 							</Flex>
 							<Flex className={classes.upload}>
 								<CUploadMuti
 									maxCount={0}
 									fileList={fileList.map((i) => i.file)}
+									accept="image/*,video/*"
 									onChange={({ file: _file, fileList: newList }) => {
 										onImportImg(newList)
 									}}

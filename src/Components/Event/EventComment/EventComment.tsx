@@ -51,7 +51,7 @@ const EventComment = ({ id }, ref) => {
 			<Flex vertical className={classes.commentBoxWrapper}>
 				<Flex className={classes.chooseImgContent}>
 					{fileList.map((i) => {
-						const { url, type } = i || {}
+						const { url, type, thumbnail } = i || {}
 						const isImg = type === 'IMAGE'
 						return (
 							<Flex key={i?.url} className={classes.chooseImgItem}>
@@ -59,7 +59,11 @@ const EventComment = ({ id }, ref) => {
 									{isImg ? (
 										<CImage preview={true} src={i?.url} />
 									) : (
-										<video preload="none" controls poster={DEFAULT_FALLBACK}>
+										<video
+											preload="none"
+											controls
+											poster={thumbnail || DEFAULT_FALLBACK}
+										>
 											<source src={url} type="video/mp4" />
 										</video>
 									)}
@@ -170,7 +174,11 @@ const EventComment = ({ id }, ref) => {
 										{isImg ? (
 											<CImage preview src={thumbnail || url} />
 										) : (
-											<video preload="none" controls poster={DEFAULT_FALLBACK}>
+											<video
+												preload="none"
+												controls
+												poster={thumbnail || DEFAULT_FALLBACK}
+											>
 												<source src={url} type="video/mp4" />
 											</video>
 										)}

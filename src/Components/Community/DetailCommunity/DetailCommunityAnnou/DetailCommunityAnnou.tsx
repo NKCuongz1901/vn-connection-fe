@@ -16,6 +16,7 @@ import ShareIconSvg from '@/svg/ShareIconSvg'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import { AnnouncementProps } from '@/interface/Community/Community.interface'
+import { DEFAULT_FALLBACK } from '@/Variable/common.variable'
 
 import classes from './DetailCommunityAnnou.module.scss'
 
@@ -51,11 +52,22 @@ const DetailCommunityAnnou = (props: DetailCommunityAnnouProps) => {
 				</Flex>
 				<Flex className={classes.medias}>
 					{isArray(medias, 1) ? (
-						medias.map((item, index) => {
-							const { thumbnail, url } = item || {}
+						medias.map((item) => {
+							const { thumbnail, url, type } = item || {}
+							const isImg = type === 'IMAGE'
 							return (
-								<Flex key={index} className={classes.media}>
-									<CImage preview src={thumbnail || url} />
+								<Flex key={url} className={classes.media}>
+									{isImg ? (
+										<CImage preview src={thumbnail || url} />
+									) : (
+										<video
+											preload="none"
+											controls
+											poster={thumbnail || DEFAULT_FALLBACK}
+										>
+											<source src={url} type="video/mp4" />
+										</video>
+									)}
 								</Flex>
 							)
 						})
