@@ -264,12 +264,21 @@ export default function useHangoutChat({
 				...(parent_id && { parent_id }),
 			})
 			const _data = res?.results?.object || {}
+			const { id } = _data || {}
 			setCommentList((prev: any[]) => {
 				const contents = prev
-				const newData = uniqueArray(
-					[{ ..._data, _id, ...(parent && { parent }) }, ...contents],
-					'_id',
-				)
+				let newData = []
+				const idx = contents.findIndex((i) => i.id === _id)
+				if (idx > -1) {
+					contents[idx] = { ..._data, _id: id, ...(parent && { parent }) }
+					newData = contents
+				} else {
+					newData = uniqueArray(
+						[{ ..._data, _id: id, ...(parent && { parent }) }, ...contents],
+						'_id',
+					)
+				}
+
 				const dataShow = mappingMessageChat(newData)
 
 				return dataShow
