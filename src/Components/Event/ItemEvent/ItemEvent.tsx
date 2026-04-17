@@ -14,7 +14,7 @@ import { repeatOpt, ticketEntranceType } from '@/Variable/select.variable'
 
 import classes from './ItemEvent.module.scss'
 
-const ItemEvent = ({ data, type }) => {
+const ItemEvent = ({ data, type, isPastEvent = false }) => {
 	const { onChangeRoute } = useLocalePath()
 	const { id, thumbnails, start_time, end_time, expect_participant } = data
 	const { time: _start_time } = getDateInfo(Number(start_time))
@@ -23,6 +23,7 @@ const ItemEvent = ({ data, type }) => {
 		const currentTime = +new Date()
 		let timeShow
 		switch (true) {
+			case !!isPastEvent:
 			case Number(start_time) > currentTime:
 				timeShow = Number(start_time)
 				break

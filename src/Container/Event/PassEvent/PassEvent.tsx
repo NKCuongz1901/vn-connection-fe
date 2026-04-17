@@ -89,7 +89,12 @@ const PassEvent = () => {
 			</div>
 			<Flex ref={_childRef} className={classes.wrapperItem} onScroll={onScroll}>
 				{listPost.map((data) => (
-					<ItemEvent key={data.id} data={data} type={mainRoutes.event} />
+					<ItemEvent
+						isPastEvent
+						key={data.id}
+						data={data}
+						type={mainRoutes.event}
+					/>
 				))}
 				{loading &&
 					arrayFrom(3).map((_, index) => (
