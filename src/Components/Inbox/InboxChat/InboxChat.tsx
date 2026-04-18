@@ -49,6 +49,8 @@ const InboxChat = (props: InboxChatProps) => {
 		onLoadMore,
 		onGetPinMessage,
 		onActionSettingConv,
+		onEnsureMessageLoaded,
+		loadingEnsureMessage,
 	} = useInboxChat(props)
 	const userInChat = useMemo(() => {
 		return (members || []).find((i) => i.user_id !== getUserInfo()?.id)
@@ -161,6 +163,8 @@ const InboxChat = (props: InboxChatProps) => {
 						_scrollRef={_scrollRef}
 						onSendMessage={onSendMessage}
 						onActionMessage={onActionMessage}
+						onEnsureMessageLoaded={onEnsureMessageLoaded}
+						loadingEnsureMessage={loadingEnsureMessage}
 					/>
 				</Flex>
 			</Flex>

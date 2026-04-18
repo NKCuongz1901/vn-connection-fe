@@ -54,6 +54,8 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 		onGetPinMessage,
 		onActionSettingConv,
 		onAddReact,
+		onEnsureMessageLoaded,
+		loadingEnsureMessage,
 	} = useChatRoomInboxChat(props)
 	const { avatar, title } = convInfo || {}
 	const _renderHeader = () => {
@@ -186,6 +188,8 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 						onSendMessage={onSendMessage}
 						onActionMessage={onActionMessage}
 						onAddReact={onAddReact}
+						onEnsureMessageLoaded={onEnsureMessageLoaded}
+						loadingEnsureMessage={loadingEnsureMessage}
 					/>
 				</Flex>
 			</Flex>

@@ -63,6 +63,7 @@ export default function useChatRoomInboxChat({
 	const [loading, setLoading] = useState(false)
 	const [loadingPage, setLoadingPage] = useState(false)
 	const [loadingConvInfo, setLoadingConvInfo] = useState(false)
+	const [loadingEnsureMessage, setLoadingEnsureMessage] = useState(false)
 
 	const reactList = useRef<{ [key: string]: ReactionPtops }>({})
 
@@ -153,6 +154,111 @@ export default function useChatRoomInboxChat({
 		const currentPage = Math.trunc((messList || []).length / limit)
 		_paginationRefs.current.page = currentPage + 1
 		await handleGetListMessById()
+	}
+
+	const handleEnsureMessageLoaded = async (targetId: string) => {
+		if (!targetId || loadingEnsureMessage) return false
+
+		const hasTarget = () =>
+			(messListRef.current || []).some((item: any) => item?.id === targetId)
+
+		if (hasTarget()) return true
+
+		setLoadingEnsureMessage(true)
+		try {
+			const targetMessage: any = await handleGetMessageById(targetId)
+			if (!targetMessage) return false
+			if (targetMessage?.conversation_id !== convId) return false
+
+			const targetTs = Number(targetMessage?.created_at_unix_timestamp || 0)
+			if (!targetTs) return false
+
+			const limit = _paginationRefs.current.limit || 20
+
+			const firstRes: any = await getConvMessById({
+				id: convId,
+				page: 1,
+				limit,
+			})
+			const total = Number(
+				firstRes?.pagination?.total || firstRes?.results?.objects?.count || 0,
+			)
+			if (!total) return false
+
+			const totalPages = Math.max(1, Math.ceil(total / limit))
+
+			const inRange = (rows: any[]) => {
+				if (!rows?.length) return false
+				const tsList = rows
+					.map((r) => Number(r?.created_at_unix_timestamp || 0))
+					.filter(Boolean)
+				if (!tsList.length) return false
+
+				const maxTs = tsList[0]
+				const minTs = tsList[tsList.length - 1]
+				return targetTs <= maxTs && targetTs >= minTs
+			}
+
+			let left = 1
+			let right = totalPages
+			let foundPage = -1
+			let safe = 0
+
+			while (left <= right && safe < 40) {
+				safe += 1
+				const mid = Math.floor((left + right) / 2)
+
+				const res: any = await getConvMessById({
+					id: convId,
+					page: mid,
+					limit,
+				})
+				const rows = res?.results?.objects?.rows || []
+				if (!rows.length) break
+
+				if (inRange(rows)) {
+					foundPage = mid
+					break
+				}
+
+				const newestTs = Number(rows[0]?.created_at_unix_timestamp || 0)
+				const oldestTs = Number(
+					rows[rows.length - 1]?.created_at_unix_timestamp || 0,
+				)
+
+				if (targetTs > newestTs) {
+					right = mid - 1
+				} else if (targetTs < oldestTs) {
+					left = mid + 1
+				} else {
+					foundPage = mid
+					break
+				}
+			}
+
+			if (foundPage < 1) {
+				foundPage = Math.min(Math.max(left, 1), totalPages)
+			}
+
+			_paginationRefs.current.page = foundPage
+			_loadmore.current = foundPage < totalPages
+			await handleGetListMessById()
+
+			let extra = 0
+			const maxExtra = 6
+			while (!hasTarget() && _loadmore.current && extra < maxExtra) {
+				extra += 1
+				_paginationRefs.current.page += 1
+				await handleGetListMessById()
+			}
+
+			return hasTarget()
+		} catch (error) {
+			openError(error)
+			return false
+		} finally {
+			setLoadingEnsureMessage(false)
+		}
 	}
 
 	const handleSendMessage = async ({
@@ -569,5 +675,7 @@ export default function useChatRoomInboxChat({
 		onGetListMessById: handleGetListMessById,
 		onActionSettingConv: handleActionSettingConv,
 		onAddReact: handleAddReact,
+		onEnsureMessageLoaded: handleEnsureMessageLoaded,
+		loadingEnsureMessage,
 	}
 }
