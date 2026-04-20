@@ -180,43 +180,46 @@ export default function useInbox() {
 		handleLoadMore()
 	}
 
-	const handleParseDataSocket = useCallback((data) => {
-		try {
-			const { conversation_id, created_at_unix_timestamp, sender_id } =
-				data || {}
-			const isMe = getUserInfo('id') === sender_id
+	const handleParseDataSocket = useCallback(
+		(data) => {
+			try {
+				const { conversation_id, created_at_unix_timestamp, sender_id } =
+					data || {}
+				const isMe = getUserInfo('id') === sender_id
 
-			if (conversation_id !== convId && !isMe) {
-				handleUpdateListConv(conversation_id, false)
+				if (conversation_id !== convId && !isMe) {
+					handleUpdateListConv(conversation_id, false)
+				}
+				setListConvPersonal((prev: any[]) => {
+					const newConv = prev.find((item) => item.id === conversation_id)
+					if (newConv) {
+						Object.assign(newConv, {
+							last_message: data,
+							last_time_chat: created_at_unix_timestamp,
+						})
+						const dataShow = uniqueArray([newConv, ...prev], 'id') as any[]
+						return dataShow
+					}
+					return prev
+				})
+				setListConv((prev: any[]) => {
+					const newConv = prev.find((item) => item.id === conversation_id)
+					if (newConv) {
+						Object.assign(newConv, {
+							last_message: data,
+							last_time_chat: created_at_unix_timestamp,
+						})
+						const dataShow = uniqueArray([newConv, ...prev], 'id') as any[]
+						return dataShow
+					}
+					return prev
+				})
+			} catch (error) {
+				console.log('error:', error)
 			}
-			setListConvPersonal((prev: any[]) => {
-				const newConv = prev.find((item) => item.id === conversation_id)
-				if (newConv) {
-					Object.assign(newConv, {
-						last_message: data,
-						last_time_chat: created_at_unix_timestamp,
-					})
-					const dataShow = uniqueArray([newConv, ...prev], 'id') as any[]
-					return dataShow
-				}
-				return prev
-			})
-			setListConv((prev: any[]) => {
-				const newConv = prev.find((item) => item.id === conversation_id)
-				if (newConv) {
-					Object.assign(newConv, {
-						last_message: data,
-						last_time_chat: created_at_unix_timestamp,
-					})
-					const dataShow = uniqueArray([newConv, ...prev], 'id') as any[]
-					return dataShow
-				}
-				return prev
-			})
-		} catch (error) {
-			console.log('error:', error)
-		}
-	}, [])
+		},
+		[convId],
+	)
 
 	const handleSearchConv = async () => {
 		setLoadingConv((prev) => ({ ...prev, conv: true }))
