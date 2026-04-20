@@ -2,6 +2,7 @@ import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { memo } from 'react'
 
+import { useLoading } from '@/context/LoadingContext'
 import useOverview from '@/hooks/Overview/useOverview'
 
 import { arrayFrom, isArray } from '@/ultis/array'
@@ -37,10 +38,12 @@ import { mainRoutes } from '@/routes/MainRoutes'
 import { mappingEventTitle } from '@/Variable/event.variable'
 import { radiusOpts, typeEvent } from '@/Variable/select.variable'
 
+import CSwitch from '@/Components/Custom/CSwitch'
 import { LEFT_FLAG } from '@/Variable/countryVariable'
 import classes from './Overview.module.scss'
 
 const Overview = () => {
+	const { loadingContext } = useLoading()
 	const { onChangeRoute } = useLocalePath()
 	const {
 		_childRef,
@@ -74,6 +77,7 @@ const Overview = () => {
 		onCheckEmail,
 		setCheckmail,
 		onCheckMailSubmit,
+		onUpdateUserInfo,
 	} = useOverview()
 	const _renderFilter = () => {
 		const { radius, date, categories, title } = filters
@@ -159,24 +163,28 @@ const Overview = () => {
 											</div>
 										))}
 								</Flex>
-								<Flex className={classes.switchStatus}>
-									<span>
-										{totalHangout + Number(is_open_hangout)} people available to
-										hangout now
-									</span>
-									<CButtonCreate
-										onClick={() => onChangeRoute(mainRoutes.hangout)}
-									>
-										Hangout now
-									</CButtonCreate>
-									{/* <CSwitch
+								<Flex className={classes.titleHangout}>
+									<Flex className={classes.switchStatus}>
+										<span>
+											{totalHangout + Number(is_open_hangout)} people available
+											to hangout now
+										</span>
+										<CButtonCreate
+											onClick={() => {
+												onChangeRoute(mainRoutes.hangout)
+											}}
+										>
+											Hangout now
+										</CButtonCreate>
+									</Flex>
+									<CSwitch
 										value={is_open_hangout}
 										disabled={loadingContext}
 										ctype="success"
 										onChange={(value) =>
 											onUpdateUserInfo({ is_open_hangout: value })
 										}
-									/> */}
+									/>
 								</Flex>
 							</Flex>
 							<Flex
