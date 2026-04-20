@@ -93,7 +93,6 @@ const Inbox = () => {
 		const meId = getUserInfo()?.id
 		const {
 			id,
-			last_message,
 			last_time_chat,
 			users_in_conversation: users,
 			is_read,
