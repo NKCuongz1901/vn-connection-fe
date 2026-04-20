@@ -182,7 +182,13 @@ export default function useInbox() {
 
 	const handleParseDataSocket = useCallback((data) => {
 		try {
-			const { conversation_id, created_at_unix_timestamp } = data || {}
+			const { conversation_id, created_at_unix_timestamp, sender_id } =
+				data || {}
+			const isMe = getUserInfo('id') === sender_id
+
+			if (conversation_id !== convId && !isMe) {
+				handleUpdateListConv(conversation_id, false)
+			}
 			setListConvPersonal((prev: any[]) => {
 				const newConv = prev.find((item) => item.id === conversation_id)
 				if (newConv) {

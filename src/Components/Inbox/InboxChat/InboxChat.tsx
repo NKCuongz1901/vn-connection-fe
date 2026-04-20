@@ -70,7 +70,7 @@ const InboxChat = (props: InboxChatProps) => {
 					<>
 						<Flex className={classes.userInChat}>
 							<CAvatar src={userInChat?.user?.avatar || ''} />
-							<span>{userInChat?.user?.name || 'The user of UniVini'}</span>
+							<span>{userInChat?.user?.name || 'Deleted account'}</span>
 						</Flex>
 						<Flex className={classes.action}>
 							<Flex

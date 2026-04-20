@@ -51,15 +51,32 @@ const Inbox = () => {
 		onUpdateListConv,
 	} = useInbox()
 
-	const _renderLastMessage = useCallback((last_message) => {
+	const _renderLastMessage = useCallback((item) => {
+		const { last_message, is_read, activeItem } = item || {}
 		const { type, content } = last_message || {}
 		switch (type) {
 			case 'TEXT':
 			case 'PIN':
 			case 'UNPIN':
-				return <div className={classes.text}>{content}</div>
+				return (
+					<div
+						className={clsx(classes.text, {
+							[classes.readed]: !!is_read || !!activeItem,
+						})}
+					>
+						{content}
+					</div>
+				)
 			default:
-				return <div>{mappingTypeMessage[type] || type}</div>
+				return (
+					<div
+						className={clsx({
+							[classes.readed]: !!is_read || !!activeItem,
+						})}
+					>
+						{mappingTypeMessage[type] || type}
+					</div>
+				)
 		}
 	}, [])
 
@@ -112,7 +129,7 @@ const Inbox = () => {
 							{!is_read && !activeItem && <span className={classes.unread} />}
 						</Flex>
 					</Flex>
-					{_renderLastMessage(last_message)}
+					{_renderLastMessage(item)}
 				</Flex>
 			</Flex>
 		)
