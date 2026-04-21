@@ -39,6 +39,44 @@ const MyLocation = () => {
 	const [loadingLocation, setLoadingLocation] = useState(false)
 	const [loadingAddress, setLoadingAddress] = useState(false)
 	const [error, setError] = useState('')
+	const helpSteps = useMemo(() => {
+		if (!error) return []
+
+		const normalizedMessage = error.toLowerCase()
+
+		if (normalizedMessage.includes('blocked') || normalizedMessage.includes('denied')) {
+			return [
+				'Allow location access for this site in your browser settings.',
+				'Reload the page after enabling permission.',
+				'Press "Get my location" again.',
+			]
+		}
+
+		if (
+			normalizedMessage.includes('position update is unavailable') ||
+			normalizedMessage.includes('location services')
+		) {
+			return [
+				'Turn on Location Services/GPS on your device.',
+				'If you are indoors, move to an open area for better signal.',
+				'Press "Get my location" to retry.',
+			]
+		}
+
+		if (normalizedMessage.includes('timed out')) {
+			return [
+				'Check your internet connection and GPS signal.',
+				'Move to an area with stronger signal.',
+				'Press "Get my location" to retry.',
+			]
+		}
+
+		return [
+			'Make sure location access is allowed for this site.',
+			'Turn on Location Services on your device.',
+			'Press "Get my location" again.',
+		]
+	}, [error])
 
 	const handleGetAddress = useCallback(async (lat: number, lng: number) => {
 		setLoadingAddress(true)
@@ -72,10 +110,6 @@ const MyLocation = () => {
 	}, [])
 
 	useEffect(() => {
-		handleGetMyLocation()
-	}, [handleGetMyLocation])
-
-	useEffect(() => {
 		handleGetAddress(marker.lat, marker.lng)
 	}, [handleGetAddress, marker.lat, marker.lng])
 
@@ -85,7 +119,8 @@ const MyLocation = () => {
 				<Flex vertical className={classes.header}>
 					<div className={classes.title}>My Location</div>
 					<div className={classes.description}>
-						View your current position on the map and refresh it anytime.
+						View your current position on the map and refresh it anytime. Tap
+						 "Get my location" to allow location access.
 					</div>
 				</Flex>
 
@@ -108,6 +143,18 @@ const MyLocation = () => {
 				</Flex>
 
 				{error ? <div className={classes.error}>{error}</div> : null}
+				{helpSteps.length ? (
+					<Flex vertical className={classes.helpCard}>
+						<div className={classes.helpTitle}>How to fix</div>
+						<ul className={classes.helpList}>
+							{helpSteps.map((step) => (
+								<li key={step} className={classes.helpItem}>
+									{step}
+								</li>
+							))}
+						</ul>
+					</Flex>
+				) : null}
 				{loadingLocation ? (
 					<div className={classes.loading}>Getting your current location...</div>
 				) : null}
