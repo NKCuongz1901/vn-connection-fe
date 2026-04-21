@@ -24,6 +24,7 @@ import { getUserInfo } from '@/ultis/storage'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'
+import { parseMentions } from '@/ultis/string'
 
 interface useEventCommentProps {
 	id: string
@@ -139,6 +140,7 @@ export default function useEventComment({ id }: useEventCommentProps, ref) {
 	}
 	const handleParsePayLoad = async () => {
 		toggleLoadingContext(true)
+
 		const _medias = fileList
 		let medias = []
 
@@ -160,33 +162,44 @@ export default function useEventComment({ id }: useEventCommentProps, ref) {
 				duration: 0,
 			}))
 		}
+
+		const { text, mentions } = parseMentions(commentContent)
+
 		return {
 			post_id: id,
-			content: commentContent,
-			medias: medias,
+			content: text,
+			mentions,
+			medias,
 		}
 	}
 	const handleSendCommentPost = async () => {
 		if ((!commentContent.trim() && !isArray(fileList, 1)) || loadingContext) {
 			return
 		}
+
 		const body = await handleParsePayLoad()
+
 		try {
 			toggleLoadingContext(true)
 			const res: any = await sendCommentPost(body)
 			const { code, results } = res || {}
+
 			if (code === 200) {
 				const { object } = results || {}
-				const { name, avatar, id, is_verified } = getUserInfo()
+				const { name, avatar, id: userId, is_verified } = getUserInfo()
+
 				const data = {
 					...object,
+					content: body.content,
+					mentions: body.mentions,
 					user: {
 						name,
 						avatar,
-						id,
+						id: userId,
 						is_verified,
 					},
 				}
+
 				setCommentContent('')
 				setCommentList((prev: any[]) => [data, ...prev])
 				setTotal((prev) => prev + 1)

@@ -413,7 +413,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 	const _renderChat = () => {
 		return (
 			<div className={classes.renderChat}>
-				<InboxChat convId={id} isNoHeader />
+				<InboxChat convId={id} isNoHeader type="chatrom" />
 			</div>
 		)
 	}

@@ -20,6 +20,7 @@ import ImageIcon from '@/svg/ImageIcon'
 import classes from './EventComment.module.scss'
 
 import { DEFAULT_FALLBACK } from '@/Variable/common.variable'
+import CInputTag from '@/Components/Custom/CInputTag'
 
 const EventComment = ({ id }, ref) => {
 	const {
@@ -97,13 +98,18 @@ const EventComment = ({ id }, ref) => {
 							</CUploadMuti>
 						</Flex>
 					</Flex>
-					<CTextArea
-						allowClear={false}
-						placeholder="What's on my mind ?"
+					<CInputTag
+						source="comment"
 						value={commentContent}
-						autoSize={{ minRows: 3, maxRows: 3 }}
+						placeholder="What's on my mind ?"
 						onChange={onChangeComment}
-						onKeyDown={onKeyDown}
+						onSendMessage={(e) => {
+							if (e.key === 'Enter' && !e.shiftKey) {
+								e.preventDefault()
+								onSendComment()
+							}
+						}}
+						disabled={isArray(fileList, 1)}
 					/>
 					<Flex
 						className={clsx(classes.iconSend, {

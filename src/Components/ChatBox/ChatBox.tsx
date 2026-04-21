@@ -1,3 +1,4 @@
+'use client'
 import { IconCircleXFilled } from '@tabler/icons-react'
 import { Dropdown, Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
@@ -18,8 +19,8 @@ import ReplyIcon from '@/svg/ReplyIcon'
 import SendIcon from '@/svg/SendIcon'
 import CAvatar from '../Custom/CAvatar'
 import CImage from '../Custom/CImage'
+import CInputTag from '../Custom/CInputTag'
 import CLoading from '../Custom/CLoading/CLoading'
-import CTextArea from '../Custom/CTextArea'
 import CTextSpecial from '../Custom/CTextSpecial'
 import CUploadMuti from '../Custom/CUploadMuti'
 
@@ -27,6 +28,7 @@ import { specialTypeMessage } from '@/Variable/common.variable'
 
 import MoreIcon from '@/svg/MoreIcon'
 import classes from './ChatBox.module.scss'
+
 interface ChatBoxProps {
 	isDisabledChat?: boolean
 	loadingPage?: boolean
@@ -39,8 +41,10 @@ interface ChatBoxProps {
 	onActionMessage?: any
 	onEnsureMessageLoaded?: (id: string) => Promise<boolean>
 	loadingEnsureMessage?: boolean
+	convId?: string
 	[key: string]: any
 }
+
 const ChatBox = ({
 	isDisabledChat,
 	loadingPage,
@@ -53,6 +57,7 @@ const ChatBox = ({
 	onActionMessage,
 	onEnsureMessageLoaded,
 	loadingEnsureMessage,
+	convId,
 }: ChatBoxProps) => {
 	const {
 		_refInput,
@@ -68,6 +73,7 @@ const ChatBox = ({
 		onScroll,
 		onGetMenus,
 	} = useChatBox({ onLoadMore, type, onActionMessage })
+
 	const [fileList, setFileList] = useState([])
 	const messageRefs = useRef<Record<string, HTMLDivElement | null>>({})
 	const [jumpHighlightId, setJumpHighlightId] = useState('')
@@ -76,6 +82,20 @@ const ChatBox = ({
 		attempt: number
 	} | null>(null)
 	const isJumpingRef = useRef(false)
+
+	const handleSubmitMessage = () => {
+		if (!(!!text.trim() || isArray(fileList, 1))) return
+
+		setText('')
+		setReply(null)
+		onSendMessage({
+			type: 'TEXT',
+			content: text,
+			parent: reply,
+			medias: fileList,
+		})
+		setFileList([])
+	}
 
 	const handleEnsureMessageLoaded = async (parentId?: string) => {
 		if (!parentId || isJumpingRef.current) return
@@ -91,6 +111,7 @@ const ChatBox = ({
 			isJumpingRef.current = false
 		}
 	}
+
 	useLayoutEffect(() => {
 		if (!pendingScroll) return
 		const { id, attempt } = pendingScroll
@@ -115,6 +136,7 @@ const ChatBox = ({
 		setPendingScroll(null)
 		return () => clearTimeout(timeoutId)
 	}, [pendingScroll, itemList])
+
 	const hangleImportImg = async (_values) => {
 		const values = []
 
@@ -137,10 +159,12 @@ const ChatBox = ({
 
 		setFileList(values)
 	}
+
 	const _renderParentItem = (parent) => {
 		const { type, content, user } = parent || {}
 		if (!type) return <></>
 		let node = <></>
+
 		switch (type) {
 			case 'TEXT':
 				node = <div>{content}</div>
@@ -158,6 +182,7 @@ const ChatBox = ({
 			default:
 				break
 		}
+
 		return (
 			<Flex
 				className={clsx(classes.parentItem, {
@@ -183,6 +208,7 @@ const ChatBox = ({
 			</Flex>
 		)
 	}
+
 	const _renderContentChat = ({
 		type,
 		content,
@@ -200,7 +226,6 @@ const ChatBox = ({
 					<div className={classes.text}>
 						{_renderParentItem(parent)}
 						<CTextSpecial data={content} mentions={mentions} />
-
 						{isLast && (
 							<div className={classes.time}>
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
@@ -220,26 +245,22 @@ const ChatBox = ({
 					</Flex>
 				)
 			case 'MEDIAS': {
-				let Content = null
 				const isMulti = isArray(medias, 2)
-				switch (medias?.[0].type) {
-					default:
-						Content = (medias || []).map((media, index) => {
-							const { type } = media || {}
-							const isImg = type === 'IMAGE'
-							return (
-								<Flex className={classes.media} key={index}>
-									{isImg ? (
-										<CImage preview src={media.url} />
-									) : (
-										<video controls>
-											<source src={media.url} type="video/mp4" />
-										</video>
-									)}
-								</Flex>
-							)
-						})
-				}
+				const Content = (medias || []).map((media, index) => {
+					const isImg = media?.type === 'IMAGE'
+					return (
+						<Flex className={classes.media} key={index}>
+							{isImg ? (
+								<CImage preview src={media.url} />
+							) : (
+								<video controls>
+									<source src={media.url} type="video/mp4" />
+								</video>
+							)}
+						</Flex>
+					)
+				})
+
 				return (
 					<Flex className={classes.mediasWrapper} vertical>
 						<Flex
@@ -248,7 +269,6 @@ const ChatBox = ({
 						>
 							{Content}
 						</Flex>
-
 						{isLast && (
 							<div className={classes.time}>
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
@@ -276,6 +296,7 @@ const ChatBox = ({
 				return <Flex className={classes.memberAccept}>{type}</Flex>
 		}
 	}
+
 	const _renderItemChat = ({ item }) => {
 		const {
 			id,
@@ -292,6 +313,7 @@ const ChatBox = ({
 		const isMe = getUserInfo('id') === user_id
 		const isMemberAction = specialTypeMessage.includes(type)
 		const isNot = isMe || isMemberAction
+
 		return (
 			<Flex
 				vertical
@@ -349,9 +371,11 @@ const ChatBox = ({
 			</Flex>
 		)
 	}
+
 	const _renderSticketList = useCallback(() => {
 		const contentSticker =
 			(stickerList[activeSticker] || stickerList[0])?.sticker_items || []
+
 		return (
 			<Flex
 				vertical
@@ -392,8 +416,16 @@ const ChatBox = ({
 				</Flex>
 			</Flex>
 		)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [activeSticker, showSticker, stickerList])
+	}, [
+		activeSticker,
+		showSticker,
+		stickerList,
+		onSendMessage,
+		reply,
+		setReply,
+		setActiveSticker,
+	])
+
 	const _renderIconHappy = () => {
 		return (
 			<Flex
@@ -404,9 +436,11 @@ const ChatBox = ({
 			</Flex>
 		)
 	}
+
 	const _renderReply = () => {
 		const { type, content, user } = reply || {}
 		let node = <></>
+
 		switch (type) {
 			case 'TEXT':
 				node = (
@@ -428,6 +462,7 @@ const ChatBox = ({
 			default:
 				break
 		}
+
 		return (
 			<Flex className={classes.chatReply}>
 				<ReplyIcon />
@@ -458,27 +493,12 @@ const ChatBox = ({
 						</Flex>
 					))}
 			</Flex>
+
 			{!isDisabledChat ? (
 				<>
 					{reply && _renderReply()}
-					<Flex
-						className={clsx(classes.chatBox)}
-						onKeyDown={(e) => {
-							if (!isMobile() && e.key === 'Enter' && !e.shiftKey) {
-								e.preventDefault()
 
-								if (!!text.trim()) {
-									setText('')
-									setReply(null)
-									onSendMessage({
-										type: 'TEXT',
-										content: text,
-										parent: reply,
-									})
-								}
-							}
-						}}
-					>
+					<Flex className={clsx(classes.chatBox)}>
 						<Flex className={classes.chooseImgContent}>
 							{fileList.map((i) => {
 								const { url, type } = i || {}
@@ -506,6 +526,7 @@ const ChatBox = ({
 								)
 							})}
 						</Flex>
+
 						<Flex className={classes.chooseImg}>
 							<CUploadMuti
 								accept="image/*,video/*"
@@ -517,36 +538,28 @@ const ChatBox = ({
 								<ImageIcon />
 							</CUploadMuti>
 						</Flex>
-						<CTextArea
-							allowClear={false}
+
+						<CInputTag
+							ref={_refInput}
+							id={convId}
 							value={text}
-							autoSize={{ minRows: 2, maxRows: 3 }}
-							style={{ height: 40 }}
 							suffix={_renderIconHappy()}
 							placeholder="Enter your text ..."
 							onChange={(e) => setText(e.target.value)}
 							disabled={fileList?.length > 0}
-							ref={_refInput}
-						/>
-						<Flex
-							className={classes.sendButton}
-							onClick={() => {
-								if (!!text.trim() || isArray(fileList, 1)) {
-									setText('')
-									setReply(null)
-									onSendMessage({
-										type: 'TEXT',
-										content: text,
-										parent: reply,
-										medias: fileList,
-									})
-									setFileList([])
+							onSendMessage={(e) => {
+								if (!isMobile() && e.key === 'Enter' && !e.shiftKey) {
+									e.preventDefault()
+									handleSubmitMessage()
 								}
 							}}
-						>
+						/>
+
+						<Flex className={classes.sendButton} onClick={handleSubmitMessage}>
 							<SendIcon />
 						</Flex>
 					</Flex>
+
 					{_renderSticketList()}
 				</>
 			) : (

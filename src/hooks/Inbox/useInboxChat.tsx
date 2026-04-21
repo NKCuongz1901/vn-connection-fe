@@ -24,7 +24,7 @@ import { mappingMessageChat, uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay } from '@/ultis/common'
 import { isEmptyObject } from '@/ultis/object'
 import { getUserInfo } from '@/ultis/storage'
-import { generateCustomUuid, randomString } from '@/ultis/string'
+import { generateCustomUuid, randomString, parseMentions } from '@/ultis/string'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { onPushState } from '@/ultis/route'
@@ -249,6 +249,7 @@ export default function useInboxChat(props: useHangoutChatProps) {
 		try {
 			let type = _type
 			let medias = []
+
 			if (_medias?.length > 0) {
 				const uploadPromises = _medias.map((media) =>
 					media?.type === 'IMAGE'
@@ -268,6 +269,7 @@ export default function useInboxChat(props: useHangoutChatProps) {
 					duration: 0,
 				}))
 			}
+
 			if (!!audio) {
 				const resAudio = await handleUploadAudio(audio)
 				type = 'MEDIAS'
@@ -282,25 +284,34 @@ export default function useInboxChat(props: useHangoutChatProps) {
 					duration: 3,
 				})
 			}
+
 			const parent_id = parent?.id
 			const _id = randomString()
 			const message_local_id = generateCustomUuid()
+
 			const message = {
 				type,
 				message_local_id,
-
 				...(parent_id && { parent_id }),
 				...(medias.length > 0 && { medias }),
 			} as {
 				[key: string]: any
 			}
+
+			const { text, mentions } =
+				type !== 'MEDIAS'
+					? parseMentions(content)
+					: { text: content, mentions: [] }
+
 			switch (type) {
 				default:
-					message.content = content
+					message.content = text
 					break
 			}
+
 			const _res = {
-				content,
+				content: text,
+				mentions,
 				type,
 				user_id: getUserInfo('id'),
 				id: _id,
@@ -309,6 +320,7 @@ export default function useInboxChat(props: useHangoutChatProps) {
 				isTemp: true,
 				...(parent && { parent }),
 			}
+
 			setMessList((prev: any[]) => {
 				const contents = prev
 				const newData = [_res, ...contents]
@@ -316,14 +328,19 @@ export default function useInboxChat(props: useHangoutChatProps) {
 
 				return dataShow
 			})
+
 			if (_scrollRef.current) {
 				_scrollRef.current.scrollTop = _scrollRef.current.scrollHeight
 			}
+
 			const res: any = await sendMessage({
 				conversation_id: convId,
-				message: message,
+				message,
+				mentions,
 			})
+
 			const _data = res?.results?.object || {}
+
 			setMessList((prev: any[]) => {
 				const contents = prev
 				const newMess = {
@@ -336,6 +353,7 @@ export default function useInboxChat(props: useHangoutChatProps) {
 				const idx = (contents || []).findIndex(
 					(i) => i.message_local_id === message_local_id,
 				)
+
 				if (idx > -1) {
 					contents[idx] = newMess
 				} else {
@@ -343,7 +361,6 @@ export default function useInboxChat(props: useHangoutChatProps) {
 				}
 
 				const dataShow = mappingMessageChat(contents)
-
 				return dataShow
 			})
 		} catch (error) {

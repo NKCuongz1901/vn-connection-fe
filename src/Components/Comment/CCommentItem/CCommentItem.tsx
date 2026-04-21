@@ -21,6 +21,7 @@ import MessageMinuIcon from '@/svg/MessageMinuIcon'
 import classes from './CCommentItem.module.scss'
 
 import { DEFAULT_FALLBACK } from '@/Variable/common.variable'
+import CTextSpecial from '@/Components/Custom/CTextSpecial'
 
 interface CommentItemProps {
 	isEdit?: boolean
@@ -65,6 +66,7 @@ const CCommentItem = (props: CommentItemProps) => {
 		user,
 		created_at,
 		content,
+		mentions,
 		is_liked,
 		amount_of_like,
 		amount_of_replies,
@@ -75,8 +77,16 @@ const CCommentItem = (props: CommentItemProps) => {
 	const { value: timeAgo, unit } = getDiffFromNow({ input: created_at })
 	const commentMenus: ItemType[] = onGetMenusItem(item)
 	const _renderCommentChild = (item) => {
-		const { id, user, created_at, content, is_liked, amount_of_like, medias } =
-			item || {}
+		const {
+			id,
+			user,
+			created_at,
+			content,
+			is_liked,
+			amount_of_like,
+			medias,
+			mentions,
+		} = item || {}
 		const { value: timeAgo, unit } = getDiffFromNow({ input: created_at })
 
 		const { avatar, name } = user || {}
@@ -110,7 +120,9 @@ const CCommentItem = (props: CommentItemProps) => {
 									</span>
 								</Flex>
 							</Flex>
-							<Flex className={classes.content}>{content}</Flex>
+							<Flex className={classes.content}>
+								<CTextSpecial data={content} mentions={mentions} />
+							</Flex>
 							<Flex className={classes.medias}>
 								{isArray(medias, 1) ? (
 									medias.map((item) => {
@@ -379,7 +391,9 @@ const CCommentItem = (props: CommentItemProps) => {
 									</span>
 								</Flex>
 							</Flex>
-							<Flex className={classes.content}>{content}</Flex>
+							<Flex className={classes.content}>
+								<CTextSpecial data={content} mentions={mentions} />
+							</Flex>
 							<Flex className={classes.medias}>
 								{isArray(medias, 1) ? (
 									medias.map((item) => {

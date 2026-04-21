@@ -156,7 +156,8 @@ const InboxChat = (props: InboxChatProps) => {
 					<ChatBox
 						loadingPage={loadingPage}
 						isDisabledChat={isDeletedUser}
-						type="inbox"
+						type={type || 'inbox'}
+						convId={convId}
 						itemList={messList}
 						loading={loading}
 						onLoadMore={onLoadMore}
