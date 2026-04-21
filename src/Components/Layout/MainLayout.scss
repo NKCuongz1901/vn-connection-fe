@@ -12,15 +12,19 @@
 	display: flex;
 	justify-content: center;
 	background: white;
+	width: 100%;
+	overflow-x: hidden;
 }
 .wrapperMainLayout {
 	color: #0f1729;
+	width: 100%;
 	max-width: 1440px;
-	min-width: 1440px;
+	min-width: 0;
 	.bodyMainLayout {
 		background-color: #f4f7fc;
 		height: calc(100dvh - 84px);
 		width: 100%;
+		min-width: 0;
 		.sideBarMainLayoutWrapper {
 			.sideBarMainLayout {
 				width: 240px;
@@ -70,13 +74,14 @@
 			overflow: auto;
 			height: 100%;
 			flex: 1;
+			min-width: 0;
 		}
 	}
 }
 @media (max-width: 1440px) {
 	.mainLayout {
 		justify-content: initial;
-		overflow: auto;
+		overflow-x: hidden;
 	}
 }
 @media (min-width: 0px) and (max-width: 1024px) {
