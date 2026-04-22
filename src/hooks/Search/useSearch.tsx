@@ -138,18 +138,44 @@ export default function useSearch({}: useSearchProps) {
 			setTotal((prev) => ({ ...prev, club: _total }))
 		}
 	}
+	const getAddressByPriority = (geoResult: any) => {
+		const components = geoResult?.address_components || []
+
+		const pick = (type: string) =>
+			components.find((c: any) => (c?.types || []).includes(type))?.long_name ||
+			''
+
+		const district =
+			pick('administrative_area_level_2') ||
+			pick('sublocality_level_1') ||
+			pick('administrative_area_level_3')
+
+		const city = pick('administrative_area_level_1') || pick('locality')
+
+		if (district && city) return `${district}, ${city}`
+		if (district) return district
+		if (city) return city
+		return geoResult?.formatted_address || ''
+	}
+
 	const handleGetAddress = async (marker) => {
 		try {
-			const res: any = await getFullAddressFromLatLng({
-				lat: Number(marker?.lat) || null,
-				lng: Number(marker?.lng) || null,
-			})
+			const lat = Number(marker?.lat) || null
+			const lng = Number(marker?.lng) || null
+
+			if (!lat || !lng) return
+
+			const res: any = await getFullAddressFromLatLng({ lat, lng })
 			const { code, results } = res || {}
+
 			if (code === 200) {
-				const { formatted_address, geometry } =
-					results?.object?.results?.[0] || {}
+				const firstResult = results?.object?.results?.[0] || {}
+				const { geometry } = firstResult || {}
+
+				const baseAddress = getAddressByPriority(firstResult)
+
 				handleChangeValue('location')({
-					display_name: formatted_address,
+					display_name: baseAddress,
 					lat: geometry?.location?.lat || marker?.lat,
 					lng: geometry?.location?.lng || marker?.lng,
 				})
