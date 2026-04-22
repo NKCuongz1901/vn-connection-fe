@@ -59,7 +59,6 @@ const data: Metadata[] = [
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	// read route params
 	const id = (await params).id
-	console.log('🎇🧧🧧🧧🎇 TrieuNinhHan ~ generateMetadata ~ 1id:', id)
 
 	// fetch data
 
