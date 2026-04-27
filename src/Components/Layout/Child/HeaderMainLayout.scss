@@ -22,7 +22,7 @@
 			max-width: 300px;
 			.headerSeachOutline {
 				font-size: 20px;
-				color: #7987a4;
+				color: #3e333c;
 			}
 		}
 	}
@@ -67,7 +67,8 @@
 			background: #fff;
 			z-index: 10;
 			/* FAB */
-			box-shadow: -2px -2px 8px 0px rgba(0, 0, 0, 0.1),
+			box-shadow:
+				-2px -2px 8px 0px rgba(0, 0, 0, 0.1),
 				2px 2px 8px 0px rgba(0, 0, 0, 0.1);
 			.menuItemHeaderChild {
 				padding: 12px 0;

@@ -276,15 +276,18 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 					<LogoSvg />
 					<div>UniVini</div>
 				</Flex>
-				{false && (
-					<Flex className="headerSearchMainLayout">
-						<CInput
-							placeholder="Find your activities"
-							style={{ borderRadius: 40, height: 40 }}
-							prefix={<SearchOutlined className="headerSeachOutline" />}
-						/>
-					</Flex>
-				)}
+				{/* {false && ( */}
+				<Flex className="headerSearchMainLayout">
+					<CInput
+						placeholder="Search location to find people, events & communities."
+						style={{ borderRadius: 40, height: 44, width: 415 }}
+						prefix={<SearchOutlined className="headerSeachOutline" />}
+						readOnly
+						onClick={() => onChangeRoute(mainRoutes.search)}
+						onFocus={() => onChangeRoute(mainRoutes.search)}
+					/>
+				</Flex>
+				{/* )} */}
 			</Flex>
 			<Flex className="headerButton">
 				{login ? (
