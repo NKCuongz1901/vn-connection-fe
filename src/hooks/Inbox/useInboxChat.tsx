@@ -11,7 +11,9 @@ import {
 	getMessageById,
 	getMessageReadMessage,
 	getPinMessageById,
+	getReact,
 	pinMessageById,
+	reactMessageById,
 	sendMessage,
 } from '@/apis/conversationApis'
 import {
@@ -29,6 +31,7 @@ import { generateCustomUuid, randomString, parseMentions } from '@/ultis/string'
 import { PaginationType } from '@/interface/common/common.interface'
 import { onPushState } from '@/ultis/route'
 import { paginationCommon } from '@/Variable/common.variable'
+import { ReactionPtops } from '@/interface/Conversation/Conversation.interface'
 
 type useHangoutChatProps = {
 	convId: string
@@ -57,6 +60,43 @@ export default function useInboxChat(props: useHangoutChatProps) {
 	const [loadingPage, setLoadingPage] = useState(false)
 	const [loadingConvInfo, setLoadingConvInfo] = useState(false)
 	const [loadingEnsureMessage, setLoadingEnsureMessage] = useState(false)
+
+	const reactList = useRef<{ [key: string]: ReactionPtops }>({})
+	const [openReact, setOpenReact] = useState() as any
+
+	const handleGetReact = async () => {
+		try {
+			const res: any = await getReact({ fields: ['$all'] })
+			reactList.current = (res?.results?.objects?.rows || []).reduce(
+				(obj, item) => {
+					obj[item.id] = item
+					return obj
+				},
+				{},
+			)
+		} catch (error) {
+			openError(error)
+		}
+	}
+	useEffect(() => {
+		handleGetReact()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
+
+	const handleAddReact = async ({ item, react, type }) => {
+		const { conversation_id, _id } = item || {}
+		const { id: reaction_id } = react || {}
+		try {
+			const payload = {
+				type_reaction: type || 'add',
+				conversation_id,
+				reaction_id,
+			}
+			await reactMessageById({ id: _id, payload })
+		} catch (error) {
+			openError(error)
+		}
+	}
 
 	const handleGetListMessById = async (isNoLoading?: boolean) => {
 		if (!isNoLoading) {
@@ -556,6 +596,37 @@ export default function useInboxChat(props: useHangoutChatProps) {
 		[convId],
 	)
 
+	const handleParseDataSocketReact = useCallback((data) => {
+		setMessList((prev) => {
+			const _prev = cloneDeep(prev)
+			const { message_id, user_id, id, reaction_id } = data || {}
+			const findItem = (_prev || []).find((i) => i.id === message_id)
+			if (!!findItem) {
+				let reactions = findItem?.reactions || []
+				const type = reactions.find((i) => i.id === id) ? 'remove' : 'add'
+				reactions = reactions.filter((i) => i?.user_id !== user_id)
+				if (type === 'add') {
+					reactions.push({
+						id: id,
+						user_id: user_id,
+						reaction_id: reaction_id,
+						created_at: +new Date(),
+						reaction: reactList.current[reaction_id],
+						user: {
+							id: user_id,
+						},
+					})
+				}
+				findItem.reactions = reactions
+			}
+			return _prev
+		})
+		try {
+		} catch (error) {
+			console.log('error:', error)
+		}
+	}, [])
+
 	const handleReadMessage = async (convId: string) => {
 		try {
 			const res: any = await getMessageReadMessage(convId)
@@ -579,11 +650,13 @@ export default function useInboxChat(props: useHangoutChatProps) {
 		if (!socket) return
 
 		socket.on('message', handleParseDataSocket)
+		socket.on('message_reaction', handleParseDataSocketReact)
 
 		return () => {
 			socket.off('message', handleParseDataSocket)
+			socket.off('message_reaction', handleParseDataSocketReact)
 		}
-	}, [convId, handleParseDataSocket, socket])
+	}, [convId, handleParseDataSocket, handleParseDataSocketReact, socket])
 
 	useEffect(() => {
 		messListRef.current = messList
@@ -601,12 +674,18 @@ export default function useInboxChat(props: useHangoutChatProps) {
 		loadingEnsureMessage,
 		modal,
 		totalPin,
+		openReact,
+
+		// Set action react
+		setOpenReact,
 		setModal,
 		openSetting,
 		setOpenSetting,
+		setMessList,
 		onSendMessage: handleSendMessage,
 		onLoadMore: handleLoadMore,
 		onActionMessage: handleActionMessage,
+		onAddReact: handleAddReact,
 		onEnsureMessageLoaded: handleEnsureMessageLoaded,
 		onGetPinMessage: handleGetPinMessage,
 		onGetListMessById: handleGetListMessById,
