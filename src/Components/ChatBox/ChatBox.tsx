@@ -17,6 +17,7 @@ import HappyIcon from '@/svg/HappyIcon'
 import ImageIcon from '@/svg/ImageIcon'
 import ReplyIcon from '@/svg/ReplyIcon'
 import SendIcon from '@/svg/SendIcon'
+import Heart from '@/svg/Heart'
 import CAvatar from '../Custom/CAvatar'
 import CImage from '../Custom/CImage'
 import CInputTag from '../Custom/CInputTag'
@@ -36,6 +37,7 @@ interface ChatBoxProps {
 	itemList?: any[]
 	onLoadMore?: any
 	onSendMessage?: any
+	onAddReact?: any
 	_scrollRef?: any
 	loading?: boolean
 	onActionMessage?: any
@@ -52,6 +54,7 @@ const ChatBox = ({
 	itemList,
 	onLoadMore,
 	onSendMessage,
+	onAddReact,
 	_scrollRef,
 	loading,
 	onActionMessage,
@@ -64,15 +67,20 @@ const ChatBox = ({
 		activeSticker,
 		showSticker,
 		stickerList,
+		reactList,
+		openReact,
 		text,
 		reply,
 		setReply,
 		setText,
+		setOpenReact,
 		setActiveSticker,
 		setShowSticker,
 		onScroll,
 		onGetMenus,
-	} = useChatBox({ onLoadMore, type, onActionMessage })
+		onOpenReact,
+		onAddReact: onActionReact,
+	} = useChatBox({ onLoadMore, type, onActionMessage, onAddReact })
 
 	const [fileList, setFileList] = useState([])
 	const messageRefs = useRef<Record<string, HTMLDivElement | null>>({})
@@ -218,6 +226,7 @@ const ChatBox = ({
 		parent,
 		user,
 		mentions,
+		reactions,
 	}) => {
 		const { name } = user || {}
 		switch (type) {
@@ -231,6 +240,7 @@ const ChatBox = ({
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
 							</div>
 						)}
+						{_renderReactView(reactions)}
 					</div>
 				)
 			case 'STICKER':
@@ -242,6 +252,7 @@ const ChatBox = ({
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
 							</div>
 						)}
+						{_renderReactView(reactions)}
 					</Flex>
 				)
 			case 'MEDIAS': {
@@ -274,6 +285,7 @@ const ChatBox = ({
 								{created_at ? dayjs(created_at).format('HH:mm') : ''}
 							</div>
 						)}
+						{_renderReactView(reactions)}
 					</Flex>
 				)
 			}
@@ -296,6 +308,59 @@ const ChatBox = ({
 				return <Flex className={classes.memberAccept}>{type}</Flex>
 		}
 	}
+	const _renderReactView = (reactions) => {
+		if (!isArray(reactions, 1)) return
+		return (
+			<Flex className={classes.reactView}>
+				{(reactions || []).map((i, index) => {
+					const { reaction } = i || {}
+					const { image_url } = reaction || {}
+					if (index > 2) return
+					return (
+						<div key={i.id} className={classes.reactViewIcon}>
+							<CImage src={image_url} />
+						</div>
+					)
+				})}
+				{reactions.length}
+			</Flex>
+		)
+	}
+	const _renderReact = (item) => {
+		if (item?.id !== openReact?.id) return
+		const { reactions } = item || {}
+		const reactType = (reactions || []).find(
+			(i) => i.user_id === getUserInfo('id'),
+		)
+
+		return (
+			<Flex className={classes.reactWrapper}>
+				{(reactList || []).map((react) => {
+					const { id, image_url } = react
+					const isActive = reactType?.reaction_id === id
+					return (
+						<Flex
+							key={id}
+							className={clsx(classes.reactItem, {
+								[classes.activeReact]: isActive,
+							})}
+							onClick={() =>
+								onActionReact({
+									item,
+									react,
+									type: isActive ? 'remove' : 'add',
+								})
+							}
+						>
+							<div className={classes.reactIcon}>
+								<CImage src={image_url} />
+							</div>
+						</Flex>
+					)
+				})}
+			</Flex>
+		)
+	}
 
 	const _renderItemChat = ({ item }) => {
 		const {
@@ -308,6 +373,7 @@ const ChatBox = ({
 			user_id,
 			created_at,
 			isTemp,
+			reactions,
 		} = item || {}
 
 		const isMe = getUserInfo('id') === user_id
@@ -349,7 +415,11 @@ const ChatBox = ({
 							{isFirst && !isNot && (
 								<Flex className={classes.name}>{user?.name}</Flex>
 							)}
-							<Flex className={classes.content}>
+							<Flex
+								className={clsx(classes.content, {
+									[classes.isReaction]: isArray(reactions, 1),
+								})}
+							>
 								{!(isTemp || isMemberAction) && (
 									<Flex className={classes.moreIconWrapper}>
 										<Dropdown
@@ -361,12 +431,19 @@ const ChatBox = ({
 												<MoreIcon />
 											</Flex>
 										</Dropdown>
+										<Flex
+											className={clsx(classes.moreIcon)}
+											onClick={() => onOpenReact(item)}
+										>
+											<Heart />
+										</Flex>
 									</Flex>
 								)}
 								{_renderContentChat(item)}
 							</Flex>
 						</Flex>
 					</Flex>
+					{_renderReact(item)}
 				</Flex>
 			</Flex>
 		)
@@ -478,7 +555,12 @@ const ChatBox = ({
 	}
 
 	return (
-		<div className={classes.wrapper}>
+		<div
+			className={classes.wrapper}
+			onClick={() => {
+				if (openReact) setOpenReact(false)
+			}}
+		>
 			<Flex
 				className={classes.chatContent}
 				vertical

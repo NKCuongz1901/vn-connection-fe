@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { getListSticket } from '@/apis/postApis'
+import { getReact } from '@/apis/conversationApis'
 
 import { useModal } from '@/context/ModalContext'
 import { ItemType } from 'antd/es/menu/interface'
 import { copyToClipboard } from '@/ultis/string'
+import { ReactionPtops } from '@/interface/Conversation/Conversation.interface'
 
 type useHangoutChatProps = {
 	type?: string
@@ -15,10 +17,13 @@ export default function useChatBox({
 	onLoadMore,
 	type,
 	onActionMessage,
+	onAddReact,
 }: useHangoutChatProps) {
 	const { openError, openSuccess } = useModal()
 	const _refInput = useRef() as any
 	const [stickerList, setStickerList] = useState([]) as any[]
+	const [reactList, setReactList] = useState<ReactionPtops[]>([])
+	const [openReact, setOpenReact] = useState() as any
 	const [activeSticker, setActiveSticker] = useState(0)
 	const [showSticker, setShowSticker] = useState(false)
 	const [text, setText] = useState('')
@@ -40,6 +45,14 @@ export default function useChatBox({
 				fields: ['$all'],
 			})
 			setStickerList(res?.results?.objects?.rows || [])
+		} catch (error) {
+			openError(error)
+		}
+	}
+	const handleGetReact = async () => {
+		try {
+			const res: any = await getReact({ fields: ['$all'] })
+			setReactList(res?.results?.objects?.rows || [])
 		} catch (error) {
 			openError(error)
 		}
@@ -120,8 +133,18 @@ export default function useChatBox({
 		]
 		return menus
 	}
+	const handleOpenReact = (item) => {
+		setOpenReact(item)
+	}
+	const handleAddReact = async (values) => {
+		if (onAddReact) {
+			await onAddReact(values)
+		}
+		setOpenReact(null)
+	}
 	useEffect(() => {
 		handleGetSticker()
+		handleGetReact()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -130,13 +153,18 @@ export default function useChatBox({
 		activeSticker,
 		showSticker,
 		stickerList,
+		reactList,
+		openReact,
 		text,
 		reply,
 		setReply,
 		setText,
+		setOpenReact,
 		setActiveSticker,
 		setShowSticker,
 		onScroll: handleScroll,
 		onGetMenus: handleGetMenus,
+		onOpenReact: handleOpenReact,
+		onAddReact: handleAddReact,
 	}
 }

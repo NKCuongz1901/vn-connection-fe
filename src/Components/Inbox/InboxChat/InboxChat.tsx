@@ -40,6 +40,10 @@ const InboxChat = (props: InboxChatProps) => {
 		pinList,
 		totalPin,
 		modal,
+		openReact,
+
+		// Set action
+		setOpenReact,
 		setModal,
 		openSetting,
 		convInfo,
@@ -51,6 +55,7 @@ const InboxChat = (props: InboxChatProps) => {
 		onActionSettingConv,
 		onEnsureMessageLoaded,
 		loadingEnsureMessage,
+		onAddReact,
 	} = useInboxChat(props)
 	const userInChat = useMemo(() => {
 		return (members || []).find((i) => i.user_id !== getUserInfo()?.id)
@@ -163,6 +168,7 @@ const InboxChat = (props: InboxChatProps) => {
 						onLoadMore={onLoadMore}
 						_scrollRef={_scrollRef}
 						onSendMessage={onSendMessage}
+						onAddReact={onAddReact}
 						onActionMessage={onActionMessage}
 						onEnsureMessageLoaded={onEnsureMessageLoaded}
 						loadingEnsureMessage={loadingEnsureMessage}
