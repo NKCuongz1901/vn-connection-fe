@@ -7,7 +7,7 @@ import { convertImageUrl } from '@/ultis/file'
 
 const MAX_RETRY = 4
 const RETRY_DELAY = 2000
-const DEFAULT_FALLBACK = '/images/defaultCover.png'
+const DEFAULT_FALLBACK = '/images/defaultCover2.png'
 
 type CImageProps = ImageProps & {
 	sizeType?: TYPE_SIZE_IMAGE
