@@ -180,12 +180,12 @@ export const Menus = [
 		child: [],
 	},
 
-	{
-		title: 'Search',
-		Icon: SearchNormal,
-		path: mainRoutes.search,
-		child: [],
-	},
+	// {
+	// 	title: 'Search',
+	// 	Icon: SearchNormal,
+	// 	path: mainRoutes.search,
+	// 	child: [],
+	// },
 	{
 		title: 'Inbox',
 		Icon: Messenger,
