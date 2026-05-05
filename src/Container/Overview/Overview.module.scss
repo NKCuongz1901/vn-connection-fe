@@ -65,6 +65,10 @@
 			.titleHangoutHeader {
 				width: 200px;
 			}
+			.titleHangoutHeaderRow {
+				justify-content: space-between;
+				align-items: center;
+			}
 			.contentHangout {
 				background: #fff;
 				padding: 12px 16px;
@@ -101,7 +105,6 @@
 					align-items: center;
 					gap: 8px;
 					border-radius: 16px;
-					background: #f4f8fc;
 					cursor: pointer;
 				}
 			}

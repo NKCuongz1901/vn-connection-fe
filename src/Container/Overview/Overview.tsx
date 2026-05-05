@@ -79,6 +79,10 @@ const Overview = () => {
 		onCheckMailSubmit,
 		onUpdateUserInfo,
 	} = useOverview()
+	const handleGoOnline = async () => {
+		await onUpdateUserInfo({ is_open_hangout: true })
+		onChangeRoute(mainRoutes.hangout)
+	}
 	const _renderFilter = () => {
 		const { radius, date, categories, title } = filters
 		return (
@@ -142,12 +146,17 @@ const Overview = () => {
 		const { is_open_hangout, title_open_hangout } = userData
 		return (
 			<Flex vertical className={classes.hangout}>
-				<Flex
-					className={clsx(classes.titleHangout, classes.titleHangoutHeader)}
-					onClick={() => onChangeRoute(mainRoutes.hangout)}
-				>
-					<Party fill="#006B35" />
-					<span className={classes.title}>Hangout</span>
+				<Flex className={classes.titleHangoutHeaderRow}>
+					<Flex
+						className={clsx(classes.titleHangout, classes.titleHangoutHeader)}
+						onClick={() => onChangeRoute(mainRoutes.hangout)}
+					>
+						<Party fill="#006B35" />
+						<span className={classes.title}>Available now</span>
+					</Flex>
+					<CButtonCreate onClick={handleGoOnline} disabled={loadingContext}>
+						Go online
+					</CButtonCreate>
 				</Flex>
 				<Flex className={classes.contentHangout} vertical>
 					{loadingProfile ? (
@@ -156,48 +165,40 @@ const Overview = () => {
 						<>
 							<Flex vertical gap="4px">
 								<Flex className={classes.hangoutPeople}>
-									{!!is_open_hangout &&
-										hangoutPeople.map((people) => (
-											<div key={people.id}>
-												<CAvatar src={people.avatar} />
-											</div>
-										))}
+									{hangoutPeople.map((people) => (
+										<div key={people.id}>
+											<CAvatar src={people.avatar} />
+										</div>
+									))}
 								</Flex>
 								<Flex className={classes.titleHangout}>
 									<Flex className={classes.switchStatus}>
-										<span>
-											{totalHangout + Number(is_open_hangout)} people available
-											to hangout now
-										</span>
-										<CButtonCreate
-											onClick={() => {
-												onChangeRoute(mainRoutes.hangout)
+										<span
+											style={{
+												fontStyle: 'medium',
+												fontSize: '12px',
+												fontWeight: 500,
+												lineHeight: '16px',
+												color: '#0F1729',
 											}}
 										>
-											Hangout now
-										</CButtonCreate>
+											<span style={{ color: '#1B8024' }}>{totalHangout}</span>{' '}
+											people are ready to talk and meet.{' '}
+											<span
+												role="button"
+												tabIndex={0}
+												onClick={handleGoOnline}
+												onKeyDown={(e) => {
+													if (e.key === 'Enter' || e.key === ' ')
+														handleGoOnline()
+												}}
+												style={{ color: '#E55A0F', cursor: 'pointer' }}
+											>
+												Go online
+											</span>{' '}
+											so they can see you.
+										</span>
 									</Flex>
-									<CSwitch
-										value={is_open_hangout}
-										disabled={loadingContext}
-										ctype="success"
-										onChange={(value) =>
-											onUpdateUserInfo({ is_open_hangout: value })
-										}
-									/>
-								</Flex>
-							</Flex>
-							<Flex
-								className={classes.titleHangout}
-								onClick={() => setModal({ type: 'choose', data: userData })}
-							>
-								<span>
-									{defaultTitleHangout ||
-										title_open_hangout ||
-										'I want to hang out'}
-								</span>
-								<Flex>
-									<PencilIcon />
 								</Flex>
 							</Flex>
 						</>
