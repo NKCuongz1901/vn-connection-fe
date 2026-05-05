@@ -317,6 +317,11 @@ export const typeCommunity = [
 ]
 
 export const typeEvent = [
+	{ value: 'Language Exchange', label: 'Language Exchange' },
+	{ value: 'Workshop', label: 'Workshop' },
+	{ value: 'Social', label: 'Social' },
+	{ value: 'Lifestyle', label: 'Lifestyle' },
+	{ value: 'Music', label: 'Music' },
 	{ value: 'Dating', label: 'Dating' },
 	{ value: 'Travel', label: 'Travel' },
 	{ value: 'Sport', label: 'Sport' },
@@ -325,10 +330,5 @@ export const typeEvent = [
 	{ value: 'Digital Nomad', label: 'Digital Nomad' },
 	{ value: 'Art', label: 'Art' },
 	{ value: 'Dancing', label: 'Dancing' },
-	{ value: 'Music', label: 'Music' },
 	{ value: 'Game', label: 'Game' },
-	{ value: 'Lifestyle', label: 'Lifestyle' },
-	{ value: 'Social', label: 'Social' },
-	{ value: 'Workshop', label: 'Workshop' },
-	{ value: 'Language Exchange', label: 'Language Exchange' },
 ]
