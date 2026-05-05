@@ -429,7 +429,7 @@ export default function useOverview() {
 				const { pagination, results } = res || {}
 				const { rows } = results?.objects || {}
 				const { total } = pagination || {}
-				setHangoutPeople([getUserInfo(), ...rows])
+				setHangoutPeople(rows || [])
 				setTotalHangout(total || 0)
 			}
 		} catch (error) {
@@ -475,13 +475,9 @@ export default function useOverview() {
 	}, [])
 
 	useEffect(() => {
-		if (userData.is_open_hangout) {
-			handleGetOpenHangout()
-		} else {
-			setHangoutPeople([getUserInfo()])
-		}
+		handleGetOpenHangout()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [userData.is_open_hangout])
+	}, [])
 
 	useEffect(() => {
 		handleAutoLoadMore()
