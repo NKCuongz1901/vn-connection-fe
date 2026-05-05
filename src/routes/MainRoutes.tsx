@@ -18,4 +18,5 @@ export const mainRoutes = {
 	profile: 'profile',
 	exploreInterest: 'explore-interest',
 	chatRoom: 'chat-room',
+	miniApps: 'mini-apps',
 }

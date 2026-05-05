@@ -5,18 +5,13 @@ import Message2Icon from '@/svg/Message2Icon'
 import Message3 from '@/svg/Message3'
 import Messenger from '@/svg/Messenger'
 import OverviewIcon from '@/svg/OverviewIcon'
-import Party from '@/svg/Party'
 import People from '@/svg/People'
-import SearchNormal from '@/svg/SearchNormal'
+import ProfileIcon from '@/svg/ProfileIcon'
+import SquareIcon from '@/svg/SquareIcon'
 import TwoUser from '@/svg/TwoUser'
-import UpcomingEvent from '@/svg/UpcomingEvent'
-import { IconMapPinFilled } from '@tabler/icons-react'
 
 import { mainRoutes } from './MainRoutes'
-
-const MyLocationIcon = ({ fill = '#94A3B8' }) => (
-	<IconMapPinFilled size={20} color={fill} />
-)
+import MiniApp from '@/svg/MiniApp'
 
 export const AUTH_ROUTES = {
 	loginPhone: '/auth/login_by_phone',
@@ -138,9 +133,9 @@ export const Menus = [
 		child: [],
 	},
 	{
-		title: 'Hangout',
-		Icon: Party,
-		path: mainRoutes.hangout,
+		title: 'My Activities',
+		Icon: Event,
+		path: mainRoutes.event,
 		child: [],
 	},
 	{
@@ -156,30 +151,17 @@ export const Menus = [
 		child: [],
 	},
 	{
-		title: 'Explore By Interest',
-		Icon: HappyIcon,
-		path: mainRoutes.exploreInterest,
-		child: [],
-	},
-	{
-		title: 'My Activities',
-		Icon: Event,
-		path: mainRoutes.event,
-		child: [],
-	},
-	{
-		title: 'Upcoming Activities',
-		Icon: UpcomingEvent,
-		path: mainRoutes.upcomingEvent,
-		child: [],
-	},
-	{
-		title: 'Discussions',
+		title: 'Discussion',
 		Icon: Message3,
 		path: mainRoutes.discussions,
 		child: [],
 	},
-
+	{
+		title: 'Explore by interest',
+		Icon: HappyIcon,
+		path: mainRoutes.exploreInterest,
+		child: [],
+	},
 	// {
 	// 	title: 'Search',
 	// 	Icon: SearchNormal,
@@ -187,21 +169,27 @@ export const Menus = [
 	// 	child: [],
 	// },
 	{
+		title: 'My profile',
+		Icon: ProfileIcon,
+		path: mainRoutes.profile,
+		child: [],
+	},
+	{
 		title: 'Inbox',
 		Icon: Messenger,
 		path: mainRoutes.inbox,
 		child: [],
 	},
 	{
-		title: 'My Location',
-		Icon: MyLocationIcon,
-		path: mainRoutes.myLocation,
-		child: [],
-	},
-	{
 		title: 'Friends',
 		Icon: TwoUser,
 		path: mainRoutes.friend,
+		child: [],
+	},
+	{
+		title: 'Mini apps',
+		Icon: MiniApp,
+		path: mainRoutes.miniApps,
 		child: [],
 	},
 	// {
