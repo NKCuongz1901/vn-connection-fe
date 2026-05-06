@@ -22,6 +22,9 @@ import { NOTIFICATION_TYPE, NotiTypes } from '@/Variable/select.variable'
 import { NotiItemProp } from '@/interface/Notification/Notification.interface'
 
 import classes from './Notification.module.scss'
+import DoubleTick from '@/svg/DoubleTick'
+import { SettingFilled } from '@ant-design/icons'
+import ModalNotificationSetting from '@/Components/Notification/ModalNotificationSetting/ModalNotificationSetting'
 
 const mappingTypeIcon = {
 	EVENT: Event,
@@ -74,12 +77,32 @@ const Notification = (props: { onClose?: any }) => {
 		setType,
 		onClickNoti,
 		onScroll,
+		onReadAllNoti,
+		onGetNotificationSetting,
+		notificationSetting,
+		loadingNotificationSetting,
+		onChangeStatusTypeNotification,
+		onChangeAllStatusTypeNotification,
 	} = useNotification({ onClose })
 
 	const _renderHeader = () => {
 		return (
 			<Flex vertical className={classes.header}>
-				<div className={classes.title}>Notification</div>
+				<div className={classes.titleRow}>
+					<div className={classes.title}>Notification</div>
+					<div className={classes.settingRow}>
+						<div className={classes.settingIconWrapper} onClick={onReadAllNoti}>
+							<DoubleTick fill="#0F1729" />
+						</div>
+						<div
+							className={classes.settingIconWrapper}
+							onClick={() => setModal({ type: 'setting' })}
+						>
+							<SettingFilled />
+						</div>
+					</div>
+				</div>
+
 				<Flex className={classes.grpbtn}>
 					{NotiTypes.map((item) => {
 						const { value, label } = item
@@ -196,6 +219,22 @@ const Notification = (props: { onClose?: any }) => {
 		switch (type) {
 			case 'detail':
 				Content = <ModalDetailNoti title="Notification" {...propsModal} />
+				break
+			case 'setting':
+				Content = (
+					<ModalNotificationSetting
+						title="Notification Setting"
+						{...propsModal}
+						setting={notificationSetting}
+						loading={loadingNotificationSetting}
+						onToggle={(key, value) =>
+							onChangeStatusTypeNotification({ [key]: value })
+						}
+						onToggleAll={(key, value) => {
+							onChangeAllStatusTypeNotification({ [key]: value })
+						}}
+					/>
+				)
 				break
 			default:
 				break

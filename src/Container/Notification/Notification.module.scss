@@ -15,6 +15,33 @@
 		gap: 24px;
 		.header {
 			gap: 20px;
+			.titleRow {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+			.settingRow {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap: 8px;
+
+				.settingIconWrapper {
+					width: 40px;
+					height: 40px;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					cursor: pointer;
+					border-radius: 50%;
+					background: #f0f3f9;
+					backdrop-filter: blur(60px);
+				}
+				.settingIcon {
+					width: 20px;
+					height: 20px;
+				}
+			}
 			.title {
 				font-size: 20px;
 				font-weight: 600;

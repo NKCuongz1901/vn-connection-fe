@@ -88,6 +88,8 @@ import NoFriendIcon from '@/svg/NoFriendIcon'
 import CatIcon from '@/svg/CatIcon'
 import BookIcon from '@/svg/BookIcon'
 import MiniApp from '@/svg/MiniApp'
+import DoubleTick from '@/svg/DoubleTick'
+import ShopIcon from '@/svg/ShopIcon'
 
 const Icons = () => {
 	const icons = [
@@ -375,6 +377,16 @@ const Icons = () => {
 		{
 			ICON: MiniApp,
 			name: '@/svg/Event/MiniApp',
+			key: randomString(),
+		},
+		{
+			ICON: DoubleTick,
+			name: '@/svg/Event/DoubleTick',
+			key: randomString(),
+		},
+		{
+			ICON: ShopIcon,
+			name: '@/svg/Event/ShopIcon',
 			key: randomString(),
 		},
 	]

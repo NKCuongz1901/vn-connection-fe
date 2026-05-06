@@ -1,0 +1,48 @@
+.container {
+	.rowHeader {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		height: 44px;
+		border-top: 1px solid #e2e8f0;
+		border-bottom: 1px solid #e2e8f0;
+		gap: 12px;
+
+		.left {
+			color: #0f1729;
+		}
+
+		.label {
+			font-size: 16px;
+			line-height: 1.2;
+			font-weight: 500;
+		}
+
+		svg {
+			width: 24px;
+			height: 24px;
+		}
+	}
+	.row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		height: 44px;
+		gap: 12px;
+
+		.left {
+			color: #0f1729;
+		}
+
+		.label {
+			font-size: 16px;
+			line-height: 1.2;
+			font-weight: 500;
+		}
+
+		svg {
+			width: 24px;
+			height: 24px;
+		}
+	}
+}

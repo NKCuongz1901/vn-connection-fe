@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { getNotificationList, readNotification } from '@/apis/notificationApis'
+import {
+	changeAllStatusTypeNotification,
+	changeStatusTypeNotification,
+	getNotificationList,
+	getNotificationSetting,
+	readAllNotification,
+	readNotification,
+} from '@/apis/notificationApis'
 
 import { useModal } from '@/context/ModalContext'
 import { PaginationType } from '@/interface/common/common.interface'
@@ -30,6 +37,12 @@ export default function useNotification({ onClose: _ }) {
 	const [notiList, setNotiList] = useState<any[]>([])
 
 	const [loading, setLoading] = useState(false)
+
+	const [notificationSetting, setNotificationSetting] = useState<{
+		[key: string]: any
+	} | null>(null)
+	const [loadingNotificationSetting, setLoadingNotificationSetting] =
+		useState(false)
 
 	const handleGetListNoti = async () => {
 		setLoading(true)
@@ -98,6 +111,58 @@ export default function useNotification({ onClose: _ }) {
 			openError(error)
 		}
 	}
+
+	const handleReadAllNoti = async () => {
+		try {
+			const res: any = await readAllNotification()
+			if (res) {
+				setNotiList((prev) => prev.map((item) => ({ ...item, is_read: true })))
+			}
+		} catch (error) {
+			openError(error)
+		}
+	}
+
+	const handleGetNotificationSetting = async () => {
+		setLoadingNotificationSetting(true)
+		try {
+			const res: any = await getNotificationSetting({
+				params: { fields: ['$all'] },
+			})
+			setNotificationSetting(res?.results?.object || null)
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoadingNotificationSetting(false)
+		}
+	}
+
+	const handleChangeStatusTypeNotification = async (payload: {
+		[key: string]: boolean
+	}) => {
+		try {
+			const res: any = await changeStatusTypeNotification(payload)
+			if (res) {
+				setNotificationSetting((prev) => ({ ...prev, ...payload }))
+			}
+		} catch (error) {
+			openError(error)
+		}
+	}
+
+	const handleChangeAllStatusTypeNotification = async (payload: {
+		[key: string]: boolean
+	}) => {
+		try {
+			const res: any = await changeAllStatusTypeNotification(payload)
+			if (res) {
+				handleGetNotificationSetting()
+			}
+		} catch (error) {
+			openError(error)
+		}
+	}
+
 	const handleClickNoti = (item: NotiItemProp) => {
 		const { id, is_read, interacting_type, extra_data } = item || {}
 		const { post_id } = extra_data || {}
@@ -153,6 +218,7 @@ export default function useNotification({ onClose: _ }) {
 	useEffect(() => {
 		_paginationRefs.current.page = 1
 		handleGetListNoti()
+		handleGetNotificationSetting()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [type])
 
@@ -163,7 +229,13 @@ export default function useNotification({ onClose: _ }) {
 		modal,
 		setModal,
 		setType,
+		notificationSetting,
+		loadingNotificationSetting,
 		onClickNoti: handleClickNoti,
 		onScroll: handleScroll,
+		onReadAllNoti: handleReadAllNoti,
+		onGetNotificationSetting: handleGetNotificationSetting,
+		onChangeStatusTypeNotification: handleChangeStatusTypeNotification,
+		onChangeAllStatusTypeNotification: handleChangeAllStatusTypeNotification,
 	}
 }

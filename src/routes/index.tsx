@@ -112,6 +112,9 @@ export const NOTIFICATION_ROUTES = {
 	name: 'notifications',
 	read: 'notifications/read',
 	count: 'notifications/count',
+	readAll: 'notifications/read-all',
+	setting: 'user/notification_setting',
+	getMyNotificationSetting: 'user/notification_setting/my',
 }
 export const SEARCH_ROUTES = {
 	searchLocal: 'search-in-app/local',

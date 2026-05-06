@@ -1,6 +1,6 @@
 import { convertParams } from '@/ultis/object'
 import axios from '../axios'
-import { NOTIFICATION_ROUTES } from '@/routes'
+import { NOTIFICATION_ROUTES, USER_ROUTES } from '@/routes'
 
 // import { CONVERSATION_ROUTES } from '@/routes'
 
@@ -36,6 +36,37 @@ export const getNotificationCount = async ({
 		params: convertParams(params),
 	})
 }
+
+export const readAllNotification = async () => {
+	const url = NOTIFICATION_ROUTES.readAll
+	return await axios.post(url)
+}
+
+export const getNotificationSetting = async ({
+	params = {},
+}: {
+	params?: { [key: string]: any }
+}) => {
+	const url = NOTIFICATION_ROUTES.getMyNotificationSetting
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const changeStatusTypeNotification = async (payload: {
+	[key: string]: boolean
+}) => {
+	const url = NOTIFICATION_ROUTES.setting
+	return await axios.post(url, payload)
+}
+
+export const changeAllStatusTypeNotification = async (payload: {
+	[key: string]: boolean
+}) => {
+	const url = USER_ROUTES.profile
+	return await axios.put(url, payload)
+}
+
 // export const getNetworkGroup = async ({
 // 	params = {},
 // }: {
