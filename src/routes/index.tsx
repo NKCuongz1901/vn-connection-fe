@@ -176,6 +176,7 @@ export const Menus = [
 		Icon: ProfileIcon,
 		path: mainRoutes.profile,
 		child: [],
+		hasTopDivider: true,
 	},
 	{
 		title: 'Inbox',
@@ -194,6 +195,7 @@ export const Menus = [
 		Icon: MiniApp,
 		path: mainRoutes.miniApps,
 		child: [],
+		hasTopDivider: true,
 	},
 	// {
 	// 	title: 'Dating',

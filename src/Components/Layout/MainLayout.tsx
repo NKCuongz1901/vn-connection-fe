@@ -80,7 +80,9 @@ const MainLayout = (props: MainLayoutProps) => {
 								>
 									<Flex
 										gap={12}
-										className={`menuItem ${active ? 'menuItemActive' : ''}`}
+										className={`menuItem ${active ? 'menuItemActive' : ''} ${
+											menu.hasTopDivider ? 'menuItemTopDivider' : ''
+										}`}
 									>
 										<div className="iconItemMenu">
 											<Icon fill={active ? '#006b35' : '#94A3B8'} />
