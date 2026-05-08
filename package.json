@@ -1,7 +1,7 @@
 {
   "name": "source-nextjs-univini",
   "version": "0.1.0",
-  "buildVersion": "2026.05.08-050",
+  "buildVersion": "2026.05.08-051",
   "private": true,
   "scripts": {
     "increase-version": "sh scripts/increase-build-version.sh",
