@@ -104,84 +104,143 @@
 							display: flex;
 							flex-direction: column;
 						}
-						.sticker {
-							// padding: 0 12px;
-						}
-						.mediasWrapper {
+						.stickerWrapper {
+							width: 100%;
 							position: relative;
-							.medias {
-								flex-wrap: wrap;
-								gap: 2px;
-								border-radius: 16px;
-								overflow: hidden;
-								width: fit-content;
-								.media {
-									border-radius: 16px;
-									overflow: hidden;
-
-									:global(.ant-image),
-									video {
-										max-width: 150px;
-										height: auto;
-										width: 150px;
+							gap: 4px;
+							.time {
+								margin-top: 4px;
+								font-size: 10px;
+								font-weight: 400;
+								color: #48546b;
+								padding: 0;
+							}
+						}
+						.sticker {
+							position: relative;
+							width: 80px;
+							justify-content: flex-end;
+						}
+						.medias {
+							flex-wrap: wrap;
+							gap: 2px;
+							border-radius: 16px;
+							.moreIconWrapper {
+								align-items: center;
+								justify-content: center;
+								padding: 6px;
+								gap: 8px;
+								order: 1;
+								position: relative;
+								.moreIcon {
+									cursor: pointer;
+									border-radius: 50%;
+									height: 32px;
+									width: 32px;
+									align-items: center;
+									justify-content: center;
+									border-radius: 99px;
+									background: #f4f8fc;
+									svg,
+									span {
+										height: 20px;
+										width: 20px;
 									}
 								}
-								:global(.ant-image) {
-									height: 140px;
+								.disabled {
+									cursor: not-allowed;
 								}
-								:global(.ant-flex) {
-									justify-content: flex-start;
-								}
-								img {
-									object-fit: cover;
-									border-radius: 16px;
-									overflow: hidden;
-								}
-								.time {
-									padding: 0 12px;
+								.isPlaying {
+									svg {
+										path {
+											fill: #006b35;
+										}
+									}
 								}
 							}
-							.multiMedias {
-								width: 240px;
-								flex-direction: row;
-								flex-wrap: wrap;
-								gap: 4px;
-								border-radius: 16px;
-								overflow: hidden;
-								.media {
+							.mediasWrapper {
+								position: relative;
+								flex-direction: column;
+								.mediaContent {
+									flex-wrap: wrap;
+									gap: 2px;
+									border-radius: 16px;
 									overflow: hidden;
 									width: fit-content;
-									:global(.ant-image),
-									video {
-										max-width: calc(120px - 2px);
-										height: auto;
-										width: calc(120px - 2px);
-										min-width: calc(120px - 2px);
+									.media {
+										border-radius: 16px;
+										overflow: hidden;
+
+										:global(.ant-image),
+										video {
+											max-width: 150px;
+											height: auto;
+											width: 150px;
+										}
+									}
+									:global(.ant-image) {
+										height: 140px;
+									}
+									:global(.ant-flex) {
+										justify-content: flex-start;
+									}
+									img {
+										object-fit: cover;
+										border-radius: 16px;
+										overflow: hidden;
+									}
+									.time {
+										padding: 0 12px;
 									}
 								}
-								& > :last-child {
-									flex: 1;
-									:global(.ant-image),
-									video {
-										max-width: 100%;
-										width: 100%;
-										min-width: 100%;
-									}
-								}
-								:global(.ant-image) {
-									height: 140px;
-								}
-								:global(.ant-flex) {
-									justify-content: flex-start;
-								}
-								img {
-									object-fit: cover;
-									// border-radius: 16px;
+								.multiMediaContent {
+									width: 240px;
+									flex-direction: row;
+									flex-wrap: wrap;
+									gap: 4px;
+									border-radius: 16px;
 									overflow: hidden;
+									.media {
+										overflow: hidden;
+										width: fit-content;
+										:global(.ant-image),
+										video {
+											max-width: calc(120px - 2px);
+											height: auto;
+											width: calc(120px - 2px);
+											min-width: calc(120px - 2px);
+										}
+									}
+									& > :last-child {
+										flex: 1;
+										:global(.ant-image),
+										video {
+											max-width: 100%;
+											width: 100%;
+											min-width: 100%;
+										}
+									}
+									:global(.ant-image) {
+										height: 140px;
+									}
+									:global(.ant-flex) {
+										justify-content: flex-start;
+									}
+									img {
+										object-fit: cover;
+										overflow: hidden;
+									}
+									.time {
+										padding: 0 12px;
+									}
 								}
-								.time {
-									padding: 0 12px;
-								}
+							}
+							.mediaContent {
+								position: relative;
+								flex-direction: column;
+							}
+							:global(.ant-flex) {
+								justify-content: flex-start;
 							}
 							.time {
 								margin-top: 4px;
@@ -190,8 +249,22 @@
 								color: #48546b;
 								padding: 0;
 							}
-							.memberAccept {
+							.spToText {
 								color: #135a19;
+								background: #e7f5e9;
+								word-break: break-word;
+								div {
+									display: flex;
+									justify-content: flex-end;
+								}
+								max-width: 80%;
+								padding: 8px 12px;
+								gap: 4px;
+								border-radius: 16px;
+								background: #f4f8fc;
+								word-break: break-word;
+								display: flex;
+								flex-direction: column;
 							}
 						}
 						.translateWrapper {
@@ -266,7 +339,7 @@
 			border: 1px solid #fff;
 			position: absolute;
 			right: 0;
-			bottom: -6;
+			bottom: 0;
 			transform: translateY(50%);
 			.reactViewIcon {
 				height: 20px;
@@ -297,30 +370,88 @@
 							background: #e7f5e9;
 							word-break: break-word;
 							position: relative;
+							min-width: 100px;
 							div {
 								display: flex;
 								justify-content: flex-end;
 							}
 						}
 						.medias {
+							.moreIconWrapper {
+								order: -1;
+								position: relative;
+								gap: 8px;
+							}
 							:global(.ant-flex) {
 								justify-content: flex-end;
 							}
+						}
+						.stickerWrapper {
+							align-items: flex-end;
 						}
 						.time {
 							display: flex;
 							justify-content: flex-end;
 						}
 					}
+					.infoNameTime {
+						font-size: 12px;
+						gap: 4px;
+						justify-content: flex-end;
+						.time {
+							color: #48546b;
+							padding: 0;
+						}
+					}
 				}
 			}
 			.reactWrapper {
-				right: 0;
+				position: absolute;
+				// top: -60px;
+				background: #e9eaec;
+				height: 56px;
+				align-items: center;
+				gap: 8px;
+				padding: 8px;
+				border-radius: 40px;
+				z-index: 2;
+				right: 0px;
 				left: unset;
+				.reactItem {
+					.reactIcon {
+						height: 40px;
+						width: 40px;
+					}
+					:hover {
+						background: #fff;
+						border-radius: 50%;
+					}
+				}
+				.activeReact {
+					background: #fff;
+					border-radius: 50%;
+				}
 			}
 			.reactView {
+				padding: 4px;
+				background: #f0f3f9;
+				border-radius: 40px;
+				gap: 4;
+				color: #48546b;
+				align-items: center;
+				border: 1px solid #fff;
+				position: absolute;
 				left: 0;
+				bottom: 0;
 				right: unset;
+				transform: translateY(50%);
+				.reactViewIcon {
+					height: 20px;
+					width: 20px;
+				}
+			}
+			.iconHeart {
+				order: -1;
 			}
 		}
 		.isCenter {
@@ -377,6 +508,18 @@
 		.chooseImg {
 			// display: none;
 			cursor: pointer;
+		}
+		.micro {
+			min-width: 44px;
+			min-height: 44px;
+			justify-content: center;
+			align-items: center;
+			border-radius: 99px;
+			background: #f0f3f9;
+			cursor: pointer;
+		}
+		.isAudioMicro {
+			background: #e7f5e9;
 		}
 	}
 	.deletedChat {
