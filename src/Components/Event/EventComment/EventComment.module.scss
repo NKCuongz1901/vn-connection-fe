@@ -60,9 +60,18 @@
 				width: 100%;
 				position: relative;
 				gap: 8px;
-				:global(.ant-input) {
-					padding: 12px 44px 12px 16px;
+				align-items: center;
+
+				.chooseImg {
+					flex-shrink: 0;
 				}
+
+				:global(.mentionsInput) {
+					max-width: none;
+					flex: 1;
+					min-width: 0;
+				}
+
 				.iconSend {
 					position: absolute;
 					z-index: 2;
@@ -75,6 +84,8 @@
 					right: 16px;
 					top: 12px;
 					cursor: pointer;
+					top: 50%;
+					transform: translateY(-50%);
 				}
 				.disabled {
 					opacity: 0.5;
@@ -138,9 +149,6 @@
 							}
 							padding: 16px;
 							.media {
-								:global(.ant-image) {
-									// width: auto;
-								}
 								img,
 								video {
 									border-radius: 16px;
