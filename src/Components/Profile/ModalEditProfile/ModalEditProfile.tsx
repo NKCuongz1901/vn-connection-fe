@@ -327,6 +327,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					<Flex>
 						<CSelectMuti
 							isSimple
+							withCheckbox
 							error={errors.country_lived}
 							value={country_lived}
 							label="Countries I've lived in"
@@ -338,6 +339,7 @@ const ModalEditProfile = (props: ModalEditProfileProps) => {
 					<Flex>
 						<CSelectMuti
 							isSimple
+							withCheckbox
 							error={errors.country_visited}
 							value={country_visited}
 							label={

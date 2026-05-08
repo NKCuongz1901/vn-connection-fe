@@ -2,15 +2,43 @@
 
 import { IconChevronDown } from '@tabler/icons-react'
 import { Flex, Select } from 'antd'
+import clsx from 'clsx'
 import { memo } from 'react'
 
 import { CSelectProps } from '@/interface/CComponent/CComponent.interface'
 
 import classes from './CSelectMuti.module.scss'
 
-const CSelectMuti = (_props: CSelectProps) => {
-	const { error, label, isRequired, isSimple, style, ...props } = _props
+interface CSelectMutiProps extends CSelectProps {
+	withCheckbox?: boolean
+}
+
+const CSelectMuti = (_props: CSelectMutiProps) => {
+	const {
+		error,
+		label,
+		isRequired,
+		isSimple,
+		withCheckbox,
+		style,
+		...props
+	} = _props
 	const status = error ? 'error' : ''
+
+	const renderOption = (oriOption: any) => {
+		const selected = Array.isArray(props.value)
+			? (props.value as any[]).includes(oriOption.value)
+			: false
+		return (
+			<Flex align="center" gap={10} className={classes.optionRow}>
+				<span
+					className={clsx(classes.checkbox, { [classes.checked]: selected })}
+				/>
+				<span>{oriOption.label}</span>
+			</Flex>
+		)
+	}
+
 	return (
 		<Flex vertical gap={4} className={classes.layout}>
 			{label && (
@@ -36,6 +64,10 @@ const CSelectMuti = (_props: CSelectProps) => {
 							</span>
 						)
 					},
+				})}
+				{...(withCheckbox && {
+					menuItemSelectedIcon: null,
+					optionRender: renderOption,
 				})}
 				{...props}
 			/>
