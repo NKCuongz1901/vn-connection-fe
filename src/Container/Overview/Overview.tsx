@@ -152,7 +152,7 @@ const Overview = () => {
 						onClick={() => onChangeRoute(mainRoutes.hangout)}
 					>
 						<Party fill="#006B35" />
-						<span className={classes.title}>Available now.</span>
+						<span className={classes.title}>Available now..</span>
 					</Flex>
 					<CButtonCreate onClick={handleGoOnline} disabled={loadingContext}>
 						Go online
