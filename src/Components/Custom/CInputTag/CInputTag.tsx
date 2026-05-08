@@ -30,6 +30,12 @@ import classes from './CInputTag.module.scss'
 import './CInputTag.scss'
 import { getFriends } from '@/apis/friendApis'
 
+interface MentionUser {
+	id: string
+	display: string
+	avatar?: string
+}
+
 interface CInputTagProps {
 	id?: string
 	disabled?: boolean
@@ -38,6 +44,7 @@ interface CInputTagProps {
 	onSendMessage?: any
 	suffix?: any
 	source?: 'conversation' | 'comment'
+	mentionData?: MentionUser[]
 }
 
 const defaultUser = {
@@ -55,6 +62,7 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 		onSendMessage,
 		value = '',
 		source = 'conversation',
+		mentionData,
 	} = _props
 
 	const debounceRef = useRef<any>(null)
@@ -199,6 +207,20 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 		}
 
 		pagination.current.page = 1
+
+		if (isArray(mentionData, 1)) {
+			const keyword = (search || '').trim().toLowerCase()
+			const filtered = keyword
+				? mentionData.filter((u) =>
+						u.display?.toLowerCase().includes(keyword),
+					)
+				: mentionData
+			loadMore.current = false
+			setUsers(filtered)
+			emitSuggestions(filtered)
+			setLoading(false)
+			return
+		}
 
 		// Hiện tạm @all ngay để dropdown mở lập tức
 		callback([defaultUser])

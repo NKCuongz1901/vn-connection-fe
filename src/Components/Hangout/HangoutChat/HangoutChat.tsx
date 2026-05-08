@@ -35,6 +35,7 @@ const HangoutChat = ({ postId, onAction }) => {
 		isLoaded,
 		showGGmap,
 		listParticipant,
+		mentionData,
 		setShowGGmap,
 		onSendMessage,
 		onChangeTitleHangout,
@@ -212,6 +213,7 @@ const HangoutChat = ({ postId, onAction }) => {
 						_scrollRef={_scrollRef}
 						onSendMessage={onSendMessage}
 						onActionMessage={onActionMessage}
+						mentionData={mentionData}
 					/>
 				</Flex>
 				{modal?.type && _renderModal()}

@@ -52,6 +52,7 @@ interface ChatBoxProps {
 	onEnsureMessageLoaded?: (id: string) => Promise<boolean>
 	loadingEnsureMessage?: boolean
 	convId?: string
+	mentionData?: { id: string; display: string; avatar?: string }[]
 	[key: string]: any
 }
 
@@ -69,6 +70,7 @@ const ChatBox = ({
 	onEnsureMessageLoaded,
 	loadingEnsureMessage,
 	convId,
+	mentionData,
 }: ChatBoxProps) => {
 	const {
 		listTranslateLoading,
@@ -820,6 +822,7 @@ const ChatBox = ({
 				<CInputTag
 					ref={_refInput}
 					id={convId}
+					mentionData={mentionData}
 					allowClear={false}
 					value={text}
 					style={{ height: 40 }}

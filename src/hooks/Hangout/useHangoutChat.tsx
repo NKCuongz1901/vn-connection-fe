@@ -22,7 +22,7 @@ import { mappingMessageChat, uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay } from '@/ultis/common'
 import { onPushState } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
-import { randomString } from '@/ultis/string'
+import { parseMentions, randomString } from '@/ultis/string'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'
@@ -59,6 +59,9 @@ export default function useHangoutChat({
 	}>({
 		WAITING: [],
 	})
+	const [mentionData, setMentionData] = useState<
+		{ id: string; display: string; avatar?: string }[]
+	>([])
 	const [loading, setLoading] = useState(false)
 	const [loadingPage, setLoadingPage] = useState(false)
 	const [showGGmap, setShowGGmap] = useState(false)
@@ -236,9 +239,15 @@ export default function useHangoutChat({
 					duration: 3,
 				})
 			}
+			const { text: parsedText, mentions } =
+				type !== 'MEDIAS' && content
+					? parseMentions(content)
+					: { text: content, mentions: [] }
+
 			const _id = randomString()
 			const _res = {
-				content,
+				content: parsedText,
+				mentions,
 				type,
 				user_id: getUserInfo('id'),
 				id: _id,
@@ -258,7 +267,8 @@ export default function useHangoutChat({
 			}
 			const res: any = await sendCommentPost({
 				post_id: postId,
-				content,
+				content: parsedText,
+				mentions,
 				medias,
 				type,
 				...(parent_id && { parent_id }),
@@ -343,6 +353,37 @@ export default function useHangoutChat({
 			toggleLoadingContext()
 		}
 	}
+	const handleGetMentionParticipants = async () => {
+		try {
+			const res: any = await getListParticipant({
+				fields: [
+					'$all',
+					{ user: ['name', 'phone', 'avatar', 'is_verified'] },
+				],
+				where: {
+					post_id: postId,
+					request_join_status: 'ACCEPT',
+				},
+				page: 1,
+				limit: 100,
+			})
+			const rows = res?.results?.objects?.rows || []
+			const currentUserId = getUserInfo('id')
+			const mapped = rows
+				.map((i: any) => ({
+					id: i?.user_id,
+					display: i?.user?.name,
+					avatar: i?.user?.avatar,
+				}))
+				.filter(
+					(i: { id: string; display: string }) =>
+						!!i.id && !!i.display && i.id !== currentUserId,
+				)
+			setMentionData(mapped)
+		} catch (error) {
+			console.log('handleGetMentionParticipants', error)
+		}
+	}
 	const handleGetWaitingParticipant = async ({ request_join_status }) => {
 		try {
 			const res: any = await getListParticipant({
@@ -396,6 +437,9 @@ export default function useHangoutChat({
 					...prev,
 					WAITING: prev.WAITING.filter((item) => item?.id !== id),
 				}))
+				if (request_join_status === 'ACCEPT') {
+					handleGetMentionParticipants()
+				}
 				openSuccess({
 					message: `You ${request_join_status.toLocaleLowerCase()} request !`,
 				})
@@ -441,6 +485,7 @@ export default function useHangoutChat({
 		_paginationRefs.current.page = 1
 		handleGetInfoHangout()
 		handleGetListCommentById()
+		handleGetMentionParticipants()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [postId])
 
@@ -461,6 +506,7 @@ export default function useHangoutChat({
 		isLoaded,
 		showGGmap,
 		listParticipant,
+		mentionData,
 		setShowGGmap,
 		onSendMessage: handleSendMessage,
 		onChangeTitleHangout: handleChangeTitleHangout,
