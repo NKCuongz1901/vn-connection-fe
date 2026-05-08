@@ -911,6 +911,11 @@
 		}
 	}
 }
+@media (min-width: 769px) and (max-width: 1440px) {
+	.wrapper .showSticker {
+		height: 300px;
+	}
+}
 .jumpHighlight {
 	animation: jumpHighlightFlash 1.5s ease;
 	border-radius: 8px;
