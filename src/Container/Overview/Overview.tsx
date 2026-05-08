@@ -167,7 +167,10 @@ const Overview = () => {
 								<Flex className={classes.hangoutPeople}>
 									{hangoutPeople.map((people) => (
 										<div key={people.id}>
-											<CAvatar src={people.avatar} />
+											<CAvatar
+												src={people.avatar}
+												style={{ width: 48, height: 48 }}
+											/>
 										</div>
 									))}
 								</Flex>
@@ -176,7 +179,7 @@ const Overview = () => {
 										<span
 											style={{
 												fontStyle: 'medium',
-												fontSize: '12px',
+												fontSize: '14px',
 												fontWeight: 500,
 												lineHeight: '16px',
 												color: '#0F1729',
