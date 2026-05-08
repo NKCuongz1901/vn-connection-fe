@@ -343,12 +343,15 @@ const ChatBox = ({
 
 			case 'STICKER':
 				return (
-					<Flex vertical className={classes.sticker}>
-						<CImage src={content} />
+					<Flex vertical className={classes.stickerWrapper}>
+						{_renderParentItem(parent)}
+						<Flex vertical className={classes.sticker}>
+							<CImage src={content} />
+							{_renderReactView(reactions)}
+						</Flex>
 						<div className={classes.time}>
 							{created_at ? dayjs(created_at).format('HH:mm') : ''}
 						</div>
-						{_renderReactView(reactions)}
 					</Flex>
 				)
 
@@ -384,18 +387,53 @@ const ChatBox = ({
 				}
 
 				return (
-					<Flex className={classes.mediasWrapper} vertical>
-						<Flex
-							className={isMulti ? classes.multiMedias : classes.medias}
-							vertical
-						>
-							{Content}
+					<Flex className={classes.medias} vertical>
+						<Flex>
+							{!(isTemp || isMemberAction) && (
+								<Flex className={classes.moreIconWrapper}>
+									{!isMe && typeMedia === 'AUDIO' && (
+										<Flex
+											className={clsx(classes.moreIcon, {
+												[classes.disabled]: loadingSpToText,
+											})}
+											onClick={() => !loadingSpToText && onAddSpToText(item)}
+										>
+											{loadingSpToText ? <CLoading /> : <CcIcon />}
+										</Flex>
+									)}
+									<Dropdown
+										trigger={['click']}
+										menu={{ items: onGetMenus({ item, isMe }) }}
+										disabled={isTemp || isMemberAction}
+									>
+										<Flex className={classes.moreIcon}>
+											<MoreIcon />
+										</Flex>
+									</Dropdown>
+									<Flex
+										className={clsx(classes.moreIcon, classes.iconHeart)}
+										onClick={() => onOpenReact(item)}
+									>
+										<Heart />
+									</Flex>
+								</Flex>
+							)}
+							<Flex className={classes.mediasWrapper}>
+								<Flex
+									className={
+										isMulti ? classes.multiMediaContent : classes.mediaContent
+									}
+									vertical
+								>
+									{Content}
+								</Flex>
+								{_renderReactView(reactions)}
+							</Flex>
 						</Flex>
 						{!!spToText && <Flex className={classes.spToText}>{spToText}</Flex>}
 						<div className={classes.time}>
 							{created_at ? dayjs(created_at).format('HH:mm') : ''}
 						</div>
-						{_renderReactView(reactions)}
 					</Flex>
 				)
 			}
@@ -535,7 +573,7 @@ const ChatBox = ({
 									[classes.isReaction]: isArray(reactions, 1),
 								})}
 							>
-								{!(isTemp || isMemberAction) && (
+								{!(isTemp || isMemberAction) && type !== 'MEDIAS' && (
 									<Flex className={classes.moreIconWrapper}>
 										{!isMe && typeMedia === 'AUDIO' && (
 											<Flex
@@ -596,7 +634,7 @@ const ChatBox = ({
 										</Dropdown>
 
 										<Flex
-											className={clsx(classes.moreIcon)}
+											className={clsx(classes.moreIcon, classes.iconHeart)}
 											onClick={() => onOpenReact(item)}
 										>
 											<Heart />
