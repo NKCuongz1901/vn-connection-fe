@@ -57,7 +57,7 @@ const Hangout = () => {
 			<Flex vertical className={classes.top}>
 				<Flex className={classes.top1}>
 					<Party fill="#006B35" />
-					<span className={classes.title}>Hangout</span>
+					<span className={classes.title}>Available now</span>
 				</Flex>
 				<Flex className={classes.top2} vertical>
 					{loadingProfile ? (

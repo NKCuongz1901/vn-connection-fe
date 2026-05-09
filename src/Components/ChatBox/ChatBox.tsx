@@ -208,13 +208,17 @@ const ChatBox = ({
 			case 'STICKER':
 				node = <CImage src={content} />
 				break
-			case 'MEDIAS':
-				node = (
-					<Flex className={classes.medias} vertical>
-						Send a media
-					</Flex>
+			case 'MEDIAS': {
+				const trimmed = String(content ?? '').trim()
+				node = trimmed ? (
+					<div className={classes.parentQuotedText}>
+						<CTextSpecial data={content} mentions={parent?.mentions} />
+					</div>
+				) : (
+					<div>Send a media</div>
 				)
 				break
+			}
 			default:
 				break
 		}
@@ -421,6 +425,7 @@ const ChatBox = ({
 								</Flex>
 							)}
 							<Flex className={classes.mediasWrapper}>
+								{_renderParentItem(parent)}
 								<Flex
 									className={
 										isMulti ? classes.multiMediaContent : classes.mediaContent
@@ -428,6 +433,11 @@ const ChatBox = ({
 									vertical
 								>
 									{Content}
+									{!!String(content || '').trim() && typeMedia !== 'AUDIO' && (
+										<div className={classes.mediaCaption}>
+											<CTextSpecial data={content} mentions={mentions} />
+										</div>
+									)}
 								</Flex>
 								{_renderReactView(reactions)}
 							</Flex>
@@ -737,9 +747,15 @@ const ChatBox = ({
 					</Flex>
 				)
 				break
-			case 'MEDIAS':
-				node = <div>Send a photo</div>
+			case 'MEDIAS': {
+				const trimmed = String(content ?? '').trim()
+				node = trimmed ? (
+					<div className={classes.replyMediaCaption}>{content}</div>
+				) : (
+					<div>Send a photo</div>
+				)
 				break
+			}
 			default:
 				break
 		}
@@ -828,20 +844,12 @@ const ChatBox = ({
 					style={{ height: 40 }}
 					suffix={_renderIconHappy()}
 					placeholder="Enter your text ..."
-					disabled={fileList?.length > 0}
+					// disabled={fileList?.length > 0}
 					onChange={(e) => setText(e.target.value)}
 					onSendMessage={(e) => {
 						if (e.key === 'Enter' && !e.shiftKey) {
 							e.preventDefault()
-							if (!!text.trim()) {
-								setText('')
-								setReply(null)
-								onSendMessage({
-									type: 'TEXT',
-									content: text,
-									parent: reply,
-								})
-							}
+							handleSubmitMessage()
 						}
 					}}
 				/>
