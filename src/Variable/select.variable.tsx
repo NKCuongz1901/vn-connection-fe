@@ -317,6 +317,7 @@ export const typeCommunity = [
 ]
 
 export const typeEvent = [
+	{ value: 'Education', label: 'Education' },
 	{ value: 'Language Exchange', label: 'Language Exchange' },
 	{ value: 'Workshop', label: 'Workshop' },
 	{ value: 'Social', label: 'Social' },
