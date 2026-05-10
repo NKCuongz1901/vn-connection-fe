@@ -104,6 +104,20 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 	const [jumpHighlightId, setJumpHighlightId] = useState('')
 	const isJumpingRef = useRef(false)
 
+	const handleSubmitMessage = () => {
+		if (!(!!text.trim() || isArray(fileList, 1))) return
+
+		setText('')
+		setReply(null)
+		onSendMessage({
+			type: 'TEXT',
+			content: text,
+			parent: reply,
+			medias: fileList,
+		})
+		setFileList([])
+	}
+
 	const handleEnsureMessageLoaded = async (parentId?: string) => {
 		if (!parentId || isJumpingRef.current) return
 
@@ -168,13 +182,17 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 			case 'STICKER':
 				node = <CImage src={content} />
 				break
-			case 'MEDIAS':
-				node = (
-					<Flex className={classes.medias} vertical>
-						Send a media
-					</Flex>
+			case 'MEDIAS': {
+				const trimmed = String(content ?? '').trim()
+				node = trimmed ? (
+					<div className={classes.parentQuotedText}>
+						<CTextSpecial data={content} mentions={parent?.mentions} />
+					</div>
+				) : (
+					<div>Send a media</div>
 				)
 				break
+			}
 			default:
 				break
 		}
@@ -394,6 +412,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 								</Flex>
 							)}
 							<Flex className={classes.mediasWrapper}>
+								{_renderParentItem(parent)}
 								<Flex
 									className={
 										isMulti ? classes.multiMediaContent : classes.mediaContent
@@ -401,6 +420,11 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 									vertical
 								>
 									{Content}
+									{!!String(content || '').trim() && typeMedia !== 'AUDIO' && (
+										<div className={classes.mediaCaption}>
+											<CTextSpecial data={content} mentions={mentions} />
+										</div>
+									)}
 								</Flex>
 								{_renderReactView(reactions)}
 							</Flex>
@@ -693,9 +717,15 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 					</Flex>
 				)
 				break
-			case 'MEDIAS':
-				node = <div>Send a photo</div>
+			case 'MEDIAS': {
+				const trimmed = String(content ?? '').trim()
+				node = trimmed ? (
+					<div className={classes.replyMediaCaption}>{content}</div>
+				) : (
+					<div>Send a photo</div>
+				)
 				break
+			}
 			default:
 				break
 		}
@@ -782,20 +812,12 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 					style={{ height: 40 }}
 					suffix={_renderIconHappy()}
 					placeholder="Enter your text ..."
-					disabled={fileList?.length > 0}
+					// disabled={fileList?.length > 0}
 					onChange={(e) => setText(e.target.value)}
 					onSendMessage={(e) => {
 						if (e.key === 'Enter' && !e.shiftKey) {
 							e.preventDefault()
-							if (!!text.trim()) {
-								setText('')
-								setReply(null)
-								onSendMessage({
-									type: 'TEXT',
-									content: text,
-									parent: reply,
-								})
-							}
+							handleSubmitMessage()
 						}
 					}}
 				/>

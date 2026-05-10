@@ -321,14 +321,14 @@ export default function useChatRoomInboxChat({
 			} as {
 				[key: string]: any
 			}
-			const { text, mentions } = type !== 'MEDIAS' ? parseMentions(content) : {}
+			const { text, mentions } =
+				type !== 'MEDIAS'
+					? parseMentions(content)
+					: { text: content, mentions: [] }
+
 			switch (type) {
 				default:
-					{
-						Object.assign(message, {
-							content: text,
-						})
-					}
+					message.content = text
 					break
 			}
 			const _res = {
