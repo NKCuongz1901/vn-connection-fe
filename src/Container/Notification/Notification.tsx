@@ -17,6 +17,7 @@ import Message3 from '@/svg/Message3'
 import Messenger from '@/svg/Messenger'
 import Party from '@/svg/Party'
 import People from '@/svg/People'
+import MicroPhoneIcon from '@/svg/MicroPhoneIcon'
 
 import { NOTIFICATION_TYPE, NotiTypes } from '@/Variable/select.variable'
 import { NotiItemProp } from '@/interface/Notification/Notification.interface'
@@ -167,7 +168,7 @@ const Notification = (props: { onClose?: any }) => {
 							</div>
 						) : (
 							<Flex className={classes.iconBell}>
-								<IconBellFilled />
+								<MicroPhoneIcon fill="#E55A0F" />
 							</Flex>
 						)}
 					</div>
