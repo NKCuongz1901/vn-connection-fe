@@ -13,6 +13,10 @@ const variant = {
 		color: 'black',
 		background: '#EEF3F6',
 	},
+	disableHangout: {
+		color: '#94A3B8',
+		background: '#EEF3F6',
+	},
 	success: {
 		color: '#EEF3F6',
 		background: '#006B35',

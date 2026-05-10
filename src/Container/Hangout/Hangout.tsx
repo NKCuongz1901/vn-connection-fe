@@ -138,7 +138,9 @@ const Hangout = () => {
 							onClick={() => setCurrentPage(index)}
 							className={classes.pageItem}
 						>
-							<CButton ctype={index === currentPage ? 'success' : 'disabled'}>
+							<CButton
+								ctype={index === currentPage ? 'success' : 'disableHangout'}
+							>
 								{item}
 							</CButton>
 						</Flex>

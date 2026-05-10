@@ -16,6 +16,16 @@
 		}
 		.radius {
 			width: 125px;
+
+			:global(.ant-select-selection-item) {
+				color: #006b35;
+				font-weight: 600;
+			}
+
+			:global(.anticon),
+			:global(.ant-select-arrow) {
+				color: #006b35;
+			}
 		}
 	}
 	.hangoutWrapper {
