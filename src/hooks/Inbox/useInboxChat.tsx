@@ -546,6 +546,7 @@ export default function useInboxChat(props: useHangoutChatProps) {
 				const { conversation_id, type, sender, message_local_id, parent_id } =
 					data || {}
 				let { content, content_en } = data || {}
+				if (conversation_id !== convId) return
 
 				clearTimeout(timeoutRef.current)
 				let { parent: _parent, ...parent } =
