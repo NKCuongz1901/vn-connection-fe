@@ -51,6 +51,7 @@ function HangoutTabOpen(props, ref) {
 				</Flex>
 				<Flex className={classes.radius}>
 					<CSelect
+						isWhite={true}
 						value={radius}
 						options={radiusOpts}
 						onChange={(e) => setRadius(e)}
@@ -67,20 +68,20 @@ function HangoutTabOpen(props, ref) {
 								setOpenHangoutSearch={setOpenHangoutSearch}
 								setTotal={setTotal}
 							/>
-					  ))
+						))
 					: _renderNoHangout()}
 
 				{loading.open || loading.search
 					? arrayFrom(3).map((_, index) => (
 							<Skeleton.Input key={index} active className={classes.skeleton} />
-					  ))
+						))
 					: (loadMore.open || loadMore.search) && (
 							<Flex className={classes.loadmore}>
 								<CButton ctype="oranger" onClick={onLoadMore}>
 									Load more
 								</CButton>
 							</Flex>
-					  )}
+						)}
 			</Flex>
 		</div>
 	)
