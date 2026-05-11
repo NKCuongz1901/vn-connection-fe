@@ -352,9 +352,13 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 					</Flex>
 				)
 			case 'MEDIAS': {
+				const totalMedia = (medias || []).length
+				const isMulti = totalMedia > 1
+				const gridCount = Math.min(totalMedia, 5)
+				const firstMediaType = medias?.[0]?.type
+				const isAudioMedia = firstMediaType === 'AUDIO'
 				let Content = null
-				const isMulti = isArray(medias, 2)
-				switch (medias?.[0].type) {
+				switch (firstMediaType) {
 					case 'AUDIO':
 						Content = (medias || []).map((media, index) => (
 							<Flex key={index}>
@@ -363,9 +367,10 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 						))
 						break
 					default:
-						Content = (medias || []).map((media, index) => {
+						Content = (medias || []).slice(0, 5).map((media, index) => {
 							const { type } = media || {}
 							const isImg = type === 'IMAGE'
+							const isOverflow = index === 4 && totalMedia > 5
 							return (
 								<Flex className={classes.media} key={index}>
 									{isImg ? (
@@ -374,6 +379,11 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 										<video controls>
 											<source src={media.url} type="video/mp4" />
 										</video>
+									)}
+									{isOverflow && (
+										<div className={classes.moreOverlay}>
+											+{totalMedia - 5}
+										</div>
 									)}
 								</Flex>
 							)
@@ -413,19 +423,23 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 							)}
 							<Flex className={classes.mediasWrapper}>
 								{_renderParentItem(parent)}
-								<Flex
-									className={
-										isMulti ? classes.multiMediaContent : classes.mediaContent
-									}
-									vertical
+								<div
+									className={clsx(
+										isMulti
+											? classes.multiMediaContent
+											: classes.mediaContent,
+										!isAudioMedia &&
+											isMulti &&
+											classes[`grid${gridCount}`],
+									)}
 								>
 									{Content}
-									{!!String(content || '').trim() && typeMedia !== 'AUDIO' && (
-										<div className={classes.mediaCaption}>
-											<CTextSpecial data={content} mentions={mentions} />
-										</div>
-									)}
-								</Flex>
+								</div>
+								{!!String(content || '').trim() && !isAudioMedia && (
+									<div className={classes.mediaCaption}>
+										<CTextSpecial data={content} mentions={mentions} />
+									</div>
+								)}
 								{_renderReactView(reactions)}
 							</Flex>
 						</Flex>
@@ -765,35 +779,37 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 					))}
 			</Flex>
 			{reply && _renderReply()}
+			{isArray(fileList, 1) && (
+				<Flex className={classes.chooseImgPreviewBar}>
+					{fileList.map((i) => {
+						const { url, type } = i || {}
+						const isImg = type === 'IMAGE'
+						return (
+							<Flex key={url} className={classes.chooseImgItem}>
+								{isImg ? (
+									<CImage preview={true} src={url} />
+								) : (
+									<video controls>
+										<source src={url} type="video/mp4" />
+									</video>
+								)}
+								<Flex
+									className={classes.chooseImgCancel}
+									onClick={() =>
+										setFileList((prev) =>
+											prev.filter((prev) => prev.url !== url),
+										)
+									}
+								>
+									<IconCircleXFilled />
+								</Flex>
+							</Flex>
+						)
+					})}
+				</Flex>
+			)}
 			<Flex className={clsx(classes.chatBox)}>
 				<Flex className={classes.chooseImg}>
-					<Flex className={classes.chooseImgContent}>
-						{fileList.map((i) => {
-							const { url, type } = i || {}
-							const isImg = type === 'IMAGE'
-							return (
-								<Flex key={url} className={classes.chooseImgItem}>
-									{isImg ? (
-										<CImage preview={true} src={url} />
-									) : (
-										<video controls>
-											<source src={url} type="video/mp4" />
-										</video>
-									)}
-									<Flex
-										className={classes.chooseImgCancel}
-										onClick={() =>
-											setFileList((prev) =>
-												prev.filter((prev) => prev.url !== url),
-											)
-										}
-									>
-										<IconCircleXFilled />
-									</Flex>
-								</Flex>
-							)
-						})}
-					</Flex>
 					<CUploadMuti
 						fileList={fileList.map((i) => i.file)}
 						onChange={({ file: _file, fileList: newList }) => {
