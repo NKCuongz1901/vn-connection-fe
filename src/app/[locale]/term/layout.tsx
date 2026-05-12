@@ -28,11 +28,11 @@ export async function generateMetadata({}: Props): Promise<Metadata> {
 	const row = data.results.objects.rows[0]
 	const title = row.id // Lấy id làm title
 	const description = row.field // Lấy field làm description
-	console.log(
-		'🎇🧧🧧🧧🎇 TrieuNinhHan ~ generateMetadata ~ title:',
-		title,
-		description,
-	)
+	// console.log(
+	// 	'🎇🧧🧧🧧🎇 TrieuNinhHan ~ generateMetadata ~ title:',
+	// 	title,
+	// 	description,
+	// )
 
 	// Trả về metadata
 	return {
