@@ -397,7 +397,13 @@ const Overview = () => {
 										))
 									: isArray(listChatRoom, 1) &&
 										listChatRoom.map((i) => {
-											const { id, avatar, title, amount_of_user } = i || {}
+											const {
+												id,
+												avatar,
+												title,
+												amount_of_user,
+												amount_of_user_online,
+											} = i || {}
 											return (
 												<Flex
 													key={id}
@@ -423,6 +429,13 @@ const Overview = () => {
 													<div className={classes.chatRoomNum}>
 														{formatNumberString(amount_of_user)} members
 													</div>
+													<Flex className={classes.totalOnl}>
+														<div className={classes.online} />
+														<div>
+															{formatNumberString(amount_of_user_online)}{' '}
+															members online
+														</div>
+													</Flex>
 												</Flex>
 											)
 										})}

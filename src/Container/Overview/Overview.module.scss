@@ -245,7 +245,7 @@
 						gap: 8px;
 						align-items: center;
 						cursor: pointer;
-						min-width: 106px;
+						min-width: 166px;
 						border-radius: 16px;
 						background: #f0f3f9;
 						padding: 12px;
@@ -304,6 +304,25 @@
 							color: #48546b;
 							text-align: center;
 							font-size: 10px;
+						}
+						.totalOnl {
+							align-items: center;
+							gap: 4px;
+							font-weight: 600;
+							color: #48546b;
+							font-size: 12px;
+							.online {
+								display: flex;
+								width: 10px;
+								height: 10px;
+								max-width: 16px;
+								border-radius: 50%;
+								background: #1e9037;
+								flex-direction: column;
+								justify-content: center;
+								align-items: center;
+								border: 1px solid #fff;
+							}
 						}
 					}
 				}
