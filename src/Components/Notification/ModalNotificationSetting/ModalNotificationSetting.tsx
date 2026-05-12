@@ -1,34 +1,89 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import classes from './ModalNotificationSetting.module.scss'
 import CModal from '@/Components/Custom/CModal/CModal'
-import CButton from '@/Components/Custom/CButton'
 import { NOTI_SETTING_ITEMS } from '@/Variable/notificationSetting.variable'
 import { Flex, Skeleton } from 'antd'
 import BellIcon from '@/svg/BellIcon'
 import CSwitch from '@/Components/Custom/CSwitch/CSwitch'
 
+type SettingState = { [key: string]: boolean }
+
 type ModalNotificationSettingProps = {
 	title: string
 	onClose: () => void
-	setting: { [key: string]: boolean } | null
+	setting: SettingState | null
 	loading?: boolean
-	onToggle: (key: string, value: boolean) => void
-	onToggleAll: (key: string, value: boolean) => void
+	onToggle: (key: string, value: boolean) => Promise<void> | void
+	onToggleAll: (key: string, value: boolean) => Promise<void> | void
 }
 
 function ModalNotificationSetting(_props: ModalNotificationSettingProps) {
 	const { title, onClose, setting, loading, onToggle, onToggleAll } = _props
 
-	const allOff = useMemo(() => {
-		if (!setting) return false
-		const keys = NOTI_SETTING_ITEMS.map((i) => i.key)
-		return keys.every((k) => setting[k] === false)
+	const [localSetting, setLocalSetting] = useState<SettingState | null>(setting)
+	const [updatingKey, setUpdatingKey] = useState<string>('')
+	const [updatingAll, setUpdatingAll] = useState(false)
+
+	useEffect(() => {
+		if (setting) {
+			setLocalSetting(setting)
+		}
 	}, [setting])
 
+	const isInitialLoading = loading && !localSetting
+
 	const isAnyOn = useMemo(() => {
-		if (!setting) return false
-		return NOTI_SETTING_ITEMS.some((i) => !!setting[i.key])
-	}, [setting])
+		if (!localSetting) return false
+		return NOTI_SETTING_ITEMS.some((i) => !!localSetting[i.key])
+	}, [localSetting])
+
+	const handleToggleItem = async (key: string, value: boolean) => {
+		if (!localSetting || updatingAll || updatingKey) return
+
+		const prevSetting = localSetting
+
+		setUpdatingKey(key)
+		setLocalSetting((prev) => ({
+			...(prev || {}),
+			[key]: value,
+		}))
+
+		try {
+			await Promise.resolve(onToggle(key, value))
+		} catch (error) {
+			setLocalSetting(prevSetting)
+		} finally {
+			setUpdatingKey('')
+		}
+	}
+
+	const handleToggleAll = async (value: boolean) => {
+		if (!localSetting || updatingAll || updatingKey) return
+
+		const prevSetting = localSetting
+
+		const nextSetting = NOTI_SETTING_ITEMS.reduce<SettingState>(
+			(obj, item) => {
+				obj[item.key] = value
+				return obj
+			},
+			{
+				...localSetting,
+				is_accept_notification: value,
+			},
+		)
+
+		setUpdatingAll(true)
+		setLocalSetting(nextSetting)
+
+		try {
+			await Promise.resolve(onToggleAll('is_accept_notification', value))
+		} catch (error) {
+			setLocalSetting(prevSetting)
+		} finally {
+			setUpdatingAll(false)
+		}
+	}
 
 	const renderSettingSkeleton = () => (
 		<Flex vertical className={classes.skeletonWrapper}>
@@ -53,13 +108,24 @@ function ModalNotificationSetting(_props: ModalNotificationSettingProps) {
 			))}
 		</Flex>
 	)
+
 	return (
 		<div className={classes.wrapper}>
 			<CModal
 				footer={null}
 				onClose={onClose}
 				onCancel={onClose}
-				title={title}
+				title={
+					<span
+						style={{
+							fontSize: 18,
+							fontWeight: 600,
+							color: '#000',
+						}}
+					>
+						{title}
+					</span>
+				}
 				styles={{
 					content: {
 						width: 660,
@@ -67,28 +133,34 @@ function ModalNotificationSetting(_props: ModalNotificationSettingProps) {
 					},
 				}}
 			>
-				{loading ? (
+				{isInitialLoading ? (
 					renderSettingSkeleton()
 				) : (
 					<Flex vertical className={classes.container}>
-						<Flex className={classes.rowHeader}>
-							<Flex className={classes.rowHeader}>
+						<Flex
+							className={classes.rowHeader}
+							align="center"
+							justify="space-between"
+						>
+							<Flex className={classes.left} align="center" gap={12}>
 								<BellIcon fill="#1B8024" />
 								<span className={classes.label}>
 									Turn off all notifications
 								</span>
 							</Flex>
+
 							<CSwitch
 								ctype="success"
-								disabled={loading}
+								disabled={updatingAll || !!updatingKey}
 								checked={isAnyOn}
-								onChange={(checked) =>
-									onToggleAll('is_accept_notification', checked)
-								}
+								onChange={(checked) => handleToggleAll(checked)}
 							/>
 						</Flex>
+
 						{NOTI_SETTING_ITEMS.map((item) => {
 							const { key, label, Icon } = item
+							const isUpdating = updatingAll || updatingKey === key
+
 							return (
 								<Flex
 									key={key}
@@ -100,11 +172,12 @@ function ModalNotificationSetting(_props: ModalNotificationSettingProps) {
 										<Icon fill="#1B8024" />
 										<span className={classes.label}>{label}</span>
 									</Flex>
+
 									<CSwitch
 										ctype="success"
-										disabled={loading}
-										checked={!!setting?.[key]}
-										onChange={(checked) => onToggle(item.key, checked)}
+										disabled={isUpdating}
+										checked={!!localSetting?.[key]}
+										onChange={(checked) => handleToggleItem(item.key, checked)}
 									/>
 								</Flex>
 							)
