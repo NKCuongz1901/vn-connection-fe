@@ -8,7 +8,8 @@
 		flex: 1;
 		width: 100%;
 		height: 200px;
-		overflow-x: scroll;
+		overflow-x: hidden;
+		overflow-y: auto;
 		flex-direction: column-reverse;
 		gap: 4px;
 		padding: 12px 28px;
@@ -571,52 +572,106 @@
 	}
 	.chatBoxSticket {
 		display: none;
+		flex-direction: column; // đảm bảo luôn column
+		width: 100%; // chống bị shrink khi parent là row
+		flex-shrink: 0; // không bị co khi panel mở
 		gap: 12px;
 		padding: 12px;
+		box-sizing: border-box;
+
 		.stickerTitle {
+			display: flex;
 			gap: 16px;
+			align-items: center;
+			overflow-x: auto;
+			overflow-y: hidden;
+			flex-shrink: 0;
 
 			.stickerItemTitle {
+				width: 48px;
+				height: 48px;
+				min-width: 48px;
 				padding: 8px;
 				cursor: pointer;
-				img {
-					height: 32px;
+				border-radius: 16px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: background 0.15s ease;
+
+				&:hover {
+					background: #e7f5e9;
+				}
+
+				:global(.ant-image) {
 					width: 32px;
+					height: 32px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
+
+				img {
+					width: 32px;
+					height: 32px;
+					object-fit: contain;
+					display: block;
 				}
 			}
-			& > :hover {
-				border-radius: 16px;
-				overflow: hidden;
-				background: #e7f5e9;
-			}
 		}
+
 		.stickerActive {
-			border-radius: 16px;
-			overflow: hidden;
 			background: #e7f5e9;
 		}
+
 		.contentSticker {
+			display: flex;
 			flex-wrap: wrap;
 			overflow: auto;
+			gap: 8px;
+			align-content: flex-start;
+
 			.stickerItem {
+				width: 96px;
+				height: 96px;
+				min-width: 96px;
 				padding: 8px;
 				cursor: pointer;
-				img {
-					height: 80px;
-					width: 80px;
-				}
-			}
-			& > :hover {
 				border-radius: 16px;
-				overflow: hidden;
-				background: #e7f5e9;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: background 0.15s ease;
+
+				&:hover {
+					background: #e7f5e9;
+				}
+
+				:global(.ant-image) {
+					width: 80px;
+					height: 80px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
+
+				img {
+					width: 80px;
+					height: 80px;
+					object-fit: contain;
+					display: block;
+				}
 			}
 		}
 	}
+
 	.showSticker {
-		height: 380px;
-		display: flex;
+		display: flex !important; // override .chatBoxSticket { display: none }
+		flex-direction: column; // lặp lại cho chắc
+		height: 300px;
+		width: 100%;
 	}
+
 	.chatReply {
 		margin: 0px 16px;
 		padding: 8px;
@@ -974,11 +1029,11 @@
 		}
 	}
 }
-@media (min-width: 769px) and (max-width: 1440px) {
-	.wrapper .showSticker {
-		height: 300px;
-	}
-}
+// @media (min-width: 769px) and (max-width: 1440px) {
+// 	.wrapper .showSticker {
+// 		height: 300px;
+// 	}
+// }
 .jumpHighlight {
 	animation: jumpHighlightFlash 1.5s ease;
 	border-radius: 8px;

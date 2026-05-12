@@ -579,45 +579,96 @@
 		display: none;
 		gap: 12px;
 		padding: 12px;
+
 		.stickerTitle {
+			display: flex;
 			gap: 16px;
+			align-items: center;
+			overflow-x: auto;
+			overflow-y: hidden;
+			flex-shrink: 0;
 
 			.stickerItemTitle {
+				width: 48px;
+				height: 48px;
+				min-width: 48px;
 				padding: 8px;
 				cursor: pointer;
-				img {
-					height: 32px;
+				border-radius: 16px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: background 0.15s ease;
+
+				&:hover {
+					background: #e7f5e9;
+				}
+
+				:global(.ant-image) {
 					width: 32px;
+					height: 32px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
+
+				img {
+					width: 32px;
+					height: 32px;
+					object-fit: contain;
+					display: block;
 				}
 			}
-			& > :hover {
-				border-radius: 16px;
-				overflow: hidden;
-				background: #e7f5e9;
-			}
 		}
+
 		.stickerActive {
-			border-radius: 16px;
-			overflow: hidden;
 			background: #e7f5e9;
 		}
+
 		.contentSticker {
+			display: flex;
 			flex-wrap: wrap;
 			overflow: auto;
+			gap: 8px;
+			align-content: flex-start;
+
 			.stickerItem {
+				width: 96px;
+				height: 96px;
+				min-width: 96px;
 				padding: 8px;
 				cursor: pointer;
-				img {
-					height: 80px;
+				border-radius: 16px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: background 0.15s ease;
+
+				&:hover {
+					background: #e7f5e9;
+				}
+
+				:global(.ant-image) {
 					width: 80px;
+					height: 80px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
+
+				img {
+					width: 80px;
+					height: 80px;
+					object-fit: contain;
+					display: block;
 				}
 			}
-			& > :hover {
-				border-radius: 16px;
-				overflow: hidden;
-				background: #e7f5e9;
-			}
 		}
+	}
+
+	.showSticker {
+		height: 380px;
+		display: flex;
 	}
 	.showSticker {
 		height: 380px;
