@@ -26,6 +26,10 @@
 			.bodyHeader {
 				align-items: center;
 				gap: 8px;
+				.avatar {
+					height: 48px;
+					width: 48px;
+				}
 			}
 			.bodyText {
 				.text {

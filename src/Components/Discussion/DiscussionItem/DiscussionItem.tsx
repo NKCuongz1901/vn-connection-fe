@@ -57,6 +57,7 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 			<Flex vertical className={classes.body}>
 				<Flex className={classes.bodyHeader}>
 					<CAvatar
+						className={classes.avatar}
 						src={avatar}
 						onClick={() => onChangeRoute(mainRoutes.profile + `/${user_id}`)}
 					/>
