@@ -20,10 +20,10 @@ const TermPolicy = () => {
 			}}
 		>
 			<Flex gap={12}>
-				<Link href={onGetPath(`${mainRoutes.policyTerm}?type=TERMS`)}>
+				<Link href={onGetPath(mainRoutes.term)}>
 					Terms of Use
 				</Link>
-				<Link href={onGetPath(`${mainRoutes.policyTerm}?type=POLICY`)}>
+				<Link href={onGetPath(mainRoutes.policy)}>
 					Privacy Policy
 				</Link>
 			</Flex>

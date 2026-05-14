@@ -1,3 +1,5 @@
+'use client'
+
 import { Flex } from 'antd'
 import { memo } from 'react'
 
@@ -10,6 +12,7 @@ import CInput from '@/Components/Custom/CInput'
 import CCheckbox from '@/Components/Custom/CCheckbox'
 import Link from 'next/link'
 import { mainRoutes } from '@/routes/MainRoutes'
+import { useLocalePath } from '@/ultis/route'
 
 interface ChangePasswordProps {
 	disabled?: boolean
@@ -46,6 +49,7 @@ const ChangePassword = ({
 	onChangeCommonData,
 	onAccept,
 }: ChangePasswordProps) => {
+	const { onGetPath } = useLocalePath()
 	return (
 		<div className={classes.wrapper}>
 			<Flex
@@ -115,7 +119,7 @@ const ChangePassword = ({
 								{' '}
 								I agree to the app's{' '}
 								<Link
-									href={`${mainRoutes.policyTerm}?type=TERMS`}
+									href={onGetPath(mainRoutes.term)}
 									className={classes.highlight}
 									target="_blank"
 								>
@@ -123,7 +127,7 @@ const ChangePassword = ({
 								</Link>{' '}
 								and{' '}
 								<Link
-									href={`${mainRoutes.policyTerm}?type=POLICY`}
+									href={onGetPath(mainRoutes.policy)}
 									className={classes.highlight}
 									target="_blank"
 								>

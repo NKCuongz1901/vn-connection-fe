@@ -1,16 +1,14 @@
-'use client'
-import PolicyTerm from '@/Container/PolicyTerm'
-import { useQuery } from '@/ultis/route'
-import React from 'react'
+import { redirect } from 'next/navigation'
 
-const Page = () => {
-	const { onGetQuerry } = useQuery()
-	const { type } = onGetQuerry()
-	return (
-		<div>
-			<PolicyTerm type={type} />
-		</div>
-	)
+type PageProps = {
+	params: { locale: string }
+	searchParams: { type?: string }
 }
 
-export default Page
+export default function PolicyTermLegacyPage({ params, searchParams }: PageProps) {
+	const { locale } = params
+	if (searchParams?.type === 'TERMS') {
+		redirect(`/${locale}/term`)
+	}
+	redirect(`/${locale}/policy`)
+}

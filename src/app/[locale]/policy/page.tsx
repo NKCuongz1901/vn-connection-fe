@@ -2,10 +2,10 @@
 
 import PolicyTerm from '@/Container/PolicyTerm'
 
-export default function TermPage() {
+export default function PolicyPage() {
 	return (
 		<div>
-			<PolicyTerm type="TERMS" />
+			<PolicyTerm type="POLICY" />
 		</div>
 	)
 }

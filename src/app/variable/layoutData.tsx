@@ -4,12 +4,15 @@ export const appLayoutExclusive = [
 	'/login',
 	'/register',
 	'/forget-password',
+	'/term',
+	'/policy',
 	'/policy-term',
 ]
 export const appLayoutAuth = [
 	mainRoutes.login,
 	mainRoutes.register,
 	mainRoutes.forgetPassword,
-	mainRoutes.policyTerm,
+	mainRoutes.term,
+	mainRoutes.policy,
 	'socketLogout',
 ]

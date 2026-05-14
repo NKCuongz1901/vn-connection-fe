@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-	title: 'Terms of Use',
+	title: 'Privacy Policy',
 }
 
-export default function TermLayout({
+export default function PolicyLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode
