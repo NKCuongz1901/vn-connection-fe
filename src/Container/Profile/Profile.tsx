@@ -154,7 +154,7 @@ const Profile = (props: ProfileProps) => {
 			<Flex className={classes.totalInfo} vertical>
 				<Flex className={classes.cover}>
 					<div className={classes.coverImg}>
-						<CImage preview src={cover || '/images/defaultCover2.png'} alt="" />
+						<CImage preview src={cover || '/images/defaultCover2.jpg'} alt="" />
 					</div>
 					<Flex className={classes.header}>
 						{!isMinimize ? (

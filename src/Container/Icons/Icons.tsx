@@ -90,6 +90,7 @@ import BookIcon from '@/svg/BookIcon'
 import MiniApp from '@/svg/MiniApp'
 import DoubleTick from '@/svg/DoubleTick'
 import ShopIcon from '@/svg/ShopIcon'
+import DocumentUpload from '@/svg/DocumentUpload'
 
 const Icons = () => {
 	const icons = [
@@ -387,6 +388,11 @@ const Icons = () => {
 		{
 			ICON: ShopIcon,
 			name: '@/svg/Event/ShopIcon',
+			key: randomString(),
+		},
+		{
+			ICON: DocumentUpload,
+			name: '@/svg/Event/DocumentUpload',
 			key: randomString(),
 		},
 	]

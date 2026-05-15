@@ -1,7 +1,7 @@
 import { IconCircleXFilled } from '@tabler/icons-react'
-import { Flex } from 'antd'
+import { Flex, Radio } from 'antd'
 import { debounce } from 'lodash'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
@@ -16,10 +16,15 @@ import FeedbackIcon from '@/svg/FeedbackIcon'
 import ImageIcon from '@/svg/ImageIcon'
 import { isArray } from '@/ultis/array'
 import { isEmail } from '@/ultis/common'
-import { handleParseFileImg, handleUploadMedia } from '@/ultis/file'
+import {
+	handleParseFileImg,
+	handleParseFileVideo,
+	handleUploadMedia,
+} from '@/ultis/file'
 
 import CImage from '../CImage'
 import CUploadMuti from '../CUploadMuti'
+import DocumentUpload from '@/svg/DocumentUpload'
 
 import { topicReportOpt } from '@/Variable/select.variable'
 
@@ -44,6 +49,7 @@ const ModalReport = (props: ModalReportProps) => {
 	const [errors, setErrors] = useState({
 		topic: '',
 		email: '',
+		content: '',
 	})
 	const [dataModal, setDataModal] = useState({
 		topic: topicReportOpt[0].value,
@@ -52,44 +58,89 @@ const ModalReport = (props: ModalReportProps) => {
 	})
 	const [fileList, setFileList] = useState([])
 
-	const handleImportImg = debounce((_values) => {
-		const values = []
+	const processUpload = useCallback(
+		async (_values: any[]) => {
+			if (!isArray(_values, 1)) return
 
-		if (isArray(_values, 1)) {
-			_values.forEach((i) => {
-				const { imageUrl, file } = handleParseFileImg(i?.originFileObj) || {}
-				if (imageUrl) {
-					values.push({ imageUrl, file })
+			const next: Array<{
+				type: 'IMAGE' | 'VIDEO'
+				url: string
+				file: File
+			}> = []
+
+			for (const i of _values) {
+				const file = i?.originFileObj as File | undefined
+				if (!file) continue
+
+				if (file.type.startsWith('image')) {
+					const { imageUrl } = handleParseFileImg(file) || {}
+					if (imageUrl) next.push({ type: 'IMAGE', url: imageUrl, file })
+					continue
 				}
-			})
-		}
-		const maxItem = 3
-		setFileList((prev) => {
-			const combined = [...prev, ...values]
-			if ((combined || []).length > maxItem) {
+
+				if (file.type.startsWith('video')) {
+					const { videoUrl } = await handleParseFileVideo(file)
+					if (videoUrl) next.push({ type: 'VIDEO', url: videoUrl, file })
+					else openError({ message: 'Video must be 60 seconds or shorter.' }) // hoặc message bạn đang dùng
+					continue
+				}
+			}
+
+			const videos = next.filter((x) => x.type === 'VIDEO')
+			const images = next.filter((x) => x.type === 'IMAGE')
+
+			if (videos.length && images.length) {
+				openError({
+					message: 'Please upload either images or one video, not both.',
+				})
+				return
+			}
+
+			if (videos.length > 1) {
+				openError({ message: 'You can only upload one video.' })
+				setFileList([videos[0]])
+				return
+			}
+
+			if (videos.length === 1) {
+				setFileList(videos)
+				return
+			}
+
+			// chỉ ảnh
+			if (images.length > 5) {
 				openConfirm({
-					message: 'You can only upload up to 3 medias',
+					message: 'You can only upload up to 5 images.',
 					onAccept: () => closeModal(),
 				})
 			}
-			return combined.slice(0, maxItem)
-		})
-	}, 200)
+			setFileList(images.slice(0, 5))
+		},
+		[closeModal, openConfirm, openError],
+	)
+
+	const handleImportImg = useMemo(
+		() => debounce((list: any[]) => void processUpload(list), 200),
+		[processUpload],
+	)
 
 	const handleOnChangeData = useCallback((key, value) => {
 		setErrors((prev) => ({ ...prev, [key]: '' }))
 		setDataModal((prev) => ({ ...prev, [key]: value }))
 	}, [])
 	const handleValidate = useCallback((dataModal: any) => {
-		const { email } = dataModal
+		const { email, topic, content } = dataModal
 		const _errors: any = Object.fromEntries(
 			Object.entries({
 				email: 'Please enter your email',
-				// content: 'Please enter your proble',
+				content: 'Please describe the issue in detail',
 			}).filter(([key]) => !dataModal?.[key]),
 		)
 		if (!_errors.email && !isEmail(email)) {
 			_errors.email = 'Please enter correct email'
+		}
+		if (!_errors.content && !content) {
+			_errors.content = 'Please describe the issue in detail'
 		}
 		if (isArray(Object.entries(_errors), 1)) {
 			setErrors(_errors)
@@ -142,10 +193,41 @@ const ModalReport = (props: ModalReportProps) => {
 		return (
 			<Flex className={classes.top} vertical>
 				<FeedbackIcon />
-				<div className={classes.title}>Tell us your problems</div>
+				<div className={classes.title}>Tell us your issue</div>
 				<span className={classes.text}>
 					Your feedbacks help us improve a lot
 				</span>
+			</Flex>
+		)
+	}
+
+	const _renderTypeIssuse = () => {
+		return (
+			<Flex vertical className={classes.topicRadioWrapper}>
+				<p className={classes.typeIssueTitle}>Type of issue</p>
+				<Radio.Group
+					//   value={topic}
+					onChange={(e) => handleOnChangeData('topic', e.target.value)}
+					className={classes.topicRadioGroup}
+				>
+					{topicReportOpt.map((opt) => (
+						<Radio
+							key={opt.value}
+							value={opt.value}
+							className={classes.topicRadio}
+						>
+							<Flex
+								vertical
+								justify="start"
+								align="start"
+								className={classes.topicRadioText}
+							>
+								<div className={classes.topicRadioTitle}>{opt.label}</div>
+								<div className={classes.topicRadioDesc}>{opt.value}</div>
+							</Flex>
+						</Radio>
+					))}
+				</Radio.Group>
 			</Flex>
 		)
 	}
@@ -154,6 +236,8 @@ const ModalReport = (props: ModalReportProps) => {
 		const { topic, email, content } = dataModal
 		return (
 			<Flex className={classes.middle} vertical>
+				<p className={classes.typeIssueTitle}>Issue detail</p>
+
 				<Flex className={classes.email}>
 					<CInput
 						isRequired
@@ -163,52 +247,59 @@ const ModalReport = (props: ModalReportProps) => {
 						error={errors.email}
 						placeholder="Enter your email"
 						onChange={(e) => handleOnChangeData('email', e.target.value)}
+						style={{ border: 'none' }}
 					/>
 				</Flex>
-				<Flex className={classes.topic}>
-					<CSelect
-						isRequired
-						label="Topic"
-						value={topic}
-						error={errors.topic}
-						options={topicReportOpt}
-						placeholder="Select your topic"
-						onChange={(e) => handleOnChangeData('topic', e)}
-					/>
-				</Flex>
+
 				<Flex className={classes.content}>
 					<CTextArea
-						showCount
+						isRequired
+						showCount={false}
 						label="Content"
 						placeholder="Describe your problems"
 						value={content}
+						error={errors.content}
 						rows={4}
 						maxLength={1000}
 						onChange={(e) => handleOnChangeData('content', e.target.value)}
+						style={{ border: 'none' }}
 					/>
 				</Flex>
 				<Flex className={classes.chooseImg} vertical>
 					<Flex className={classes.upload}>
 						<CUploadMuti
-							maxCount={0}
+							maxCount={5}
 							fileList={fileList.map((i) => i.file)}
 							onChange={({ file: _file, fileList: newList }) => {
 								handleImportImg(newList)
 							}}
+							accept="image/*,video/*"
 						>
-							<ImageIcon /> <span> &nbsp;Upload image</span>
+							<DocumentUpload /> <span> &nbsp;Upload media</span>
 						</CUploadMuti>
 					</Flex>
+					<p className={classes.uploadText}>
+						* Upload 5 images or video (max 60s)
+					</p>
 					<Flex className={classes.medias}>
-						{fileList.map((i) => (
-							<Flex key={i.imageUrl || i?.url} className={classes.media}>
-								<CImage preview={true} src={i.imageUrl || i?.url} />
+						{fileList.map((item, idx) => (
+							<Flex key={`${item.url}-${idx}`} className={classes.media}>
+								{item.type === 'VIDEO' ? (
+									<video
+										src={item.url}
+										controls
+										muted
+										playsInline
+										className={classes.videoPreview}
+									/>
+								) : (
+									<CImage preview src={item.url} />
+								)}
 								<Flex
 									className={classes.chooseImgCancel}
 									onClick={() => {
-										setFileList((prev) =>
-											prev.filter((prev) => prev.imageUrl !== i.imageUrl),
-										)
+										URL.revokeObjectURL(item.url)
+										setFileList((prev) => prev.filter((_, i) => i !== idx))
 									}}
 								>
 									<IconCircleXFilled />
@@ -230,16 +321,21 @@ const ModalReport = (props: ModalReportProps) => {
 					title={title || 'Report'}
 					styles={{
 						content: {
-							width: 800,
+							width: 660,
+							minHeight: 800,
 						},
 					}}
 					footer={[
-						<Flex key="back" justify="flex-end">
+						<Flex key="back">
 							<CButton
-								disabled={loadingContext}
+								disabled={
+									loadingContext ||
+									!String(dataModal.email ?? '').trim() ||
+									!String(dataModal.content ?? '').trim()
+								}
 								onClick={handleSubmit}
 								ctype="oranger"
-								style={{ width: 240 }}
+								style={{ width: '100%' }}
 							>
 								Submit
 							</CButton>
@@ -248,6 +344,7 @@ const ModalReport = (props: ModalReportProps) => {
 				>
 					<Flex className={classes.wrapper} vertical>
 						{_renderTop()}
+						{_renderTypeIssuse()}
 						{_renderMiddle()}
 					</Flex>
 				</CModal>

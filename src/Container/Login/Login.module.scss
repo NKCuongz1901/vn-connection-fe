@@ -63,14 +63,32 @@
 					}
 				}
 				.rightTop3 {
+					width: 360px;
+					color: #006b35;
+					text-align: center;
+					font-family: Inter;
 					font-size: 24px;
+					font-style: normal;
 					font-weight: 600;
+					line-height: 28px;
 				}
 			}
 		}
 	}
 	.color {
-		color: #e55a0f;
+		color: #0f1729;
+		font-family: Inter;
+		font-size: 12px;
+		font-style: normal;
+		font-weight: 600;
+		line-height: 16px;
+		text-decoration-line: underline;
+		text-decoration-style: solid;
+		text-decoration-skip-ink: none;
+		text-decoration-thickness: auto;
+		text-underline-offset: auto;
+		text-underline-position: from-font;
+		cursor: pointer;
 	}
 	.title {
 		font-weight: 600;

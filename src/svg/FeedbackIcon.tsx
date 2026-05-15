@@ -4,8 +4,8 @@ const FeedbackIcon = () => {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
-			width="84"
-			height="120"
+			width="80"
+			height="80"
 			viewBox="0 0 84 120"
 			fill="none"
 		>

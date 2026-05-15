@@ -2,7 +2,7 @@
 import { Checkbox, Flex } from 'antd'
 import clsx from 'clsx'
 import Link from 'next/link'
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useState } from 'react'
 
 import useLogin from '@/hooks/Login/useLogin'
 import { useLoading } from '@/context/LoadingContext'
@@ -21,6 +21,7 @@ import MainLogo from './MainLogo'
 import classes from './Login.module.scss'
 
 import { mainRoutes } from '@/routes/MainRoutes'
+import ModalReport from '@/Components/Custom/ModalReport'
 
 const { forgetPassword } = mainRoutes
 
@@ -28,6 +29,7 @@ const Login = () => {
 	const { onGetPath, onChangeRoute } = useLocalePath()
 	const { loadingContext } = useLoading()
 	const { account, onChange, isValidate, onLogin } = useLogin()
+	const [openModalReport, setOpenModalReport] = useState(false)
 
 	const _renderLeft = useCallback(() => {
 		return (
@@ -79,7 +81,7 @@ const Login = () => {
 					</div>
 					<Flex vertical gap={20}>
 						<Flex align="center" justify="center" className={classes.rightTop3}>
-							Sign In
+							Just enter your <br /> phone number to get started
 						</Flex>
 						<CInputPhone
 							isNotBold
@@ -99,7 +101,7 @@ const Login = () => {
 							onChange={(e) => onChange('password')(e.target.value)}
 							placeholder="Password"
 						/>
-						<Flex justify="space-between" align="center">
+						<Flex justify="space-between" align="flex-start">
 							<Flex>
 								<Checkbox
 									checked={isRemember}
@@ -108,9 +110,14 @@ const Login = () => {
 									Remember me
 								</Checkbox>
 							</Flex>
-							<Link href={onGetPath(forgetPassword)}>
-								<span className={classes.color}>Forgot password</span>
-							</Link>
+							<Flex vertical gap={16} align="flex-end">
+								<Link href={onGetPath(forgetPassword)}>
+									<span className={classes.color}>Forgot password?</span>
+								</Link>
+								<span onClick={() => setOpenModalReport(true)}>
+									<span className={classes.color}>Need help?</span>
+								</span>
+							</Flex>
 						</Flex>
 						<CButton
 							disabled={disable}
@@ -131,6 +138,13 @@ const Login = () => {
 			{_renderLeft()}
 			{<DownloadApp />}
 			<div className={classes.rightContainer}>{_renderRight()}</div>
+			<ModalReport
+				open={openModalReport}
+				onClose={() => setOpenModalReport(false)}
+				data={{}}
+				message="You want to need help this problem ?"
+				title="Report"
+			/>
 		</div>
 	)
 }
