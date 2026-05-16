@@ -150,7 +150,7 @@ const FriendItem = (_props: FriendItemProps) => {
 	return (
 		<Flex className={classes.wrapper}>
 			<Flex className={classes.left}>
-				<CAvatar src={avatar} />
+				<CAvatar src={avatar} size={46} />
 				<div>{name}</div>
 			</Flex>
 			{_renderRight()}

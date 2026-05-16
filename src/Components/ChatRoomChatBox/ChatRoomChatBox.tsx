@@ -381,9 +381,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 										</video>
 									)}
 									{isOverflow && (
-										<div className={classes.moreOverlay}>
-											+{totalMedia - 5}
-										</div>
+										<div className={classes.moreOverlay}>+{totalMedia - 5}</div>
 									)}
 								</Flex>
 							)
@@ -425,12 +423,8 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 								{_renderParentItem(parent)}
 								<div
 									className={clsx(
-										isMulti
-											? classes.multiMediaContent
-											: classes.mediaContent,
-										!isAudioMedia &&
-											isMulti &&
-											classes[`grid${gridCount}`],
+										isMulti ? classes.multiMediaContent : classes.mediaContent,
+										!isAudioMedia && isMulti && classes[`grid${gridCount}`],
 									)}
 								>
 									{Content}
@@ -563,6 +557,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 										onClick={() =>
 											onChangeRoute(`${mainRoutes.profile}/${user_id}`)
 										}
+										size={46}
 									/>
 								)}
 							</Flex>
