@@ -7,6 +7,7 @@ import { routing } from '@/i18n/routing'
 import { LoadingProvider } from '@/context/LoadingContext'
 import { ModalProvider } from '@/context/ModalContext'
 import { SocketProvider } from '@/context/SocketContext'
+import { NewInboxProvider } from '@/context/NewInboxContext'
 
 import MainLayout from '@/Components/Layout/MainLayout'
 import 'country-flag-icons/3x2/flags.css'
@@ -34,7 +35,9 @@ export default async function LocaleLayout({
 			<LoadingProvider>
 				<ModalProvider>
 					<SocketProvider>
-						<MainLayout>{children}</MainLayout>
+						<NewInboxProvider>
+							<MainLayout>{children}</MainLayout>
+						</NewInboxProvider>
 					</SocketProvider>
 				</ModalProvider>
 			</LoadingProvider>

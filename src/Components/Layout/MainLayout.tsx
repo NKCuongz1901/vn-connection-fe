@@ -6,6 +6,7 @@ import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
 
 import { isLogin } from '@/ultis/storage'
 import { useLocalePath } from '@/ultis/route'
+import { useNewInbox } from '@/context/NewInboxContext'
 
 import AuthLayout from './Child/AuthLayout'
 import HeaderMainLayout from './Child/HeaderMainLayout'
@@ -24,6 +25,7 @@ interface MainLayoutProps {
 const MainLayout = (props: MainLayoutProps) => {
 	const { children } = props
 	const { pathname, onGetPath, localePathname, onChangeRoute } = useLocalePath()
+	const { hasNewInboxMessage } = useNewInbox()
 	const ref = useRef<HTMLDivElement>(null)
 
 	const [openMenu, setOpenMenu] = useState(false)
@@ -71,6 +73,8 @@ const MainLayout = (props: MainLayoutProps) => {
 						{Menus.map((menu) => {
 							const { title, Icon, path } = menu
 							const active = Boolean(path) && pathname.startsWith(path)
+							const isInboxMenu = path === mainRoutes.inbox
+							const showDot = isInboxMenu && hasNewInboxMessage && !active
 
 							return (
 								<Link
@@ -86,6 +90,9 @@ const MainLayout = (props: MainLayoutProps) => {
 									>
 										<div className="iconItemMenu">
 											<Icon fill={active ? '#006b35' : '#94A3B8'} />
+											{showDot && (
+												<span className="inboxUnreadDot" aria-hidden />
+											)}
 										</div>
 										<span>{title}</span>
 									</Flex>
@@ -134,7 +141,7 @@ const MainLayout = (props: MainLayoutProps) => {
 			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [localePathname, openMenu])
+	}, [localePathname, openMenu, hasNewInboxMessage])
 
 	return <div className="mainLayout">{content}</div>
 }

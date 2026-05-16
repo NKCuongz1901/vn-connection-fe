@@ -49,7 +49,22 @@
 						color: #94a3b8;
 						align-items: center;
 						.iconItemMenu {
+							position: relative;
 							width: 24px;
+							height: 24px;
+							flex-shrink: 0;
+
+							.inboxUnreadDot {
+								position: absolute;
+								top: -2px;
+								right: -2px;
+								width: 8px;
+								height: 8px;
+								background: #e55a0f;
+								border-radius: 50%;
+								border: 1.5px solid #fff;
+								pointer-events: none;
+							}
 						}
 						svg {
 							height: 20px;
