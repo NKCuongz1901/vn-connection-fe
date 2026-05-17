@@ -2,7 +2,7 @@ import { IconCircleXFilled } from '@tabler/icons-react'
 import { Dropdown, Flex, Menu, Skeleton } from 'antd'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
-import { memo, useCallback, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useRef, useState } from 'react'
 
 import useChatRoomChatBox from '@/hooks/ChatRoomChatBox/useChatRoomChatBox'
 
@@ -49,7 +49,28 @@ interface ChatRoomChatBoxProps {
 	[key: string]: any
 	onEnsureMessageLoaded?: (id: string) => Promise<boolean>
 	loadingEnsureMessage?: boolean
+	editingMessage?: any
+	onEditMessage?: (values: {
+		message: any
+		content?: string
+		medias?: any[]
+	}) => void
+	onCancelEdit?: () => void
 }
+
+const mapMessageMediasToFileList = (medias: any[] = []) =>
+	(medias || []).map((m) => ({
+		type: m?.type || 'IMAGE',
+		url: m?.url,
+		isExisting: true,
+		fileName: m?.fileName,
+		width: m?.width,
+		height: m?.height,
+		ratio: m?.ratio,
+		thumbnail: m?.thumbnail,
+		duration: m?.duration,
+	}))
+
 const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 	const {
 		itemList,
@@ -59,7 +80,11 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		convId,
 		onEnsureMessageLoaded,
 		loadingEnsureMessage,
+		editingMessage,
+		onEditMessage,
+		onCancelEdit,
 	} = props
+	const cancelEditRef = useRef<() => void>(() => {})
 	const { onChangeRoute } = useLocalePath()
 	const {
 		listTranslateLoading,
@@ -97,15 +122,48 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		onAddReact,
 		onOpenReact,
 		onChangeLanguage,
-	} = useChatRoomChatBox(props)
+	} = useChatRoomChatBox({
+		...props,
+		onCancelEdit: () => cancelEditRef.current(),
+	})
 
 	const [fileList, setFileList] = useState([])
 	const messageRefs = useRef<Record<string, HTMLDivElement | null>>({})
 	const [jumpHighlightId, setJumpHighlightId] = useState('')
 	const isJumpingRef = useRef(false)
 
+	const handleCancelEditMode = useCallback(() => {
+		setText('')
+		setFileList([])
+		setReply(null)
+		onCancelEdit?.()
+	}, [onCancelEdit, setReply, setText])
+
+	cancelEditRef.current = handleCancelEditMode
+
+	useEffect(() => {
+		if (!editingMessage) return
+		setText(editingMessage.content || '')
+		setReply(null)
+		setFileList(mapMessageMediasToFileList(editingMessage.medias))
+		_refInput?.current?.focus()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [editingMessage?.id])
+
 	const handleSubmitMessage = () => {
 		if (!(!!text.trim() || isArray(fileList, 1))) return
+
+		if (editingMessage && onEditMessage) {
+			onEditMessage({
+				message: editingMessage,
+				content: text,
+				medias: fileList,
+			})
+			setText('')
+			setFileList([])
+			setReply(null)
+			return
+		}
 
 		setText('')
 		setReply(null)
@@ -168,7 +226,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 			}
 		}
 
-		setFileList(values)
+		setFileList((prev) => (editingMessage ? [...prev, ...values] : values))
 	}
 
 	const _renderParentItem = (parent) => {
@@ -708,6 +766,54 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 			</Flex>
 		)
 	}
+	const _renderEditMediaThumbnails = () => {
+		if (!isArray(fileList, 1)) return null
+		return (
+			<Flex className={classes.editMediaList} wrap="wrap" gap={8}>
+				{fileList.map((i) => {
+					const { url, type } = i || {}
+					const isImg = type === 'IMAGE'
+					return (
+						<Flex key={url} className={classes.editMediaItem}>
+							{isImg ? (
+								<CImage preview src={url} />
+							) : (
+								<video controls>
+									<source src={url} type="video/mp4" />
+								</video>
+							)}
+							<Flex
+								className={classes.editMediaCancel}
+								onClick={() =>
+									setFileList((prev) => prev.filter((p) => p.url !== url))
+								}
+							>
+								<IconCircleXFilled />
+							</Flex>
+						</Flex>
+					)
+				})}
+			</Flex>
+		)
+	}
+
+	const _renderEdit = () => {
+		if (!editingMessage) return null
+
+		return (
+			<Flex className={classes.chatReply}>
+				<ReplyIcon />
+				<Flex className={classes.replyInfo} vertical>
+					<div className={classes.replyName}>Editing message</div>
+					{_renderEditMediaThumbnails()}
+				</Flex>
+				<Flex className={classes.replyCancel} onClick={handleCancelEditMode}>
+					<IconCircleXFilled />
+				</Flex>
+			</Flex>
+		)
+	}
+
 	const _renderReply = () => {
 		const { type, content, user } = reply || {}
 		let node = <></>
@@ -773,8 +879,9 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 						</Flex>
 					))}
 			</Flex>
-			{reply && _renderReply()}
-			{isArray(fileList, 1) && (
+			{editingMessage && _renderEdit()}
+			{reply && !editingMessage && _renderReply()}
+			{isArray(fileList, 1) && !editingMessage && (
 				<Flex className={classes.chooseImgPreviewBar}>
 					{fileList.map((i) => {
 						const { url, type } = i || {}
@@ -806,7 +913,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 			<Flex className={clsx(classes.chatBox)}>
 				<Flex className={classes.chooseImg}>
 					<CUploadMuti
-						fileList={fileList.map((i) => i.file)}
+						fileList={fileList.filter((i) => i?.file).map((i) => i.file)}
 						onChange={({ file: _file, fileList: newList }) => {
 							handleImportMedia(newList)
 						}}
@@ -838,15 +945,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 						className={classes.sendButton}
 						onClick={() => {
 							if (!!text.trim() || isArray(fileList, 1)) {
-								setText('')
-								setReply(null)
-								onSendMessage({
-									type: 'TEXT',
-									content: text,
-									parent: reply,
-									medias: fileList,
-								})
-								setFileList([])
+								handleSubmitMessage()
 							}
 						}}
 					>

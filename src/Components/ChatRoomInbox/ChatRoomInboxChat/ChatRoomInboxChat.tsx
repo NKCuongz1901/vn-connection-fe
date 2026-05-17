@@ -49,6 +49,9 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 
 		setOpenSetting,
 		onSendMessage,
+		editingMessage,
+		onEditMessage,
+		onCancelEdit,
 		onActionMessage,
 		onLoadMore,
 		onGetPinMessage,
@@ -186,6 +189,9 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 						onLoadMore={onLoadMore}
 						_scrollRef={_scrollRef}
 						onSendMessage={onSendMessage}
+						editingMessage={editingMessage}
+						onEditMessage={onEditMessage}
+						onCancelEdit={onCancelEdit}
 						onActionMessage={onActionMessage}
 						onAddReact={onAddReact}
 						onEnsureMessageLoaded={onEnsureMessageLoaded}
