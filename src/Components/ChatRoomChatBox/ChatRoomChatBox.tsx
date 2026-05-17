@@ -5,10 +5,15 @@ import dayjs from 'dayjs'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 
 import useChatRoomChatBox from '@/hooks/ChatRoomChatBox/useChatRoomChatBox'
+import { useModal } from '@/context/ModalContext'
 
 import { arrayFrom, isArray } from '@/ultis/array'
 import { parseDayFromIsNewDate } from '@/ultis/date'
-import { handleParseFileImg, handleParseFileVideo } from '@/ultis/file'
+import {
+	handleParseFileImg,
+	handleParseFileVideo,
+	mergeChatMediaFileList,
+} from '@/ultis/file'
 import { useLocalePath } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
 
@@ -84,6 +89,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		onEditMessage,
 		onCancelEdit,
 	} = props
+	const { openConfirm, closeModal } = useModal()
 	const cancelEditRef = useRef<() => void>(() => {})
 	const { onChangeRoute } = useLocalePath()
 	const {
@@ -140,6 +146,13 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 	}, [onCancelEdit, setReply, setText])
 
 	cancelEditRef.current = handleCancelEditMode
+
+	const notifyMediaLimit = useCallback(() => {
+		openConfirm({
+			message: 'You can only upload up to 5 medias',
+			onAccept: () => closeModal(),
+		})
+	}, [closeModal, openConfirm])
 
 	useEffect(() => {
 		if (!editingMessage) return
@@ -226,7 +239,15 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 			}
 		}
 
-		setFileList((prev) => (editingMessage ? [...prev, ...values] : values))
+		setFileList((prev) => {
+			const { next, limitExceeded } = mergeChatMediaFileList(
+				prev,
+				values,
+				!!editingMessage,
+			)
+			if (limitExceeded) notifyMediaLimit()
+			return next
+		})
 	}
 
 	const _renderParentItem = (parent) => {

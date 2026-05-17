@@ -31,7 +31,10 @@ import { generateCustomUuid, parseMentions, randomString } from '@/ultis/string'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { ReactionPtops } from '@/interface/Conversation/Conversation.interface'
-import { paginationCommon } from '@/Variable/common.variable'
+import {
+	MAX_CHAT_MEDIAS,
+	paginationCommon,
+} from '@/Variable/common.variable'
 
 type useHangoutChatProps = {
 	convId: string
@@ -515,7 +518,9 @@ export default function useChatRoomInboxChat({
 	}) => {
 		if (!message?.id) return
 		try {
-			const medias = await buildMediasPayload(_medias)
+			const medias = await buildMediasPayload(
+				(_medias || []).slice(0, MAX_CHAT_MEDIAS),
+			)
 			const type = medias.length > 0 ? 'MEDIAS' : 'TEXT'
 			const { text, mentions } =
 				type !== 'MEDIAS'

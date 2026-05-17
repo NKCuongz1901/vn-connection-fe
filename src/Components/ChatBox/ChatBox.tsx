@@ -13,11 +13,16 @@ import {
 } from 'react'
 
 import useChatBox from '@/hooks/ChatBox/useChatBox'
+import { useModal } from '@/context/ModalContext'
 
 import { arrayFrom, isArray } from '@/ultis/array'
 import { isMobile } from '@/ultis/common'
 import { parseDayFromIsNewDate } from '@/ultis/date'
-import { handleParseFileImg, handleParseFileVideo } from '@/ultis/file'
+import {
+	handleParseFileImg,
+	handleParseFileVideo,
+	mergeChatMediaFileList,
+} from '@/ultis/file'
 import { getUserInfo } from '@/ultis/storage'
 
 import HappyIcon from '@/svg/HappyIcon'
@@ -102,6 +107,7 @@ const ChatBox = ({
 	onEditMessage,
 	onCancelEdit,
 }: ChatBoxProps) => {
+	const { openConfirm, closeModal } = useModal()
 	const cancelEditRef = useRef<() => void>(() => {})
 	const [fileList, setFileList] = useState([])
 	const messageRefs = useRef<Record<string, HTMLDivElement | null>>({})
@@ -164,6 +170,13 @@ const ChatBox = ({
 	}, [onCancelEdit, setReply, setText])
 
 	cancelEditRef.current = handleCancelEditMode
+
+	const notifyMediaLimit = useCallback(() => {
+		openConfirm({
+			message: 'You can only upload up to 5 medias',
+			onAccept: () => closeModal(),
+		})
+	}, [closeModal, openConfirm])
 
 	useEffect(() => {
 		if (!editingMessage) return
@@ -260,7 +273,15 @@ const ChatBox = ({
 			}
 		}
 
-		setFileList((prev) => (editingMessage ? [...prev, ...values] : values))
+		setFileList((prev) => {
+			const { next, limitExceeded } = mergeChatMediaFileList(
+				prev,
+				values,
+				!!editingMessage,
+			)
+			if (limitExceeded) notifyMediaLimit()
+			return next
+		})
 	}
 
 	const _renderParentItem = (parent) => {

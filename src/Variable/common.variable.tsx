@@ -1543,6 +1543,8 @@ export const specialTypeMessage = [
 	'OPEN_CHAT_CREATE',
 ]
 
+export const MAX_CHAT_MEDIAS = 5
+
 export const mappingTypeMessage = {
 	STICKER: 'Send a sticker',
 	MEDIAS: 'Send a media',

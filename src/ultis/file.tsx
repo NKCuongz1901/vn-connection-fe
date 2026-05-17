@@ -1,4 +1,5 @@
 import { handleUploadImage } from '@/apis/uploadApis'
+import { MAX_CHAT_MEDIAS } from '@/Variable/common.variable'
 import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
 
 export const handleParseFileImg = (file) => {
@@ -219,4 +220,25 @@ export const convertImageUrl = (url?: any, sizeType?: TYPE_SIZE_IMAGE) => {
 	}
 
 	return converted
+}
+
+export const mergeChatMediaFileList = (
+	prev: any[],
+	incoming: any[],
+	isEditing: boolean,
+): { next: any[]; limitExceeded: boolean } => {
+	if (!isEditing) {
+		return { next: incoming, limitExceeded: false }
+	}
+
+	const room = MAX_CHAT_MEDIAS - (prev?.length || 0)
+
+	if (room <= 0) {
+		return { next: prev, limitExceeded: incoming.length > 0 }
+	}
+
+	const toAdd = incoming.slice(0, room)
+	const limitExceeded = incoming.length > room
+
+	return { next: [...prev, ...toAdd], limitExceeded }
 }
