@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { loginByPhone } from '@/apis/authApis'
+import { checkPhoneExists, loginByPhone } from '@/apis/authApis'
 
 import { delay, formatPhone, toJson } from '@/ultis/common'
 import { useLocalePath } from '@/ultis/route'
@@ -13,7 +13,12 @@ import { randomString } from '@/ultis/string'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 
-export default function useLogin() {
+type UseLoginOptions = {
+	onAccountNotFound?: (displayPhone: string) => void
+}
+
+export default function useLogin(options?: UseLoginOptions) {
+	const { onAccountNotFound } = options || {}
 	const { toggleLoadingContext } = useLoading()
 	const { openError } = useModal()
 	const { onChangeRoute } = useLocalePath()
@@ -48,62 +53,78 @@ export default function useLogin() {
 		[],
 	)
 
+	const persistLoginSession = useCallback(
+		async (res: any, isRemember: boolean) => {
+			const { object, refresh_token, token } = res.results || {}
+			const {
+				id,
+				name,
+				avatar,
+				country_code,
+				email,
+				cover,
+				latitude,
+				longitude,
+				is_verified,
+			} = object || {}
+			const dataInfo = {
+				id,
+				name,
+				avatar,
+				country_code,
+				email,
+				cover,
+				latitude,
+				longitude,
+				is_verified,
+			}
+			if (isRemember) {
+				handleStorageCookie({
+					key: 'info',
+					data: dataInfo,
+					expireInDays: 300,
+				})
+				handleStorageCookie({
+					key: 'refresh_token',
+					data: refresh_token,
+					expireInDays: 300,
+				})
+				handleStorageCookie({ key: 'token', data: token, expireInDays: 300 })
+			} else {
+				handleStorageCookie({ key: 'info', data: dataInfo })
+				handleStorageCookie({
+					key: 'refresh_token',
+					data: refresh_token,
+				})
+				handleStorageCookie({ key: 'token', data: token })
+			}
+			await delay(100)
+			onChangeRoute(`${mainRoutes.overview}?cookie_id=${randomString()}`)
+		},
+		[onChangeRoute],
+	)
+
 	const handleLogin = async () => {
 		const { phone, password, prefix, isRemember } = account
+		const formattedPhone = formatPhone(prefix, phone)
+
 		toggleLoadingContext(true)
 		try {
-			const payload = {
-				phone: formatPhone(prefix, phone),
-				password: md5(password),
+			const checkRes: any = await checkPhoneExists({ phone: formattedPhone })
+			const { is_existed_phone } = checkRes?.results?.object ?? {}
+
+			if (!is_existed_phone) {
+				onAccountNotFound?.(phone)
+				return
 			}
-			const res: any = await loginByPhone(payload)
+
+			const res: any = await loginByPhone({
+				phone: formattedPhone,
+				password: md5(password),
+			})
 
 			if (res.code === 200) {
-				const { object, refresh_token, token } = res.results || {}
-				const {
-					id,
-					name,
-					avatar,
-					country_code,
-					email,
-					cover,
-					latitude,
-					longitude,
-					is_verified,
-				} = object || {}
-				const dataInfo = {
-					id,
-					name,
-					avatar,
-					country_code,
-					email,
-					cover,
-					latitude,
-					longitude,
-					is_verified,
-				}
-				if (isRemember) {
-					handleStorageCookie({
-						key: 'info',
-						data: dataInfo,
-						expireInDays: 300,
-					})
-					handleStorageCookie({
-						key: 'refresh_token',
-						data: refresh_token,
-						expireInDays: 300,
-					})
-					handleStorageCookie({ key: 'token', data: token, expireInDays: 300 })
-				} else {
-					handleStorageCookie({ key: 'info', data: dataInfo })
-					handleStorageCookie({
-						key: 'refresh_token',
-						data: refresh_token,
-					})
-					handleStorageCookie({ key: 'token', data: token })
-				}
-				await delay(100)
-				onChangeRoute(`${mainRoutes.overview}?cookie_id=${randomString()}`)
+				await persistLoginSession(res, isRemember)
 			}
 		} catch (error: any) {
 			openError(error)
@@ -111,10 +132,12 @@ export default function useLogin() {
 			toggleLoadingContext(false)
 		}
 	}
+
 	useEffect(() => {
 		if (isLogin()) return onChangeRoute(mainRoutes.overview)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
+
 	return {
 		isValidate,
 		account,

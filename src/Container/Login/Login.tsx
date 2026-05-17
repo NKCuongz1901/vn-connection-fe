@@ -1,6 +1,5 @@
 'use client'
 import { Checkbox, Flex } from 'antd'
-import clsx from 'clsx'
 import Link from 'next/link'
 import { memo, useCallback, useState } from 'react'
 
@@ -22,14 +21,25 @@ import classes from './Login.module.scss'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import ModalReport from '@/Components/Custom/ModalReport'
+import NotFound from '@/svg/NotFound'
+import ModalNotFoundAccount from '@/Components/Notification/ModalNotFoundAccount/ModalNotFoundAccount'
 
 const { forgetPassword } = mainRoutes
 
 const Login = () => {
 	const { onGetPath, onChangeRoute } = useLocalePath()
 	const { loadingContext } = useLoading()
-	const { account, onChange, isValidate, onLogin } = useLogin()
 	const [openModalReport, setOpenModalReport] = useState(false)
+	const [openModalNotFoundAccount, setOpenModalNotFoundAccount] =
+		useState(false)
+	const [notFoundPhone, setNotFoundPhone] = useState('')
+
+	const { account, onChange, isValidate, onLogin } = useLogin({
+		onAccountNotFound: (displayPhone) => {
+			setNotFoundPhone(displayPhone)
+			setOpenModalNotFoundAccount(true)
+		},
+	})
 
 	const _renderLeft = useCallback(() => {
 		return (
@@ -62,27 +72,23 @@ const Login = () => {
 		const { phone, password, isRemember, prefix } = account
 		const disable = !isValidate || loadingContext
 		return (
-			<Flex className={classes.right} vertical justify="space-between">
-				<div className={classes.rightTop}>
-					<div className={classes.rightTop1}>
-						<Logo />
-						<span className={classes.title}>UniVini</span>
-					</div>
-					<div className={classes.rightTop2}>
-						<div className={clsx(classes.buttonSwitch, classes.active)}>
-							Sign In
-						</div>
-						<div
-							className={classes.buttonSwitch}
-							onClick={() => onChangeRoute(mainRoutes.register)}
-						>
-							Sign Up
-						</div>
-					</div>
-					<Flex vertical gap={20}>
-						<Flex align="center" justify="center" className={classes.rightTop3}>
+			<Flex className={classes.right} vertical>
+				<Flex className={classes.rightHeader} justify="flex-end" align="center">
+					<Logo />
+					<span className={classes.brandSmall}>UniVini</span>
+				</Flex>
+
+				<Flex
+					className={classes.rightCenter}
+					vertical
+					justify="center"
+					align="center"
+					flex={1}
+				>
+					<Flex vertical gap={20} className={classes.form}>
+						<div className={classes.rightTop3}>
 							Just enter your <br /> phone number to get started
-						</Flex>
+						</div>
 						<CInputPhone
 							isNotBold
 							isRequired
@@ -102,14 +108,12 @@ const Login = () => {
 							placeholder="Password"
 						/>
 						<Flex justify="space-between" align="flex-start">
-							<Flex>
-								<Checkbox
-									checked={isRemember}
-									onChange={(e) => onChange('isRemember')(e.target.checked)}
-								>
-									Remember me
-								</Checkbox>
-							</Flex>
+							<Checkbox
+								checked={isRemember}
+								onChange={(e) => onChange('isRemember')(e.target.checked)}
+							>
+								Remember me
+							</Checkbox>
 							<Flex vertical gap={16} align="flex-end">
 								<Link href={onGetPath(forgetPassword)}>
 									<span className={classes.color}>Forgot password?</span>
@@ -124,12 +128,14 @@ const Login = () => {
 							ctype={!disable ? 'oranger' : null}
 							onClick={onLogin}
 						>
-							Sign in
+							Continue
 						</CButton>
 					</Flex>
+				</Flex>
+
+				<div className={classes.footer}>
+					<TermPolicy />
 				</div>
-				<br />
-				<TermPolicy />
 			</Flex>
 		)
 	}
@@ -144,6 +150,21 @@ const Login = () => {
 				data={{}}
 				message="You want to need help this problem ?"
 				title="Report"
+			/>
+			<ModalNotFoundAccount
+				open={openModalNotFoundAccount}
+				onClose={() => setOpenModalNotFoundAccount(false)}
+				icon={<NotFound />}
+				title="We couldn't find your account."
+				description={notFoundPhone}
+				onGetHelp={() => {
+					setOpenModalNotFoundAccount(false)
+					setOpenModalReport(true)
+				}}
+				onRegister={() => {
+					setOpenModalNotFoundAccount(false)
+					onChangeRoute(mainRoutes.register)
+				}}
 			/>
 		</div>
 	)

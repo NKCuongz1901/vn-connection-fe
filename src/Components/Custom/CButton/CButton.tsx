@@ -5,9 +5,15 @@ import { Button, ButtonProps } from 'antd'
 import classes from './CButton.module.scss'
 import clsx from 'clsx'
 const variant = {
+	default: {
+		color: 'black',
+		background: '#F1F5F8',
+		fontSize: '16px',
+	},
 	oranger: {
 		color: 'white',
 		background: ' #e55a0f ',
+		fontSize: '16px',
 	},
 	disabled: {
 		color: 'black',
