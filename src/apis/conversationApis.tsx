@@ -128,6 +128,17 @@ export const deleteMessageById = async ({ id }: { id: string }) => {
 	const url = CONVERSATION_ROUTES.message + `/${id}`
 	return await axios.delete(url)
 }
+
+export const editMessageById = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: any
+}) => {
+	const url = CONVERSATION_ROUTES.message + `/${id}`
+	return await axios.put(url, payload)
+}
 export const pinMessageById = async ({
 	id,
 	payload,

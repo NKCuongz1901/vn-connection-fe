@@ -15,6 +15,7 @@ import {
 	pinMessageById,
 	reactMessageById,
 	sendMessage,
+	editMessageById,
 } from '@/apis/conversationApis'
 import {
 	handleUploadAudio,
@@ -63,6 +64,60 @@ export default function useInboxChat(props: useHangoutChatProps) {
 
 	const reactList = useRef<{ [key: string]: ReactionPtops }>({})
 	const [openReact, setOpenReact] = useState() as any
+	const [editingMessage, setEditingMessage] = useState<any>(null)
+
+	const getMediaThumbnail = (item: {
+		thumbnail?: string | null
+		url?: string
+	}) => {
+		if (typeof item?.thumbnail === 'string' && item.thumbnail) {
+			return item.thumbnail
+		}
+		return item?.url || ''
+	}
+
+	const buildMediasPayload = async (_medias: any[] = []) => {
+		const medias: any[] = []
+		for (const item of _medias) {
+			if (item?.file) {
+				const url =
+					item.type === 'IMAGE'
+						? await handleUploadImage(item.file)
+						: await handleUploadVideo(item.file)
+				medias.push({
+					url,
+					type: item?.type || 'IMAGE',
+					fileName: null,
+					width: 692,
+					height: 1500,
+					ratio: 0.4613333333333333,
+					thumbnail: getMediaThumbnail({ url }),
+					duration: 0,
+				})
+			} else if (item?.url) {
+				medias.push({
+					url: item.url,
+					type: item?.type || 'IMAGE',
+					fileName: item.fileName ?? null,
+					width: item.width ?? 692,
+					height: item.height ?? 1500,
+					ratio: item.ratio ?? 0.4613333333333333,
+					thumbnail: getMediaThumbnail(item),
+					duration: item.duration ?? 0,
+				})
+			}
+		}
+		return medias
+	}
+
+	const handleStartEdit = (message: any) => {
+		if (!['TEXT', 'MEDIAS'].includes(message?.type)) return
+		setEditingMessage(message)
+	}
+
+	const handleCancelEdit = () => {
+		setEditingMessage(null)
+	}
 
 	const handleGetReact = async () => {
 		try {
@@ -298,16 +353,19 @@ export default function useInboxChat(props: useHangoutChatProps) {
 				)
 				const resList = await Promise.all(uploadPromises)
 				type = 'MEDIAS'
-				medias = (_medias || []).map((i, index) => ({
-					url: resList[index],
-					type: i?.type || 'IMAGE',
-					fileName: null,
-					width: 692,
-					height: 1500,
-					ratio: 0.4613333333333333,
-					thumbnail: null,
-					duration: 0,
-				}))
+				medias = (_medias || []).map((i, index) => {
+					const url = resList[index]
+					return {
+						url,
+						type: i?.type || 'IMAGE',
+						fileName: null,
+						width: 692,
+						height: 1500,
+						ratio: 0.4613333333333333,
+						thumbnail: url || '',
+						duration: 0,
+					}
+				})
 			}
 
 			if (!!audio) {
@@ -320,7 +378,7 @@ export default function useInboxChat(props: useHangoutChatProps) {
 					height: null,
 					ratio: null,
 					type: 'AUDIO',
-					thumbnail: null,
+					thumbnail: resAudio || '',
 					duration: 3,
 				})
 			}
@@ -465,6 +523,72 @@ export default function useInboxChat(props: useHangoutChatProps) {
 		}
 	}
 
+	const handleEditMessage = async ({
+		message,
+		content,
+		medias: _medias = [],
+	}: {
+		message: any
+		content?: string
+		medias?: any[]
+	}) => {
+		if (!message?.id) return
+		try {
+			const medias = await buildMediasPayload(_medias)
+			const type = medias.length > 0 ? 'MEDIAS' : 'TEXT'
+			const { text, mentions } =
+				type !== 'MEDIAS'
+					? parseMentions(content)
+					: { text: content || '', mentions: [] }
+
+			const payload = {
+				conversation_id: convId,
+				message: {
+					type,
+					content: text,
+					message_local_id: message.message_local_id,
+					...(medias.length > 0 && { medias }),
+				},
+				mentions,
+			}
+
+			setMessList((prev: any[]) =>
+				mappingMessageChat(
+					prev.map((m) =>
+						m.id === message.id
+							? { ...m, content: text, type, medias, isTemp: true }
+							: m,
+					),
+				),
+			)
+
+			const res: any = await editMessageById({
+				id: message.id,
+				payload,
+			})
+
+			const _data = res?.results?.object || {}
+
+			setMessList((prev: any[]) =>
+				mappingMessageChat(
+					prev.map((m) =>
+						m.id === message.id ? { ...m, ..._data, isTemp: false } : m,
+					),
+				),
+			)
+			setEditingMessage(null)
+		} catch (error) {
+			openError(error)
+			setMessList((prev: any[]) =>
+				mappingMessageChat(
+					prev.map((m) =>
+						m.id === message.id ? { ...m, isTemp: false } : m,
+					),
+				),
+			)
+		}
+	}
+
 	const handlePinMessage = async ({ key, value }) => {
 		const { id } = value || {}
 		try {
@@ -492,6 +616,9 @@ export default function useInboxChat(props: useHangoutChatProps) {
 	}
 	const handleActionMessage = async ({ key, value }) => {
 		switch (key) {
+			case 'edit':
+				handleStartEdit(value)
+				break
 			case 'delete':
 				handleDeleteMessage(value)
 				break
@@ -638,6 +765,7 @@ export default function useInboxChat(props: useHangoutChatProps) {
 	}
 
 	useEffect(() => {
+		setEditingMessage(null)
 		_paginationRefs.current.page = 1
 		handleGetInfoConv()
 		handleGetListMessById()
@@ -683,7 +811,10 @@ export default function useInboxChat(props: useHangoutChatProps) {
 		openSetting,
 		setOpenSetting,
 		setMessList,
+		editingMessage,
 		onSendMessage: handleSendMessage,
+		onEditMessage: handleEditMessage,
+		onCancelEdit: handleCancelEdit,
 		onLoadMore: handleLoadMore,
 		onActionMessage: handleActionMessage,
 		onAddReact: handleAddReact,

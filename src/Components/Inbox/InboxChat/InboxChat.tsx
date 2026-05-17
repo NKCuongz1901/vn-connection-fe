@@ -48,7 +48,10 @@ const InboxChat = (props: InboxChatProps) => {
 		openSetting,
 		convInfo,
 		setOpenSetting,
+		editingMessage,
 		onSendMessage,
+		onEditMessage,
+		onCancelEdit,
 		onActionMessage,
 		onLoadMore,
 		onGetPinMessage,
@@ -168,6 +171,9 @@ const InboxChat = (props: InboxChatProps) => {
 						onLoadMore={onLoadMore}
 						_scrollRef={_scrollRef}
 						onSendMessage={onSendMessage}
+						onEditMessage={onEditMessage}
+						onCancelEdit={onCancelEdit}
+						editingMessage={editingMessage}
 						onAddReact={onAddReact}
 						onActionMessage={onActionMessage}
 						onEnsureMessageLoaded={onEnsureMessageLoaded}
