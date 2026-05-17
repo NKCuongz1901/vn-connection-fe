@@ -13,7 +13,6 @@ const variant = {
 	oranger: {
 		color: 'white',
 		background: ' #e55a0f ',
-		fontSize: '16px',
 	},
 	disabled: {
 		color: 'black',
