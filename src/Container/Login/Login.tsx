@@ -19,7 +19,9 @@ import MainLogo from './MainLogo'
 
 import classes from './Login.module.scss'
 
+import { REGISTER_FROM_LOGIN_SESSION_KEY } from '@/Variable/common.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
+import { setSessionStorage } from '@/ultis/storage'
 import ModalReport from '@/Components/Custom/ModalReport'
 import NotFound from '@/svg/NotFound'
 import ModalNotFoundAccount from '@/Components/Notification/ModalNotFoundAccount/ModalNotFoundAccount'
@@ -163,6 +165,13 @@ const Login = () => {
 				}}
 				onRegister={() => {
 					setOpenModalNotFoundAccount(false)
+					setSessionStorage({
+						key: REGISTER_FROM_LOGIN_SESSION_KEY,
+						data: {
+							phone: account.phone,
+							prefix: account.prefix,
+						},
+					})
 					onChangeRoute(mainRoutes.register)
 				}}
 			/>

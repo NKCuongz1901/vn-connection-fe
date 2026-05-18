@@ -1158,6 +1158,8 @@ export const countryCodes = [
 	value: i.code || '',
 }))
 
+export const REGISTER_FROM_LOGIN_SESSION_KEY = 'register_from_login'
+
 export enum OTP_TYPE {
 	REGISTER = 'REGISTER',
 	FORGET_PASSWORD = 'FORGET_PASSWORD',
