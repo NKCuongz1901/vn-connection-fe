@@ -636,7 +636,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 										onClick={() =>
 											onChangeRoute(`${mainRoutes.profile}/${user_id}`)
 										}
-										size={46}
+										size={48}
 									/>
 								)}
 							</Flex>

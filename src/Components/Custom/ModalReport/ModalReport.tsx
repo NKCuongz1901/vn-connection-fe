@@ -177,9 +177,10 @@ const ModalReport = (props: ModalReportProps) => {
 			return
 		}
 		const { email, topic, content } = dataModal
+		const selectedTopic = topicReportOpt.find((opt) => opt.value === topic)
 		const payload = {
 			email,
-			topic: topic || '',
+			topic: selectedTopic?.label ?? topic ?? '',
 			content,
 			images: [],
 			...data,
@@ -207,6 +208,7 @@ const ModalReport = (props: ModalReportProps) => {
 				<p className={classes.typeIssueTitle}>Type of issue</p>
 				<Radio.Group
 					//   value={topic}
+					value={dataModal.topic}
 					onChange={(e) => handleOnChangeData('topic', e.target.value)}
 					className={classes.topicRadioGroup}
 				>

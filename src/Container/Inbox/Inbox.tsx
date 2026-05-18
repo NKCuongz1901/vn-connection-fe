@@ -111,7 +111,7 @@ const Inbox = () => {
 					onPushState({ id })
 				}}
 			>
-				<CAvatar src={avatar} size={46} />
+				<CAvatar src={avatar} size={48} />
 				<Flex className={classes.info} vertical>
 					<Flex className={classes.infoTop}>
 						<div
