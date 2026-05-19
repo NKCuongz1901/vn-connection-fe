@@ -5,7 +5,6 @@
 		.title {
 			color: #0f1729;
 			text-align: center;
-			font-family: Inter;
 			font-size: 24px;
 			font-style: normal;
 			font-weight: 600;
@@ -14,7 +13,6 @@
 		}
 		.text {
 			color: #48546b;
-			font-family: Inter;
 			text-align: center;
 			font-size: 14px;
 			font-weight: 400;
@@ -23,7 +21,7 @@
 		}
 	}
 	.topicRadioWrapper {
-		gap: 8px;
+		gap: 12px;
 		.topicRadioGroup {
 			display: flex;
 			flex-direction: column;
@@ -38,7 +36,6 @@
 			}
 		}
 		.typeIssueTitle {
-			font-family: Inter;
 			font-size: 16px;
 			font-weight: 600;
 			line-height: 24px;
@@ -50,7 +47,6 @@
 		.topicRadioTitle {
 			color: var(--text-primary, #0f1729);
 
-			font-family: var(--body-base-font, Inter);
 			font-size: var(--body-base-size, 14px);
 			font-style: normal;
 			font-weight: 400;
@@ -60,7 +56,6 @@
 		.topicRadioDesc {
 			color: var(--text-secondary, #48546b);
 
-			font-family: var(--body-small-font, Inter);
 			font-size: var(--body-small-size, 12px);
 			font-style: normal;
 			font-weight: 400;
@@ -73,7 +68,6 @@
 		margin-bottom: 16px;
 		gap: 8px;
 		.typeIssueTitle {
-			font-family: Inter;
 			font-size: 16px;
 			font-weight: 600;
 			line-height: 24px;
@@ -81,10 +75,29 @@
 		}
 		// align-items: center;
 		.topic,
-		.email,
+		.email {
+			width: 100%;
+			min-height: 50px;
+
+			:global(span.bold),
+			:global(.layout > span:first-child) {
+				color: #0f1729;
+				font-size: 14px;
+				font-weight: 500;
+				line-height: 20px;
+			}
+		}
 		.content {
 			width: 100%;
 			min-height: 50px;
+
+			:global(span.bold),
+			:global(.layout > span:first-child) {
+				color: #0f1729;
+				font-size: 14px;
+				font-weight: 500;
+				line-height: 20px;
+			}
 		}
 		.chooseImg {
 			gap: 4px;
@@ -99,7 +112,6 @@
 				color: var(--component-button-secondary-fg-default, #0f1729);
 
 				/* body/base-emphasis */
-				font-family: var(--body-base-font, Inter);
 				font-size: var(--body-base-size, 14px);
 				font-style: normal;
 				font-weight: 600;
@@ -111,7 +123,6 @@
 				color: var(--text-secondary, #48546b);
 
 				/* body/small */
-				font-family: var(--body-small-font, Inter);
 				font-size: var(--body-small-size, 12px);
 				font-style: normal;
 				font-weight: 400;

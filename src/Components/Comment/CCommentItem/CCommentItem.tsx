@@ -20,7 +20,7 @@ import ImageIcon from '@/svg/ImageIcon'
 import MessageMinuIcon from '@/svg/MessageMinuIcon'
 import classes from './CCommentItem.module.scss'
 
-import { DEFAULT_FALLBACK } from '@/Variable/common.variable'
+import { DEFAULT_FALLBACK, REPORT_ISSUE_TYPE } from '@/Variable/common.variable'
 import CTextSpecial from '@/Components/Custom/CTextSpecial'
 
 interface CommentItemProps {
@@ -246,6 +246,7 @@ const CCommentItem = (props: CommentItemProps) => {
 			case 'report':
 				Content = (
 					<ModalReport
+						reportType={REPORT_ISSUE_TYPE.TALKROOM}
 						open
 						{...propsModal}
 						data={{ comment_id: data }}

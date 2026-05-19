@@ -1563,3 +1563,11 @@ export const levelOptions = [
 	{ value: 'INTERMEDIATE', label: 'Intermediate' },
 	{ value: 'ADVANCED', label: 'Advanced' },
 ]
+export const REPORT_ISSUE_TYPE = {
+	GET_HELP: 'GET_HELP',
+	TALKROOM: 'TALKROOM',
+	TUTOR: 'TUTOR',
+} as const
+
+export type ReportIssueType =
+	(typeof REPORT_ISSUE_TYPE)[keyof typeof REPORT_ISSUE_TYPE]

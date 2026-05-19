@@ -1,12 +1,12 @@
 import { IconCircleXFilled } from '@tabler/icons-react'
 import { Flex, Radio } from 'antd'
 import { debounce } from 'lodash'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { reportUser } from '@/apis/userApis'
+import { getReportIssueTypes, reportUser } from '@/apis/userApis'
 
 import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
@@ -31,18 +31,22 @@ import { topicReportOpt } from '@/Variable/select.variable'
 import classes from './ModalReport.module.scss'
 import { getUserInfo } from '@/ultis/storage'
 import CTextArea from '../CTextArea'
+import { ReportIssueType } from '@/Variable/common.variable'
 
 interface ModalReportProps {
 	open: boolean
 	onClose: any
 	data?: any
 	message?: string
+	reportType?: ReportIssueType
 	title?: string
 	[key: string]: any
 }
 
 const ModalReport = (props: ModalReportProps) => {
-	const { onClose, open, data, message, title } = props
+	const { onClose, open, data, message, title, reportType } = props
+	const [reportTypeList, setReportTypeList] = useState([])
+	const [loadingReportType, setLoadingReportType] = useState(false)
 	const { loadingContext, toggleLoadingContext } = useLoading()
 	const { openConfirm, openError, openSuccess, closeModal } = useModal()
 	const { email } = getUserInfo()
@@ -52,11 +56,35 @@ const ModalReport = (props: ModalReportProps) => {
 		content: '',
 	})
 	const [dataModal, setDataModal] = useState({
-		topic: topicReportOpt[0].value,
+		topic: '',
 		email: email || '',
 		content: '',
 	})
 	const [fileList, setFileList] = useState([])
+
+	useEffect(() => {
+		if (!open || !reportType) {
+			setReportTypeList([])
+			setDataModal({ topic: '', email: email || '', content: '' })
+			setFileList([])
+		}
+		const load = async () => {
+			setLoadingReportType(true)
+			try {
+				const res: any = await getReportIssueTypes({ type: reportType })
+				const rows = res?.results?.objects ?? []
+				setReportTypeList(rows)
+				if (rows[0]) {
+					setDataModal((prev) => ({ ...prev, topic: rows[0].id }))
+				}
+			} catch (e) {
+				openError(e)
+			} finally {
+				setLoadingReportType(false)
+			}
+		}
+		load()
+	}, [open, reportType])
 
 	const processUpload = useCallback(
 		async (_values: any[]) => {
@@ -177,10 +205,10 @@ const ModalReport = (props: ModalReportProps) => {
 			return
 		}
 		const { email, topic, content } = dataModal
-		const selectedTopic = topicReportOpt.find((opt) => opt.value === topic)
+		const selected = reportTypeList.find((opt) => opt.id === topic)
 		const payload = {
 			email,
-			topic: selectedTopic?.label ?? topic ?? '',
+			topic: selected?.label ?? '',
 			content,
 			images: [],
 			...data,
@@ -203,30 +231,29 @@ const ModalReport = (props: ModalReportProps) => {
 	}
 
 	const _renderTypeIssuse = () => {
+		if (loadingReportType) {
+			return (
+				<Flex vertical className={classes.topicRadioWrapper}>
+					<p className={classes.typeIssueTitle}>Type of issue</p>
+					{/* Spin hoặc skeleton */}
+				</Flex>
+			)
+		}
+
+		if (!reportTypeList.length) return null // hoặc "No issue types"
+
 		return (
 			<Flex vertical className={classes.topicRadioWrapper}>
 				<p className={classes.typeIssueTitle}>Type of issue</p>
 				<Radio.Group
-					//   value={topic}
 					value={dataModal.topic}
 					onChange={(e) => handleOnChangeData('topic', e.target.value)}
 					className={classes.topicRadioGroup}
 				>
-					{topicReportOpt.map((opt) => (
-						<Radio
-							key={opt.value}
-							value={opt.value}
-							className={classes.topicRadio}
-						>
-							<Flex
-								vertical
-								justify="start"
-								align="start"
-								className={classes.topicRadioText}
-							>
-								<div className={classes.topicRadioTitle}>{opt.label}</div>
-								<div className={classes.topicRadioDesc}>{opt.value}</div>
-							</Flex>
+					{reportTypeList.map((opt) => (
+						<Radio key={opt.id} value={opt.id} className={classes.topicRadio}>
+							<div className={classes.topicRadioTitle}>{opt.label}</div>
+							<div className={classes.topicRadioDesc}>{opt.description}</div>
 						</Radio>
 					))}
 				</Radio.Group>
@@ -249,7 +276,13 @@ const ModalReport = (props: ModalReportProps) => {
 						error={errors.email}
 						placeholder="Enter your email"
 						onChange={(e) => handleOnChangeData('email', e.target.value)}
-						style={{ border: 'none' }}
+						style={{
+							border: 'none',
+							color: '#0F1729',
+							fontSize: '14px',
+							fontWeight: 500,
+							lineHeight: '20px',
+						}}
 					/>
 				</Flex>
 

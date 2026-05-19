@@ -19,7 +19,10 @@ import MainLogo from './MainLogo'
 
 import classes from './Login.module.scss'
 
-import { REGISTER_FROM_LOGIN_SESSION_KEY } from '@/Variable/common.variable'
+import {
+	REGISTER_FROM_LOGIN_SESSION_KEY,
+	REPORT_ISSUE_TYPE,
+} from '@/Variable/common.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { setSessionStorage } from '@/ultis/storage'
 import ModalReport from '@/Components/Custom/ModalReport'
@@ -147,6 +150,7 @@ const Login = () => {
 			{<DownloadApp />}
 			<div className={classes.rightContainer}>{_renderRight()}</div>
 			<ModalReport
+				reportType={REPORT_ISSUE_TYPE.GET_HELP}
 				open={openModalReport}
 				onClose={() => setOpenModalReport(false)}
 				data={{}}

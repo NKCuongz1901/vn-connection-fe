@@ -17,6 +17,7 @@ import NoPostIcon from '@/svg/DiscusstionSvg/NoPostIcon'
 import ImageIcon from '@/svg/ImageIcon'
 
 import classes from './DetailCommunityDiscussion.module.scss'
+import { REPORT_ISSUE_TYPE } from '@/Variable/common.variable'
 interface DetailCommunityDiscussionProp {
 	id: string
 	[key: string]: any
@@ -125,7 +126,7 @@ const DetailCommunityDiscussion = (
 										onAction={onAction}
 										onChangeUrl={onChangeUrl}
 									/>
-							  ))
+								))
 							: _renderNoPost()}
 						{loading.discuss && _renderSkeleton()}
 					</Flex>
@@ -179,6 +180,7 @@ const DetailCommunityDiscussion = (
 			case 'report':
 				Content = (
 					<ModalReport
+						reportType={REPORT_ISSUE_TYPE.TALKROOM}
 						open
 						{...propsModal}
 						data={{ discuss_id: data?.id }}

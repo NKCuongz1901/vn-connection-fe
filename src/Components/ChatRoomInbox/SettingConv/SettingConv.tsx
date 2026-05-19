@@ -19,6 +19,7 @@ import ImageIcon from '@/svg/ImageIcon'
 import TrashIcon from '@/svg/TrashIcon'
 
 import classes from './SettingConv.module.scss'
+import { REPORT_ISSUE_TYPE } from '@/Variable/common.variable'
 
 interface SettingConvProps {
 	convInfo: any
@@ -136,6 +137,7 @@ const SettingConv = (props: SettingConvProps) => {
 			case 'report':
 				content = (
 					<ModalReport
+						reportType={REPORT_ISSUE_TYPE.TALKROOM}
 						open
 						onClose={() => setModal(null)}
 						data={data}

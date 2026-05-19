@@ -23,6 +23,7 @@ import TopicIcon from '@/svg/TopicIcon'
 
 import classes from './DetailCommunity.module.scss'
 import { getUserInfo } from '@/ultis/storage'
+import { REPORT_ISSUE_TYPE } from '@/Variable/common.variable'
 
 const mappingTabsBtnTop = {
 	member: 'member',
@@ -350,6 +351,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 			case 'report':
 				Content = (
 					<ModalReport
+						reportType={REPORT_ISSUE_TYPE.TALKROOM}
 						open
 						{...propsModal}
 						data={{ discuss_id: data?.id }}
@@ -361,6 +363,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 			case 'reportCommunity':
 				Content = (
 					<ModalReport
+						reportType={REPORT_ISSUE_TYPE.TALKROOM}
 						open
 						{...propsModal}
 						data={{ conversation_id: data?.id }}

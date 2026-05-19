@@ -9,6 +9,7 @@ import ModalMyFriend from '@/Components/Friend/ModalMyFriend'
 import ModalReport from '../../Custom/ModalReport'
 
 import classes from './UserMoreAction.module.scss'
+import { REPORT_ISSUE_TYPE } from '@/Variable/common.variable'
 const UserMoreAction = (props: {
 	id: string
 	isFriend?: any
@@ -68,6 +69,7 @@ const UserMoreAction = (props: {
 			case 'report':
 				Content = (
 					<ModalReport
+						reportType={REPORT_ISSUE_TYPE.TALKROOM}
 						title="Report"
 						open={true}
 						data={{ user_id: open.data }}

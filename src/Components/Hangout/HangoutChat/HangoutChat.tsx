@@ -17,6 +17,7 @@ import MoreIcon from '@/svg/MoreIcon'
 import ModelChooseHangout from '../ModelChooseHangout'
 
 import classes from './HangoutChat.module.scss'
+import { REPORT_ISSUE_TYPE } from '@/Variable/common.variable'
 
 const containerStyle = { width: '100%', height: '104px' }
 
@@ -92,6 +93,7 @@ const HangoutChat = ({ postId, onAction }) => {
 			case 'report':
 				content = (
 					<ModalReport
+						reportType={REPORT_ISSUE_TYPE.TALKROOM}
 						open
 						onClose={() => setModal(null)}
 						data={data}

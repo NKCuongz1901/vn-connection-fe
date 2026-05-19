@@ -25,6 +25,7 @@ import ImageIcon from '@/svg/ImageIcon'
 import SearchIcon from '@/svg/SearchIcon'
 
 import classes from './Discussion.module.scss'
+import { REPORT_ISSUE_TYPE } from '@/Variable/common.variable'
 
 const mappingTopicTitle = {
 	explore: 'Channels Suggestions',
@@ -169,7 +170,7 @@ const Discussion = () => {
 									onAction={onAction}
 									onChangeUrl={onChangeUrl}
 								/>
-						  ))
+							))
 						: _renderNoPost()}
 					{loading.discuss && _renderSkeleton()}
 				</Flex>
@@ -332,6 +333,7 @@ const Discussion = () => {
 			case 'report':
 				Content = (
 					<ModalReport
+						reportType={REPORT_ISSUE_TYPE.TALKROOM}
 						open
 						{...propsModal}
 						data={{ discuss_id: data?.id }}

@@ -13,6 +13,7 @@ import DiscussionItem from '../DiscussionItem'
 import ModalCRUDDiscussion from '../ModalCRUDDiscussion'
 
 import classes from './DiscussionDetail.module.scss'
+import { REPORT_ISSUE_TYPE } from '@/Variable/common.variable'
 interface DiscussionDetailProps {
 	discussId: string
 	conversation_id?: string
@@ -114,6 +115,7 @@ const DiscussionDetail = (
 			case 'report':
 				Content = (
 					<ModalReport
+						reportType={REPORT_ISSUE_TYPE.TALKROOM}
 						open
 						{...propsModal}
 						data={{ discuss_id: data?.id }}
@@ -125,6 +127,7 @@ const DiscussionDetail = (
 			case 'reportCommentItem':
 				Content = (
 					<ModalReport
+						reportType={REPORT_ISSUE_TYPE.TALKROOM}
 						open
 						{...propsModal}
 						data={{ comment_id: data?.id }}
