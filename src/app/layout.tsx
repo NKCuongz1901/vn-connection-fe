@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
+import { Inter } from 'next/font/google'
 import './globals.css'
 import { headers } from 'next/headers'
 import { appLayoutExclusive } from './variable/layoutData'
@@ -15,6 +16,14 @@ const geistMono = localFont({
 	variable: '--font-geist-mono',
 	weight: '100 900',
 })
+
+const inter = Inter({
+	subsets: ['latin', 'vietnamese'],
+	variable: '--font-inter',
+	display: 'swap',
+})
+
+const fontVariables = `${geistSans.variable} ${geistMono.variable} ${inter.variable}`
 
 export const metadata: Metadata = {
 	title: 'UniVini',
@@ -44,7 +53,7 @@ export default function RootLayout({
 	if (appLayoutExclusive.some((i) => i.startsWith(pathname))) {
 		content = (
 			<html lang="en">
-				<body className={`${geistSans.variable} ${geistMono.variable}`}>
+				<body className={fontVariables}>
 					<div>{children}</div>
 				</body>
 			</html>
@@ -52,7 +61,7 @@ export default function RootLayout({
 	}
 	return (
 		<html lang="en">
-			<body className={`${geistSans.variable} ${geistMono.variable}`}>
+			<body className={fontVariables}>
 				<AntdRegistry>{content}</AntdRegistry>
 			</body>
 		</html>

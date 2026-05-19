@@ -32,6 +32,7 @@ function ModalNotFoundAccount(_props: ModalNotFoundAccountProps) {
 			open={open}
 			onClose={onClose}
 			onCancel={onClose}
+			width={343}
 			footer={[
 				<div key="footer" className={classes.footer}>
 					<CButton
