@@ -51,6 +51,10 @@
 
 			.form {
 				width: 100%;
+
+				.passwordField :global(span.bold) {
+					font-weight: 500;
+				}
 			}
 
 			.rightTop3 {

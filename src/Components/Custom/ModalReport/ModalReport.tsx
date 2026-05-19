@@ -357,7 +357,6 @@ const ModalReport = (props: ModalReportProps) => {
 					styles={{
 						content: {
 							width: 660,
-							minHeight: 800,
 						},
 					}}
 					footer={[

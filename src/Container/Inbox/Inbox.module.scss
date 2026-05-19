@@ -99,10 +99,14 @@
 								overflow: hidden;
 								white-space: nowrap;
 								text-overflow: ellipsis;
+								color: #0f1729;
 							}
 							.long {
 								width: 208px;
-								color: #7b88a6;
+								color: #0f1729;
+								font-weight: 500;
+								font-size: 14px;
+								line-height: 20px;
 							}
 							.time {
 								align-items: center;
@@ -112,7 +116,7 @@
 									width: 8px;
 									height: 8px;
 									border-radius: 99px;
-									background: #2381ff;
+									background: #006b35;
 								}
 							}
 						}
@@ -121,6 +125,10 @@
 							white-space: nowrap;
 							overflow: hidden;
 							text-overflow: ellipsis;
+							font-weight: 600;
+							font-size: 14px;
+							line-height: 20px;
+							color: #0f1729;
 						}
 						.readed {
 							color: #7b88a6;

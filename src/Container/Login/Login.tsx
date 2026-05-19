@@ -94,24 +94,51 @@ const Login = () => {
 						<div className={classes.rightTop3}>
 							Just enter your <br /> phone number to get started
 						</div>
-						<CInputPhone
-							isNotBold
-							isRequired
-							label="Phone number"
-							prefix={prefix}
-							value={phone}
-							onChangePrefix={onChange('prefix')}
-							onChange={(e) => onChange('phone')(e.target.value)}
-							placeholder="Phone number"
-							maxLength={255}
-						/>
-						<CInputPassword
-							isRequired
-							label="Password"
-							value={password}
-							onChange={(e) => onChange('password')(e.target.value)}
-							placeholder="Password"
-						/>
+						<div
+							className={classes.fieldLabel}
+							style={{
+								color: '#0f1729',
+								fontSize: '14px',
+								fontWeight: 500,
+								lineHeight: '20px',
+							}}
+						>
+							<CInputPhone
+								isNotBold
+								isRequired
+								label="Phone number"
+								prefix={prefix}
+								value={phone}
+								onChangePrefix={onChange('prefix')}
+								onChange={(e) => onChange('phone')(e.target.value)}
+								placeholder="Phone number"
+								maxLength={255}
+								labelStyle={{
+									color: '#0f1729',
+									fontSize: '14px',
+									fontWeight: 500,
+									lineHeight: '20px',
+								}}
+							/>
+						</div>
+						<div
+							className={classes.passwordField}
+							style={{
+								color: '#0f1729',
+								fontSize: '14px',
+								fontWeight: 500,
+								lineHeight: '20px',
+							}}
+						>
+							<CInputPassword
+								isNotBold={true}
+								isRequired
+								label="Password"
+								value={password}
+								onChange={(e) => onChange('password')(e.target.value)}
+								placeholder="Password"
+							/>
+						</div>
 						<Flex justify="space-between" align="flex-start">
 							<Checkbox
 								checked={isRemember}

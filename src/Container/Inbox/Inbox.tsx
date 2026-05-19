@@ -146,7 +146,7 @@ const Inbox = () => {
 					<span className={classes.title}>New message request</span>
 					<span>Messages from strangers</span>
 				</Flex>
-				<Flex className={classes.iconCancelWrapper}>
+				<Flex className={classes.iconCancelWrapper} style={{ display: 'none' }}>
 					<IconCircleXFilled
 						className={classes.iconCancel}
 						onClick={(e) => {
