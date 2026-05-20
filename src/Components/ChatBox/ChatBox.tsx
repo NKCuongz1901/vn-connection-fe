@@ -72,6 +72,7 @@ interface ChatBoxProps {
 		medias?: any[]
 	}) => void
 	onCancelEdit?: () => void
+	onAvatarClick?: (userId: string) => void
 	[key: string]: any
 }
 
@@ -106,6 +107,7 @@ const ChatBox = ({
 	editingMessage,
 	onEditMessage,
 	onCancelEdit,
+	onAvatarClick,
 }: ChatBoxProps) => {
 	const { openConfirm, closeModal } = useModal()
 	const cancelEditRef = useRef<() => void>(() => {})
@@ -675,7 +677,18 @@ const ChatBox = ({
 					<Flex className={classes.contentItem}>
 						{!isNot && (
 							<Flex className={classes.avatar}>
-								{isFirst && <CAvatar src={user?.avatar} />}
+								{isFirst && (
+									<CAvatar
+										style={onAvatarClick ? { cursor: 'pointer' } : undefined}
+										src={user?.avatar}
+										size={48}
+										onClick={() => {
+											if (user_id && onAvatarClick) {
+												onAvatarClick(user_id)
+											}
+										}}
+									/>
+								)}
 							</Flex>
 						)}
 						<Flex className={classes.contentInfo} vertical>

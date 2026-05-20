@@ -122,7 +122,13 @@ const Inbox = () => {
 							{name}
 						</div>
 						<Flex className={classes.time}>
-							<span>
+							<span
+								className={clsx(
+									is_read || activeItem
+										? classes.timeRead
+										: classes.timeUnread,
+								)}
+							>
 								{timeAgo} {unit ? unit + 's ago' : ''}
 							</span>
 							{!is_read && !activeItem && <span className={classes.unread} />}

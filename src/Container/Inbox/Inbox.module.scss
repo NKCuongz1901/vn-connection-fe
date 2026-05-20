@@ -100,6 +100,7 @@
 								white-space: nowrap;
 								text-overflow: ellipsis;
 								color: #0f1729;
+								font-size: 14px;
 							}
 							.long {
 								width: 208px;
@@ -112,6 +113,27 @@
 								align-items: center;
 								gap: 8px;
 								min-width: fit-content;
+
+								.timeUnread,
+								.timeRead {
+									overflow: hidden;
+									white-space: nowrap;
+									text-overflow: ellipsis;
+									font-size: var(--body-small-size, 12px);
+									font-style: normal;
+									font-weight: 400;
+									line-height: var(--body-small-line-height, 16px);
+									letter-spacing: var(--body-small-tracking, 0);
+								}
+
+								.timeUnread {
+									color: var(--text-primary, #0f1729);
+								}
+
+								.timeRead {
+									color: var(--text-secondary, #48546b);
+								}
+
 								.unread {
 									width: 8px;
 									height: 8px;
