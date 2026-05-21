@@ -86,6 +86,7 @@ const InboxChat = (props: InboxChatProps) => {
 					<>
 						<Flex className={classes.userInChat}>
 							<CAvatar
+								size={48}
 								style={otherUserId ? { cursor: 'pointer' } : undefined}
 								src={userInChat?.user?.avatar || ''}
 								onClick={() => handleGoToProfile(otherUserId)}

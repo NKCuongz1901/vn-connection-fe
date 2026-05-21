@@ -28,8 +28,9 @@
 		.date {
 			width: 100%;
 			justify-content: center;
-			font-weight: 600;
+			font-weight: 300;
 			margin: 8px 0;
+			color: #7b88a6;
 		}
 		.itemChat {
 			max-width: 100%;
@@ -44,11 +45,19 @@
 					display: flex;
 				}
 				.time {
+					display: flex;
+					align-items: center;
+					gap: 4px;
 					margin-top: 4px;
 					font-size: 10px;
 					font-weight: 400;
 					color: #48546b;
 					padding: 0;
+				}
+				.editedLabel {
+					font-size: 10px;
+					font-weight: 400;
+					color: #48546b;
 				}
 				.contentInfo {
 					max-width: 100%;

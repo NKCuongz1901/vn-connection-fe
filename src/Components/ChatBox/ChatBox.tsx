@@ -339,6 +339,16 @@ const ChatBox = ({
 		)
 	}
 
+	const _renderMessageTime = (
+		created_at?: string,
+		edited_at?: string | null,
+	) => (
+		<div className={classes.time}>
+			<span>{created_at ? dayjs(created_at).format('HH:mm') : ''}</span>
+			{edited_at ? <span className={classes.editedLabel}>Edited</span> : null}
+		</div>
+	)
+
 	const _renderContentChat = (item) => {
 		const {
 			id,
@@ -352,6 +362,7 @@ const ChatBox = ({
 			isTemp,
 			reactions,
 			created_at,
+			edited_at,
 		} = item || {}
 
 		const { name } = user || {}
@@ -430,9 +441,7 @@ const ChatBox = ({
 								</Flex>
 							</div>
 						)}
-						<div className={classes.time}>
-							{created_at ? dayjs(created_at).format('HH:mm') : ''}
-						</div>
+						{_renderMessageTime(created_at, edited_at)}
 						{_renderReactView(reactions)}
 					</div>
 				)
@@ -445,9 +454,7 @@ const ChatBox = ({
 							<CImage src={content} />
 							{_renderReactView(reactions)}
 						</Flex>
-						<div className={classes.time}>
-							{created_at ? dayjs(created_at).format('HH:mm') : ''}
-						</div>
+						{_renderMessageTime(created_at, edited_at)}
 					</Flex>
 				)
 
@@ -547,9 +554,7 @@ const ChatBox = ({
 							</Flex>
 						</Flex>
 						{!!spToText && <Flex className={classes.spToText}>{spToText}</Flex>}
-						<div className={classes.time}>
-							{created_at ? dayjs(created_at).format('HH:mm') : ''}
-						</div>
+						{_renderMessageTime(created_at, edited_at)}
 					</Flex>
 				)
 			}

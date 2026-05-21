@@ -552,7 +552,7 @@ export default function useInboxChat(props: useHangoutChatProps) {
 					type,
 					content: text,
 					message_local_id: message.message_local_id,
-					...(medias.length > 0 && { medias }),
+					medias,
 				},
 				mentions,
 			}

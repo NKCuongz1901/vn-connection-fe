@@ -211,6 +211,15 @@ export default function useChatRoomChatBox({
 			isMe && (item?.type === 'TEXT' || item?.type === 'MEDIAS')
 
 		const menus: ItemType[] = [
+			...(canEdit
+				? [
+						{
+							key: 'EDIT',
+							label: 'Edit',
+							onClick: () => onActionMessage({ key: 'edit', value: item }),
+						},
+					]
+				: []),
 			{
 				key: 'REPLY',
 				label: 'Reply',
@@ -224,15 +233,6 @@ export default function useChatRoomChatBox({
 							label: 'Delete',
 							style: { color: '#F80024' },
 							onClick: () => onActionMessage({ key: 'delete', value: item }),
-						},
-				  ]
-				: []),
-			...(canEdit
-				? [
-						{
-							key: 'EDIT',
-							label: 'Edit',
-							onClick: () => onActionMessage({ key: 'edit', value: item }),
 						},
 					]
 				: []),

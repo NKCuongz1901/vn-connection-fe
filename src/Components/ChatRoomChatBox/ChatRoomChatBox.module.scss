@@ -44,6 +44,19 @@
 					min-width: 32px;
 					display: flex;
 				}
+				.time {
+					display: flex;
+					align-items: center;
+					gap: 4px;
+					font-size: 10px;
+					font-weight: 400;
+					color: #48546b;
+				}
+				.editedLabel {
+					font-size: 10px;
+					font-weight: 400;
+					color: #48546b;
+				}
 				.contentInfo {
 					max-width: 100%;
 					gap: 4px;
@@ -55,8 +68,16 @@
 							font-weight: 600;
 						}
 						.time {
+							display: flex;
+							align-items: center;
+							gap: 4px;
 							color: #48546b;
 							padding: 0;
+						}
+						.editedLabel {
+							font-size: 10px;
+							font-weight: 400;
+							color: #48546b;
 						}
 					}
 					.content {
@@ -316,6 +337,13 @@
 								justify-content: flex-start;
 							}
 							.time {
+								display: flex;
+								align-items: center;
+								gap: 4px;
+								margin-top: 4px;
+								font-size: 10px;
+								font-weight: 400;
+								color: #48546b;
 								padding: 0 12px;
 							}
 							.spToText {

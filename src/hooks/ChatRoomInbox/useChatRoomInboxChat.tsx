@@ -533,7 +533,7 @@ export default function useChatRoomInboxChat({
 					type,
 					content: text,
 					message_local_id: message.message_local_id,
-					...(medias.length > 0 && { medias }),
+					medias,
 				},
 				mentions,
 			}
