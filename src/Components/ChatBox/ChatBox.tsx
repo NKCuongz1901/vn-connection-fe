@@ -344,8 +344,8 @@ const ChatBox = ({
 		edited_at?: string | null,
 	) => (
 		<div className={classes.time}>
-			<span>{created_at ? dayjs(created_at).format('HH:mm') : ''}</span>
 			{edited_at ? <span className={classes.editedLabel}>Edited</span> : null}
+			<span>{created_at ? dayjs(created_at).format('HH:mm') : ''}</span>
 		</div>
 	)
 
@@ -490,9 +490,7 @@ const ChatBox = ({
 										</video>
 									)}
 									{isOverflow && (
-										<div className={classes.moreOverlay}>
-											+{totalMedia - 5}
-										</div>
+										<div className={classes.moreOverlay}>+{totalMedia - 5}</div>
 									)}
 								</Flex>
 							)
@@ -535,12 +533,8 @@ const ChatBox = ({
 								{_renderParentItem(parent)}
 								<div
 									className={clsx(
-										isMulti
-											? classes.multiMediaContent
-											: classes.mediaContent,
-										!isAudioMedia &&
-											isMulti &&
-											classes[`grid${gridCount}`],
+										isMulti ? classes.multiMediaContent : classes.mediaContent,
+										!isAudioMedia && isMulti && classes[`grid${gridCount}`],
 									)}
 								>
 									{Content}

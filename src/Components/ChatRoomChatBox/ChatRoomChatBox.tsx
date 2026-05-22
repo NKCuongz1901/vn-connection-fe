@@ -324,8 +324,8 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		edited_at?: string | null,
 	) => (
 		<div className={classes.time}>
-			<span>{created_at ? dayjs(created_at).format('HH:mm') : ''}</span>
 			{edited_at ? <span className={classes.editedLabel}>Edited</span> : null}
+			<span>{created_at ? dayjs(created_at).format('HH:mm') : ''}</span>
 		</div>
 	)
 
@@ -647,8 +647,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 							{isFirst && (
 								<Flex className={classes.infoNameTime}>
 									{!isNot && <Flex className={classes.name}>{user?.name}</Flex>}
-									{!isMemberAction &&
-										_renderMessageTime(created_at, edited_at)}
+									{/* {!isMemberAction && _renderMessageTime(created_at, edited_at)} */}
 								</Flex>
 							)}
 							<Flex
