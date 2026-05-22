@@ -69,7 +69,7 @@ const Hangout = () => {
 									{!!is_open_hangout &&
 										hangoutPeople.map((people) => (
 											<div key={people.id}>
-												<CAvatar src={people.avatar} />
+												<CAvatar src={people.avatar} size={48} />
 											</div>
 										))}
 								</Flex>

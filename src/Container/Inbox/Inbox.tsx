@@ -111,7 +111,7 @@ const Inbox = () => {
 					onPushState({ id })
 				}}
 			>
-				<CAvatar src={avatar} size={46} />
+				<CAvatar src={avatar} size={48} />
 				<Flex className={classes.info} vertical>
 					<Flex className={classes.infoTop}>
 						<div
@@ -122,7 +122,13 @@ const Inbox = () => {
 							{name}
 						</div>
 						<Flex className={classes.time}>
-							<span>
+							<span
+								className={clsx(
+									is_read || activeItem
+										? classes.timeRead
+										: classes.timeUnread,
+								)}
+							>
 								{timeAgo} {unit ? unit + 's ago' : ''}
 							</span>
 							{!is_read && !activeItem && <span className={classes.unread} />}
@@ -146,7 +152,7 @@ const Inbox = () => {
 					<span className={classes.title}>New message request</span>
 					<span>Messages from strangers</span>
 				</Flex>
-				<Flex className={classes.iconCancelWrapper}>
+				<Flex className={classes.iconCancelWrapper} style={{ display: 'none' }}>
 					<IconCircleXFilled
 						className={classes.iconCancel}
 						onClick={(e) => {

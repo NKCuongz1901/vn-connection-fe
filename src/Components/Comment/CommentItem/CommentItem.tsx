@@ -21,6 +21,7 @@ import ImageIcon from '@/svg/ImageIcon'
 import MessageMinuIcon from '@/svg/MessageMinuIcon'
 
 import classes from './CommentItem.module.scss'
+import { REPORT_ISSUE_TYPE } from '@/Variable/common.variable'
 
 interface CommentItemProps {
 	isEdit?: boolean
@@ -138,6 +139,7 @@ const CommentItem = ({
 			case 'report':
 				Content = (
 					<ModalReport
+						reportType={REPORT_ISSUE_TYPE.TALKROOM}
 						open
 						{...propsModal}
 						data={{ comment_id: data }}

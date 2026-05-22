@@ -4,7 +4,7 @@ import { memo, useMemo } from 'react'
 
 import { isArray } from '@/ultis/array'
 import { toJson } from '@/ultis/common'
-import { onPushState } from '@/ultis/route'
+import { onPushState, useLocalePath } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
 
 import ChatBox from '@/Components/ChatBox'
@@ -16,6 +16,7 @@ import ModelPin from '../ModelPin'
 import SettingConv from '../SettingConv'
 
 import ArrrowRightIcon from '@/svg/ArrrowRightIcon'
+import { mainRoutes } from '@/routes/MainRoutes'
 import classes from './InboxChat.module.scss'
 
 const mappingType = {
@@ -30,6 +31,7 @@ interface InboxChatProps {
 }
 const InboxChat = (props: InboxChatProps) => {
 	const { convId, isNoHeader, type } = props
+	const { onChangeRoute } = useLocalePath()
 
 	const {
 		_scrollRef,
@@ -48,7 +50,10 @@ const InboxChat = (props: InboxChatProps) => {
 		openSetting,
 		convInfo,
 		setOpenSetting,
+		editingMessage,
 		onSendMessage,
+		onEditMessage,
+		onCancelEdit,
 		onActionMessage,
 		onLoadMore,
 		onGetPinMessage,
@@ -65,6 +70,12 @@ const InboxChat = (props: InboxChatProps) => {
 		return !userInChat?.user && type === 'inbox'
 	}, [type, userInChat])
 
+	const otherUserId = userInChat?.user?.id
+
+	const handleGoToProfile = (userId: string) => {
+		if (userId) onChangeRoute(`${mainRoutes.profile}/${userId}`)
+	}
+
 	const _renderHeader = () => {
 		if (!!isNoHeader) return
 		return (
@@ -74,7 +85,12 @@ const InboxChat = (props: InboxChatProps) => {
 				) : (
 					<>
 						<Flex className={classes.userInChat}>
-							<CAvatar src={userInChat?.user?.avatar || ''} />
+							<CAvatar
+								size={48}
+								style={otherUserId ? { cursor: 'pointer' } : undefined}
+								src={userInChat?.user?.avatar || ''}
+								onClick={() => handleGoToProfile(otherUserId)}
+							/>
 							<span>{userInChat?.user?.name || 'Deleted account'}</span>
 						</Flex>
 						<Flex className={classes.action}>
@@ -168,10 +184,14 @@ const InboxChat = (props: InboxChatProps) => {
 						onLoadMore={onLoadMore}
 						_scrollRef={_scrollRef}
 						onSendMessage={onSendMessage}
+						onEditMessage={onEditMessage}
+						onCancelEdit={onCancelEdit}
+						editingMessage={editingMessage}
 						onAddReact={onAddReact}
 						onActionMessage={onActionMessage}
 						onEnsureMessageLoaded={onEnsureMessageLoaded}
 						loadingEnsureMessage={loadingEnsureMessage}
+						onAvatarClick={handleGoToProfile}
 					/>
 				</Flex>
 			</Flex>

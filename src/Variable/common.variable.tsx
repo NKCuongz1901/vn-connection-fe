@@ -1158,6 +1158,8 @@ export const countryCodes = [
 	value: i.code || '',
 }))
 
+export const REGISTER_FROM_LOGIN_SESSION_KEY = 'register_from_login'
+
 export enum OTP_TYPE {
 	REGISTER = 'REGISTER',
 	FORGET_PASSWORD = 'FORGET_PASSWORD',
@@ -1543,6 +1545,8 @@ export const specialTypeMessage = [
 	'OPEN_CHAT_CREATE',
 ]
 
+export const MAX_CHAT_MEDIAS = 5
+
 export const mappingTypeMessage = {
 	STICKER: 'Send a sticker',
 	MEDIAS: 'Send a media',
@@ -1559,3 +1563,11 @@ export const levelOptions = [
 	{ value: 'INTERMEDIATE', label: 'Intermediate' },
 	{ value: 'ADVANCED', label: 'Advanced' },
 ]
+export const REPORT_ISSUE_TYPE = {
+	GET_HELP: 'GET_HELP',
+	TALKROOM: 'TALKROOM',
+	TUTOR: 'TUTOR',
+} as const
+
+export type ReportIssueType =
+	(typeof REPORT_ISSUE_TYPE)[keyof typeof REPORT_ISSUE_TYPE]

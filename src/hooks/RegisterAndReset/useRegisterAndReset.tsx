@@ -1,5 +1,5 @@
 import md5 from 'md5'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
@@ -16,10 +16,56 @@ import { isArray } from '@/ultis/array'
 import { formatPhone, toJson } from '@/ultis/common'
 import { useLocalePath } from '@/ultis/route'
 
-import { OTP_TYPE, OTPType } from '@/Variable/common.variable'
+import {
+	OTP_TYPE,
+	OTPType,
+	REGISTER_FROM_LOGIN_SESSION_KEY,
+} from '@/Variable/common.variable'
+import { getSessionStorage } from '@/ultis/storage'
 import { emailRegex, passwordRegex } from '@/Variable/regex.variable'
 import { forgetPasswordStep } from '@/Variable/step.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
+
+type RegisterFromLoginInit = {
+	phone: string
+	prefix: string
+}
+
+const readRegisterFromLogin = (type: OTPType): RegisterFromLoginInit | null => {
+	if (typeof window === 'undefined') return null
+	if (type !== OTP_TYPE.REGISTER) return null
+
+	const init = getSessionStorage(REGISTER_FROM_LOGIN_SESSION_KEY)
+	if (!init?.phone) return null
+
+	sessionStorage.removeItem(REGISTER_FROM_LOGIN_SESSION_KEY)
+
+	return {
+		phone: init.phone,
+		prefix: init.prefix || '+84',
+	}
+}
+
+const createInitialAccountInfo = (
+	type: OTPType,
+	steps: string[],
+	loginInit: RegisterFromLoginInit | null,
+) => ({
+	title: loginInit
+		? (steps[1] ?? 'OTP Verify')
+		: (steps[0] ?? 'Verify Phone Number'),
+	otp: '',
+	phone: loginInit?.phone ?? '',
+	password: '',
+	confirmPassword: '',
+	prefix: loginInit?.prefix ?? '+84',
+	uid: '',
+	name: '',
+	invite_code: '',
+	email: '',
+	type,
+	checked: false,
+})
 
 export default function useRegisterAndReset({
 	type,
@@ -31,22 +77,13 @@ export default function useRegisterAndReset({
 	const { toggleLoadingContext } = useLoading()
 	const { openError, openSuccess } = useModal()
 	const { onChangeRoute } = useLocalePath()
-	const [step, setStep] = useState(0)
-	const [accountInfo, setAccountInfo] = useState({
-		title: 'Verify Phone Number',
-		otp: '',
-		phone: '',
-		password: '',
-		confirmPassword: '',
-		prefix: '+84',
-		uid: '',
-		name: '',
-		invite_code: '',
-		email: '',
+	const otpFromLoginSentRef = useRef(false)
 
-		type,
-		checked: false,
-	})
+	const [loginInit] = useState(() => readRegisterFromLogin(type))
+	const [step, setStep] = useState(() => (loginInit ? 1 : 0))
+	const [accountInfo, setAccountInfo] = useState(() =>
+		createInitialAccountInfo(type, steps, loginInit),
+	)
 	const [errors, setErrors] = useState({})
 	const [isValidate, setIsValidate] = useState(false)
 	const handleChangeStep = useCallback((value: number) => {
@@ -263,6 +300,32 @@ export default function useRegisterAndReset({
 	useEffect(() => {
 		setIsValidate(handleValidate())
 	}, [handleValidate])
+
+	useEffect(() => {
+		if (!loginInit || otpFromLoginSentRef.current) return
+
+		otpFromLoginSentRef.current = true
+		const { prefix, phone } = loginInit
+
+		const sendOtpFromLogin = async () => {
+			toggleLoadingContext(true)
+			try {
+				const dataSendOtp: any = await sendOTP({
+					phone: formatPhone(prefix, phone),
+				})
+				if (dataSendOtp?.results?.object?.sid !== 'success') {
+					openError({ message: 'Failed to send OTP. Please try again.' })
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				toggleLoadingContext(false)
+			}
+		}
+
+		sendOtpFromLogin()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [loginInit])
 
 	return {
 		isValidate: isValidate,

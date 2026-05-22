@@ -20,7 +20,6 @@ import { ConversationChatRoomProps } from '@/interface/Conversation/Conversation
 import { mainRoutes } from '@/routes/MainRoutes'
 import { paginationCommon } from '@/Variable/common.variable'
 import { STORAGE_KEY } from '@/Variable/storage.variable'
-import { radiusOpts } from '@/Variable/select.variable'
 
 type userDataProps = {
 	is_open_hangout: boolean
@@ -39,7 +38,7 @@ export default function useOverview() {
 	const { openError } = useModal()
 	const _childRef = useRef<HTMLDivElement | null>(null)
 	const _filterRef = useRef<filterProps>({
-		radius: radiusOpts.at(-1).value,
+		radius: 50,
 		date: null,
 		categories: null,
 		title: '',
@@ -84,7 +83,7 @@ export default function useOverview() {
 
 	const [loadmore, setLoadMore] = useState(true)
 	const [filters, setFilters] = useState<filterProps>({
-		radius: radiusOpts.at(-1).value,
+		radius: 50,
 		date: null,
 		categories: null,
 		title: '',

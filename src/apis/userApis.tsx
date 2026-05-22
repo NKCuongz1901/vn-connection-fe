@@ -32,3 +32,9 @@ export const reportUser = async (payload) => {
 	const url = USER_ROUTES.report
 	return await axios.post(url, payload)
 }
+
+export const getReportIssueTypes = async (params: { type: string }) => {
+	return await axios.get(`${USER_ROUTES.report}/issuse-types`, {
+		params: convertParams(params),
+	})
+}

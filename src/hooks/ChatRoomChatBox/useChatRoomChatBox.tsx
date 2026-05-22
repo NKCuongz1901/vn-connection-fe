@@ -25,6 +25,7 @@ export default function useChatRoomChatBox({
 	type,
 	onActionMessage,
 	onAddReact,
+	onCancelEdit,
 }: useHangoutChatProps) {
 	const { openError, openSuccess } = useModal()
 	const _refInput = useRef() as any
@@ -147,6 +148,7 @@ export default function useChatRoomChatBox({
 		}
 	}
 	const handleReply = (item) => {
+		onCancelEdit?.()
 		setReply(item)
 		_refInput?.current?.focus()
 	}
@@ -205,7 +207,19 @@ export default function useChatRoomChatBox({
 			default:
 				break
 		}
+		const canEdit =
+			isMe && (item?.type === 'TEXT' || item?.type === 'MEDIAS')
+
 		const menus: ItemType[] = [
+			...(canEdit
+				? [
+						{
+							key: 'EDIT',
+							label: 'Edit',
+							onClick: () => onActionMessage({ key: 'edit', value: item }),
+						},
+					]
+				: []),
 			{
 				key: 'REPLY',
 				label: 'Reply',
@@ -220,7 +234,7 @@ export default function useChatRoomChatBox({
 							style: { color: '#F80024' },
 							onClick: () => onActionMessage({ key: 'delete', value: item }),
 						},
-				  ]
+					]
 				: []),
 		]
 		return menus

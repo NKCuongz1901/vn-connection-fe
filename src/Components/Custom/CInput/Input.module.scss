@@ -11,6 +11,9 @@
 	height: 44px;
 }
 .wrapper :global(.ant-input-group-addon) {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	padding: 8px 16px;
 	background: #f4f8fc;
 	border-radius: 16px 0 0 16px !important;
