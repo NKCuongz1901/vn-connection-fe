@@ -58,7 +58,8 @@ const Local = (props: LocalProps) => {
 		onLoadMore,
 		onSearch,
 	} = useLocal(props)
-
+	const { data } = props || {}
+	const { address } = data || {}
 	const _renderFilterGroup = () => {
 		const { age_range, gender_array, radius } = filter
 		return (
@@ -293,7 +294,9 @@ const Local = (props: LocalProps) => {
 						onClick={() => onChangeRoute(mainRoutes.search)}
 					/>
 					<ProfileIcon />
-					<div className={classes.headerLabel}>Locals and Expats</div>
+					<div className={classes.headerLabel}>
+						Locals and Expats {address ? `in ${address}` : ''}
+					</div>
 					<Flex className={classes.totalUser}>{total.user}</Flex>
 				</Flex>
 				{_renderFilter()}

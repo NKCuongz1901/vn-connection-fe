@@ -13,6 +13,9 @@ interface CInputMapProps {
 	latitude: number
 	title?: string
 	onSubmitModal?: any
+	onInputClick?: () => void
+	open?: boolean
+	onOpenChange?: (open: boolean) => void
 }
 
 const CInputMap = (_props: CInputMapProps & CInputProps) => {
@@ -25,22 +28,45 @@ const CInputMap = (_props: CInputMapProps & CInputProps) => {
 		onSubmitModal,
 		longitude,
 		latitude,
+		onInputClick,
+		open,
+		onOpenChange,
 		...props
 	} = _props
-	const [openModal, setOpenModal] = useState(false)
+	const [internalOpen, setInternalOpen] = useState(false)
+	const isControlled = open !== undefined
+	const openModal = isControlled ? open : internalOpen
+	const setOpenModal = useCallback(
+		(next: boolean) => {
+			if (isControlled) {
+				onOpenChange?.(next)
+			} else {
+				setInternalOpen(next)
+			}
+		},
+		[isControlled, onOpenChange],
+	)
 	const status = error ? 'error' : ''
-	const handleCloseModal = useCallback((e) => {
-		e?.stopPropagation?.()
-		setOpenModal(false)
-	}, [])
+	const handleCloseModal = useCallback(
+		(e) => {
+			e?.stopPropagation?.()
+			setOpenModal(false)
+		},
+		[setOpenModal],
+	)
+	const handleInputClick = useCallback(() => {
+		if (onInputClick) {
+			onInputClick()
+			return
+		}
+		setOpenModal(true)
+	}, [onInputClick, setOpenModal])
 	return (
 		<Flex
 			vertical
 			gap={4}
 			className={classes.layout}
-			onClick={() => {
-				setOpenModal(true)
-			}}
+			onClick={handleInputClick}
 		>
 			{label && (
 				<span className="bold">

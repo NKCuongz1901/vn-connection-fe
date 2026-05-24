@@ -1,6 +1,6 @@
 'use client'
-import { MenuOutlined, SearchOutlined } from '@ant-design/icons'
-import { IconBellFilled, IconUserCircle } from '@tabler/icons-react'
+import { MenuOutlined } from '@ant-design/icons'
+import { IconBellFilled, IconMapPinFilled, IconUserCircle } from '@tabler/icons-react'
 import { Dropdown, Flex } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import { onMessage } from 'firebase/messaging'
@@ -13,7 +13,9 @@ import { logout } from '@/apis/authApis'
 import { getNotificationCount } from '@/apis/notificationApis'
 import { getUserProfile, updateUserProfile } from '@/apis/userApis'
 
-import { useLocalePath } from '@/ultis/route'
+import { useSearchLocation } from '@/context/SearchLocationContext'
+
+import { useLocalePath, useQuery } from '@/ultis/route'
 import {
 	getStorageCookie,
 	handleRemoveAllCookie,
@@ -24,7 +26,7 @@ import {
 } from '@/ultis/storage'
 
 import CButton from '@/Components/Custom/CButton'
-import CInput from '@/Components/Custom/CInput'
+import CInputMap from '@/Components/Custom/CInputMap'
 import Notification from '@/Container/Notification'
 import LogoSvg from '@/svg/LogoSvg'
 import CAvatar from '@/Components/Custom/CAvatar'
@@ -40,11 +42,17 @@ interface HeaderMainLayoutProps {
 }
 const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 	const { onToggleMenus } = props
-	const { onChangeRoute } = useLocalePath()
+	const { onChangeRoute, pathname } = useLocalePath()
+	const { onGetQuerry } = useQuery()
+	const { t: searchDetailType } = onGetQuerry()
+	const { location, setLocationFromMap } = useSearchLocation()
+
+	const isSearchPage = pathname.includes(mainRoutes.search)
 
 	const ref = useRef<HTMLDivElement>(null)
 
 	const [login, setLogin] = useState(false)
+	const [mapOpen, setMapOpen] = useState(false)
 	const [show, setShow] = useState(false)
 	const [count, setCount] = useState(0)
 	const [user, setUser] = useState(null)
@@ -249,6 +257,14 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 		}
 	}
 
+	const handleSearchInputClick = useCallback(() => {
+		if (!isSearchPage) {
+			onChangeRoute(mainRoutes.search)
+			return
+		}
+		setMapOpen(true)
+	}, [isSearchPage, onChangeRoute])
+
 	const handleMenusClick = useCallback((type: string) => {
 		switch (type) {
 			case 'profile':
@@ -277,16 +293,23 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 					<div>UniVini</div>
 				</Flex>
 				{/* {false && ( */}
-				<Flex className="headerSearchMainLayout">
-					<CInput
-						placeholder="Search location to find people, events & communities."
-						style={{ borderRadius: 40, height: 44, width: 415 }}
-						prefix={<SearchOutlined className="headerSeachOutline" />}
-						readOnly
-						onClick={() => onChangeRoute(mainRoutes.search)}
-						onFocus={() => onChangeRoute(mainRoutes.search)}
-					/>
-				</Flex>
+				{!searchDetailType && (
+					<Flex className="headerSearchMainLayout">
+						<CInputMap
+							title="Location"
+							value={location.address}
+							longitude={location.longitude}
+							latitude={location.latitude}
+							placeholder="Search location to find people, events & communities."
+							onSubmitModal={setLocationFromMap}
+							onInputClick={handleSearchInputClick}
+							open={mapOpen}
+							onOpenChange={setMapOpen}
+							prefix={<IconMapPinFilled fill="#E55A0F" />}
+							style={{ borderRadius: 40, height: 44, width: 415 }}
+						/>
+					</Flex>
+				)}
 				{/* )} */}
 			</Flex>
 			<Flex className="headerButton">

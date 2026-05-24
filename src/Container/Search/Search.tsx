@@ -1,5 +1,4 @@
 'use client'
-import { IconMapPinFilled } from '@tabler/icons-react'
 import { Flex } from 'antd'
 import clsx from 'clsx'
 import { memo } from 'react'
@@ -10,7 +9,6 @@ import { onPushState, useLocalePath } from '@/ultis/route'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CImage from '@/Components/Custom/CImage'
-import CInputMap from '@/Components/Custom/CInputMap'
 import EventTitle from '@/Components/Event/EventTitle'
 import Local from '@/Components/Search/Local'
 import SocialEvent from '@/Components/Search/SocialEvent'
@@ -24,24 +22,9 @@ import MiniAppList from '@/Components/MiniApp/MiniAppList'
 
 const Search = () => {
 	const { onChangeRoute } = useLocalePath()
-	const { user, event, club, data, total, location, type, onChangeValue } =
-		useSearch({})
+	const { user, event, club, data, total, location, type } = useSearch({})
 
 	const { address, longitude, latitude, type: typeLocation } = location
-	const _renderInputMap = () => {
-		if (type) return
-		return (
-			<CInputMap
-				title="Location"
-				value={address}
-				longitude={longitude}
-				latitude={latitude}
-				placeholder="Location by city, district"
-				onSubmitModal={onChangeValue('location')}
-				prefix={<IconMapPinFilled fill="#E55A0F" />}
-			/>
-		)
-	}
 	const _renderUser = () => {
 		if (type) return
 		return (
@@ -176,7 +159,6 @@ const Search = () => {
 	return (
 		<div className={clsx(classes.wrapper)}>
 			<Flex className={clsx(classes.container)} vertical>
-				{/* {_renderInputMap()} */}
 				<MiniAppList />
 				{_renderUser()}
 				{_renderEvent()}

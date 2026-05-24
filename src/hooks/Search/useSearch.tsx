@@ -1,16 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { getInappClub, getInappEvent, getInappLocal } from '@/apis/searchApis'
-import { getFullAddressFromLatLng } from '@/apis/ggApis'
 
 import { useModal } from '@/context/ModalContext'
+import { useSearchLocation } from '@/context/SearchLocationContext'
 
-import { useQuery } from '@/ultis/route'
-import { randomString } from '@/ultis/string'
-import { getCurrentLocation } from '@/ultis/common'
+import { useLocalePath, useQuery } from '@/ultis/route'
 
 import { NetworkItemProps } from '@/interface/Community/Community.interface'
 import { LocalProps, LocalResProps } from '@/interface/Search/Search.interface'
+import { mainRoutes } from '@/routes/MainRoutes'
 
 interface useSearchProps {
 	[key: string]: any
@@ -23,53 +22,33 @@ const searchType = {
 
 export default function useSearch({}: useSearchProps) {
 	const { openError } = useModal()
+	const { location, isReady } = useSearchLocation()
 	const { onGetQuerry } = useQuery()
+	const { pathname } = useLocalePath()
 	const { t, longitude, latitude, address, type: typeSearch } = onGetQuerry()
-	const [location, setLocation] = useState({
-		address: '',
-		longitude: 0,
-		latitude: 0,
-		type: [],
-	})
+
+	const isSearchPage = pathname.includes(mainRoutes.search)
 
 	const [user, setUser] = useState<LocalProps[]>([])
 	const [event, setEvent] = useState<any[]>([])
 	const [club, setClub] = useState<NetworkItemProps[]>([])
 
-	const [loading, setLoading] = useState({ user: false })
+	const [loading, setLoading] = useState({ user: false, event: false, club: false })
 	const [total, setTotal] = useState({ user: 0, event: 0, club: 0 })
-	const [apiId, setApiId] = useState<string>('')
 
 	const [type, setType] = useState(searchType[t] || '')
 
-	const handleChangeValue = (key) => (_value) => {
-		switch (key) {
-			case 'location':
-				setLocation({
-					address: _value.display_name,
-					longitude: _value.lng,
-					latitude: _value.lat,
-					type: _value.type,
-				})
-				break
-
-			default:
-				break
-		}
-		setApiId(randomString())
-	}
-
-	const handleGetInAppLocal = async () => {
+	const handleGetInAppLocal = useCallback(async () => {
 		if (type) return
 		setLoading((prev) => ({ ...prev, user: true }))
 		let _total = 0
 		try {
-			const { latitude, longitude, address, type } = location
+			const { latitude, longitude, address, type: locationType } = location
 			const res: LocalResProps = (await getInappLocal({
 				fields: ['$all'],
 				...(latitude && longitude && { latitude, longitude }),
 				...(address && { google_title: address }),
-				type,
+				type: locationType,
 				page: 1,
 				limit: 20,
 			})) as any
@@ -84,19 +63,19 @@ export default function useSearch({}: useSearchProps) {
 			setLoading((prev) => ({ ...prev, user: false }))
 			setTotal((prev) => ({ ...prev, user: _total }))
 		}
-	}
+	}, [type, location, openError])
 
-	const handleGetUpcommingEvent = async () => {
+	const handleGetUpcommingEvent = useCallback(async () => {
 		if (type) return
 		setLoading((prev) => ({ ...prev, event: true }))
 		let _total = 0
 		try {
-			const { latitude, longitude, address, type } = location
+			const { latitude, longitude, address, type: locationType } = location
 			const res: any = (await getInappEvent({
 				fields: ['$all'],
 				...(latitude && longitude && { latitude, longitude }),
 				...(address && { google_title: address }),
-				type,
+				type: locationType,
 				page: 1,
 				limit: 20,
 			})) as any
@@ -111,9 +90,9 @@ export default function useSearch({}: useSearchProps) {
 			setLoading((prev) => ({ ...prev, event: false }))
 			setTotal((prev) => ({ ...prev, event: _total }))
 		}
-	}
+	}, [type, location, openError])
 
-	const handleGetInAppClub = async () => {
+	const handleGetInAppClub = useCallback(async () => {
 		if (type) return
 		setLoading((prev) => ({ ...prev, club: true }))
 		let _total = 0
@@ -137,77 +116,24 @@ export default function useSearch({}: useSearchProps) {
 			setLoading((prev) => ({ ...prev, club: false }))
 			setTotal((prev) => ({ ...prev, club: _total }))
 		}
-	}
-	const getAddressByPriority = (geoResult: any) => {
-		const components = geoResult?.address_components || []
+	}, [type, location, openError])
 
-		const pick = (type: string) =>
-			components.find((c: any) => (c?.types || []).includes(type))?.long_name ||
-			''
-
-		const district =
-			pick('administrative_area_level_2') ||
-			pick('sublocality_level_1') ||
-			pick('administrative_area_level_3')
-
-		const city = pick('administrative_area_level_1') || pick('locality')
-
-		if (district && city) return `${district}, ${city}`
-		if (district) return district
-		if (city) return city
-		return geoResult?.formatted_address || ''
-	}
-
-	const handleGetAddress = async (marker) => {
-		try {
-			const lat = Number(marker?.lat) || null
-			const lng = Number(marker?.lng) || null
-
-			if (!lat || !lng) return
-
-			const res: any = await getFullAddressFromLatLng({ lat, lng })
-			const { code, results } = res || {}
-
-			if (code === 200) {
-				const firstResult = results?.object?.results?.[0] || {}
-				const { geometry } = firstResult || {}
-
-				const baseAddress = getAddressByPriority(firstResult)
-
-				handleChangeValue('location')({
-					display_name: baseAddress,
-					lat: geometry?.location?.lat || marker?.lat,
-					lng: geometry?.location?.lng || marker?.lng,
-				})
-			}
-		} catch (error) {
-			console.log('error:', error)
-		}
-	}
-
-	const handleGetLocation = async () => {
-		let res: any
-		try {
-			res = await getCurrentLocation()
-			if (res) {
-				res = await handleGetAddress(res)
-			}
-		} catch (error) {
-			console.log(' error:', error)
-		} finally {
-			return res
-		}
-	}
 	useEffect(() => {
-		if (apiId) {
-			handleGetInAppLocal()
-			handleGetUpcommingEvent()
-			handleGetInAppClub()
-		} else {
-			handleGetLocation()
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [apiId])
+		if (!isSearchPage || !isReady || type) return
+		handleGetInAppLocal()
+		handleGetUpcommingEvent()
+		handleGetInAppClub()
+	}, [
+		isSearchPage,
+		isReady,
+		type,
+		location.address,
+		location.latitude,
+		location.longitude,
+		handleGetInAppLocal,
+		handleGetUpcommingEvent,
+		handleGetInAppClub,
+	])
 
 	useEffect(() => {
 		setType(searchType[t] || '')
@@ -228,6 +154,5 @@ export default function useSearch({}: useSearchProps) {
 			type: typeSearch,
 		},
 		setType,
-		onChangeValue: handleChangeValue,
 	}
 }

@@ -8,6 +8,7 @@ import { LoadingProvider } from '@/context/LoadingContext'
 import { ModalProvider } from '@/context/ModalContext'
 import { SocketProvider } from '@/context/SocketContext'
 import { NewInboxProvider } from '@/context/NewInboxContext'
+import { SearchLocationProvider } from '@/context/SearchLocationContext'
 
 import MainLayout from '@/Components/Layout/MainLayout'
 import 'country-flag-icons/3x2/flags.css'
@@ -36,7 +37,9 @@ export default async function LocaleLayout({
 				<ModalProvider>
 					<SocketProvider>
 						<NewInboxProvider>
-							<MainLayout>{children}</MainLayout>
+							<SearchLocationProvider>
+								<MainLayout>{children}</MainLayout>
+							</SearchLocationProvider>
 						</NewInboxProvider>
 					</SocketProvider>
 				</ModalProvider>
