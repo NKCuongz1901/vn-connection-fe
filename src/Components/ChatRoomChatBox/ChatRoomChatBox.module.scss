@@ -577,6 +577,12 @@
 		align-items: center;
 		position: relative;
 		gap: 8px;
+		:global(.mentionsInput) {
+			flex: 1;
+			min-width: 0;
+			max-width: none;
+			width: 100%;
+		}
 		.iconHappi,
 		.sendButton {
 			cursor: pointer;

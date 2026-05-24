@@ -1,11 +1,14 @@
 .wrapper {
 	height: 100%;
 	width: 100%;
+	overflow: hidden;
 	.container {
 		padding: 24px;
 		height: 100%;
 		width: 100%;
 		gap: 12px;
+		overflow: hidden;
+		min-height: 0;
 
 		.title {
 			font-weight: 600;
@@ -22,7 +25,9 @@
 		.body {
 			width: 100%;
 			border-radius: 16px;
-			height: 100%;
+			flex: 1;
+			min-height: 0;
+			overflow: hidden;
 			gap: 12px;
 			.tabs {
 				width: 100%;
@@ -34,10 +39,16 @@
 				}
 			}
 			.languageWrapper {
-				height: 100%;
+				flex: 1;
+				min-height: 0;
+				overflow: hidden;
+				align-items: stretch;
 				.detailChatRoom {
 					padding: 24px 32px;
 					flex: 1;
+					min-width: 0;
+					min-height: 0;
+					overflow: hidden;
 					width: 100%;
 					border-radius: 16px;
 				}
@@ -45,11 +56,13 @@
 			.tabLanguage {
 				gap: 20px;
 				flex-wrap: wrap;
-				overflow: auto;
+				flex: 1;
+				min-height: 0;
+				overflow-x: hidden;
+				overflow-y: auto;
 				background: #fff;
 				padding: 16px;
 				width: 100%;
-				height: fit-content;
 				.chatRoomWrapper {
 					padding: 12px;
 					gap: 8px;
@@ -139,11 +152,22 @@
 				.chatRoomWrapperActive {
 					background: #e7f5e9;
 				}
-			}
-			.inboxDetail {
-				width: 384px;
-				min-width: 384px;
-				max-width: 384px;
+
+				&.inboxDetail {
+					flex: none;
+					width: 200px;
+					min-width: 200px;
+					max-width: 200px;
+					height: 100%;
+					align-self: stretch;
+					flex-direction: column;
+					flex-wrap: nowrap;
+					.chatRoomWrapper {
+						width: 100%;
+						max-width: 100%;
+						flex-shrink: 0;
+					}
+				}
 			}
 			.develop {
 				width: 100%;
@@ -155,8 +179,12 @@
 	}
 	.containerChatDetail {
 		padding: 0;
+		height: 100%;
 		.body {
 			border-radius: 0;
+			flex: 1;
+			min-height: 0;
+			overflow: hidden;
 		}
 	}
 }
@@ -175,7 +203,7 @@
 				}
 				.tabLanguage {
 					.chatRoomWrapper {
-						width: calc(33% - 12px);
+						width: 100%;
 						.chatRoomTitle {
 						}
 						.totalMem {
@@ -219,7 +247,7 @@
 				}
 				.tabLanguage {
 					.chatRoomWrapper {
-						width: calc(50% - 10px);
+						width: 100%;
 						.chatRoomTitle {
 						}
 						.totalMem {
