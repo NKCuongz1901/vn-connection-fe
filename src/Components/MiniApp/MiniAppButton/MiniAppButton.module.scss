@@ -1,0 +1,35 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	border: none;
+	background: none;
+
+	.iconBox {
+		cursor: pointer;
+		display: flex;
+		width: 52px;
+		height: 52px;
+		padding: 4px;
+		justify-content: center;
+		align-items: center;
+		aspect-ratio: 1/1;
+		border-radius: var(--radius-4, 16px);
+	}
+	svg {
+		width: 32px;
+		height: 32px;
+	}
+
+	.label {
+		color: var(--text-primary, #0f1729);
+		text-align: center;
+
+		font-size: var(--body-xsmall-size, 10px);
+		font-style: normal;
+		font-weight: 600;
+		line-height: var(--body-xsmall-line-height, 14px);
+		letter-spacing: var(--body-xsmall-tracking, 0);
+	}
+}

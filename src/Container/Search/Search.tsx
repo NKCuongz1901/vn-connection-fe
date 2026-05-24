@@ -20,6 +20,7 @@ import ProfileIcon from '@/svg/ProfileIcon'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './Search.module.scss'
+import MiniAppList from '@/Components/MiniApp/MiniAppList'
 
 const Search = () => {
 	const { onChangeRoute } = useLocalePath()
@@ -175,7 +176,8 @@ const Search = () => {
 	return (
 		<div className={clsx(classes.wrapper)}>
 			<Flex className={clsx(classes.container)} vertical>
-				{_renderInputMap()}
+				{/* {_renderInputMap()} */}
+				<MiniAppList />
 				{_renderUser()}
 				{_renderEvent()}
 				{_renderClub()}
