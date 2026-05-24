@@ -99,10 +99,24 @@ const Inbox = () => {
 			activeItem,
 		} = item
 		const otherUser = users.find((user) => user?.user?.id !== meId) || {}
-		const { avatar, name } = otherUser?.user || { name: 'Deleted account' }
+		const { avatar, name, visibility, online_time } = otherUser?.user || {
+			name: 'Deleted account',
+		}
+		const isOnline = visibility === 'ONLINE'
+
 		const { value: timeAgo, unit } = getDiffFromNow({
 			input: Number(last_time_chat),
 		})
+
+		const formatLastOnline = (ts?: string) => {
+			if (!ts) return ''
+			const { value, unit } = getDiffFromNow({ input: Number(ts) })
+			if (unit === 'second') return 'now'
+			if (unit === 'minute') return `${value} min`
+			if (unit === 'hour') return `${value} hr`
+			if (unit === 'day') return `${value} d`
+			return String(value)
+		}
 		return (
 			<Flex
 				className={clsx(classes.convItem)}
@@ -111,7 +125,18 @@ const Inbox = () => {
 					onPushState({ id })
 				}}
 			>
-				<CAvatar src={avatar} size={48} />
+				<div className={classes.avatarWrap}>
+					<CAvatar src={avatar} size={48} />
+					{isOnline ? (
+						<span className={classes.onlineDot} aria-label="Online" />
+					) : (
+						online_time && (
+							<span className={classes.lastSeen}>
+								{formatLastOnline(online_time)}
+							</span>
+						)
+					)}
+				</div>
 				<Flex className={classes.info} vertical>
 					<Flex className={classes.infoTop}>
 						<div
@@ -124,9 +149,7 @@ const Inbox = () => {
 						<Flex className={classes.time}>
 							<span
 								className={clsx(
-									is_read || activeItem
-										? classes.timeRead
-										: classes.timeUnread,
+									is_read || activeItem ? classes.timeRead : classes.timeUnread,
 								)}
 							>
 								{timeAgo} {unit ? unit + 's ago' : ''}
