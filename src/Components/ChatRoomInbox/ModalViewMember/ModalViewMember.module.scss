@@ -5,6 +5,40 @@
 	flex-direction: column;
 	gap: 28px;
 	overflow: auto;
+
+	.userAvatarWrapper {
+		.avatarWrap {
+			position: relative;
+		}
+		.lastSeen {
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			padding: 0 2px;
+			border-radius: 999px;
+			background: #e7f5e9;
+			color: var(--text-brand-secondary, #006b35);
+			text-align: center;
+			font-size: 7px;
+			font-style: normal;
+			font-weight: 400;
+			line-height: var(--body-xsmall-line-height, 14px);
+			letter-spacing: var(--body-xsmall-tracking, 0);
+			z-index: 2;
+		}
+	}
+	.onlineDot {
+		width: 12px;
+		height: 12px;
+		border-radius: 50%;
+		background: #32a036;
+		border: 2px solid #fff;
+		z-index: 2;
+	}
+	.userNameRow {
+		width: 100%;
+		max-width: 170px;
+	}
 	.section {
 		gap: 12px;
 		.header {
@@ -102,21 +136,29 @@
 					}
 				}
 			}
-			.moreAround {
+			.moreAroundWrap {
 				position: relative;
-				.moreAroundMe {
-					position: absolute;
-					top: 0;
-					background: rgba(0, 8, 25, 0.48);
-					height: 64px;
-					width: 64px;
-					border-radius: 50%;
-					align-items: center;
-					justify-content: center;
-					color: #fff;
-					font-weight: 600;
-					font-size: 18px;
-				}
+				min-width: 170px;
+				max-width: 170px;
+			}
+
+			.moreAroundBadge {
+				position: absolute;
+				top: 0;
+				left: 50%;
+				transform: translateX(-50%);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: rgba(0, 8, 25, 0.48);
+				height: 64px;
+				width: 64px;
+				border-radius: 50%;
+				color: #fff;
+				font-weight: 600;
+				font-size: 18px;
+				pointer-events: none;
+				z-index: 3;
 			}
 			.skeleton {
 				gap: 4px;

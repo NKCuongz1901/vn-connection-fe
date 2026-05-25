@@ -205,6 +205,8 @@ export interface ClubMemberProps {
 		country_code: string
 		address_local: string
 		profile: any
+		visibility: string
+		online_time: string | null
 	}
 	dating: any
 }

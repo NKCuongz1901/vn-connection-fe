@@ -17,6 +17,17 @@ import DetailCommunityAddAdmin from '../DetailCommunityAddAdmin'
 import { ConversationProps } from '@/interface/Community/Community.interface'
 
 import classes from './DetailCommunityMember.module.scss'
+import { getDiffFromNow } from '@/ultis/date'
+
+const formatLastOnline = (online_time?: string | null) => {
+	if (!online_time) return ''
+	const { value, unit } = getDiffFromNow({ input: Number(online_time) })
+	if (unit === 'second') return 'now'
+	if (unit === 'minute') return `${value} min`
+	if (unit === 'hour') return `${value} hr`
+	if (unit === 'day') return `${value} d`
+	return String(value)
+}
 
 interface DetailCommunityMemberProp {
 	id: string
@@ -123,9 +134,11 @@ const DetailCommunityMember = (props: DetailCommunityMemberProp, ref) => {
 				<Flex className={classes.adminList} onScroll={onScroll}>
 					{members.map((member) => {
 						const { type, user } = member
-						const { id, name, avatar } = user
+						const { id, name, avatar, visibility, online_time } = user
 						const isOwner = type === 'OWNER'
 						const isMember = type === 'MEMBER'
+						const isOnline = visibility === 'ONLINE'
+
 						return (
 							<Flex vertical key={id}>
 								<Dropdown
@@ -134,7 +147,7 @@ const DetailCommunityMember = (props: DetailCommunityMemberProp, ref) => {
 									disabled={!isMe || isOwner}
 								>
 									<Flex vertical className={classes.admin}>
-										<Flex>
+										<div className={classes.avatarWrap}>
 											<CAvatarBandage
 												isHidden={isMember}
 												src={avatar}
@@ -144,8 +157,26 @@ const DetailCommunityMember = (props: DetailCommunityMemberProp, ref) => {
 												})}
 												{...(!isOwner && { customeBandage: <StarIcon /> })}
 											/>
+											{!isOnline && online_time && (
+												<span className={classes.lastSeen}>
+													{formatLastOnline(online_time)}
+												</span>
+											)}
+										</div>
+										<Flex
+											align="center"
+											justify="center"
+											gap={4}
+											className={classes.userNameRow}
+										>
+											{isOnline && (
+												<span
+													className={classes.onlineDot}
+													aria-label="Online"
+												/>
+											)}
+											<div className={classes.name}>{name}</div>
 										</Flex>
-										<div className={classes.name}>{name}</div>
 									</Flex>
 								</Dropdown>
 							</Flex>

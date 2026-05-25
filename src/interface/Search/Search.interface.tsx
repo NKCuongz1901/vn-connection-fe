@@ -12,9 +12,10 @@ export interface LocalProps {
 	language: string
 	age: number
 	languages_can_speak_array: string[]
-	online_time: string
-	country_code: string
-	i_am_from: string
+	online_time: string | null
+	visibility: string
+	country_code: string | null
+	i_am_from: string | null
 }
 
 export interface LocalResProps {

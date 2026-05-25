@@ -19,6 +19,17 @@ import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './Search.module.scss'
 import MiniAppList from '@/Components/MiniApp/MiniAppList'
+import { getDiffFromNow } from '@/ultis/date'
+
+const formatLastOnline = (online_time?: string | null) => {
+	if (!online_time) return ''
+	const { value, unit } = getDiffFromNow({ input: Number(online_time) })
+	if (unit === 'second') return 'now'
+	if (unit === 'minute') return `${value} min`
+	if (unit === 'hour') return `${value} hr`
+	if (unit === 'day') return `${value} d`
+	return String(value)
+}
 
 const Search = () => {
 	const { onChangeRoute } = useLocalePath()
@@ -51,17 +62,41 @@ const Search = () => {
 					/>
 				</div>
 				<Flex className={classes.userList}>
-					{(user || []).map((item) => (
-						<Flex
-							key={item.id}
-							vertical
-							className={classes.user}
-							onClick={() => onChangeRoute(`${mainRoutes.profile}/${item.id}`)}
-						>
-							<CAvatar src={item.avatar} className={classes.userAvatar} />
-							<div className={classes.userName}> {item.name}</div>
-						</Flex>
-					))}
+					{(user || []).map((item) => {
+						const { id, avatar, name, visibility, online_time } = item
+						const isOnline = visibility === 'ONLINE'
+
+						return (
+							<Flex
+								key={id}
+								vertical
+								className={classes.user}
+								onClick={() => onChangeRoute(`${mainRoutes.profile}/${id}`)}
+							>
+								<div className={classes.userAvatarWrapper}>
+									<div className={classes.avatarWrap}>
+										<CAvatar src={avatar} className={classes.userAvatar} />
+										{!isOnline && online_time && (
+											<span className={classes.lastSeen}>
+												{formatLastOnline(online_time)}
+											</span>
+										)}
+									</div>
+								</div>
+								<Flex
+									align="center"
+									justify="center"
+									gap={4}
+									className={classes.userNameRow}
+								>
+									{isOnline && (
+										<span className={classes.onlineDot} aria-label="Online" />
+									)}
+									<div className={classes.userName}>{name}</div>
+								</Flex>
+							</Flex>
+						)
+					})}
 				</Flex>
 			</Flex>
 		)

@@ -29,6 +29,17 @@ import MaleIcon from '@/svg/MaleIcon'
 import { LEFT_FLAG, mappingFlag } from '@/Variable/countryVariable'
 import clsx from 'clsx'
 import classes from './Local.module.scss'
+import { getDiffFromNow } from '@/ultis/date'
+
+const formatLastOnline = (online_time?: string | null) => {
+	if (!online_time) return ''
+	const { value, unit } = getDiffFromNow({ input: Number(online_time) })
+	if (unit === 'second') return 'now'
+	if (unit === 'minute') return `${value} min`
+	if (unit === 'hour') return `${value} hr`
+	if (unit === 'day') return `${value} d`
+	return String(value)
+}
 
 const genderIcon = {
 	MALE: MaleIcon,
@@ -226,17 +237,37 @@ const Local = (props: LocalProps) => {
 		return (
 			<Flex className={classes.userList} onScroll={onScroll}>
 				{user.map((item) => {
-					const { id, avatar, name, i_am_from, country_code, age, gender } =
-						item || {}
+					const {
+						id,
+						avatar,
+						name,
+						i_am_from,
+						country_code,
+						age,
+						gender,
+						visibility,
+						online_time,
+					} = item || {}
 					const IconGender = genderIcon[gender]
+					const isOnline = visibility === 'ONLINE'
+
 					return (
 						<Flex key={id} vertical className={classes.user}>
 							<Flex className={classes.userAvatarWrapper}>
-								<CAvatar
-									src={avatar}
-									className={classes.userAvatar}
-									onClick={() => onChangeRoute(`${mainRoutes.profile}/${id}`)}
-								/>
+								<div className={classes.avatarWrap}>
+									<CAvatar
+										src={avatar}
+										className={classes.userAvatar}
+										onClick={() =>
+											onChangeRoute(`${mainRoutes.profile}/${id}`)
+										}
+									/>
+									{!isOnline && online_time && (
+										<span className={classes.lastSeen}>
+											{formatLastOnline(online_time)}
+										</span>
+									)}
+								</div>
 
 								<div className={classes.flagWrapper}>
 									<div
@@ -251,7 +282,17 @@ const Local = (props: LocalProps) => {
 									/>
 								</div>
 							</Flex>
-							<div className={classes.userName}> {name}</div>
+							<Flex
+								align="center"
+								justify="center"
+								gap={4}
+								className={classes.userNameRow}
+							>
+								{isOnline && (
+									<span className={classes.onlineDot} aria-label="Online" />
+								)}
+								<div className={classes.userName}>{name}</div>
+							</Flex>
 							<Flex align="center" gap={4}>
 								{!!age && (
 									<>

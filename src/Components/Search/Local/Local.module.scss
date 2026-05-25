@@ -86,6 +86,23 @@
 				.userAvatarWrapper {
 					position: relative;
 
+					.avatarWrap {
+						position: relative;
+					}
+
+					.lastSeen {
+						position: absolute;
+						left: 0;
+						bottom: 0;
+						padding: 0 2px;
+						border-radius: 999px;
+						background: #e7f5e9;
+						color: #006b35;
+						font-size: 7px;
+						line-height: 14px;
+						z-index: 2;
+					}
+
 					.userAvatar {
 						height: 64px;
 						width: 64px;
@@ -121,6 +138,19 @@
 						}
 					}
 				}
+				.userNameRow {
+					width: 100%;
+					max-width: 136px;
+				}
+
+				.onlineDot {
+					flex-shrink: 0;
+					width: 8px;
+					height: 8px;
+					border-radius: 50%;
+					background: #32a036;
+				}
+
 				.userName {
 					display: -webkit-box;
 					-webkit-line-clamp: 2; /* số dòng muốn hiển thị */

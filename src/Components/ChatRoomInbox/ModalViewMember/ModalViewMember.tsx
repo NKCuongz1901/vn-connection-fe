@@ -23,6 +23,7 @@ import { mainRoutes } from '@/routes/MainRoutes'
 
 import { mappingFlag } from '@/Variable/countryVariable'
 import classes from './ModalViewMember.module.scss'
+import { getDiffFromNow } from '@/ultis/date'
 
 interface ModelChooseHangoutProps {
 	id: string
@@ -33,6 +34,16 @@ const genderIcon = {
 	MALE: MaleIcon,
 	FEMALE: FeMaleIcon,
 	OTHER: GenderIcon,
+}
+
+const formatLastOnline = (online_time?: string) => {
+	if (!online_time) return ''
+	const { value, unit } = getDiffFromNow({ input: Number(online_time) })
+	if (unit === 'second') return 'now'
+	if (unit === 'minute') return `${value} min`
+	if (unit === 'hour') return `${value} hr`
+	if (unit === 'day') return `${value} d`
+	return String(value)
 }
 
 const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
@@ -69,19 +80,38 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 	}
 	const _renderItem = (item: MemberProps) => {
 		const { user } = item || {}
-		const { avatar, name, country_code, age, id, address_local } = user || {}
-		const IconGender = genderIcon.OTHER
+		const {
+			avatar,
+			name,
+			country_code,
+			age,
+			id,
+			address_local,
+			visibility,
+			online_time,
+			gender,
+		} = user || {}
+		const IconGender =
+			genderIcon[gender as keyof typeof genderIcon] ?? genderIcon.OTHER
+		const isOnline = visibility === 'ONLINE'
 
 		return (
-			<Flex key={id} vertical className={classes.user}>
+			<Flex key={id || item.id} vertical className={classes.user}>
 				<Flex className={classes.userAvatarWrapper}>
-					<CAvatar
-						src={avatar}
-						className={classes.userAvatar}
-						onClick={() => {
-							if (id) onChangeRoute(`${mainRoutes.profile}/${id}`)
-						}}
-					/>
+					<div className={classes.avatarWrap}>
+						<CAvatar
+							src={avatar}
+							className={classes.userAvatar}
+							onClick={() => {
+								if (id) onChangeRoute(`${mainRoutes.profile}/${id}`)
+							}}
+						/>
+						{!isOnline && online_time && (
+							<span className={classes.lastSeen}>
+								{formatLastOnline(online_time)}
+							</span>
+						)}
+					</div>
 					<div className={classes.flagWrapper}>
 						<div
 							className={clsx(
@@ -91,7 +121,17 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 						/>
 					</div>
 				</Flex>
-				<div className={classes.userName}> {name}</div>
+				<Flex
+					align="center"
+					justify="center"
+					gap={4}
+					className={classes.userNameRow}
+				>
+					{isOnline && (
+						<span className={classes.onlineDot} aria-label="Online" />
+					)}
+					<div className={classes.userName}>{name}</div>
+				</Flex>
 				<Flex align="center" gap={4}>
 					{!!age && (
 						<>
@@ -130,19 +170,13 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 				</Flex>
 				<Flex className={classes.userList}>
 					{memberAround.slice(0, 7).map(_renderItem)}
-					{isMore && !loading.around && (
-						<Flex className={clsx(classes.moreAround, classes.user)} vertical>
-							<Flex className={classes.userAvatarWrapper}>
-								<CAvatar
-									src={memberAround[7]?.user?.avatar}
-									className={classes.userAvatar}
-									onClick={() => onChangeRoute(`${mainRoutes.profile}/${id}`)}
-								/>
-							</Flex>
-							<Flex className={classes.moreAroundMe}>
+					{isMore && !loading.around && memberAround[7] && (
+						<div className={classes.moreAroundWrap}>
+							{_renderItem(memberAround[7])}
+							<div className={classes.moreAroundBadge}>
 								+{formatNumberString(total.around - memberAround.length + 1)}
-							</Flex>
-						</Flex>
+							</div>
+						</div>
 					)}
 					{loading.around && _renderLoading()}
 				</Flex>

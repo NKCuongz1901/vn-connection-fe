@@ -44,6 +44,9 @@ export interface MemberProps {
 		address_local: string
 		blocked_at: any
 		profile: any
+		gender: string
+		visibility: string
+		online_time: string
 	} | null
 	dating: any
 }
