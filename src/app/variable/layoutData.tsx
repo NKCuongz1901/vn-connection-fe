@@ -15,4 +15,5 @@ export const appLayoutAuth = [
 	mainRoutes.term,
 	mainRoutes.policy,
 	'socketLogout',
+	'open-app',
 ]
