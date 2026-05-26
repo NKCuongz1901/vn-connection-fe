@@ -117,9 +117,6 @@ export default function useOverview() {
 		setLoadMore(true)
 		_paginationRefs.current.page = 1
 		handleGetListPost()
-		if (userData.is_open_hangout && type === 'radius') {
-			handleGetOpenHangout()
-		}
 	}
 
 	const handleChangeKeyword = (e) => {
@@ -275,6 +272,7 @@ export default function useOverview() {
 					latitude,
 					longitude,
 				})
+				await handleGetOpenHangout(!!is_open_hangout)
 			}
 		} catch (error) {
 			openError(error)
@@ -296,14 +294,19 @@ export default function useOverview() {
 			const { code, results } = res || {}
 
 			if (code === 200) {
-				const { is_open_hangout, title_open_hangout, latitude, longitude } =
-					results?.object || {}
+				const obj = results?.object || {}
+				const isOpenHangout =
+					typeof obj.is_open_hangout === 'boolean'
+						? obj.is_open_hangout
+						: payload.is_open_hangout
 				setUserData({
-					is_open_hangout,
-					title_open_hangout,
-					latitude,
-					longitude,
+					is_open_hangout: isOpenHangout,
+					title_open_hangout:
+						obj.title_open_hangout ?? payload.title_open_hangout,
+					latitude: obj.latitude ?? payload.latitude,
+					longitude: obj.longitude ?? payload.longitude,
 				})
+				await handleGetOpenHangout(isOpenHangout)
 			}
 		} catch (error) {
 			openError(error)
@@ -417,18 +420,28 @@ export default function useOverview() {
 
 		handleLoadMore()
 	}
-	const handleGetOpenHangout = async () => {
+	const handleGetOpenHangout = async (isOpenHangout: boolean) => {
 		try {
-			const { radius } = _filterRef.current
 			const res: any = await getUserOpenHangout({
 				fields: ['$all'],
-				radius: radius,
 			})
 			if (res) {
 				const { pagination, results } = res || {}
 				const { rows } = results?.objects || {}
 				const { total } = pagination || {}
-				setHangoutPeople(rows || [])
+				const me = getUserInfo() as { id?: string; avatar?: string }
+				const meId = me?.id
+				let list = [...(rows || [])]
+				if (meId) {
+					list = list.filter(
+						(p: { id?: string; user_id?: string }) =>
+							p?.id !== meId && p?.user_id !== meId,
+					)
+				}
+				if (isOpenHangout && me?.id) {
+					list = [me, ...list]
+				}
+				setHangoutPeople(list)
 				setTotalHangout(total || 0)
 			}
 		} catch (error) {
@@ -470,11 +483,6 @@ export default function useOverview() {
 		handleGetListPost()
 		handleGetListNetwork()
 		handleGetListChatRoom()
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
-
-	useEffect(() => {
-		handleGetOpenHangout()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 

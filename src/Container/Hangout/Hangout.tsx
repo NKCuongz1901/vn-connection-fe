@@ -66,12 +66,11 @@ const Hangout = () => {
 						<>
 							<Flex vertical gap="4px">
 								<Flex className={classes.hangoutPeople}>
-									{!!is_open_hangout &&
-										hangoutPeople.map((people) => (
-											<div key={people.id}>
-												<CAvatar src={people.avatar} size={48} />
-											</div>
-										))}
+									{hangoutPeople.map((people) => (
+										<div key={people.id}>
+											<CAvatar src={people.avatar} size={48} />
+										</div>
+									))}
 								</Flex>
 								<Flex className={classes.switchStatus}>
 									<span>

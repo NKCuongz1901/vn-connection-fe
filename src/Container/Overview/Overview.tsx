@@ -163,7 +163,11 @@ const Overview = () => {
 						<Skeleton.Input active className={classes.skeleton} />
 					) : (
 						<>
-							<Flex vertical gap="4px">
+							<Flex
+								vertical
+								gap="4px"
+								onClick={() => onChangeRoute(mainRoutes.hangout)}
+							>
 								<Flex className={classes.hangoutPeople}>
 									{hangoutPeople.map((people) => (
 										<div key={people.id}>
