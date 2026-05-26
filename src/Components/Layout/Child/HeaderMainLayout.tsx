@@ -1,6 +1,10 @@
 'use client'
-import { MenuOutlined } from '@ant-design/icons'
-import { IconBellFilled, IconMapPinFilled, IconUserCircle } from '@tabler/icons-react'
+import { MenuOutlined, SearchOutlined } from '@ant-design/icons'
+import {
+	IconBellFilled,
+	IconMapPinFilled,
+	IconUserCircle,
+} from '@tabler/icons-react'
 import { Dropdown, Flex } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import { onMessage } from 'firebase/messaging'
@@ -305,7 +309,7 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 							onInputClick={handleSearchInputClick}
 							open={mapOpen}
 							onOpenChange={setMapOpen}
-							prefix={<IconMapPinFilled fill="#E55A0F" />}
+							prefix={<SearchOutlined className="headerSeachOutline" />}
 							style={{ borderRadius: 40, height: 44, width: 415 }}
 						/>
 					</Flex>
