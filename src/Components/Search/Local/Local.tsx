@@ -29,17 +29,7 @@ import MaleIcon from '@/svg/MaleIcon'
 import { LEFT_FLAG, mappingFlag } from '@/Variable/countryVariable'
 import clsx from 'clsx'
 import classes from './Local.module.scss'
-import { getDiffFromNow } from '@/ultis/date'
-
-const formatLastOnline = (online_time?: string | null) => {
-	if (!online_time) return ''
-	const { value, unit } = getDiffFromNow({ input: Number(online_time) })
-	if (unit === 'second') return 'now'
-	if (unit === 'minute') return `${value} min`
-	if (unit === 'hour') return `${value} hr`
-	if (unit === 'day') return `${value} d`
-	return String(value)
-}
+import { formatLastOnlineShort, getDiffFromNow } from '@/ultis/date'
 
 const genderIcon = {
 	MALE: MaleIcon,
@@ -258,13 +248,11 @@ const Local = (props: LocalProps) => {
 									<CAvatar
 										src={avatar}
 										className={classes.userAvatar}
-										onClick={() =>
-											onChangeRoute(`${mainRoutes.profile}/${id}`)
-										}
+										onClick={() => onChangeRoute(`${mainRoutes.profile}/${id}`)}
 									/>
 									{!isOnline && online_time && (
 										<span className={classes.lastSeen}>
-											{formatLastOnline(online_time)}
+											{formatLastOnlineShort(online_time)}
 										</span>
 									)}
 								</div>

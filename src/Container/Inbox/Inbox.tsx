@@ -8,7 +8,7 @@ import useInbox from '@/hooks/Inbox/useInbox'
 
 import { arrayFrom, isArray } from '@/ultis/array'
 import { toJson } from '@/ultis/common'
-import { getDiffFromNow } from '@/ultis/date'
+import { formatLastOnlineShort, getDiffFromNow } from '@/ultis/date'
 import { onPushState } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
 import { randomString } from '@/ultis/string'
@@ -108,15 +108,6 @@ const Inbox = () => {
 			input: Number(last_time_chat),
 		})
 
-		const formatLastOnline = (ts?: string) => {
-			if (!ts) return ''
-			const { value, unit } = getDiffFromNow({ input: Number(ts) })
-			if (unit === 'second') return 'now'
-			if (unit === 'minute') return `${value} min`
-			if (unit === 'hour') return `${value} hr`
-			if (unit === 'day') return `${value} d`
-			return String(value)
-		}
 		return (
 			<Flex
 				className={clsx(classes.convItem)}
@@ -132,7 +123,7 @@ const Inbox = () => {
 					) : (
 						online_time && (
 							<span className={classes.lastSeen}>
-								{formatLastOnline(online_time)}
+								{formatLastOnlineShort(online_time)}
 							</span>
 						)
 					)}

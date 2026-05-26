@@ -19,17 +19,7 @@ import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './Search.module.scss'
 import MiniAppList from '@/Components/MiniApp/MiniAppList'
-import { getDiffFromNow } from '@/ultis/date'
-
-const formatLastOnline = (online_time?: string | null) => {
-	if (!online_time) return ''
-	const { value, unit } = getDiffFromNow({ input: Number(online_time) })
-	if (unit === 'second') return 'now'
-	if (unit === 'minute') return `${value} min`
-	if (unit === 'hour') return `${value} hr`
-	if (unit === 'day') return `${value} d`
-	return String(value)
-}
+import { formatLastOnlineShort, getDiffFromNow } from '@/ultis/date'
 
 const Search = () => {
 	const { onChangeRoute } = useLocalePath()
@@ -78,7 +68,7 @@ const Search = () => {
 										<CAvatar src={avatar} className={classes.userAvatar} />
 										{!isOnline && online_time && (
 											<span className={classes.lastSeen}>
-												{formatLastOnline(online_time)}
+												{formatLastOnlineShort(online_time)}
 											</span>
 										)}
 									</div>

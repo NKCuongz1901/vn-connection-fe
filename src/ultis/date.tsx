@@ -95,3 +95,24 @@ export const parseDayFromIsNewDate = (created) => {
 
 	return d.format('MMMM, DD YYYY HH:mm')
 }
+
+export const formatLastOnlineShort = (ts?: string | number | null): string => {
+	if (ts === undefined || ts === null || ts === '') return ''
+	const target = dayjs(typeof ts === 'string' ? Number(ts) : ts)
+	if (!target.isValid()) return ''
+
+	const now = dayjs()
+	const sec = now.diff(target, 'second')
+	if (sec < 60) return '1 min'
+
+	const min = now.diff(target, 'minute')
+	if (min < 60) return min === 1 ? '1 min' : `${min} mins`
+
+	const hr = now.diff(target, 'hour')
+	if (hr < 24) return hr === 1 ? '1 hr' : `${hr} hrs`
+
+	const days = now.diff(target, 'day')
+	if (days > 30) return ''
+	if (days < 1) return '1 day'
+	return days === 1 ? '1 day' : `${days} days`
+}

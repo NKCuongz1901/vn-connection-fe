@@ -29,7 +29,7 @@ import DocumentUpload from '@/svg/DocumentUpload'
 import { topicReportOpt } from '@/Variable/select.variable'
 
 import classes from './ModalReport.module.scss'
-import { getUserInfo } from '@/ultis/storage'
+import { getUserInfo, isLogin } from '@/ultis/storage'
 import CTextArea from '../CTextArea'
 import { ReportIssueType } from '@/Variable/common.variable'
 
@@ -50,6 +50,8 @@ const ModalReport = (props: ModalReportProps) => {
 	const { loadingContext, toggleLoadingContext } = useLoading()
 	const { openConfirm, openError, openSuccess, closeModal } = useModal()
 	const { email } = getUserInfo()
+	const isLoginUser = isLogin()
+	console.log('isLoginUser', isLoginUser)
 	const [errors, setErrors] = useState({
 		topic: '',
 		email: '',
@@ -300,49 +302,51 @@ const ModalReport = (props: ModalReportProps) => {
 						style={{ border: 'none' }}
 					/>
 				</Flex>
-				<Flex className={classes.chooseImg} vertical>
-					<Flex className={classes.upload}>
-						<CUploadMuti
-							maxCount={5}
-							fileList={fileList.map((i) => i.file)}
-							onChange={({ file: _file, fileList: newList }) => {
-								handleImportImg(newList)
-							}}
-							accept="image/*,video/*"
-						>
-							<DocumentUpload /> <span> &nbsp;Upload media</span>
-						</CUploadMuti>
-					</Flex>
-					<p className={classes.uploadText}>
-						* Upload 5 images or video (max 60s)
-					</p>
-					<Flex className={classes.medias}>
-						{fileList.map((item, idx) => (
-							<Flex key={`${item.url}-${idx}`} className={classes.media}>
-								{item.type === 'VIDEO' ? (
-									<video
-										src={item.url}
-										controls
-										muted
-										playsInline
-										className={classes.videoPreview}
-									/>
-								) : (
-									<CImage preview src={item.url} />
-								)}
-								<Flex
-									className={classes.chooseImgCancel}
-									onClick={() => {
-										URL.revokeObjectURL(item.url)
-										setFileList((prev) => prev.filter((_, i) => i !== idx))
-									}}
-								>
-									<IconCircleXFilled />
+				{isLoginUser && (
+					<Flex className={classes.chooseImg} vertical>
+						<Flex className={classes.upload}>
+							<CUploadMuti
+								maxCount={5}
+								fileList={fileList.map((i) => i.file)}
+								onChange={({ file: _file, fileList: newList }) => {
+									handleImportImg(newList)
+								}}
+								accept="image/*,video/*"
+							>
+								<DocumentUpload /> <span> &nbsp;Upload media</span>
+							</CUploadMuti>
+						</Flex>
+						<p className={classes.uploadText}>
+							* Upload 5 images or video (max 60s)
+						</p>
+						<Flex className={classes.medias}>
+							{fileList.map((item, idx) => (
+								<Flex key={`${item.url}-${idx}`} className={classes.media}>
+									{item.type === 'VIDEO' ? (
+										<video
+											src={item.url}
+											controls
+											muted
+											playsInline
+											className={classes.videoPreview}
+										/>
+									) : (
+										<CImage preview src={item.url} />
+									)}
+									<Flex
+										className={classes.chooseImgCancel}
+										onClick={() => {
+											URL.revokeObjectURL(item.url)
+											setFileList((prev) => prev.filter((_, i) => i !== idx))
+										}}
+									>
+										<IconCircleXFilled />
+									</Flex>
 								</Flex>
-							</Flex>
-						))}
+							))}
+						</Flex>
 					</Flex>
-				</Flex>
+				)}
 			</Flex>
 		)
 	}
@@ -378,7 +382,7 @@ const ModalReport = (props: ModalReportProps) => {
 				>
 					<Flex className={classes.wrapper} vertical>
 						{_renderTop()}
-						{_renderTypeIssuse()}
+						{isLoginUser && _renderTypeIssuse()}
 						{_renderMiddle()}
 					</Flex>
 				</CModal>

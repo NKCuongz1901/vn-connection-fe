@@ -17,17 +17,7 @@ import DetailCommunityAddAdmin from '../DetailCommunityAddAdmin'
 import { ConversationProps } from '@/interface/Community/Community.interface'
 
 import classes from './DetailCommunityMember.module.scss'
-import { getDiffFromNow } from '@/ultis/date'
-
-const formatLastOnline = (online_time?: string | null) => {
-	if (!online_time) return ''
-	const { value, unit } = getDiffFromNow({ input: Number(online_time) })
-	if (unit === 'second') return 'now'
-	if (unit === 'minute') return `${value} min`
-	if (unit === 'hour') return `${value} hr`
-	if (unit === 'day') return `${value} d`
-	return String(value)
-}
+import { formatLastOnlineShort, getDiffFromNow } from '@/ultis/date'
 
 interface DetailCommunityMemberProp {
 	id: string
@@ -159,7 +149,7 @@ const DetailCommunityMember = (props: DetailCommunityMemberProp, ref) => {
 											/>
 											{!isOnline && online_time && (
 												<span className={classes.lastSeen}>
-													{formatLastOnline(online_time)}
+													{formatLastOnlineShort(online_time)}
 												</span>
 											)}
 										</div>
