@@ -21,6 +21,7 @@ import MicroPhoneIcon from '@/svg/MicroPhoneIcon'
 import BookIcon from '@/svg/BookIcon'
 import TutorIcon from '@/svg/TutorIcon'
 import ShopIcon from '@/svg/ShopIcon'
+import FmgIcon from '@/svg/FmgIcon'
 
 import { NOTIFICATION_TYPE, NotiTypes } from '@/Variable/select.variable'
 import { NotiItemProp } from '@/interface/Notification/Notification.interface'
@@ -56,6 +57,9 @@ const mappingTypeIcon = {
 	[NOTIFICATION_TYPE.COMMENT_ON_DISCUSS_IN_CHATROOM]: Message3,
 	[NOTIFICATION_TYPE.COMMENT_ON_DISCUSS_IN_CLUB]: Message3,
 	DISCUSS_IN_TOPIC: Message3,
+	ANNOUNCEMENT: Message3,
+	LIKE_ON_ANNOUNCEMENT: Message3,
+	TALKROOM: MicroPhoneIcon,
 
 	[NOTIFICATION_TYPE.ADD_FRIEND]: Messenger,
 	[NOTIFICATION_TYPE.ACCEPT_FRIEND]: Messenger,
@@ -64,6 +68,7 @@ const mappingTypeIcon = {
 	MATCH_DATING: DoubleHeart,
 	CRUSH_DATING: DoubleHeart,
 
+	HANGOUT: Party,
 	[NOTIFICATION_TYPE.REQUEST_JOIN_HANGOUT]: Party,
 	[NOTIFICATION_TYPE.ACCEPT_PARTICIPANT]: Party,
 	[NOTIFICATION_TYPE.JOIN_HANGOUT]: Party,
@@ -75,6 +80,8 @@ const mappingTypeIcon = {
 	TUTOR: TutorIcon,
 	[NOTIFICATION_TYPE.TUTOR_LEARNER_SOFT_RE_ENGAGEMENT]: TutorIcon,
 	[NOTIFICATION_TYPE.TUTOR_PROFILE_INCOMPLETE_REMINDER]: TutorIcon,
+
+	FMG_SERVICE_LIKED: FmgIcon,
 }
 const Notification = (props: { onClose?: any }) => {
 	const { onClose } = props || {}
