@@ -18,6 +18,9 @@ import Messenger from '@/svg/Messenger'
 import Party from '@/svg/Party'
 import People from '@/svg/People'
 import MicroPhoneIcon from '@/svg/MicroPhoneIcon'
+import BookIcon from '@/svg/BookIcon'
+import TutorIcon from '@/svg/TutorIcon'
+import ShopIcon from '@/svg/ShopIcon'
 
 import { NOTIFICATION_TYPE, NotiTypes } from '@/Variable/select.variable'
 import { NotiItemProp } from '@/interface/Notification/Notification.interface'
@@ -66,6 +69,12 @@ const mappingTypeIcon = {
 	[NOTIFICATION_TYPE.JOIN_HANGOUT]: Party,
 	[NOTIFICATION_TYPE.NEAR_END_HANGOUT_STATUS]: Party,
 	[NOTIFICATION_TYPE.COMMENT_ON_HANGOUT]: Party,
+
+	[NOTIFICATION_TYPE.NEW_ITEM_LISTED]: ShopIcon,
+	[NOTIFICATION_TYPE.NEW_BOOK_LISTED]: BookIcon,
+	TUTOR: TutorIcon,
+	[NOTIFICATION_TYPE.TUTOR_LEARNER_SOFT_RE_ENGAGEMENT]: TutorIcon,
+	[NOTIFICATION_TYPE.TUTOR_PROFILE_INCOMPLETE_REMINDER]: TutorIcon,
 }
 const Notification = (props: { onClose?: any }) => {
 	const { onClose } = props || {}
