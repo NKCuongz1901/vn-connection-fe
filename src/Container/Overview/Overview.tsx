@@ -189,7 +189,9 @@ const Overview = () => {
 												color: '#0F1729',
 											}}
 										>
-											<span style={{ color: '#1B8024' }}>{totalHangout}</span>{' '}
+											<span style={{ color: '#1B8024' }}>
+												{totalHangout + Number(is_open_hangout)}
+											</span>{' '}
 											people are ready to talk and meet.{' '}
 											<span
 												role="button"
