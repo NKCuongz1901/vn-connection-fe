@@ -68,7 +68,11 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 			</>
 		)
 	}
-	const _renderItem = (item: MemberProps) => {
+	const _renderItem = (
+		item: MemberProps,
+		options?: { hidePresence?: boolean },
+	) => {
+		const hidePresence = options?.hidePresence ?? false
 		const { user } = item || {}
 		const {
 			avatar,
@@ -96,7 +100,7 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 								if (id) onChangeRoute(`${mainRoutes.profile}/${id}`)
 							}}
 						/>
-						{!isOnline && online_time && (
+						{!hidePresence && !isOnline && online_time && (
 							<span className={classes.lastSeen}>
 								{formatLastOnlineShort(online_time)}
 							</span>
@@ -117,7 +121,7 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 					gap={4}
 					className={classes.userNameRow}
 				>
-					{isOnline && (
+					{!hidePresence && isOnline && (
 						<span className={classes.onlineDot} aria-label="Online" />
 					)}
 					<div className={classes.userName}>{name}</div>
@@ -159,10 +163,10 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 					<div className={classes.subTitle}>{_address}</div>
 				</Flex>
 				<Flex className={classes.userList}>
-					{memberAround.slice(0, 7).map(_renderItem)}
+					{memberAround.slice(0, 7).map((item) => _renderItem(item))}
 					{isMore && !loading.around && memberAround[7] && (
 						<div className={classes.moreAroundWrap}>
-							{_renderItem(memberAround[7])}
+							{_renderItem(memberAround[7], { hidePresence: true })}
 							<div className={classes.moreAroundBadge}>
 								+{formatNumberString(total.around - memberAround.length + 1)}
 							</div>
@@ -180,7 +184,7 @@ const ModalViewMember = ({ id, onClose }: ModelChooseHangoutProps) => {
 					<div className={classes.title}>All members</div>
 				</Flex>
 				<Flex className={classes.userList}>
-					{memberAll.map(_renderItem)}
+					{memberAll.map((item) => _renderItem(item))}
 					{loading.all && _renderLoading()}
 				</Flex>
 			</Flex>

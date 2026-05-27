@@ -65,7 +65,7 @@ const Hangout = () => {
 					) : (
 						<>
 							<Flex vertical gap="4px">
-								<Flex className={classes.hangoutPeople}>
+								<Flex className={classes.hangoutPeople} wrap="wrap">
 									{hangoutPeople.map((people) => (
 										<div key={people.id}>
 											<CAvatar src={people.avatar} size={48} />

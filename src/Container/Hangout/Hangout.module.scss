@@ -36,14 +36,14 @@
 					align-items: center;
 				}
 				.hangoutPeople {
+					flex-wrap: wrap;
 					gap: 4px;
 					padding: 4px;
 					border-bottom: 1px solid #f4f8fc;
-					overflow-x: auto;
-					/* Thanh scrollbar ngang */
+					overflow-x: visible;
 
-					&::-webkit-scrollbar:horizontal {
-						height: 4px; /* độ dày thanh ngang */
+					> div {
+						flex-shrink: 0;
 					}
 				}
 				.titleHangout {

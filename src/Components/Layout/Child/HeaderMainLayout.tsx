@@ -19,7 +19,7 @@ import { getUserProfile, updateUserProfile } from '@/apis/userApis'
 
 import { useSearchLocation } from '@/context/SearchLocationContext'
 
-import { useLocalePath, useQuery } from '@/ultis/route'
+import { useLocalePath } from '@/ultis/route'
 import {
 	getStorageCookie,
 	handleRemoveAllCookie,
@@ -47,8 +47,6 @@ interface HeaderMainLayoutProps {
 const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 	const { onToggleMenus } = props
 	const { onChangeRoute, pathname } = useLocalePath()
-	const { onGetQuerry } = useQuery()
-	const { t: searchDetailType } = onGetQuerry()
 	const { location, setLocationFromMap } = useSearchLocation()
 
 	const isSearchPage = pathname.includes(mainRoutes.search)
@@ -296,25 +294,21 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 					<LogoSvg />
 					<div>UniVini</div>
 				</Flex>
-				{/* {false && ( */}
-				{!searchDetailType && (
-					<Flex className="headerSearchMainLayout">
-						<CInputMap
-							title="Location"
-							value={location.address}
-							longitude={location.longitude}
-							latitude={location.latitude}
-							placeholder="Search location to find people, events & communities."
-							onSubmitModal={setLocationFromMap}
-							onInputClick={handleSearchInputClick}
-							open={mapOpen}
-							onOpenChange={setMapOpen}
-							prefix={<SearchOutlined className="headerSeachOutline" />}
-							style={{ borderRadius: 40, height: 44, width: 415 }}
-						/>
-					</Flex>
-				)}
-				{/* )} */}
+				<Flex className="headerSearchMainLayout">
+					<CInputMap
+						title="Location"
+						value={location.address}
+						longitude={location.longitude}
+						latitude={location.latitude}
+						placeholder="Search location to find people, events & communities."
+						onSubmitModal={setLocationFromMap}
+						onInputClick={handleSearchInputClick}
+						open={mapOpen}
+						onOpenChange={setMapOpen}
+						prefix={<SearchOutlined className="headerSeachOutline" />}
+						style={{ borderRadius: 40, height: 44, width: 415 }}
+					/>
+				</Flex>
 			</Flex>
 			<Flex className="headerButton">
 				{login ? (
