@@ -16,7 +16,8 @@ const MiniAppList = () => {
 					label={label}
 					background={MINI_APP_GRADIENT[variant]}
 					icon={<Icon fill="#fff" />}
-					onClick={() => route && onChangeRoute(route)}
+					// onClick={() => route && onChangeRoute(route)}
+					onClick={() => {}}
 				/>
 			))}
 		</Flex>

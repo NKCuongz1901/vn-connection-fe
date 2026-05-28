@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import classes from './MiniAppButton.module.scss'
 import { memo } from 'react'
+import { Tooltip } from 'antd'
 
 type MiniAppButtonProps = {
 	label: string
@@ -20,17 +21,22 @@ function MiniAppButton({
 	disabled,
 }: MiniAppButtonProps) {
 	return (
-		<button
-			type="button"
-			className={clsx(classes.wrapper, className)}
-			onClick={onClick}
-			disabled={disabled}
+		<Tooltip
+			title={<div>This mini app is available in the UniVini app</div>}
+			color="green"
 		>
-			<div className={classes.iconBox} style={{ background }}>
-				<span className={classes.icon}>{icon}</span>
-			</div>
-			<span className={classes.label}>{label}</span>
-		</button>
+			<button
+				type="button"
+				className={clsx(classes.wrapper, className)}
+				onClick={onClick}
+				disabled={disabled}
+			>
+				<div className={classes.iconBox} style={{ background }}>
+					<span className={classes.icon}>{icon}</span>
+				</div>
+				<span className={classes.label}>{label}</span>
+			</button>
+		</Tooltip>
 	)
 }
 
