@@ -20,7 +20,7 @@ import useDetailEvent from '@/hooks/Event/useDetailEvent'
 
 import { isArray } from '@/ultis/array'
 import { cloneDeep } from '@/ultis/common'
-import { getDateFormat, getDateInfo } from '@/ultis/date'
+import { getDateFormat, getDateInfo, isSameDay } from '@/ultis/date'
 import { isEmptyObject } from '@/ultis/object'
 import { goToGoogleMap, onPushState, useSafeBack } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
@@ -82,6 +82,7 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 	const { loadingContext } = useLoading()
 	const { goBackOrPush } = useSafeBack()
 	const { events } = detailPost || {}
+	console.log('detailPost', detailPost)
 	const _renderSkeleton = () => {
 		return (
 			<Flex className={classes.container} vertical>
@@ -99,13 +100,18 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 	const _renderEvents = () => {
 		if (!isArray(events, 1)) return
 		return (
-			<Flex gap={10}>
+			<Flex gap={10} className={classes.eventRepeatList}>
 				{events.map((event) => {
-					const { id: idEvent, start_time } = event
+					const { id: idEvent, start_time, end_time } = event
 					const date = getDateFormat(start_time, {
 						format: 'ddd, D MMM',
 					})
+					const endDate = getDateFormat(end_time, {
+						format: 'ddd, D MMM',
+					})
+					const isSameDayEvent = isSameDay(start_time, end_time)
 					const time = getDateInfo(start_time).time.toUpperCase()
+					const endTime = getDateInfo(end_time).time.toUpperCase()
 					return (
 						<Flex
 							className={clsx(classes.eventRepeatBox, {
@@ -118,10 +124,20 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 								setId(idEvent)
 							}}
 						>
-							<div className="bold">{date}</div>
+							<div className="bold">
+								{date}
+								{!isSameDayEvent && (
+									<>
+										{' '}
+										<span>-</span> {endDate}
+									</>
+								)}
+							</div>
 							<Flex gap={4} align="center">
 								<ClockIcon />
 								{time}
+								<span>-</span>
+								{endTime}
 							</Flex>
 						</Flex>
 					)

@@ -86,9 +86,12 @@
 			}
 			.info {
 				width: 100%;
+				max-width: 100%;
+				min-width: 0;
 				padding: 24px 16px;
 				gap: 24px;
 				background: #fff;
+				overflow: hidden;
 				.title {
 					width: 100%;
 					font-weight: 600;
@@ -123,14 +126,24 @@
 						}
 					}
 				}
+				.eventRepeatList {
+					width: 100%;
+					max-width: 100%;
+					min-width: 0;
+					overflow-x: auto;
+					overflow-y: hidden;
+					flex-wrap: nowrap;
+					-webkit-overflow-scrolling: touch;
+				}
 				.eventRepeatBox {
-					width: 100px;
+					flex-shrink: 0;
+					width: auto;
 					min-width: fit-content;
 					justify-content: center;
-					border-radius: 16px;
+					border-radius: 12px;
 					background: #f4f8fc;
 					font-size: 14px;
-					padding: 8px;
+					padding: 8px 12px;
 					gap: 8px;
 					color: #48546b;
 					border: 1px solid #f4f8fc;

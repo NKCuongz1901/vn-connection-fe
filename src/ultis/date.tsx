@@ -116,3 +116,6 @@ export const formatLastOnlineShort = (ts?: string | number | null): string => {
 	if (days < 1) return '1 day'
 	return days === 1 ? '1 day' : `${days} days`
 }
+
+export const isSameDay = (start_time: string, end_time: string) =>
+	dayjs(Number(start_time)).isSame(dayjs(Number(end_time)), 'day')
