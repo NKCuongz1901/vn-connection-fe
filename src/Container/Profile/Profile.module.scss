@@ -58,7 +58,7 @@
 
 					.avatar {
 						position: relative;
-						bottom: 40px;
+						bottom: -7px;
 						height: 96px;
 						width: 96px;
 						border-radius: 50%;
@@ -101,6 +101,56 @@
 					}
 					.address {
 						word-break: break-word;
+					}
+					.amountOfFriend,
+					.amountOfFeferences {
+						overflow: hidden;
+						color: var(--text-brand-secondary, #006b35);
+						text-overflow: ellipsis;
+
+						font-size: var(--body-base-size, 14px);
+						font-style: normal;
+						font-weight: 400;
+						line-height: var(--body-base-line-height, 20px); /* 142.857% */
+						letter-spacing: var(--body-base-tracking, 0);
+					}
+					.completedScoreWrapper {
+						display: flex;
+						align-items: center;
+						cursor: pointer;
+						width: 460px;
+						padding: 8px 16px;
+						border-radius: 8px;
+						background: var(--background-success-subtle, #fff5eb);
+
+						.completedScoreText {
+							color: var(--text-warning, #ce5b05);
+
+							font-size: var(--body-small-size, 12px);
+							font-style: normal;
+							font-weight: 400;
+							line-height: var(--body-small-line-height, 16px);
+							letter-spacing: var(--body-small-tracking, 0);
+						}
+					}
+
+					.completedScoreWrapperComplete {
+						display: flex;
+						align-items: center;
+						width: 460px;
+						padding: 8px 16px;
+						border-radius: 8px;
+						background: #e7f5e9;
+
+						.completedScoreCompleteText {
+							color: var(--text-brand-secondary, #006b35);
+
+							font-size: var(--body-small-size, 12px);
+							font-style: normal;
+							font-weight: 400;
+							line-height: var(--body-small-line-height, 16px);
+							letter-spacing: var(--body-small-tracking, 0);
+						}
 					}
 				}
 			}

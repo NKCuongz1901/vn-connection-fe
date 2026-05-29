@@ -3,6 +3,8 @@ export interface AnyProps {
 }
 export interface SvgProps {
 	fill?: string
+	width?: number
+	height?: number
 	className?: string
 	[key: string]: any
 }

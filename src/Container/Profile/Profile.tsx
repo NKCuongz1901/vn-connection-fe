@@ -3,7 +3,7 @@ import { IconChevronLeft } from '@tabler/icons-react'
 import { Dropdown, Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useState } from 'react'
 
 import useProfile from '@/hooks/Profile/useProfile'
 
@@ -33,6 +33,10 @@ import PinTickIcon from '@/svg/PinTickIcon'
 import ProfileCircleIcon from '@/svg/ProfileCircleIcon'
 import TwoUser from '@/svg/TwoUser'
 import WorldIcon from '@/svg/WorldIcon'
+import People from '@/svg/People'
+import { IconStarFilled } from '@tabler/icons-react'
+import { IconAlertCircleFilled } from '@tabler/icons-react'
+import TickIcon from '@/svg/TickIcon'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import {
@@ -49,6 +53,8 @@ import {
 } from '@/Variable/countryVariable'
 
 import classes from './Profile.module.scss'
+import ModalProfileComplete from '@/Components/Notification/ModalProfileComplete/ModalProfileComplete'
+import TickCircleIcon from '@/svg/TickCircleIcon'
 
 const skeletonItems = [
 	{ id: '2', value: 220 },
@@ -80,6 +86,10 @@ const Profile = (props: ProfileProps) => {
 	} = useProfile(props)
 	const { goBackOrPush } = useSafeBack()
 	const { onChangeRoute } = useLocalePath()
+	const [openModalProfileComplete, setOpenModalProfileComplete] =
+		useState(false)
+	const COMPLETED_SCORE = 100
+	console.log('userData', userData)
 	const _renderButtonFriend = useCallback(() => {
 		const { is_friend } = userData || {}
 		const { responMenus, cancelMenus, deleteMenus } = menus
@@ -147,9 +157,19 @@ const Profile = (props: ProfileProps) => {
 	}, [userData, menus, loadingButtonFriend, onMenusClick])
 
 	const _renderTotalInfo = useCallback(() => {
-		const { avatar, cover, name, address, id, is_friend, i_am_from, mode } =
-			userData || {}
+		const {
+			avatar,
+			cover,
+			name,
+			address,
+			id,
+			is_friend,
+			i_am_from,
+			mode,
+			amount_of_friend,
+		} = userData || {}
 		const isMe = id === getUserInfo('id')
+		const completedScore = userData?.complete_profile?.point || 0
 		return (
 			<Flex className={classes.totalInfo} vertical>
 				<Flex className={classes.cover}>
@@ -200,12 +220,48 @@ const Profile = (props: ProfileProps) => {
 								/>
 								{mappingCountriesOptions[i_am_from]?.name}
 							</Flex>
+							<Flex gap={12} align="center">
+								<Flex gap={4} align="center">
+									<People fill="#006B35" width={14} height={14} />
+									<span className={classes.amountOfFriend}>
+										{amount_of_friend} friends
+									</span>
+								</Flex>
+								<Flex gap={4} align="center">
+									<IconStarFilled size={14} color="#006B35" />
+									<span className={classes.amountOfFeferences}>
+										10 feferences
+									</span>
+								</Flex>
+							</Flex>
 							<Flex className={classes.address} align="center" gap={4}>
 								<div>
 									<MarkIcon fill="#7987A4" />
 								</div>
 								{(address || '').split(',').slice(-2).join(',')}
 							</Flex>
+							{isMe && completedScore < 100 ? (
+								<div
+									className={classes.completedScoreWrapper}
+									onClick={() => setOpenModalProfileComplete(true)}
+								>
+									<Flex gap={4} align="center">
+										<IconAlertCircleFilled size={16} color="#E55A0F" />
+										<span className={classes.completedScoreText}>
+											Your Profile: {completedScore}% completed
+										</span>
+									</Flex>
+								</div>
+							) : (
+								<div className={classes.completedScoreWrapperComplete}>
+									<Flex gap={4} align="center">
+										<TickCircleIcon fill="#006B35" width={16} height={16} />
+										<span className={classes.completedScoreCompleteText}>
+											Your profile is complete
+										</span>
+									</Flex>
+								</div>
+							)}
 						</Flex>
 					</Flex>
 					<Flex className={classes.endButton}>
@@ -499,6 +555,16 @@ const Profile = (props: ProfileProps) => {
 					onClose={onCloseEditP}
 					data={userData}
 					onGetUserProfile={redirect ? onReDirect : onGetUserProfile}
+				/>
+			)}
+			{openModalProfileComplete && (
+				<ModalProfileComplete
+					completeData={userData?.complete_profile}
+					onClose={() => setOpenModalProfileComplete(false)}
+					onCompleteProfile={() => {
+						setOpenModalProfileComplete(false)
+						onOpenEditP()
+					}}
 				/>
 			)}
 		</Flex>
