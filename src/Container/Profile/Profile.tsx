@@ -3,11 +3,12 @@ import { IconChevronLeft } from '@tabler/icons-react'
 import { Dropdown, Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
-import { memo, useCallback, useState } from 'react'
+import { memo, useCallback, useState, Fragment } from 'react'
 
 import useProfile from '@/hooks/Profile/useProfile'
 
 import { toJson } from '@/ultis/common'
+import { isArray } from '@/ultis/array'
 import { getAge } from '@/ultis/date'
 import { useLocalePath, useQuery, useSafeBack } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
@@ -367,40 +368,28 @@ const Profile = (props: ProfileProps) => {
 	}, [toJson(userData)])
 
 	const _renderLanguages = useCallback(() => {
-		const { user_languages, languages_can_speak_array } = userData || {}
+		const { user_languages } = userData || {}
+		if (!isArray(user_languages, 1)) return null
+
 		return (
-			<Flex className={classes.contentBody}>
-				<Flex className={classes.content} vertical>
-					<div className={classes.title}>Languages</div>
-					<Flex vertical gap={12}>
-						<Flex className={classes.languageName}>
-							<div>{(languages_can_speak_array || []).join(', ')}</div>
-							<div
-								className={clsx(
-									classes.proficiencyLevel,
-									classes.languagesCanSpeak,
-								)}
-							>
-								Native
-							</div>
-						</Flex>
-						{(user_languages || []).map((item) => {
-							const { language_name, proficiency_level } = item || {}
-							return (
-								<Flex key={language_name} className={classes.languageName}>
-									<div>{language_name}</div>
-									<div
-										className={clsx(classes.proficiencyLevel, {
-											[classes[mappingLevelOptions[proficiency_level]]]:
-												!!proficiency_level,
-										})}
-									>
-										{mappingLevelOptions[proficiency_level]}
-									</div>
+			<Flex className={classes.contentBody} vertical>
+				<div className={classes.title}>Languages</div>
+				<Flex className={classes.languageSkills} align="center" wrap="wrap">
+					{(user_languages || []).map((item, index) => {
+						const { language_name, proficiency_level } = item || {}
+						const levelLabel =
+							mappingLevelOptions[proficiency_level] || proficiency_level
+
+						return (
+							<Fragment key={`${language_name}-${index}`}>
+								{index > 0 && <div className={classes.languageDivider} />}
+								<Flex className={classes.languageItem} vertical>
+									<span className={classes.languageName}>{language_name}</span>
+									<span className={classes.languageLevel}>{levelLabel}</span>
 								</Flex>
-							)
-						})}
-					</Flex>
+							</Fragment>
+						)
+					})}
 				</Flex>
 			</Flex>
 		)
@@ -443,27 +432,58 @@ const Profile = (props: ProfileProps) => {
 			},
 		]
 		return (
-			<Flex className={classes.contentBody}>
-				<Flex className={classes.content} vertical>
-					<div className={classes.title}>Summary</div>
+			<Flex className={classes.contentBody} vertical>
+				<div className={classes.title}>Summary</div>
+				<div className={classes.summaryList}>
 					{content.map((item) => {
 						const { id, label, value, Icon } = item || {}
 						return (
-							<Flex key={id} gap={8}>
-								<Flex className={classes.contentIcon}>
-									{Icon ? <Icon fill="#006B35" /> : null}
+							<Flex key={id} className={classes.summaryItem} align="flex-start">
+								<Flex className={classes.summaryIcon}>
+									{Icon ? <Icon fill="#006B35" width={24} height={24} /> : null}
 								</Flex>
-								<Flex vertical>
-									<div className={classes.label}>{label}</div>
-									<div className={id === 1 ? classes.friend : ''}>{value}</div>
+								<Flex className={classes.summaryText} vertical>
+									<span className={classes.summaryLabel}>{label}</span>
+									<span
+										className={clsx(classes.summaryValue, {
+											[classes.friend]: id === 1,
+										})}
+									>
+										{value}
+									</span>
 								</Flex>
 							</Flex>
 						)
 					})}
-				</Flex>
+				</div>
 			</Flex>
 		)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [toJson(userData)])
+
+	const _renderReferences = useCallback(() => {
+		const { id } = userData || {}
+		const isMe = id === getUserInfo('id')
+		if (!isMe) return null
+		return (
+			<Flex className={classes.contentBody}>
+				<Flex className={classes.refContent}>
+					<Flex className={classes.title} vertical gap={8}>
+						<Flex gap={8}>
+							<p className={classes.titleText}>Invite & Earn</p>
+							<div className={classes.titleTextSub}>1 point = 5,000 đ</div>
+						</Flex>
+						<div className={classes.DetailTextSub}>
+							Community builder:{' '}
+							<span className={classes.DetailTextSubBold}>
+								5 friends invited
+							</span>
+						</div>
+					</Flex>
+					<CButton className={classes.inviteBtn}>Invite now</CButton>
+				</Flex>
+			</Flex>
+		)
 	}, [toJson(userData)])
 
 	const _renderSpecial = useCallback(() => {
@@ -543,6 +563,7 @@ const Profile = (props: ProfileProps) => {
 	return (
 		<Flex className={classes.wrapper} vertical>
 			{_renderTotalInfo()}
+			{_renderReferences()}
 			{_renderMessageForU()}
 			{_renderAbout()}
 			{_renderLanguages()}
