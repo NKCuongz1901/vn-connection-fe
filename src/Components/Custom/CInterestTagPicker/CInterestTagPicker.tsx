@@ -14,19 +14,23 @@ type CInterestTagPickerProps = {
 	items?: InterestItem[]
 	selected?: string[]
 	onToggle?: (id: string) => void
+	className?: string
+	listClassName?: string
 }
 
 const CInterestTagPicker = ({
 	items = [],
 	selected = [],
 	onToggle,
+	className,
+	listClassName,
 }: CInterestTagPickerProps) => {
 	if (!items.length) {
 		return <div className={classes.empty}>No interests available</div>
 	}
 
 	return (
-		<div className={classes.tagList}>
+		<div className={clsx(classes.tagList, listClassName, className)}>
 			{items.map((item) => {
 				const isActive = selected.includes(item.id)
 				return (

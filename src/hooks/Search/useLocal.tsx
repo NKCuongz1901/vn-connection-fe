@@ -49,7 +49,8 @@ export default function useLocal({ data }: useLocalProps) {
 	const [filter, setFilter] = useState({
 		gender_array: [],
 		age_range: [18, 81],
-		languages_can_speak_array: [],
+		languages_can_speak_array: [] as string[],
+		nationality: [] as string[],
 		interest: [] as string[],
 		radius: radiusOpts.at(-1).value,
 		keyword: '',
@@ -98,10 +99,21 @@ export default function useLocal({ data }: useLocalProps) {
 					if (value?.includes(_value)) {
 						value = value.filter((i) => i !== _value)
 					} else {
+						if (isArray(value, 3)) {
+							openError('You can only select up to 3 interests')
+							return
+						}
 						value.push(_value)
 					}
 					valueInput = value
 				}
+				break
+			case 'nationality':
+				key = 'nationality'
+				valueInput = _value ? [_value] : []
+				break
+			case 'radiusOption':
+				key = 'radius'
 				break
 			case 'age':
 				key = 'age_range'
@@ -114,6 +126,9 @@ export default function useLocal({ data }: useLocalProps) {
 					...prev,
 					gender_array: [],
 					age_range: [18, 81],
+					languages_can_speak_array: [],
+					nationality: [],
+					interest: [],
 					radius: radiusOpts.at(-1).value,
 				}))
 				return
@@ -156,6 +171,7 @@ export default function useLocal({ data }: useLocalProps) {
 				radius,
 				keyword,
 				languages_can_speak_array,
+				nationality,
 				interest,
 			} = activeFilter
 			let isNew = false
@@ -173,6 +189,7 @@ export default function useLocal({ data }: useLocalProps) {
 					interest,
 					categories_array: interest,
 				}),
+				...(isArray(nationality, 1) && { nationality }),
 				age_range,
 				keyword,
 			}

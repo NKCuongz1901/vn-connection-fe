@@ -10,7 +10,6 @@ import { useLocalePath } from '@/ultis/route'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
-import CCheckbox from '@/Components/Custom/CCheckbox'
 import CInput from '@/Components/Custom/CInput'
 import CInterestTagPicker, {
 	interestTagPickerClasses,
@@ -27,7 +26,7 @@ import NotFound from '@/svg/NotFound'
 import ProfileIcon from '@/svg/ProfileIcon'
 
 import { mainRoutes } from '@/routes/MainRoutes'
-import { genderOpts } from '@/Variable/common.variable'
+import { genderOpts, countryCodes } from '@/Variable/common.variable'
 import { languages, radiusOpts } from '@/Variable/select.variable'
 
 import DotIcon from '@/svg/DotIcon'
@@ -66,6 +65,20 @@ const getSelectedLabels = (
 		.join(', ')
 }
 
+const filterRadiusOpts = radiusOpts.filter((item) =>
+	[2, 5, 10, 20].includes(Number(item.value)),
+)
+
+const filterGenderOpts = genderOpts.map((item) =>
+	item.value === 'OTHER' ? { ...item, label: 'All' } : item,
+)
+
+const nationalityOptions = countryCodes.map((item) => ({
+	value: item.code,
+	label: item.name,
+	name: item.name,
+}))
+
 const Local = (props: LocalProps) => {
 	const { onChangeRoute } = useLocalePath()
 	const {
@@ -87,58 +100,191 @@ const Local = (props: LocalProps) => {
 	const { data } = props || {}
 	const { address } = data || {}
 	const _renderFilterGroup = () => {
-		const { age_range, gender_array, radius } = filter
-		return (
-			<div className={classes.filterGroupWrapper}>
-				<Flex className={classes.filterGroupContainer} vertical>
-					<Flex className={classes.genderWrapper} vertical>
-						<div className={classes.title}>Gender</div>
-						<Flex className={classes.genders}>
-							{genderOpts.map((i) => (
-								<div key={i.value} className={classes.gender}>
-									<CCheckbox
-										checked={gender_array.includes(i.value)}
-										onChange={() => onChangeValue('gender')(i.value)}
-									>
-										{i.label}
-									</CCheckbox>
-								</div>
-							))}
-						</Flex>
-					</Flex>
-					<Flex className={classes.ageWrapper} vertical>
-						<div className={classes.title}>Age Range</div>
-						<div>
-							<CSliderRanger
-								showIcon
-								range
-								step={1}
-								max={81}
-								min={18}
-								value={age_range}
-								marks={{ 18: 18, 81: '+80' }}
-								onChange={onChangeValue('age')}
-							/>
-						</div>
-					</Flex>
-					<Flex className={classes.distanceWrapper} vertical>
-						<div className={classes.title}>Distance</div>
-						<CSelect
-							value={radius}
-							placeholder="Choose distance"
-							options={radiusOpts}
-							onChange={onChangeValue('distance')}
-						/>
-					</Flex>
+		const {
+			age_range,
+			gender_array,
+			radius,
+			languages_can_speak_array,
+			nationality,
+			interest,
+		} = filter
+		const filterLanguageLabel = getSelectedLabels(
+			languages_can_speak_array,
+			languages,
+			'Select languages',
+		)
+		const selectedNationalityCode = nationality?.[0]
 
-					<Flex className={classes.filterButton}>
+		return (
+			<div className={classes.filterPanelWrapper}>
+				<div className={classes.filterPanelContent}>
+				<Flex className={classes.filterSection} vertical>
+					<div className={classes.sectionTitle}>Gender</div>
+					<Flex className={classes.radioRow}>
+						{filterGenderOpts.map((item) => (
+							<label key={item.value} className={classes.radioItem}>
+								<span
+									className={clsx(classes.radioCircle, {
+										[classes.radioCircleActive]:
+											gender_array.includes(item.value),
+									})}
+								/>
+								<span className={classes.radioLabel}>{item.label}</span>
+								<input
+									type="checkbox"
+									className={classes.radioInput}
+									checked={gender_array.includes(item.value)}
+									onChange={() => onChangeValue('gender')(item.value)}
+								/>
+							</label>
+						))}
+					</Flex>
+				</Flex>
+
+				<Flex className={classes.filterSection} vertical>
+					<div className={classes.sectionTitle}>Age Range</div>
+					<CSliderRanger
+						showIcon
+						range
+						step={1}
+						max={81}
+						min={18}
+						value={age_range}
+						marks={{ 18: 18, 81: '+80' }}
+						onChange={onChangeValue('age')}
+					/>
+				</Flex>
+
+				<Flex className={classes.filterSection} vertical>
+					<div className={classes.sectionTitle}>Distance</div>
+					<Flex className={classes.distanceGrid} vertical gap={8}>
+						{[0, 1].map((row) => (
+							<Flex key={row} className={classes.radioRow}>
+								{filterRadiusOpts.slice(row * 2, row * 2 + 2).map((item) => (
+									<label key={item.value} className={classes.radioItem}>
+										<span
+											className={clsx(classes.radioCircle, {
+												[classes.radioCircleActive]: radius === item.value,
+											})}
+										/>
+										<span className={classes.radioLabel}>{item.label}</span>
+										<input
+											type="radio"
+											name="local-filter-radius"
+											className={classes.radioInput}
+											checked={radius === item.value}
+											onChange={() =>
+												onChangeValue('radiusOption')(item.value)
+											}
+										/>
+									</label>
+								))}
+							</Flex>
+						))}
+					</Flex>
+				</Flex>
+
+				<Flex className={classes.filterSection} vertical>
+					<div className={classes.fieldLabel}>Languages</div>
+					<Popover
+						trigger="click"
+						placement="bottomLeft"
+						overlayClassName={selectionPickerClasses.popover}
+						arrow={false}
+						content={
+							<CSelectionPicker title="Choose languages">
+								{languages.map((item) => (
+									<CSelectionItem
+										key={item.value}
+										label={item.label}
+										checked={languages_can_speak_array.includes(
+											item.value,
+										)}
+										onClick={() => onChangeValue('language')(item.value)}
+									/>
+								))}
+							</CSelectionPicker>
+						}
+					>
+						<div className={classes.filterDropdownWrap}>
+							<button type="button" className={classes.filterDropdown}>
+							<span
+								className={clsx(classes.filterDropdownText, {
+									[classes.filterDropdownPlaceholder]:
+										!isArray(languages_can_speak_array, 1),
+								})}
+							>
+								{filterLanguageLabel}
+							</span>
+							<IconChevronDown size={20} className={classes.filterDropdownIcon} />
+							</button>
+						</div>
+					</Popover>
+				</Flex>
+
+				<Flex className={classes.filterSection} vertical>
+					<div className={classes.sectionTitle}>Nationality</div>
+					<CSelect
+						className={classes.filterSelectNationality}
+						showSearch
+						allowClear
+						placeholder="Select nationality"
+						options={nationalityOptions}
+						value={selectedNationalityCode || undefined}
+						bordered={false}
+						style={{ width: '100%' }}
+						prefix={
+							selectedNationalityCode ? (
+								<span
+									className={clsx(
+										`flag:${mappingFlag[selectedNationalityCode] || selectedNationalityCode}`,
+										classes.nationalityFlag,
+									)}
+								/>
+							) : null
+						}
+						optionRender={(option) => (
+							<Flex align="center" gap={8}>
+								<span
+									className={clsx(
+										`flag:${mappingFlag[option.value as string] || option.value}`,
+										classes.nationalityFlag,
+									)}
+								/>
+								<span>{option.label}</span>
+							</Flex>
+						)}
+						filterOption={(input, option) =>
+							(option?.name as string)
+								?.toLowerCase()
+								.includes(input.toLowerCase())
+						}
+						onChange={onChangeValue('nationality')}
+					/>
+				</Flex>
+
+				<Flex className={classes.filterSection} vertical>
+					<div className={classes.sectionTitle}>Interest</div>
+					<CInterestTagPicker
+						items={tabsData}
+						selected={interest}
+						listClassName={classes.filterInterestTags}
+						onToggle={(id) => onChangeValue('hobby')(id)}
+					/>
+				</Flex>
+				</div>
+
+				<Flex className={classes.filterPanelFooter}>
+					<div className={classes.filterFooterBtn}>
 						<CButton ctype="disabled" onClick={onChangeValue('reset')}>
 							Reset
 						</CButton>
+					</div>
+					<div className={classes.filterFooterBtn}>
 						<CButton ctype="oranger" onClick={onSearch}>
-							Show
+							Show results
 						</CButton>
-					</Flex>
+					</div>
 				</Flex>
 			</div>
 		)
@@ -248,6 +394,8 @@ const Local = (props: LocalProps) => {
 					open={shows.filter}
 					onOpenChange={togglePopover('filter')}
 					content={_renderFilterGroup}
+					overlayClassName={classes.filterPopover}
+					arrow={false}
 				>
 					<button type="button" className={classes.filterAction}>
 						<FilterIcon fill="#7987A4" width={24} height={24} />
