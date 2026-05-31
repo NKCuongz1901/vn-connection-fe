@@ -31,30 +31,97 @@
 		}
 		.filter {
 			gap: 8px;
+			align-items: center;
+			width: 100%;
+			flex-wrap: nowrap;
+
 			.filterSearch {
 				flex: 1;
+				min-width: 0;
+
+				.searchInput {
+					width: 100%;
+
+					:global(.ant-input-affix-wrapper) {
+						border: none;
+						box-shadow: none;
+						background: #f4f8fc;
+						border-radius: 99px;
+						padding: 8px 16px;
+						height: 40px;
+					}
+
+					:global(.ant-input) {
+						background: transparent;
+						font-size: 14px;
+						line-height: 20px;
+
+						&::placeholder {
+							color: #7987a4;
+						}
+					}
+				}
+
 				.filterSearchIcon {
 					color: #7987a4;
 					font-size: 20px;
 				}
 			}
-			.filterGroup {
-				width: 167px;
-				height: 44px;
+
+			.filterPill {
+				flex: 0 1 200px;
+				min-width: 0;
+				max-width: 220px;
+				height: 40px;
 				align-items: center;
 				gap: 8px;
+				padding: 8px;
 				border-radius: 999px;
-				background: #f4f8fc;
-				justify-content: space-around;
+				background: #fff;
+				border: 1px solid #edf0f5;
 				cursor: pointer;
-				.filterIcon {
-					display: flex;
-					padding: 4px;
-					align-items: center;
-					gap: 10px;
-					border-radius: 999px;
-					background: #006b35;
-				}
+			}
+
+			.filterPillIcon {
+				display: flex;
+				flex-shrink: 0;
+				align-items: center;
+				justify-content: center;
+				padding: 4px;
+				border-radius: 999px;
+				background: #006b35;
+				line-height: 0;
+			}
+
+			.filterPillLabel {
+				flex: 1;
+				min-width: 0;
+				font-size: 14px;
+				font-weight: 500;
+				line-height: 20px;
+				color: #0f1729;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.filterPillChevron {
+				flex-shrink: 0;
+				color: #94a3b8;
+			}
+
+			.filterAction {
+				display: flex;
+				flex-shrink: 0;
+				align-items: center;
+				justify-content: center;
+				width: 40px;
+				height: 40px;
+				padding: 8px;
+				border: none;
+				border-radius: 99px;
+				background: #f1f5f8;
+				cursor: pointer;
 			}
 		}
 		.notFound {
@@ -241,14 +308,9 @@
 	.wrapper {
 		.container {
 			.filter {
-				flex-wrap: wrap;
-				.filterSearch {
-					min-width: 100%;
-					max-width: 100%;
-				}
-				.filterGroup {
-					min-width: calc(50% - 4px);
-					max-width: calc(50% - 4px);
+				.filterPill {
+					flex: 0 1 120px;
+					max-width: 140px;
 				}
 			}
 
@@ -289,9 +351,8 @@
 	.wrapper {
 		.container {
 			.filter {
-				.filterGroup {
+				.filterPillLabel {
 					font-size: 12px;
-					height: 32px;
 				}
 			}
 

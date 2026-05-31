@@ -32,12 +32,17 @@ export default function useLocal({ data }: useLocalProps) {
 	const _loadmore = useRef<boolean>(true)
 	const [user, setUser] = useState<LocalProps[]>([])
 
-	const [shows, setShows] = useState({ filter: false, language: false })
+	const [shows, setShows] = useState({
+		filter: false,
+		language: false,
+		hobbies: false,
+	})
 
 	const [filter, setFilter] = useState({
 		gender_array: [],
 		age_range: [18, 81],
 		languages_can_speak_array: [],
+		category_list: [] as string[],
 		radius: radiusOpts.at(-1).value,
 		keyword: '',
 	})
@@ -47,7 +52,8 @@ export default function useLocal({ data }: useLocalProps) {
 	const [apiId, setApiId] = useState<string>('')
 
 	const handleChangeValue = (_key) => (_value) => {
-		const { gender_array, languages_can_speak_array } = cloneDeep(filter) || {}
+		const { gender_array, languages_can_speak_array, category_list } =
+			cloneDeep(filter) || {}
 		let key = _key
 		let valueInput = _value
 		switch (_key) {
@@ -67,6 +73,18 @@ export default function useLocal({ data }: useLocalProps) {
 				{
 					key = 'languages_can_speak_array'
 					let value: string[] = languages_can_speak_array || []
+					if (value?.includes(_value)) {
+						value = value.filter((i) => i !== _value)
+					} else {
+						value.push(_value)
+					}
+					valueInput = value
+				}
+				break
+			case 'hobby':
+				{
+					key = 'category_list'
+					let value: string[] = category_list || []
 					if (value?.includes(_value)) {
 						value = value.filter((i) => i !== _value)
 					} else {
@@ -95,6 +113,12 @@ export default function useLocal({ data }: useLocalProps) {
 					languages_can_speak_array: [],
 				}))
 				return
+			case 'resetHobbies':
+				setFilter((prev) => ({
+					...prev,
+					category_list: [],
+				}))
+				return
 			case 'keyword':
 				setFilter((prev) => ({
 					...prev,
@@ -110,9 +134,10 @@ export default function useLocal({ data }: useLocalProps) {
 		setFilter((prev) => ({ ...prev, [key]: valueInput }))
 	}
 
-	const handleGetInAppLocal = async () => {
+	const handleGetInAppLocal = async (filterOverride?: Partial<typeof filter>) => {
 		setLoading(true)
 		let _total = 0
+		const activeFilter = { ...filter, ...filterOverride }
 		try {
 			const { page, limit } = _paginationRefs.current
 			const {
@@ -121,7 +146,8 @@ export default function useLocal({ data }: useLocalProps) {
 				radius,
 				keyword,
 				languages_can_speak_array,
-			} = filter
+				category_list,
+			} = activeFilter
 			let isNew = false
 			if (page === 1) {
 				setUser([])
@@ -133,6 +159,7 @@ export default function useLocal({ data }: useLocalProps) {
 				...(isArray(languages_can_speak_array, 1) && {
 					languages_can_speak_array,
 				}),
+				...(isArray(category_list, 1) && { category_list }),
 				age_range,
 				keyword,
 			}
@@ -195,10 +222,34 @@ export default function useLocal({ data }: useLocalProps) {
 		handleScrollCallback(e, handleLoadMore)
 	}
 	const handleSearch = () => {
-		setShows({ filter: false, language: false })
+		setShows({ filter: false, language: false, hobbies: false })
 		_loadmore.current = true
 		_paginationRefs.current.page = 1
 		handleGetInAppLocal()
+	}
+
+	const handleToggleLanguage = (value: string) => {
+		const current = filter.languages_can_speak_array || []
+		const next = current.includes(value)
+			? current.filter((item) => item !== value)
+			: [...current, value]
+
+		setFilter((prev) => ({ ...prev, languages_can_speak_array: next }))
+		_loadmore.current = true
+		_paginationRefs.current.page = 1
+		handleGetInAppLocal({ languages_can_speak_array: next })
+	}
+
+	const handleToggleHobby = (value: string) => {
+		const current = filter.category_list || []
+		const next = current.includes(value)
+			? current.filter((item) => item !== value)
+			: [...current, value]
+
+		setFilter((prev) => ({ ...prev, category_list: next }))
+		_loadmore.current = true
+		_paginationRefs.current.page = 1
+		handleGetInAppLocal({ category_list: next })
 	}
 	useEffect(() => {
 		handleGetInAppLocal()
@@ -226,6 +277,8 @@ export default function useLocal({ data }: useLocalProps) {
 		shows,
 		setShows,
 		onChangeValue: handleChangeValue,
+		onToggleLanguage: handleToggleLanguage,
+		onToggleHobby: handleToggleHobby,
 		onScroll: handleScroll,
 		onLoadMore: handleLoadMore,
 		onSearch: handleSearch,

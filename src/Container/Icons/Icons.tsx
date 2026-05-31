@@ -96,6 +96,7 @@ import GlobalIcon from '@/svg/GlobalIcon'
 import PolicyIcon from '@/svg/PolicyIcon'
 import SettingIcon from '@/svg/SettingIcon'
 import SecurityIcon from '@/svg/SecurityIcon'
+import LanguageIcon from '@/svg/LanguageIcon'
 
 const Icons = () => {
 	const icons = [
@@ -423,6 +424,11 @@ const Icons = () => {
 		{
 			ICON: SettingIcon,
 			name: '@/svg/Event/SettingIcon',
+			key: randomString(),
+		},
+		{
+			ICON: LanguageIcon,
+			name: '@/svg/Event/LanguageIcon',
 			key: randomString(),
 		},
 	]

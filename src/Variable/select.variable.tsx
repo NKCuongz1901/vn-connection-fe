@@ -290,19 +290,21 @@ export enum NOTIFICATION_TYPE {
 }
 
 export const languages = [
-	{ value: 'Italian', label: 'Italian' },
-	{ value: 'Korean', label: 'Korean' },
-	{ value: 'Japanese', label: 'Japanese' },
-	{ value: 'Russian', label: 'Russian' },
-	{ value: 'Portuguese', label: 'Portuguese' },
-	{ value: 'Spanish', label: 'Spanish' },
-	{ value: 'Thai', label: 'Thai' },
-	{ value: 'Vietnamese', label: 'Vietnamese' },
-	{ value: 'Chinese', label: 'Chinese' },
 	{ value: 'English', label: 'English' },
-	{ value: 'Arabic', label: 'Arabic' },
+	{ value: 'Vietnamese', label: 'Vietnamese' },
+	{ value: 'Chinese', label: 'Chinese (Mandarin)' },
+	{ value: 'Spanish', label: 'Spanish' },
 	{ value: 'French', label: 'French' },
 	{ value: 'German', label: 'German' },
+	{ value: 'Japanese', label: 'Japanese' },
+	{ value: 'Korean', label: 'Korean' },
+	{ value: 'Russian', label: 'Russian' },
+	{ value: 'Arabic', label: 'Arabic' },
+	{ value: 'Portuguese', label: 'Portuguese' },
+	{ value: 'Hindi', label: 'Hindi' },
+	{ value: 'Italian', label: 'Italian' },
+	{ value: 'Thai', label: 'Thai' },
+	{ value: 'Indonesian', label: 'Indonesian' },
 ]
 export const typeCommunity = [
 	{ value: 'Business', label: 'Business' },

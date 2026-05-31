@@ -1,0 +1,33 @@
+.popover {
+	:global(.ant-popover-inner) {
+		padding: 0;
+		border-radius: 8px;
+		box-shadow:
+			-2px -2px 8px rgba(0, 0, 0, 0.1),
+			2px 2px 8px rgba(0, 0, 0, 0.1);
+	}
+}
+
+.picker {
+	width: 220px;
+	max-width: 90vw;
+	background: #fff;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.header {
+	padding: 8px 16px;
+	text-align: center;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	color: #0f1729;
+}
+
+.list {
+	display: flex;
+	flex-direction: column;
+	max-height: 360px;
+	overflow-y: auto;
+}

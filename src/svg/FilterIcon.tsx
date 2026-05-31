@@ -2,13 +2,15 @@ import { memo } from 'react'
 
 import { SvgProps } from '@/interface/common/common.interface'
 
-const FilterIcon = ({ fill }: SvgProps) => {
+const FilterIcon = ({ fill, width, height }: SvgProps) => {
 	const _fill = fill || '#fff'
+	const _width = width || 16
+	const _height = height || 16
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
-			width="16"
-			height="16"
+			width={_width}
+			height={_height}
 			viewBox="0 0 16 16"
 			fill="none"
 		>
