@@ -17,7 +17,7 @@ import {
 	IconUserFilled,
 } from '@tabler/icons-react'
 
-import { Divider, Flex } from 'antd'
+import { Divider, Flex, Skeleton } from 'antd'
 import CInput from '@/Components/Custom/CInput'
 import ModalNotFoundAccount from '@/Components/Notification/ModalNotFoundAccount/ModalNotFoundAccount'
 
@@ -48,11 +48,18 @@ const ACCOUNT_ACTIONS = [
 	},
 ] as const
 
+const skeletonItems = [
+	{ id: '2', value: 220 },
+	{ id: '1', value: 120 },
+	{ id: '3', value: 320 },
+	{ id: '4', value: 240 },
+]
+
 function ManageAccount() {
 	const { onChangeRoute } = useLocalePath()
 	const { toggleLoadingContext } = useLoading()
 	const { openError } = useModal()
-	const { userData } = useProfile({})
+	const { userData, loading } = useProfile({})
 	const { name, email, phone } = userData || {}
 	const [openDeleteModal, setOpenDeleteModal] = useState(false)
 
@@ -70,6 +77,10 @@ function ManageAccount() {
 		if (key === 'delete') {
 			setOpenDeleteModal(true)
 		}
+	}
+
+	const handleGoChangePhone = () => {
+		onChangeRoute(`${mainRoutes.accountSetting}/manage-account/change-phone`)
 	}
 
 	const handleCloseDeleteModal = useCallback(() => {
@@ -106,6 +117,24 @@ function ManageAccount() {
 		}
 	}
 
+	if (loading) {
+		return (
+			<Flex className={classes.wrapper} vertical>
+				<Flex className={classes.totalInfo} vertical>
+					<Skeleton.Input active style={{ width: '100%', height: 320 }} />
+				</Flex>
+				{skeletonItems.map((i) => (
+					<Skeleton.Input
+						key={i.id}
+						active
+						className={classes.contentBody}
+						style={{ width: '100%', height: i.value }}
+					/>
+				))}
+			</Flex>
+		)
+	}
+
 	return (
 		<div className={classes.wrapper}>
 			<Flex className={classes.section}>
@@ -121,9 +150,20 @@ function ManageAccount() {
 								allowClear={false}
 								bordered={false}
 								suffix={
-									<span className={classes.editIcon}>
-										<PencilIcon fill="#7987A4" />
-									</span>
+									key === 'phone' ? (
+										<button
+											type="button"
+											className={classes.editIcon}
+											onClick={handleGoChangePhone}
+											aria-label="Change phone number"
+										>
+											<PencilIcon fill="#7987A4" />
+										</button>
+									) : (
+										<span className={classes.editIcon}>
+											<PencilIcon fill="#7987A4" />
+										</span>
+									)
 								}
 							/>
 						</div>

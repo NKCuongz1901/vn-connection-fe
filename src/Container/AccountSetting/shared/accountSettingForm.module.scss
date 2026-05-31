@@ -1,0 +1,189 @@
+.wrapper {
+	width: 100%;
+}
+
+.section {
+	display: flex;
+	align-items: flex-start;
+	gap: 24px;
+	padding: 12px 0;
+	width: 100%;
+}
+
+.sectionTitle {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-shrink: 0;
+	width: 250px;
+	padding: 0;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	color: var(--Color-Grey-800, #48546b);
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	text-align: left;
+
+	&:hover {
+		color: var(--Color-Brand-Green-Main, #006b35);
+	}
+}
+
+.form {
+	flex: 1;
+	min-width: 0;
+	width: 100%;
+}
+
+.fieldLabel {
+	color: var(--color-grey-700, #7987a4);
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+}
+
+.phoneField {
+	width: 100%;
+
+	> div > span:first-of-type {
+		color: var(--color-grey-700, #7987a4);
+		font-size: 14px;
+		font-weight: 500;
+		line-height: 20px;
+	}
+
+	:global(.ant-input-group-addon) {
+		border: none;
+		background: var(--color-grey-300, #f4f8fc);
+		padding: 0 0 0 16px;
+	}
+
+	:global(.ant-select-selector) {
+		border: none !important;
+		box-shadow: none !important;
+		background: transparent !important;
+		padding: 0 !important;
+		height: auto !important;
+	}
+
+	:global(.ant-input-affix-wrapper),
+	:global(.ant-input-group-wrapper) :global(.ant-input) {
+		border: none;
+		box-shadow: none;
+		background: var(--color-grey-300, #f4f8fc);
+	}
+
+	:global(.ant-input-group) {
+		border-radius: 16px;
+		overflow: hidden;
+		background: var(--color-grey-300, #f4f8fc);
+	}
+
+	:global(.ant-input) {
+		font-size: 14px;
+		font-weight: 400;
+		line-height: 20px;
+		color: var(--color-grey-900, #0f1729);
+		background: var(--color-grey-300, #f4f8fc);
+		border: none;
+		height: 44px;
+		padding: 12px 16px;
+
+		&::placeholder {
+			color: var(--color-grey-600, #94a3b8);
+		}
+	}
+}
+
+.submitButton {
+	width: 100%;
+
+	:global(.wrapper) {
+		width: 100%;
+	}
+
+	:global(.ant-btn) {
+		width: 100%;
+		height: 48px;
+		border: none;
+		border-radius: 99px;
+		font-size: 16px;
+		font-weight: 600;
+		line-height: 24px;
+		box-shadow: none;
+	}
+
+	:global(.disabled) :global(.ant-btn),
+	:global(.ant-btn:disabled) {
+		background: #f0f3f9 !important;
+		color: #7987a4 !important;
+	}
+}
+
+.otpDescription {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+	color: #7987a4;
+
+	.phoneHighlight {
+		color: #0f1729;
+		font-weight: 600;
+	}
+}
+
+.otpBlock {
+	width: 100%;
+	padding: 16px 0;
+}
+
+.otpInput {
+	width: 100%;
+
+	:global(.ant-otp) {
+		width: 100%;
+		gap: 8px;
+	}
+
+	:global(.ant-otp-input) {
+		flex: 1;
+		width: auto !important;
+		min-width: 0;
+		height: 56px;
+		border: none;
+		border-radius: 16px;
+		background: var(--color-grey-300, #f4f8fc);
+		font-size: 16px;
+		font-weight: 600;
+		color: #0f1729;
+	}
+
+	:global(.ant-otp-input:focus) {
+		box-shadow: none;
+		background: var(--color-grey-300, #f4f8fc);
+	}
+}
+
+.resendRow {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	flex-wrap: wrap;
+	font-size: 14px;
+	line-height: 20px;
+	color: #48546b;
+}
+
+.resendLink {
+	padding: 0;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	color: #e55a0f;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 20px;
+}
