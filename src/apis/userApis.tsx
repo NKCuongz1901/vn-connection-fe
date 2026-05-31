@@ -37,6 +37,11 @@ export const changeUserPassword = async (payload: {
 	})
 }
 
+export const deleteMySelfAccount = async () => {
+	const url = USER_ROUTES.user + '/delete'
+	return await axios.delete(url)
+}
+
 export const blockUser = async (id: string) => {
 	const url = USER_ROUTES.block + '/' + id
 	return await axios.post(url)

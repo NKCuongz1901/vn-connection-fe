@@ -1,19 +1,25 @@
 'use client'
+import React, { useCallback, useState } from 'react'
 
+import { deleteMySelfAccount } from '@/apis/userApis'
+import { useLoading } from '@/context/LoadingContext'
+import { useModal } from '@/context/ModalContext'
+import useProfile from '@/hooks/Profile/useProfile'
+import { mainRoutes } from '@/routes/MainRoutes'
+import { useLocalePath } from '@/ultis/route'
+import { handleRemoveAllCookie, handleRemoveAllSession } from '@/ultis/storage'
+
+import PencilIcon from '@/svg/Hangout/PencilIcon'
+import TrashIcon from '@/svg/TrashIcon'
 import {
 	IconChevronRight,
 	IconLockPassword,
 	IconUserFilled,
 } from '@tabler/icons-react'
-import { Divider, Flex } from 'antd'
-import React from 'react'
 
+import { Divider, Flex } from 'antd'
 import CInput from '@/Components/Custom/CInput'
-import useProfile from '@/hooks/Profile/useProfile'
-import { mainRoutes } from '@/routes/MainRoutes'
-import { useLocalePath } from '@/ultis/route'
-import PencilIcon from '@/svg/Hangout/PencilIcon'
-import TrashIcon from '@/svg/TrashIcon'
+import ModalNotFoundAccount from '@/Components/Notification/ModalNotFoundAccount/ModalNotFoundAccount'
 
 import classes from './ManageAccount.module.scss'
 
@@ -44,8 +50,11 @@ const ACCOUNT_ACTIONS = [
 
 function ManageAccount() {
 	const { onChangeRoute } = useLocalePath()
+	const { toggleLoadingContext } = useLoading()
+	const { openError } = useModal()
 	const { userData } = useProfile({})
 	const { name, email, phone } = userData || {}
+	const [openDeleteModal, setOpenDeleteModal] = useState(false)
 
 	const fieldValues: Record<(typeof ACCOUNT_FIELDS)[number]['key'], string> = {
 		phone: phone || '',
@@ -56,8 +65,33 @@ function ManageAccount() {
 	const handleActionClick = (key: (typeof ACCOUNT_ACTIONS)[number]['key']) => {
 		if (key === 'change-password') {
 			onChangeRoute(`${mainRoutes.accountSetting}/manage-account/change`)
+			return
+		}
+		if (key === 'delete') {
+			setOpenDeleteModal(true)
 		}
 	}
+
+	const handleCloseDeleteModal = useCallback(() => {
+		setOpenDeleteModal(false)
+	}, [])
+
+	const handleDeleteAccount = useCallback(async () => {
+		toggleLoadingContext(true)
+		try {
+			const res: any = await deleteMySelfAccount()
+			if (res?.code === 200) {
+				setOpenDeleteModal(false)
+				handleRemoveAllCookie()
+				handleRemoveAllSession()
+				onChangeRoute(mainRoutes.login)
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			toggleLoadingContext(false)
+		}
+	}, [onChangeRoute, openError, toggleLoadingContext])
 
 	const renderActionIcon = (key: (typeof ACCOUNT_ACTIONS)[number]['key']) => {
 		switch (key) {
@@ -125,6 +159,19 @@ function ManageAccount() {
 					))}
 				</Flex>
 			</Flex>
+
+			<ModalNotFoundAccount
+				open={openDeleteModal}
+				onClose={handleCloseDeleteModal}
+				icon={<TrashIcon fill="#F80024" width={48} height={48} />}
+				title="Delete your account?"
+				description="Are you sure you want to permanently delete your account? This action cannot be undone."
+				plainDescription
+				leftText="Delete Account"
+				rightText="Continue Using"
+				onGetHelp={handleDeleteAccount}
+				onRegister={handleCloseDeleteModal}
+			/>
 		</div>
 	)
 }

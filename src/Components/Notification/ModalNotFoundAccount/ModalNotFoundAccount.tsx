@@ -10,6 +10,7 @@ type ModalNotFoundAccountProps = {
 	description: string
 	leftText?: string
 	rightText?: string
+	plainDescription?: boolean
 	onClose?: () => void
 	onGetHelp?: () => void
 	onRegister?: () => void
@@ -23,6 +24,7 @@ function ModalNotFoundAccount(_props: ModalNotFoundAccountProps) {
 		description,
 		rightText = 'Register',
 		leftText = 'Get help',
+		plainDescription = false,
 		onClose,
 		onGetHelp,
 		onRegister,
@@ -55,11 +57,15 @@ function ModalNotFoundAccount(_props: ModalNotFoundAccountProps) {
 			<div className={classes.modalNotFoundAccountWrapper}>
 				{icon}
 				<p className={classes.title}>{title}</p>
-				<p className={classes.description}>
-					Please register{' '}
-					<span className={classes.phone}>&apos;{description}&apos;</span> if
-					you&apos;re new here, or contact Support for help.
-				</p>
+				{plainDescription ? (
+					<p className={classes.description}>{description}</p>
+				) : (
+					<p className={classes.description}>
+						Please register{' '}
+						<span className={classes.phone}>&apos;{description}&apos;</span> if
+						you&apos;re new here, or contact Support for help.
+					</p>
+				)}
 			</div>
 		</CModal>
 	)
