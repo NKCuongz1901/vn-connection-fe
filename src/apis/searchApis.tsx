@@ -52,6 +52,44 @@ export const getInappCategoryUserMatching = async (params) => {
 		params: { ...convertParams(_params), keyword },
 	})
 }
+
+export const searchUserNetwork = async (params?: {
+	q?: string
+	page?: number
+	limit?: number
+	[key: string]: any
+}) => {
+	const url = SEARCH_ROUTES.searchUserNetwork
+	const { q = '', page = 1, limit = 30, ...rest } = params || {}
+
+	return await axios.get(url, {
+		params: {
+			...convertParams(rest),
+			q,
+			page,
+			limit,
+		},
+	})
+}
+
+export const searchCommunityNetwork = async (params?: {
+	q?: string
+	page?: number
+	limit?: number
+	[key: string]: any
+}) => {
+	const url = SEARCH_ROUTES.searchCommunityNetwork
+	const { q = '', page = 1, limit = 30, ...rest } = params || {}
+
+	return await axios.get(url, {
+		params: {
+			...convertParams(rest),
+			q,
+			page,
+			limit,
+		},
+	})
+}
 // export const getDiscussDetail = async (params: {
 // 	id: string
 // 	[key: string]: any

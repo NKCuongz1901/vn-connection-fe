@@ -124,6 +124,8 @@ export const SEARCH_ROUTES = {
 	searchCategoryClub: 'search-in-app/category-club',
 	searchCategoryClubMatching: 'search-in-app/club-matching-categories',
 	searchCategoryUserMatching: 'search-in-app/user-matching-categories',
+	searchUserNetwork: 'search/user',
+	searchCommunityNetwork: 'search/club',
 }
 export const MAP_ROUTES = {
 	name: 'map/google/place/textsearch/json',
