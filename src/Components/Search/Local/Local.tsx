@@ -12,6 +12,9 @@ import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
 import CCheckbox from '@/Components/Custom/CCheckbox'
 import CInput from '@/Components/Custom/CInput'
+import CInterestTagPicker, {
+	interestTagPickerClasses,
+} from '@/Components/Custom/CInterestTagPicker'
 import CSelectionItem from '@/Components/Custom/CSelectionItem'
 import CSelectionPicker, {
 	selectionPickerClasses,
@@ -25,11 +28,7 @@ import ProfileIcon from '@/svg/ProfileIcon'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import { genderOpts } from '@/Variable/common.variable'
-import {
-	categoryNetworkOpts,
-	languages,
-	radiusOpts,
-} from '@/Variable/select.variable'
+import { languages, radiusOpts } from '@/Variable/select.variable'
 
 import DotIcon from '@/svg/DotIcon'
 import FeMaleIcon from '@/svg/FeMaleIcon'
@@ -75,6 +74,7 @@ const Local = (props: LocalProps) => {
 		user,
 		total,
 		filter,
+		tabsData,
 		shows,
 		setShows,
 		onChangeValue,
@@ -160,33 +160,30 @@ const Local = (props: LocalProps) => {
 		)
 	}
 	const _renderFilterHobbies = () => {
-		const { category_list } = filter
+		const { interest } = filter
 
 		return (
-			<CSelectionPicker title="Choose hobbies">
-				{categoryNetworkOpts.map((item) => (
-					<CSelectionItem
-						key={item.value}
-						label={item.label}
-						checked={category_list.includes(item.value)}
-						onClick={() => onToggleHobby(item.value)}
-					/>
-				))}
-			</CSelectionPicker>
+			<div className={interestTagPickerClasses.picker}>
+				<CInterestTagPicker
+					items={tabsData}
+					selected={interest}
+					onToggle={onToggleHobby}
+				/>
+			</div>
 		)
 	}
 	const _renderFilter = () => {
-		const { languages_can_speak_array, category_list } = filter
+		const { languages_can_speak_array, interest } = filter
+		const interestOptions = tabsData.map((item) => ({
+			value: item.id,
+			label: item.title,
+		}))
 		const languageLabel = getSelectedLabels(
 			languages_can_speak_array,
 			languages,
 			'Languages',
 		)
-		const hobbiesLabel = getSelectedLabels(
-			category_list,
-			categoryNetworkOpts,
-			'Hobbies',
-		)
+		const hobbiesLabel = getSelectedLabels(interest, interestOptions, 'Hobbies')
 
 		const togglePopover =
 			(key: 'filter' | 'language' | 'hobbies') => (open: boolean) => {
@@ -234,7 +231,7 @@ const Local = (props: LocalProps) => {
 					open={shows.hobbies}
 					onOpenChange={togglePopover('hobbies')}
 					content={_renderFilterHobbies}
-					overlayClassName={selectionPickerClasses.popover}
+					overlayClassName={interestTagPickerClasses.popover}
 					arrow={false}
 				>
 					<Flex className={classes.filterPill}>

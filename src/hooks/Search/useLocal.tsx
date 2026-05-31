@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useModal } from '@/context/ModalContext'
 
-import { getInappLocal } from '@/apis/searchApis'
+import { getInappCategoryUser, getInappLocal } from '@/apis/searchApis'
 
 import { isArray, uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common'
@@ -12,7 +12,15 @@ import { paginationMore } from '@/Variable/common.variable'
 
 import { LocalProps, LocalResProps } from '@/interface/Search/Search.interface'
 import { PaginationType } from '@/interface/common/common.interface'
+import { NetworkClubSearchInAppProps } from '@/interface/Community/Community.interface'
 import { radiusOpts } from '@/Variable/select.variable'
+import { getUserInfo } from '@/ultis/storage'
+
+const normalizeCategoryRows = (rows: any): NetworkClubSearchInAppProps[] => {
+	if (Array.isArray(rows)) return rows
+	if (rows && typeof rows === 'object') return Object.values(rows)
+	return []
+}
 
 interface useLocalProps {
 	data: {
@@ -42,17 +50,19 @@ export default function useLocal({ data }: useLocalProps) {
 		gender_array: [],
 		age_range: [18, 81],
 		languages_can_speak_array: [],
-		category_list: [] as string[],
+		interest: [] as string[],
 		radius: radiusOpts.at(-1).value,
 		keyword: '',
 	})
+
+	const [tabsData, setTabsData] = useState<NetworkClubSearchInAppProps[]>([])
 
 	const [loading, setLoading] = useState(true)
 	const [total, setTotal] = useState({ user: 0 })
 	const [apiId, setApiId] = useState<string>('')
 
 	const handleChangeValue = (_key) => (_value) => {
-		const { gender_array, languages_can_speak_array, category_list } =
+		const { gender_array, languages_can_speak_array, interest } =
 			cloneDeep(filter) || {}
 		let key = _key
 		let valueInput = _value
@@ -83,8 +93,8 @@ export default function useLocal({ data }: useLocalProps) {
 				break
 			case 'hobby':
 				{
-					key = 'category_list'
-					let value: string[] = category_list || []
+					key = 'interest'
+					let value: string[] = interest || []
 					if (value?.includes(_value)) {
 						value = value.filter((i) => i !== _value)
 					} else {
@@ -116,7 +126,7 @@ export default function useLocal({ data }: useLocalProps) {
 			case 'resetHobbies':
 				setFilter((prev) => ({
 					...prev,
-					category_list: [],
+					interest: [],
 				}))
 				return
 			case 'keyword':
@@ -146,7 +156,7 @@ export default function useLocal({ data }: useLocalProps) {
 				radius,
 				keyword,
 				languages_can_speak_array,
-				category_list,
+				interest,
 			} = activeFilter
 			let isNew = false
 			if (page === 1) {
@@ -159,7 +169,10 @@ export default function useLocal({ data }: useLocalProps) {
 				...(isArray(languages_can_speak_array, 1) && {
 					languages_can_speak_array,
 				}),
-				...(isArray(category_list, 1) && { category_list }),
+				...(isArray(interest, 1) && {
+					interest,
+					categories_array: interest,
+				}),
 				age_range,
 				keyword,
 			}
@@ -240,19 +253,49 @@ export default function useLocal({ data }: useLocalProps) {
 		handleGetInAppLocal({ languages_can_speak_array: next })
 	}
 
-	const handleToggleHobby = (value: string) => {
-		const current = filter.category_list || []
-		const next = current.includes(value)
-			? current.filter((item) => item !== value)
-			: [...current, value]
+	const handleToggleHobby = (id: string) => {
+		const current = filter.interest || []
+		let next: string[]
 
-		setFilter((prev) => ({ ...prev, category_list: next }))
+		if (current.includes(id)) {
+			next = current.filter((item) => item !== id)
+		} else {
+			if (isArray(current, 3)) {
+				openError('You can only select up to 3 interests')
+				return
+			}
+			next = [...current, id]
+		}
+
+		setFilter((prev) => ({ ...prev, interest: next }))
 		_loadmore.current = true
 		_paginationRefs.current.page = 1
-		handleGetInAppLocal({ category_list: next })
+		handleGetInAppLocal({ interest: next })
+	}
+
+	const handleFetchInterestCategories = async () => {
+		try {
+			const { latitude: userLat, longitude: userLng } = getUserInfo() || {}
+			const payload = {
+				fields: ['$all'],
+				latitude: Number(latitude) || userLat || 0,
+				longitude: Number(longitude) || userLng || 0,
+				google_title: address || '',
+				radius: filter.radius,
+				...(type && {
+					type: (type || '').split(','),
+				}),
+			}
+			const res: any = await getInappCategoryUser(payload)
+			const rows = res?.results?.objects?.rows
+			setTabsData(normalizeCategoryRows(rows))
+		} catch (error) {
+			openError(error)
+		}
 	}
 	useEffect(() => {
 		handleGetInAppLocal()
+		handleFetchInterestCategories()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 	useEffect(() => {
@@ -274,6 +317,7 @@ export default function useLocal({ data }: useLocalProps) {
 		total,
 		_loadmore,
 		filter,
+		tabsData,
 		shows,
 		setShows,
 		onChangeValue: handleChangeValue,
