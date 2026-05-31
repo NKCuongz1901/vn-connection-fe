@@ -17,6 +17,7 @@ export const mainRoutes = {
 	myLocation: 'my-location',
 	dating: 'dating',
 	profile: 'profile',
+	accountSetting: 'profile/account-setting',
 	exploreInterest: 'explore-interest',
 	chatRoom: 'chat-room',
 	miniApps: 'mini-apps',

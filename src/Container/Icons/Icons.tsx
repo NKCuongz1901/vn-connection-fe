@@ -92,6 +92,10 @@ import DoubleTick from '@/svg/DoubleTick'
 import ShopIcon from '@/svg/ShopIcon'
 import DocumentUpload from '@/svg/DocumentUpload'
 import TickCircleIcon from '@/svg/TickCircleIcon'
+import GlobalIcon from '@/svg/GlobalIcon'
+import PolicyIcon from '@/svg/PolicyIcon'
+import SettingIcon from '@/svg/SettingIcon'
+import SecurityIcon from '@/svg/SecurityIcon'
 
 const Icons = () => {
 	const icons = [
@@ -399,6 +403,26 @@ const Icons = () => {
 		{
 			ICON: TickCircleIcon,
 			name: '@/svg/Event/TickCircleIcon',
+			key: randomString(),
+		},
+		{
+			ICON: GlobalIcon,
+			name: '@/svg/Event/GlobalIcon',
+			key: randomString(),
+		},
+		{
+			ICON: PolicyIcon,
+			name: '@/svg/Event/PolicyIcon',
+			key: randomString(),
+		},
+		{
+			ICON: SecurityIcon,
+			name: '@/svg/Event/SecurityIcon',
+			key: randomString(),
+		},
+		{
+			ICON: SettingIcon,
+			name: '@/svg/Event/SettingIcon',
 			key: randomString(),
 		},
 	]

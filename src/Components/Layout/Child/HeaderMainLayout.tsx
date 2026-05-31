@@ -69,6 +69,7 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 			{
 				key: 'setting',
 				label: 'Account Settings',
+				onClick: () => handleMenusClick('accountSetting'),
 			},
 			{
 				key: 'fns',
@@ -276,6 +277,9 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 				break
 			case 'signout':
 				handleLogout()
+				break
+			case 'accountSetting':
+				onChangeRoute(mainRoutes.accountSetting)
 				break
 			default:
 				break
