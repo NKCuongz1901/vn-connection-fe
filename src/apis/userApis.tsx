@@ -1,5 +1,7 @@
 import { convertParams } from '@/ultis/object'
+import md5 from 'md5'
 import axios from '../axios'
+import { getStorageCookie } from '@/ultis/storage'
 
 import { USER_ROUTES } from '@/routes'
 
@@ -21,6 +23,18 @@ export const getUserProfile = async ({
 export const updateUserProfile = async (payload: any) => {
 	const url = USER_ROUTES.profile // myprofile
 	return await axios.put(url, payload)
+}
+
+export const changeUserPassword = async (payload: {
+	old_password: string
+	new_password: string
+}) => {
+	const fcm_token = getStorageCookie('last_token_web')
+	return await axios.post(`${USER_ROUTES.user}/change_password`, {
+		old_password: md5(payload.old_password),
+		new_password: md5(payload.new_password),
+		...(fcm_token ? { fcm_token } : {}),
+	})
 }
 
 export const blockUser = async (id: string) => {

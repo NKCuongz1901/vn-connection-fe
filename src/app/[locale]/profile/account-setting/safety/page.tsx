@@ -1,7 +1,8 @@
+import Safety from '@/Container/AccountSetting/Safety/Safety'
 import React from 'react'
 
 function page() {
-	return <div>safety page</div>
+	return <Safety type="TERMS" />
 }
 
 export default page

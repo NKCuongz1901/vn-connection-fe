@@ -1,7 +1,8 @@
+import About from '@/Container/AccountSetting/About/About'
 import React from 'react'
 
 function page() {
-	return <div>page</div>
+	return <About />
 }
 
 export default page

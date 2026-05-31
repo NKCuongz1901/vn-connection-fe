@@ -10,12 +10,12 @@ export const ACCOUNT_SETTING_MENUS = [
 		path: 'profile/account-setting/about',
 		Icon: GlobalIcon,
 	},
-	{
-		key: 'policy',
-		label: 'Policy',
-		path: 'profile/account-setting/policy',
-		Icon: PolicyIcon,
-	},
+	// {
+	// 	key: 'policy',
+	// 	label: 'Policy',
+	// 	path: 'profile/account-setting/policy',
+	// 	Icon: PolicyIcon,
+	// },
 	{
 		key: 'safety',
 		label: 'Safety',

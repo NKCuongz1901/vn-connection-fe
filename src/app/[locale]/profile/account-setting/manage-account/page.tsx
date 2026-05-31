@@ -1,7 +1,9 @@
+'use client'
+import ManageAccount from '@/Container/AccountSetting/ManageAccount/ManageAccount'
 import React from 'react'
 
 function page() {
-	return <div> manage page</div>
+	return <ManageAccount />
 }
 
 export default page
