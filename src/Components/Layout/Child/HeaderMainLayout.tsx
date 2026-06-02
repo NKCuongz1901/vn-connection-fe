@@ -279,7 +279,7 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 				handleLogout()
 				break
 			case 'accountSetting':
-				onChangeRoute(mainRoutes.accountSetting)
+				onChangeRoute(`${mainRoutes.accountSetting}/manage-account`)
 				break
 			default:
 				break

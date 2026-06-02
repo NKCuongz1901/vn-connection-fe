@@ -19,6 +19,7 @@ import {
 
 import { Divider, Flex, Skeleton } from 'antd'
 import CInput from '@/Components/Custom/CInput'
+import ModalEditProfile from '@/Components/Profile/ModalEditProfile'
 import ModalNotFoundAccount from '@/Components/Notification/ModalNotFoundAccount/ModalNotFoundAccount'
 
 import classes from './ManageAccount.module.scss'
@@ -59,7 +60,15 @@ function ManageAccount() {
 	const { onChangeRoute } = useLocalePath()
 	const { toggleLoadingContext } = useLoading()
 	const { openError } = useModal()
-	const { userData, loading } = useProfile({})
+	const {
+		userData,
+		loading,
+		openEditProfile,
+		categoryNetworkOpts,
+		onOpenEditP,
+		onCloseEditP,
+		onGetUserProfile,
+	} = useProfile({})
 	const { name, email, phone } = userData || {}
 	const [openDeleteModal, setOpenDeleteModal] = useState(false)
 
@@ -159,6 +168,15 @@ function ManageAccount() {
 										>
 											<PencilIcon fill="#7987A4" />
 										</button>
+									) : key === 'name' ? (
+										<button
+											type="button"
+											className={classes.editIcon}
+											onClick={onOpenEditP}
+											aria-label="Edit profile"
+										>
+											<PencilIcon fill="#7987A4" />
+										</button>
 									) : (
 										<span className={classes.editIcon}>
 											<PencilIcon fill="#7987A4" />
@@ -212,6 +230,16 @@ function ManageAccount() {
 				onGetHelp={handleDeleteAccount}
 				onRegister={handleCloseDeleteModal}
 			/>
+
+			{openEditProfile && (
+				<ModalEditProfile
+					categoryNetworkOpts={categoryNetworkOpts}
+					open={openEditProfile}
+					onClose={onCloseEditP}
+					data={userData}
+					onGetUserProfile={onGetUserProfile}
+				/>
+			)}
 		</div>
 	)
 }
