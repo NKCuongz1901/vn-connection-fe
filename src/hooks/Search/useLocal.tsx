@@ -45,6 +45,8 @@ export type LocalFilterState = {
 	interest: string[]
 	radius: number | string
 	keyword: string
+	/** Chỉ gửi age_range lên API sau khi user kéo slider */
+	isAgeRangeApplied: boolean
 }
 
 const createDefaultLocalFilter = (
@@ -57,6 +59,7 @@ const createDefaultLocalFilter = (
 	interest: urlPart?.interest ?? [],
 	radius: radiusOpts.at(-1).value,
 	keyword: '',
+	isAgeRangeApplied: false,
 })
 
 const getInitialFilterFromUrl = () => {
@@ -123,6 +126,7 @@ export default function useLocal({ data }: useLocalProps) {
 		const { gender_array, languages_can_speak_array, interest } = current
 		let key = _key
 		let valueInput: unknown = _value
+		let applyAge = false
 		switch (_key) {
 			case 'gender': {
 				key = 'gender_array'
@@ -166,6 +170,8 @@ export default function useLocal({ data }: useLocalProps) {
 				break
 			case 'age':
 				key = 'age_range'
+				valueInput = _value
+				applyAge = true
 				break
 			case 'distance':
 				key = 'radius'
@@ -173,7 +179,7 @@ export default function useLocal({ data }: useLocalProps) {
 			default:
 				break
 		}
-		return { key, valueInput }
+		return { key, valueInput, applyAge }
 	}
 
 	const handleChangeDraftValue = (_key: string) => (_value: unknown) => {
@@ -183,8 +189,12 @@ export default function useLocal({ data }: useLocalProps) {
 		}
 		const result = applyFilterFieldChange(draftFilter, _key, _value)
 		if (!result) return
-		const { key, valueInput } = result
-		setDraftFilter((prev) => ({ ...prev, [key]: valueInput }))
+		const { key, valueInput, applyAge } = result
+		setDraftFilter((prev) => ({
+			...prev,
+			[key]: valueInput,
+			...(applyAge && { isAgeRangeApplied: true }),
+		}))
 	}
 
 	const handleChangeValue = (_key: string) => (_value: unknown) => {
@@ -207,6 +217,7 @@ export default function useLocal({ data }: useLocalProps) {
 			const { page, limit } = _paginationRefs.current
 			const {
 				age_range,
+				isAgeRangeApplied,
 				gender_array,
 				radius,
 				keyword,
@@ -230,7 +241,7 @@ export default function useLocal({ data }: useLocalProps) {
 					categories_array: interest,
 				}),
 				...(isArray(nationality, 1) && { nationality }),
-				age_range,
+				...(isAgeRangeApplied && { age_range }),
 				keyword,
 			}
 			if (
