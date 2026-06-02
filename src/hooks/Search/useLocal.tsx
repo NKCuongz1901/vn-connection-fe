@@ -1,3 +1,4 @@
+import { useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
 import { useModal } from '@/context/ModalContext'
@@ -6,6 +7,10 @@ import { getInappCategoryUser, getInappLocal } from '@/apis/searchApis'
 
 import { isArray, uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common'
+import {
+	parseLocalFilterFromSearchParams,
+	syncLocalFilterToUrl,
+} from '@/ultis/localSearchFilterUrl'
 import { randomString } from '@/ultis/string'
 
 import { paginationMore } from '@/Variable/common.variable'
@@ -32,9 +37,43 @@ interface useLocalProps {
 	[key: string]: any
 }
 
+export type LocalFilterState = {
+	gender_array: string[]
+	age_range: number[]
+	languages_can_speak_array: string[]
+	nationality: string[]
+	interest: string[]
+	radius: number | string
+	keyword: string
+}
+
+const createDefaultLocalFilter = (
+	urlPart?: Partial<Pick<LocalFilterState, 'languages_can_speak_array' | 'interest'>>,
+): LocalFilterState => ({
+	gender_array: [],
+	age_range: [18, 81],
+	languages_can_speak_array: urlPart?.languages_can_speak_array ?? [],
+	nationality: [],
+	interest: urlPart?.interest ?? [],
+	radius: radiusOpts.at(-1).value,
+	keyword: '',
+})
+
+const getInitialFilterFromUrl = () => {
+	if (typeof window === 'undefined') {
+		return createDefaultLocalFilter()
+	}
+	const urlPart = parseLocalFilterFromSearchParams(
+		new URLSearchParams(window.location.search),
+	)
+	return createDefaultLocalFilter(urlPart)
+}
+
 export default function useLocal({ data }: useLocalProps) {
 	const { openError } = useModal()
 	const { longitude, latitude, address, type } = data || {}
+	const searchParams = useSearchParams()
+	const urlFilterOnMount = useRef(getInitialFilterFromUrl())
 
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationMore))
 	const _loadmore = useRef<boolean>(true)
@@ -46,15 +85,29 @@ export default function useLocal({ data }: useLocalProps) {
 		hobbies: false,
 	})
 
-	const [filter, setFilter] = useState({
-		gender_array: [],
-		age_range: [18, 81],
-		languages_can_speak_array: [] as string[],
-		nationality: [] as string[],
-		interest: [] as string[],
-		radius: radiusOpts.at(-1).value,
-		keyword: '',
-	})
+	const [filter, setFilter] = useState<LocalFilterState>(() =>
+		urlFilterOnMount.current,
+	)
+	const [draftFilter, setDraftFilter] = useState<LocalFilterState>(() =>
+		cloneDeep(urlFilterOnMount.current),
+	)
+
+	const setFilterWithUrlSync = (
+		updater: (prev: LocalFilterState) => LocalFilterState,
+	) => {
+		setFilter((prev) => {
+			const next = updater(prev)
+			syncLocalFilterToUrl(
+				next.languages_can_speak_array,
+				next.interest,
+			)
+			return next
+		})
+	}
+
+	const initDraftFilter = () => {
+		setDraftFilter(cloneDeep(filter))
+	}
 
 	const [tabsData, setTabsData] = useState<NetworkClubSearchInAppProps[]>([])
 
@@ -62,52 +115,48 @@ export default function useLocal({ data }: useLocalProps) {
 	const [total, setTotal] = useState({ user: 0 })
 	const [apiId, setApiId] = useState<string>('')
 
-	const handleChangeValue = (_key) => (_value) => {
-		const { gender_array, languages_can_speak_array, interest } =
-			cloneDeep(filter) || {}
+	const applyFilterFieldChange = (
+		current: LocalFilterState,
+		_key: string,
+		_value: unknown,
+	) => {
+		const { gender_array, languages_can_speak_array, interest } = current
 		let key = _key
-		let valueInput = _value
+		let valueInput: unknown = _value
 		switch (_key) {
-			case 'gender':
-				{
-					key = 'gender_array'
-					let value: string[] = gender_array || []
-					if (value?.includes(_value)) {
-						value = value.filter((i) => i !== _value)
-					} else {
-						value.push(_value)
-					}
-					valueInput = value
+			case 'gender': {
+				key = 'gender_array'
+				let value: string[] = gender_array || []
+				if (value.includes(_value as string)) {
+					value = value.filter((i) => i !== _value)
+				} else {
+					value.push(_value as string)
 				}
+				valueInput = value
 				break
-			case 'language':
-				{
-					key = 'languages_can_speak_array'
-					let value: string[] = languages_can_speak_array || []
-					if (value?.includes(_value)) {
-						value = value.filter((i) => i !== _value)
-					} else {
-						value.push(_value)
-					}
-					valueInput = value
+			}
+			case 'language': {
+				key = 'languages_can_speak_array'
+				let value: string[] = languages_can_speak_array || []
+				if (value.includes(_value as string)) {
+					value = value.filter((i) => i !== _value)
+				} else {
+					value.push(_value as string)
 				}
+				valueInput = value
 				break
-			case 'hobby':
-				{
-					key = 'interest'
-					let value: string[] = interest || []
-					if (value?.includes(_value)) {
-						value = value.filter((i) => i !== _value)
-					} else {
-						if (isArray(value, 3)) {
-							openError('You can only select up to 3 interests')
-							return
-						}
-						value.push(_value)
-					}
-					valueInput = value
+			}
+			case 'hobby': {
+				key = 'interest'
+				let value: string[] = interest || []
+				if (value.includes(_value as string)) {
+					value = value.filter((i) => i !== _value)
+				} else {
+					value.push(_value as string)
 				}
+				valueInput = value
 				break
+			}
 			case 'nationality':
 				key = 'nationality'
 				valueInput = _value ? [_value] : []
@@ -121,45 +170,36 @@ export default function useLocal({ data }: useLocalProps) {
 			case 'distance':
 				key = 'radius'
 				break
-			case 'reset':
-				setFilter((prev) => ({
-					...prev,
-					gender_array: [],
-					age_range: [18, 81],
-					languages_can_speak_array: [],
-					nationality: [],
-					interest: [],
-					radius: radiusOpts.at(-1).value,
-				}))
-				return
-			case 'resetLanguage':
-				setFilter((prev) => ({
-					...prev,
-					languages_can_speak_array: [],
-				}))
-				return
-			case 'resetHobbies':
-				setFilter((prev) => ({
-					...prev,
-					interest: [],
-				}))
-				return
-			case 'keyword':
-				setFilter((prev) => ({
-					...prev,
-					keyword: _value.target.value,
-				}))
-				setApiId(randomString())
-
-				return
-
 			default:
 				break
 		}
-		setFilter((prev) => ({ ...prev, [key]: valueInput }))
+		return { key, valueInput }
 	}
 
-	const handleGetInAppLocal = async (filterOverride?: Partial<typeof filter>) => {
+	const handleChangeDraftValue = (_key: string) => (_value: unknown) => {
+		if (_key === 'reset') {
+			setDraftFilter(createDefaultLocalFilter())
+			return
+		}
+		const result = applyFilterFieldChange(draftFilter, _key, _value)
+		if (!result) return
+		const { key, valueInput } = result
+		setDraftFilter((prev) => ({ ...prev, [key]: valueInput }))
+	}
+
+	const handleChangeValue = (_key: string) => (_value: unknown) => {
+		if (_key === 'keyword') {
+			setFilter((prev) => ({
+				...prev,
+				keyword: (_value as { target: { value: string } }).target.value,
+			}))
+			setApiId(randomString())
+		}
+	}
+
+	const handleGetInAppLocal = async (
+		filterOverride?: Partial<typeof filter>,
+	) => {
 		setLoading(true)
 		let _total = 0
 		const activeFilter = { ...filter, ...filterOverride }
@@ -251,11 +291,17 @@ export default function useLocal({ data }: useLocalProps) {
 	const handleScroll = (e: any) => {
 		handleScrollCallback(e, handleLoadMore)
 	}
-	const handleSearch = () => {
+	const handleApplyFilter = () => {
+		const nextFilter = cloneDeep(draftFilter)
 		setShows({ filter: false, language: false, hobbies: false })
+		setFilter(nextFilter)
+		syncLocalFilterToUrl(
+			nextFilter.languages_can_speak_array,
+			nextFilter.interest,
+		)
 		_loadmore.current = true
 		_paginationRefs.current.page = 1
-		handleGetInAppLocal()
+		handleGetInAppLocal(nextFilter)
 	}
 
 	const handleToggleLanguage = (value: string) => {
@@ -264,7 +310,10 @@ export default function useLocal({ data }: useLocalProps) {
 			? current.filter((item) => item !== value)
 			: [...current, value]
 
-		setFilter((prev) => ({ ...prev, languages_can_speak_array: next }))
+		setFilterWithUrlSync((prev) => ({
+			...prev,
+			languages_can_speak_array: next,
+		}))
 		_loadmore.current = true
 		_paginationRefs.current.page = 1
 		handleGetInAppLocal({ languages_can_speak_array: next })
@@ -277,14 +326,10 @@ export default function useLocal({ data }: useLocalProps) {
 		if (current.includes(id)) {
 			next = current.filter((item) => item !== id)
 		} else {
-			if (isArray(current, 3)) {
-				openError('You can only select up to 3 interests')
-				return
-			}
 			next = [...current, id]
 		}
 
-		setFilter((prev) => ({ ...prev, interest: next }))
+		setFilterWithUrlSync((prev) => ({ ...prev, interest: next }))
 		_loadmore.current = true
 		_paginationRefs.current.page = 1
 		handleGetInAppLocal({ interest: next })
@@ -311,7 +356,24 @@ export default function useLocal({ data }: useLocalProps) {
 		}
 	}
 	useEffect(() => {
-		handleGetInAppLocal()
+		const urlFilter = parseLocalFilterFromSearchParams(searchParams)
+		const hasUrlFilter =
+			isArray(urlFilter.languages_can_speak_array, 1) ||
+			isArray(urlFilter.interest, 1)
+
+		if (hasUrlFilter) {
+			const merged = {
+				...urlFilterOnMount.current,
+				languages_can_speak_array: urlFilter.languages_can_speak_array,
+				interest: urlFilter.interest,
+			}
+			setFilter(merged)
+			setDraftFilter(cloneDeep(merged))
+		}
+
+		_loadmore.current = true
+		_paginationRefs.current.page = 1
+		handleGetInAppLocal(hasUrlFilter ? urlFilter : undefined)
 		handleFetchInterestCategories()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
@@ -319,7 +381,11 @@ export default function useLocal({ data }: useLocalProps) {
 		let timeout: ReturnType<typeof setTimeout>
 
 		if (apiId) {
-			timeout = setTimeout(() => handleSearch(), 1000)
+			timeout = setTimeout(() => {
+				_loadmore.current = true
+				_paginationRefs.current.page = 1
+				handleGetInAppLocal()
+			}, 1000)
 		}
 
 		return () => {
@@ -334,14 +400,17 @@ export default function useLocal({ data }: useLocalProps) {
 		total,
 		_loadmore,
 		filter,
+		draftFilter,
 		tabsData,
 		shows,
 		setShows,
+		initDraftFilter,
 		onChangeValue: handleChangeValue,
+		onChangeDraftValue: handleChangeDraftValue,
 		onToggleLanguage: handleToggleLanguage,
 		onToggleHobby: handleToggleHobby,
 		onScroll: handleScroll,
 		onLoadMore: handleLoadMore,
-		onSearch: handleSearch,
+		onApplyFilter: handleApplyFilter,
 	}
 }

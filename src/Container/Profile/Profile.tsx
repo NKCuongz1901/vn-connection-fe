@@ -56,6 +56,7 @@ import {
 import classes from './Profile.module.scss'
 import ModalProfileComplete from '@/Components/Notification/ModalProfileComplete/ModalProfileComplete'
 import TickCircleIcon from '@/svg/TickCircleIcon'
+import CupIcon from '@/svg/CupIcon'
 
 const skeletonItems = [
 	{ id: '2', value: 220 },
@@ -241,24 +242,39 @@ const Profile = (props: ProfileProps) => {
 								</div>
 								{(address || '').split(',').slice(-2).join(',')}
 							</Flex>
-							{isMe && completedScore < 100 ? (
-								<div
-									className={classes.completedScoreWrapper}
-									onClick={() => setOpenModalProfileComplete(true)}
-								>
-									<Flex gap={4} align="center">
-										<IconAlertCircleFilled size={16} color="#E55A0F" />
-										<span className={classes.completedScoreText}>
-											Your Profile: {completedScore}% completed
-										</span>
-									</Flex>
-								</div>
+							{isMe ? (
+								completedScore < 100 ? (
+									<div
+										className={classes.completedScoreWrapper}
+										onClick={() => setOpenModalProfileComplete(true)}
+									>
+										<Flex gap={4} align="center">
+											<IconAlertCircleFilled size={16} color="#E55A0F" />
+											<span className={classes.completedScoreText}>
+												Your Profile: {completedScore}% completed
+											</span>
+										</Flex>
+									</div>
+								) : (
+									<div className={classes.completedScoreWrapperComplete}>
+										<Flex gap={4} align="center">
+											<TickCircleIcon fill="#006B35" width={16} height={16} />
+											<span className={classes.completedScoreCompleteText}>
+												Your profile is complete
+											</span>
+										</Flex>
+									</div>
+								)
 							) : (
-								<div className={classes.completedScoreWrapperComplete}>
+								<div className={classes.communityBuilderWrapper}>
 									<Flex gap={4} align="center">
-										<TickCircleIcon fill="#006B35" width={16} height={16} />
-										<span className={classes.completedScoreCompleteText}>
-											Your profile is complete
+										<CupIcon fill="#E55A0F" width={14} height={14} />
+										<span className={classes.communityBuilderText}>
+											Community builder:{' '}
+											<span className={classes.communityBuilderTextBold}>
+												5
+											</span>{' '}
+											friends invited
 										</span>
 									</Flex>
 								</div>
@@ -368,28 +384,65 @@ const Profile = (props: ProfileProps) => {
 	}, [toJson(userData)])
 
 	const _renderLanguages = useCallback(() => {
-		const { user_languages } = userData || {}
-		if (!isArray(user_languages, 1)) return null
+		const { user_languages, languages_can_speak_array } = userData || {}
+		const nativeLanguages = (languages_can_speak_array || []).filter(Boolean)
+		const practicingLanguages = user_languages || []
+
+		if (!isArray(nativeLanguages, 1) && !isArray(practicingLanguages, 1))
+			return null
+
+		const displayItems: { key: string; name: string; level: string; combined?: boolean }[] =
+			[]
+
+		if (nativeLanguages.length > 2) {
+			displayItems.push({
+				key: 'languages-can-speak-combined',
+				name: nativeLanguages.join(', '),
+				level: 'Native',
+				combined: true,
+			})
+		} else {
+			nativeLanguages.forEach((lang, index) => {
+				displayItems.push({
+					key: `native-${lang}-${index}`,
+					name: lang,
+					level: 'Native',
+				})
+			})
+		}
+
+		practicingLanguages.forEach((item, index) => {
+			const { language_name, proficiency_level } = item || {}
+			if (!language_name) return
+			displayItems.push({
+				key: `practice-${language_name}-${index}`,
+				name: language_name,
+				level:
+					mappingLevelOptions[proficiency_level] || proficiency_level || '',
+			})
+		})
+
+		if (!displayItems.length) return null
 
 		return (
 			<Flex className={classes.contentBody} vertical>
 				<div className={classes.title}>Languages</div>
 				<Flex className={classes.languageSkills} align="center" wrap="wrap">
-					{(user_languages || []).map((item, index) => {
-						const { language_name, proficiency_level } = item || {}
-						const levelLabel =
-							mappingLevelOptions[proficiency_level] || proficiency_level
-
-						return (
-							<Fragment key={`${language_name}-${index}`}>
-								{index > 0 && <div className={classes.languageDivider} />}
-								<Flex className={classes.languageItem} vertical>
-									<span className={classes.languageName}>{language_name}</span>
-									<span className={classes.languageLevel}>{levelLabel}</span>
-								</Flex>
-							</Fragment>
-						)
-					})}
+					{displayItems.map((item, index) => (
+						<Fragment key={item.key}>
+							{index > 0 && <div className={classes.languageDivider} />}
+							<Flex className={classes.languageItem} vertical>
+								<span
+									className={clsx(classes.languageName, {
+										[classes.languageNameCombined]: item.combined,
+									})}
+								>
+									{item.name}
+								</span>
+								<span className={classes.languageLevel}>{item.level}</span>
+							</Flex>
+						</Fragment>
+					))}
 				</Flex>
 			</Flex>
 		)

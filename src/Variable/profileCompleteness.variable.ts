@@ -1,7 +1,7 @@
 export const PROFILE_COMPLETENESS_ITEMS = [
 	{ key: 'about_me', label: 'About Me', weight: 10 },
 	{ key: 'email_verified', label: 'Confirm your Email Address', weight: 10 },
-	{ key: 'profile_photo', label: 'Upload profile avatar', weight: 10 },
+	{ key: 'profile_photo', label: 'Upload profile and cover photo', weight: 10 },
 	{ key: 'interests', label: 'Add your interests', weight: 10 },
 	{ key: 'friend_about', label: 'Add a friend', weight: 10 },
 	{ key: 'languages', label: 'Add languages you can speak', weight: 10 },

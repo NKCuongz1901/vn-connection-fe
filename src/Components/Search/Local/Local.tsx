@@ -87,15 +87,18 @@ const Local = (props: LocalProps) => {
 		user,
 		total,
 		filter,
+		draftFilter,
 		tabsData,
 		shows,
 		setShows,
+		initDraftFilter,
 		onChangeValue,
+		onChangeDraftValue,
 		onToggleLanguage,
 		onToggleHobby,
 		onScroll,
 		onLoadMore,
-		onSearch,
+		onApplyFilter,
 	} = useLocal(props)
 	const { data } = props || {}
 	const { address } = data || {}
@@ -107,7 +110,7 @@ const Local = (props: LocalProps) => {
 			languages_can_speak_array,
 			nationality,
 			interest,
-		} = filter
+		} = draftFilter
 		const filterLanguageLabel = getSelectedLabels(
 			languages_can_speak_array,
 			languages,
@@ -134,7 +137,7 @@ const Local = (props: LocalProps) => {
 									type="checkbox"
 									className={classes.radioInput}
 									checked={gender_array.includes(item.value)}
-									onChange={() => onChangeValue('gender')(item.value)}
+									onChange={() => onChangeDraftValue('gender')(item.value)}
 								/>
 							</label>
 						))}
@@ -151,7 +154,7 @@ const Local = (props: LocalProps) => {
 						min={18}
 						value={age_range}
 						marks={{ 18: 18, 81: '+80' }}
-						onChange={onChangeValue('age')}
+						onChange={onChangeDraftValue('age')}
 					/>
 				</Flex>
 
@@ -174,7 +177,7 @@ const Local = (props: LocalProps) => {
 											className={classes.radioInput}
 											checked={radius === item.value}
 											onChange={() =>
-												onChangeValue('radiusOption')(item.value)
+												onChangeDraftValue('radiusOption')(item.value)
 											}
 										/>
 									</label>
@@ -200,7 +203,7 @@ const Local = (props: LocalProps) => {
 										checked={languages_can_speak_array.includes(
 											item.value,
 										)}
-										onClick={() => onChangeValue('language')(item.value)}
+										onClick={() => onChangeDraftValue('language')(item.value)}
 									/>
 								))}
 							</CSelectionPicker>
@@ -259,7 +262,7 @@ const Local = (props: LocalProps) => {
 								?.toLowerCase()
 								.includes(input.toLowerCase())
 						}
-						onChange={onChangeValue('nationality')}
+						onChange={onChangeDraftValue('nationality')}
 					/>
 				</Flex>
 
@@ -269,19 +272,19 @@ const Local = (props: LocalProps) => {
 						items={tabsData}
 						selected={interest}
 						listClassName={classes.filterInterestTags}
-						onToggle={(id) => onChangeValue('hobby')(id)}
+						onToggle={(id) => onChangeDraftValue('hobby')(id)}
 					/>
 				</Flex>
 				</div>
 
 				<Flex className={classes.filterPanelFooter}>
 					<div className={classes.filterFooterBtn}>
-						<CButton ctype="disabled" onClick={onChangeValue('reset')}>
+						<CButton ctype="disabled" onClick={onChangeDraftValue('reset')}>
 							Reset
 						</CButton>
 					</div>
 					<div className={classes.filterFooterBtn}>
-						<CButton ctype="oranger" onClick={onSearch}>
+						<CButton ctype="oranger" onClick={onApplyFilter}>
 							Show results
 						</CButton>
 					</div>
@@ -333,6 +336,9 @@ const Local = (props: LocalProps) => {
 
 		const togglePopover =
 			(key: 'filter' | 'language' | 'hobbies') => (open: boolean) => {
+				if (key === 'filter' && open) {
+					initDraftFilter()
+				}
 				setShows({
 					filter: key === 'filter' ? open : false,
 					language: key === 'language' ? open : false,

@@ -152,6 +152,29 @@
 							letter-spacing: var(--body-small-tracking, 0);
 						}
 					}
+					.communityBuilderWrapper {
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						width: 460px;
+						padding: 8px 16px;
+						border-radius: 8px;
+						background: #fff5eb;
+
+						.communityBuilderText {
+							color: var(--text-primary, #0f1729);
+
+							font-size: var(--body-small-size, 12px);
+							font-style: normal;
+							font-weight: 400;
+							line-height: var(--body-small-line-height, 16px); /* 133.333% */
+							letter-spacing: var(--body-small-tracking, 0);
+
+							.communityBuilderTextBold {
+								font-weight: 600;
+							}
+						}
+					}
 				}
 			}
 			.endButton {
@@ -194,6 +217,10 @@
 			font-weight: 600;
 			line-height: var(--body-base-line-height, 20px);
 			white-space: nowrap;
+		}
+		.languageNameCombined {
+			white-space: normal;
+			max-width: 280px;
 		}
 		.languageLevel {
 			color: var(--text-secondary, #48546b);
