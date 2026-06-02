@@ -85,6 +85,26 @@ export default function useChatRoom(props: useChatRoomProps) {
 		}
 	}
 
+	const handleRefreshListChatRoom = async () => {
+		_paginationRefs.current.page = 1
+		setLoading((prev) => ({ ...prev, chatroom: true }))
+		try {
+			const res: any = await getChatRoomList({
+				fields: ['$all'],
+				page: 1,
+				limit: 50,
+				order: [['created_at', 'desc']],
+			})
+			if (res?.code === 200) {
+				setListChatRoom(res?.results?.objects?.rows || [])
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoading((prev) => ({ ...prev, chatroom: false }))
+		}
+	}
+
 	const handleUpdateUserInConv = async (convInfo) => {
 		try {
 			const { id, users_in_conversation } = convInfo || {}
@@ -111,70 +131,88 @@ export default function useChatRoom(props: useChatRoomProps) {
 		} finally {
 		}
 	}
-	const handleSuccess = ({ type, id, data }) => {
+
+	const handleSuccess = ({ type, id }) => {
 		switch (type) {
 			case 'join':
-				{
-					const item = listChatRoom.find((i) => i.id === id)
-					if (!isArray(item?.users_in_conversation, 1)) {
-						const {
-							id: _id,
-							type,
-							conversation_id,
-							user_id,
-							amount_of_remind,
-						} = data || {}
-						const { avatar, name } = getUserInfo() || {}
-						setListChatRoom((prev) =>
-							prev.map((i) =>
-								i.id === id
-									? {
-											...i,
-											users_in_conversation: [
-												{
-													id: _id,
-													type: type,
-													conversation_id: conversation_id,
-													user_id: user_id,
-													amount_of_remind,
-													user: {
-														id: user_id,
-														avatar: avatar,
-														name: name,
-													},
-												},
-											],
-										}
-									: i,
-							),
-						)
-					}
-				}
-				break
 			case 'leave':
-				setListChatRoom((prev) =>
-					prev.map((i) => {
-						if (i.id === id) {
-							return {
-								...i,
-								users_in_conversation: [],
-							}
-						} else {
-							return i
-						}
-					}),
-				)
+				handleRefreshListChatRoom()
 				break
-			case 'remind':
-				{
-					const convInfo = listChatRoom.find((i) => i.id === id)
-					handleUpdateUserInConv(convInfo)
-				}
+			case 'remind': {
+				const convInfo = listChatRoom.find((i) => i.id === id)
+				handleUpdateUserInConv(convInfo)
 				break
+			}
 			default:
 				break
 		}
 	}
+	// const handleSuccess = ({ type, id, data }) => {
+	// 	switch (type) {
+	// 		case 'join':
+	// 			handleRefreshListChatRoom()
+	// 			{
+	// 				const item = listChatRoom.find((i) => i.id === id)
+	// 				if (!isArray(item?.users_in_conversation, 1)) {
+	// 					const {
+	// 						id: _id,
+	// 						type,
+	// 						conversation_id,
+	// 						user_id,
+	// 						amount_of_remind,
+	// 					} = data || {}
+	// 					const { avatar, name } = getUserInfo() || {}
+	// 					setListChatRoom((prev) =>
+	// 						prev.map((i) =>
+	// 							i.id === id
+	// 								? {
+	// 										...i,
+	// 										users_in_conversation: [
+	// 											{
+	// 												id: _id,
+	// 												type: type,
+	// 												conversation_id: conversation_id,
+	// 												user_id: user_id,
+	// 												amount_of_remind,
+	// 												user: {
+	// 													id: user_id,
+	// 													avatar: avatar,
+	// 													name: name,
+	// 												},
+	// 											},
+	// 										],
+	// 									}
+	// 								: i,
+	// 						),
+	// 					)
+	// 				}
+	// 			}
+	// 			break
+	// 		case 'leave':
+	// 			handleRefreshListChatRoom()
+	// 			setListChatRoom((prev) =>
+	// 				prev.map((i) => {
+	// 					if (i.id === id) {
+	// 						return {
+	// 							...i,
+	// 							users_in_conversation: [],
+	// 						}
+	// 					} else {
+	// 						return i
+	// 					}
+	// 				}),
+	// 			)
+	// 			break
+	// 		case 'remind':
+	// 			{
+	// 				const convInfo = listChatRoom.find((i) => i.id === id)
+	// 				handleUpdateUserInConv(convInfo)
+	// 			}
+	// 			break
+	// 		default:
+	// 			break
+	// 	}
+	// }
 
 	const handleGetProfile = async () => {
 		try {
