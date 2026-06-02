@@ -8,7 +8,7 @@ import { uniqueArray } from '@/ultis/array'
 import { handleScrollCallback } from '@/ultis/common'
 import { randomString } from '@/ultis/string'
 
-type NetworkTab = 'user' | 'club'
+type NetworkTab = 'friends' | 'user' | 'club'
 const defaultFilter = {
 	q: '',
 	// thêm field filter khi backend confirm, ví dụ:
@@ -148,6 +148,21 @@ export default function useNetwork() {
 		return () => clearTimeout(timeout)
 	}, [searchId, onSearch])
 
+	const updateUser = useCallback(
+		(userId: string, patch: Record<string, unknown>) => {
+			setUsers((prev) =>
+				prev.map((user) => (user.id === userId ? { ...user, ...patch } : user)),
+			)
+		},
+		[],
+	)
+
+	const updateClub = useCallback((clubId: string, patch: Record<string, unknown>) => {
+		setClubs((prev) =>
+			prev.map((club) => (club.id === clubId ? { ...club, ...patch } : club)),
+		)
+	}, [])
+
 	return {
 		activeTab,
 		users,
@@ -163,5 +178,7 @@ export default function useNetwork() {
 		onSearch,
 		onLoadMore,
 		onScroll,
+		updateUser,
+		updateClub,
 	}
 }

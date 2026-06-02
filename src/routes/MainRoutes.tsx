@@ -21,4 +21,5 @@ export const mainRoutes = {
 	exploreInterest: 'explore-interest',
 	chatRoom: 'chat-room',
 	miniApps: 'mini-apps',
+	peopleCommunity: 'people-community',
 }

@@ -67,6 +67,11 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 				onClick: () => handleMenusClick('profile'),
 			},
 			{
+				key: 'peopleCommunity',
+				label: 'Search people & communities',
+				onClick: () => handleMenusClick('peopleCommunity'),
+			},
+			{
 				key: 'setting',
 				label: 'Account Settings',
 				onClick: () => handleMenusClick('accountSetting'),
@@ -280,6 +285,9 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 				break
 			case 'accountSetting':
 				onChangeRoute(`${mainRoutes.accountSetting}/manage-account`)
+				break
+			case 'peopleCommunity':
+				onChangeRoute(mainRoutes.peopleCommunity)
 				break
 			default:
 				break

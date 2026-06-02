@@ -1,0 +1,541 @@
+.wrapper {
+	padding: 12px 32px;
+
+	.title {
+		color: var(--color-grey-700-p-text, #0f1729);
+
+		font-size: 18px;
+		font-style: normal;
+		font-weight: 600;
+		line-height: 28px; /* 155.556% */
+
+		margin-bottom: 12px;
+		margin-top: 24px;
+	}
+
+	.container {
+		background: #fff;
+		border-radius: 16px;
+		.tabBar {
+			width: 100%;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 0 16px 4px;
+			border-bottom: 1px solid #edf0f5;
+		}
+
+		.tabItem {
+			flex: 1;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 44px;
+			padding: 8px 12px;
+			border: none;
+			border-bottom: 2px solid transparent;
+			background: transparent;
+			cursor: pointer;
+			font-size: 16px;
+			font-weight: 600;
+			line-height: 24px;
+			color: #48546b;
+			white-space: nowrap;
+
+			&:hover {
+				color: #006b35;
+			}
+		}
+
+		.tabItemActive {
+			color: #006b35;
+			border-bottom-color: #006b35;
+		}
+
+		.searchRow {
+			width: 100%;
+			padding: 16px 16px 8px;
+
+			.searchInput {
+				width: 100%;
+
+				:global(.ant-input-affix-wrapper) {
+					border: none;
+					box-shadow: none;
+					background: #f0f3f9;
+					border-radius: 999px;
+					padding: 12px 8px;
+					height: 44px;
+				}
+
+				:global(.ant-input) {
+					background: transparent;
+					font-size: 14px;
+					line-height: 20px;
+
+					&::placeholder {
+						color: #7987a4;
+					}
+				}
+			}
+
+			.searchIcon {
+				color: #7987a4;
+				font-size: 20px;
+				margin-left: 8px;
+			}
+		}
+
+		.listBody {
+			padding: 12px 16px;
+			width: 100%;
+		}
+
+		.memberList {
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
+			max-height: calc(100dvh - 280px);
+			overflow: auto;
+		}
+
+		.memberItem {
+			display: flex;
+			align-items: center;
+			gap: 4px;
+			cursor: pointer;
+			min-width: 0;
+		}
+
+		.memberAvatarCol {
+			flex-shrink: 0;
+		}
+
+		.memberAvatarWrap {
+			position: relative;
+			line-height: 0;
+		}
+
+		.memberAvatar {
+			border: 1px solid #fff;
+			flex-shrink: 0;
+		}
+
+		.lastSeen {
+			position: absolute;
+			left: -2px;
+			bottom: 0;
+			padding: 0 2px;
+			border-radius: 999px;
+			background: #e7f5e9;
+			color: #006b35;
+			font-size: 7px;
+			line-height: 14px;
+			z-index: 2;
+			white-space: nowrap;
+		}
+
+		.flagWrapper {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: hidden;
+			height: 20px;
+			width: 20px;
+			position: absolute;
+			right: -2px;
+			bottom: 0;
+			border-radius: 50%;
+			border: 1px solid #fff;
+			z-index: 2;
+		}
+
+		.flag {
+			transform: translateX(-6px);
+			min-height: 20px;
+			min-width: 30px;
+		}
+
+		.leftFlag {
+			width: unset;
+			left: 5px;
+			position: relative;
+		}
+
+		.memberInfo {
+			flex: 1;
+			min-width: 0;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0;
+			padding: 0 4px;
+		}
+
+		.memberName {
+			width: 100%;
+			font-size: 12px;
+			font-weight: 600;
+			line-height: 16px;
+			color: #0f1729;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.memberMetaRow {
+			min-height: 16px;
+		}
+
+		.memberMeta {
+			font-size: 12px;
+			font-weight: 400;
+			line-height: 16px;
+			color: #48546b;
+		}
+
+		.genderIcon {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			line-height: 0;
+		}
+
+		.genderIconOther {
+			opacity: 1;
+		}
+
+		.memberLocation {
+			width: 100%;
+			min-width: 0;
+			font-size: 12px;
+			font-weight: 400;
+			line-height: 16px;
+			color: #48546b;
+
+			span {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+		}
+
+		.memberActions {
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+		}
+
+		.friendBtn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 32px;
+			min-height: 32px;
+			padding: 8px;
+			border: none;
+			border-radius: 999px;
+			cursor: pointer;
+			flex-shrink: 0;
+
+			&:disabled {
+				opacity: 0.6;
+				cursor: not-allowed;
+			}
+		}
+
+		.friendBtnSecondary {
+			background: #f0f3f9;
+		}
+
+		.friendBtnPrimary {
+			background: #006b35;
+		}
+
+		.friendBtnStatic {
+			cursor: default;
+		}
+
+		.networkGrid {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+			max-height: calc(100dvh - 280px);
+			overflow: auto;
+		}
+
+		.communityList {
+			display: flex;
+			flex-direction: column;
+			max-height: calc(100dvh - 280px);
+			overflow: auto;
+		}
+
+		.communityItem {
+			display: flex;
+			align-items: flex-start;
+			gap: 4px;
+			padding: 8px 0;
+			cursor: pointer;
+			min-width: 0;
+		}
+
+		.communityAvatarCol {
+			flex-shrink: 0;
+			padding: 0 12px 8px 0;
+		}
+
+		.communityAvatarWrap {
+			position: relative;
+			line-height: 0;
+		}
+
+		.communityAvatar {
+			flex-shrink: 0;
+		}
+
+		.communityBandage {
+			height: 20px;
+			width: 20px;
+			right: -4px;
+			bottom: -2px;
+		}
+
+		.communityBandageAdmin {
+			background: #006b35;
+			border: 1px solid #fff;
+
+			svg {
+				height: 14px;
+				width: 14px;
+			}
+		}
+
+		.communityActivityBadge {
+			position: absolute;
+			left: -2px;
+			bottom: 0;
+			padding: 0 2px;
+			border-radius: 999px;
+			background: #e7f5e9;
+			color: #006b35;
+			font-size: 7px;
+			line-height: 14px;
+			z-index: 2;
+			white-space: nowrap;
+		}
+
+		.communityInfo {
+			flex: 1;
+			min-width: 0;
+			display: flex;
+			flex-direction: column;
+			gap: 4px;
+			padding-right: 8px;
+		}
+
+		.communityTitle {
+			font-size: 14px;
+			font-weight: 500;
+			line-height: 20px;
+			color: #0f1729;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.communityCategory {
+			font-size: 12px;
+			font-weight: 400;
+			line-height: 16px;
+			color: #48546b;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.communityMetaRow {
+			flex-wrap: wrap;
+			min-width: 0;
+		}
+
+		.communityMetaItem {
+			font-size: 10px;
+			font-weight: 600;
+			line-height: 14px;
+			color: #48546b;
+			white-space: nowrap;
+		}
+
+		.communityMetaDivider {
+			width: 1px;
+			height: 12px;
+			background: #edf0f5;
+			flex-shrink: 0;
+		}
+
+		.communityMetaOnline {
+			color: #1b8024;
+		}
+
+		.communityMetaInPerson {
+			color: #0067b8;
+		}
+
+		.communityUpdatedAt {
+			font-size: 10px;
+			font-weight: 400;
+			line-height: 14px;
+			color: #48546b;
+		}
+
+		.communityActions {
+			flex-shrink: 0;
+			align-self: center;
+			padding-left: 4px;
+		}
+
+		.communityBtn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 32px;
+			min-width: 78px;
+			padding: 8px 12px;
+			border: none;
+			border-radius: 999px;
+			font-size: 14px;
+			font-weight: 600;
+			line-height: 20px;
+			cursor: pointer;
+			white-space: nowrap;
+
+			&:disabled {
+				cursor: not-allowed;
+				opacity: 0.7;
+			}
+		}
+
+		.communityBtnJoined {
+			background: #f0f3f9;
+			color: #0f1729;
+		}
+
+		.communityBtnJoin {
+			background: #e55a0f;
+			color: #fff;
+		}
+
+		.communityDivider {
+			height: 1px;
+			background: #edf0f5;
+			width: 100%;
+		}
+
+		.communityList > .communityDivider:last-child {
+			display: none;
+		}
+
+		.networkItem {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 4px;
+			width: 80px;
+			cursor: pointer;
+			min-width: 0;
+		}
+
+		.networkAvatarWrap {
+			position: relative;
+			line-height: 0;
+		}
+
+		.badge {
+			position: absolute;
+			right: -2px;
+			bottom: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 4px;
+			border-radius: 99px;
+			border: 1px solid #fff;
+		}
+
+		.badgeCrown {
+			background: #e55a0f;
+			color: #fff;
+		}
+
+		.badgeStar {
+			background: #006b35;
+		}
+
+		.networkName {
+			width: 100%;
+			text-align: center;
+			font-size: 12px;
+			font-weight: 600;
+			line-height: 16px;
+			color: #0f1729;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+			word-break: break-word;
+		}
+
+		.notFound {
+			width: 100%;
+			align-items: center;
+			color: #7987a4;
+			justify-content: center;
+			gap: 4px;
+			text-align: center;
+			padding: 48px 16px;
+
+			.notFoundTitle {
+				font-size: 20px;
+				font-weight: 600;
+				color: #48546b;
+			}
+		}
+
+		.skeletonMember {
+			width: 100%;
+
+			:global(.ant-skeleton-input) {
+				width: 100%;
+				height: 72px;
+				border-radius: 8px;
+			}
+		}
+
+		.skeletonCommunity {
+			width: 100%;
+
+			:global(.ant-skeleton-input) {
+				width: 100%;
+				height: 88px;
+				border-radius: 8px;
+			}
+		}
+
+		.skeletonNetwork {
+			width: 80px;
+
+			:global(.ant-skeleton-avatar) {
+				width: 64px !important;
+				height: 64px !important;
+			}
+		}
+
+		.loadMore {
+			width: 100%;
+			display: flex;
+			justify-content: center;
+			padding: 8px 0 4px;
+		}
+	}
+}

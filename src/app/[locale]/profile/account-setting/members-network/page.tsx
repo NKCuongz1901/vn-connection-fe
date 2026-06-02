@@ -1,4 +1,4 @@
-import Network from '@/Container/AccountSetting/Network'
+import Network from '@/Container/PeopleCommunity'
 import React from 'react'
 
 function page() {

@@ -98,6 +98,9 @@ import SettingIcon from '@/svg/SettingIcon'
 import SecurityIcon from '@/svg/SecurityIcon'
 import LanguageIcon from '@/svg/LanguageIcon'
 import CupIcon from '@/svg/CupIcon'
+import FriendPendingIcon from '@/svg/FriendPendingIcon'
+import FriendAcceptIcon from '@/svg/FriendAcceptIcon'
+import FriendNormalIcon from '@/svg/FriendNormalIcon'
 
 const Icons = () => {
 	const icons = [
@@ -435,6 +438,21 @@ const Icons = () => {
 		{
 			ICON: CupIcon,
 			name: '@/svg/Event/CupIcon',
+			key: randomString(),
+		},
+		{
+			ICON: FriendAcceptIcon,
+			name: '@/svg/Event/FriendAcceptIcon',
+			key: randomString(),
+		},
+		{
+			ICON: FriendPendingIcon,
+			name: '@/svg/Event/FriendPendingIcon',
+			key: randomString(),
+		},
+		{
+			ICON: FriendNormalIcon,
+			name: '@/svg/Event/FriendNormalIcon',
 			key: randomString(),
 		},
 	]
