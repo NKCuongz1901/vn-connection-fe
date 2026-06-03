@@ -32,7 +32,7 @@ const CInputPhone = ({
 		<Select
 			value={prefix}
 			onChange={onChangePrefix}
-			style={{ width: 90 }}
+			style={{ minWidth: 115, width: 'auto' }}
 			dropdownStyle={{ width: 280 }}
 			showSearch
 			filterOption={(input, option) => {
