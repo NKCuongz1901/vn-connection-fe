@@ -9,7 +9,7 @@ import useProfile from '@/hooks/Profile/useProfile'
 
 import { toJson } from '@/ultis/common'
 import { isArray } from '@/ultis/array'
-import { getAge } from '@/ultis/date'
+import { getAge, getDiffFromNow } from '@/ultis/date'
 import { useLocalePath, useQuery, useSafeBack } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
 
@@ -19,6 +19,7 @@ import CImage from '@/Components/Custom/CImage'
 import ModalEditProfile from '@/Components/Profile/ModalEditProfile'
 import UserMoreAction from '@/Components/User/UserMoreAction'
 import ArmHeartIcon from '@/svg/ArmHeartIcon'
+import ClockIcon from '@/svg/ClockIcon'
 import ClockIconDivideTopIcon from '@/svg/ClockIconDivideTopIcon'
 import FavoriteIcon from '@/svg/FavoriteIcon'
 import ProfileCancelIcon from '@/svg/FriendSvg/ProfileCancelIcon'
@@ -32,7 +33,6 @@ import Messenger from '@/svg/Messenger'
 import PeopleHexagonIcon from '@/svg/PeopleHexagonIcon'
 import PinTickIcon from '@/svg/PinTickIcon'
 import ProfileCircleIcon from '@/svg/ProfileCircleIcon'
-import TwoUser from '@/svg/TwoUser'
 import WorldIcon from '@/svg/WorldIcon'
 import People from '@/svg/People'
 import { IconStarFilled } from '@tabler/icons-react'
@@ -91,7 +91,6 @@ const Profile = (props: ProfileProps) => {
 	const [openModalProfileComplete, setOpenModalProfileComplete] =
 		useState(false)
 	const COMPLETED_SCORE = 100
-	console.log('userData', userData)
 	const _renderButtonFriend = useCallback(() => {
 		const { is_friend } = userData || {}
 		const { responMenus, cancelMenus, deleteMenus } = menus
@@ -450,21 +449,31 @@ const Profile = (props: ProfileProps) => {
 	}, [toJson(userData)])
 
 	const _renderSumary = useCallback(() => {
-		const { id, amount_of_friend, gender, birthday, created_at, is_hide_age } =
-			userData || {}
+		const {
+			id,
+			gender,
+			birthday,
+			created_at,
+			is_hide_age,
+			visibility,
+			online_time,
+		} = userData || {}
 		const isHideAge = is_hide_age && id !== getUserInfo('id')
+
+		const lastActiveValue = (() => {
+			if (visibility === 'ONLINE') return 'Online'
+			if (!online_time) return ''
+			const { value, unit } = getDiffFromNow({ input: Number(online_time) })
+			if (!unit) return String(value)
+			const label = value === 1 ? unit : `${unit}s`
+			return `${value} ${label} ago`
+		})()
 
 		const content = [
 			{
-				label: 'Friends',
-				value: (amount_of_friend || 0) + ' friends',
-				id: 1,
-				Icon: TwoUser,
-			},
-			{
 				label: 'Gender',
 				value: mappingGender[gender],
-				id: 2,
+				id: 1,
 				Icon: GenderIcon,
 			},
 			...(isHideAge
@@ -473,15 +482,21 @@ const Profile = (props: ProfileProps) => {
 						{
 							label: 'Age',
 							value: getAge(birthday),
-							id: 3,
+							id: 2,
 							Icon: ProfileCircleIcon,
 						},
 					]),
 			{
 				label: 'Member since',
 				value: created_at ? dayjs(created_at).format(formatDate.dmy) : '',
-				id: 4,
+				id: 3,
 				Icon: ClockIconDivideTopIcon,
+			},
+			{
+				label: 'Last active',
+				value: lastActiveValue,
+				id: 4,
+				Icon: ClockIcon,
 			},
 		]
 		return (
@@ -497,13 +512,7 @@ const Profile = (props: ProfileProps) => {
 								</Flex>
 								<Flex className={classes.summaryText} vertical>
 									<span className={classes.summaryLabel}>{label}</span>
-									<span
-										className={clsx(classes.summaryValue, {
-											[classes.friend]: id === 1,
-										})}
-									>
-										{value}
-									</span>
+									<span className={classes.summaryValue}>{value}</span>
 								</Flex>
 							</Flex>
 						)
