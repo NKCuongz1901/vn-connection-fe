@@ -1,8 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useModal } from '@/context/ModalContext'
 import { PaginationType } from '@/interface/common/common.interface'
-import { paginationMore } from '@/Variable/common.variable'
+import {
+	optionFriends,
+	paginationMore,
+	stateFriends,
+} from '@/Variable/common.variable'
 import { cloneDeep } from 'lodash'
+import { getFriends } from '@/apis/friendApis'
 import { searchCommunityNetwork, searchUserNetwork } from '@/apis/searchApis'
 import { uniqueArray } from '@/ultis/array'
 import { handleScrollCallback } from '@/ultis/common'
@@ -11,9 +16,19 @@ import { randomString } from '@/ultis/string'
 type NetworkTab = 'friends' | 'user' | 'club'
 const defaultFilter = {
 	q: '',
-	// thêm field filter khi backend confirm, ví dụ:
-	// gender_array: [],
-	// category_ids: [],
+}
+
+const mapFriendRowToUser = (row: any) => {
+	const user = row?.friend || {}
+	return {
+		...user,
+		id: user.id,
+		is_friend: {
+			id: row.id,
+			state: stateFriends.ACCEPTED,
+			friend_id: user.id,
+		},
+	}
 }
 
 export default function useNetwork() {
@@ -21,22 +36,29 @@ export default function useNetwork() {
 
 	const [activeTab, setActiveTab] = useState<NetworkTab>('user')
 	const [users, setUsers] = useState<any[]>([])
+	const [friends, setFriends] = useState<any[]>([])
 	const [clubs, setClubs] = useState<any[]>([])
 	const [filter, setFilter] = useState(defaultFilter)
-	const [loading, setLoading] = useState({ user: false, club: false })
-	const [total, setTotal] = useState({ user: 0, club: 0 })
+	const [loading, setLoading] = useState({
+		user: false,
+		friends: false,
+		club: false,
+	})
+	const [total, setTotal] = useState({ user: 0, friends: 0, club: 0 })
 	const [searchId, setSearchId] = useState('')
 
 	const userPaginationRef = useRef<PaginationType>(cloneDeep(paginationMore))
+	const friendsPaginationRef = useRef<PaginationType>(cloneDeep(paginationMore))
 	const clubPaginationRef = useRef<PaginationType>(cloneDeep(paginationMore))
 	const userCanLoadMoreRef = useRef(true)
+	const friendsCanLoadMoreRef = useRef(true)
 	const clubCanLoadMoreRef = useRef(true)
 
 	const buildParams = useCallback(() => {
 		const { q, ...rest } = filter
 		return {
 			q: q?.trim() || '',
-			...rest, // convertParams trong API sẽ stringify array/object
+			...rest,
 		}
 	}, [filter])
 
@@ -64,6 +86,37 @@ export default function useNetwork() {
 		}
 	}, [buildParams, openError])
 
+	const fetchFriends = useCallback(async () => {
+		setLoading((prev) => ({ ...prev, friends: true }))
+		let count = 0
+		try {
+			const { page, limit } = friendsPaginationRef.current
+			const isNew = page === 1
+			if (isNew) setFriends([])
+			const res: any = await getFriends({
+				params: {
+					type: optionFriends[0].value,
+					fields: ['$all', { user: ['$all'] }, { friend: ['$all'] }],
+					where: { name: filter.q?.trim() || '' },
+					page,
+					limit,
+				},
+			})
+			const rows = res?.results?.objects?.rows || []
+			count = res?.results?.objects?.count || 0
+			friendsCanLoadMoreRef.current = rows.length >= limit
+			const normalized = rows.map(mapFriendRowToUser)
+			setFriends((prev) =>
+				uniqueArray(isNew ? normalized : [...prev, ...normalized], 'id'),
+			)
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoading((prev) => ({ ...prev, friends: false }))
+			setTotal((prev) => ({ ...prev, friends: count }))
+		}
+	}, [filter.q, openError])
+
 	const fetchClubs = useCallback(async () => {
 		setLoading((prev) => ({ ...prev, club: true }))
 		let count = 0
@@ -90,12 +143,15 @@ export default function useNetwork() {
 
 	const onSearch = useCallback(() => {
 		userPaginationRef.current.page = 1
+		friendsPaginationRef.current.page = 1
 		clubPaginationRef.current.page = 1
 		userCanLoadMoreRef.current = true
+		friendsCanLoadMoreRef.current = true
 		clubCanLoadMoreRef.current = true
 		if (activeTab === 'user') fetchUsers()
+		else if (activeTab === 'friends') fetchFriends()
 		else fetchClubs()
-	}, [activeTab, fetchUsers, fetchClubs])
+	}, [activeTab, fetchUsers, fetchFriends, fetchClubs])
 
 	const onLoadMore = useCallback(async () => {
 		if (activeTab === 'user') {
@@ -104,10 +160,16 @@ export default function useNetwork() {
 			await fetchUsers()
 			return
 		}
+		if (activeTab === 'friends') {
+			if (!friendsCanLoadMoreRef.current || loading.friends) return
+			friendsPaginationRef.current.page += 1
+			await fetchFriends()
+			return
+		}
 		if (!clubCanLoadMoreRef.current || loading.club) return
 		clubPaginationRef.current.page += 1
 		await fetchClubs()
-	}, [activeTab, loading, fetchUsers, fetchClubs])
+	}, [activeTab, loading, fetchUsers, fetchFriends, fetchClubs])
 
 	const onScroll = (e: any) => {
 		handleScrollCallback(e, onLoadMore)
@@ -129,6 +191,12 @@ export default function useNetwork() {
 			fetchUsers()
 			return
 		}
+		if (tab === 'friends') {
+			friendsPaginationRef.current.page = 1
+			friendsCanLoadMoreRef.current = true
+			fetchFriends()
+			return
+		}
 		clubPaginationRef.current.page = 1
 		clubCanLoadMoreRef.current = true
 		fetchClubs()
@@ -138,10 +206,12 @@ export default function useNetwork() {
 		setFilter(defaultFilter)
 		setSearchId(randomString())
 	}
+
 	useEffect(() => {
 		fetchUsers()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
+
 	useEffect(() => {
 		if (!searchId) return
 		const timeout = setTimeout(onSearch, 500)
@@ -157,6 +227,14 @@ export default function useNetwork() {
 		[],
 	)
 
+	const updateFriend = useCallback((userId: string) => {
+		setFriends((prev) => prev.filter((friend) => friend.id !== userId))
+		setTotal((prev) => ({
+			...prev,
+			friends: Math.max(prev.friends - 1, 0),
+		}))
+	}, [])
+
 	const updateClub = useCallback((clubId: string, patch: Record<string, unknown>) => {
 		setClubs((prev) =>
 			prev.map((club) => (club.id === clubId ? { ...club, ...patch } : club)),
@@ -166,11 +244,13 @@ export default function useNetwork() {
 	return {
 		activeTab,
 		users,
+		friends,
 		clubs,
 		filter,
 		loading,
 		total,
 		canLoadMoreUser: userCanLoadMoreRef,
+		canLoadMoreFriends: friendsCanLoadMoreRef,
 		canLoadMoreClub: clubCanLoadMoreRef,
 		onChangeTab,
 		onChangeFilter,
@@ -179,6 +259,7 @@ export default function useNetwork() {
 		onLoadMore,
 		onScroll,
 		updateUser,
+		updateFriend,
 		updateClub,
 	}
 }

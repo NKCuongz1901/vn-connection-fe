@@ -1,10 +1,7 @@
 'use client'
 
 import { SearchOutlined } from '@ant-design/icons'
-import {
-	IconCircleCheckFilled,
-	IconXboxXFilled,
-} from '@tabler/icons-react'
+import { IconCircleCheckFilled, IconXboxXFilled } from '@tabler/icons-react'
 import clsx from 'clsx'
 import { Flex, Skeleton } from 'antd'
 import React, { useCallback, useState } from 'react'
@@ -20,7 +17,7 @@ import useFriendItem from '@/hooks/Friend/useFriendItem'
 import useNetwork from '@/hooks/network/useNetwork'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { arrayFrom, isArray } from '@/ultis/array'
-import { formatLastOnlineShort, getAge, getDiffFromNow } from '@/ultis/date'
+import { formatLastOnlineShort, getAge } from '@/ultis/date'
 import { useLocalePath } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
 import DotIcon from '@/svg/DotIcon'
@@ -58,25 +55,6 @@ const genderIcon = {
 	MALE: MaleIcon,
 	FEMALE: FeMaleIcon,
 	OTHER: GenderIcon,
-}
-
-const formatRelativeAgo = (date?: string) => {
-	if (!date) return ''
-	const { value, unit } = getDiffFromNow({ input: date })
-	if (!unit) return String(value)
-	const label = value === 1 ? unit : `${unit}s`
-	return `${value} ${label} ago`
-}
-
-const formatActivityBadge = (updatedAt?: string) => {
-	if (!updatedAt) return ''
-	const { value, unit } = getDiffFromNow({ input: updatedAt })
-	if (!unit) return ''
-	if (unit === 'second') return '1 min'
-	if (unit === 'minute') return value === 1 ? '1 min' : `${value} mins`
-	if (unit === 'hour') return value === 1 ? '1 hr' : `${value} hrs`
-	if (unit === 'day') return value === 1 ? '1 day' : `${value} days`
-	return ''
 }
 
 const getCommunityRole = (item: any) =>
@@ -124,10 +102,12 @@ function PeopleCommunity() {
 	const {
 		activeTab,
 		users,
+		friends,
 		clubs,
 		filter,
 		loading,
 		canLoadMoreUser,
+		canLoadMoreFriends,
 		canLoadMoreClub,
 		onChangeTab,
 		onChangeFilter,
@@ -242,7 +222,6 @@ function PeopleCommunity() {
 		const role = getCommunityRole(item)
 		const isOwner = role === 'OWNER'
 		const isAdmin = role === 'ADMIN'
-		const activityBadge = formatActivityBadge(updated_at)
 
 		const avatarNode =
 			isOwner || isAdmin ? (
@@ -259,14 +238,7 @@ function PeopleCommunity() {
 				<CAvatar src={avatar} size={48} className={classes.communityAvatar} />
 			)
 
-		return (
-			<div className={classes.communityAvatarWrap}>
-				{avatarNode}
-				{activityBadge && (
-					<span className={classes.communityActivityBadge}>{activityBadge}</span>
-				)}
-			</div>
-		)
+		return <div className={classes.communityAvatarWrap}>{avatarNode}</div>
 	}
 
 	const renderCommunityMeta = (item: any) => {
@@ -499,14 +471,19 @@ function PeopleCommunity() {
 		</Flex>
 	)
 
-	const renderMemberList = () => {
-		if (!loading.user && !isArray(users, 1)) {
-			return renderEmpty('Try a different search keyword')
+	const renderMemberList = (
+		items: any[],
+		isLoading: boolean,
+		canLoadMore: React.MutableRefObject<boolean>,
+		emptyLabel: string,
+	) => {
+		if (!isLoading && !isArray(items, 1)) {
+			return renderEmpty(emptyLabel)
 		}
 
 		return (
 			<div className={classes.memberList} onScroll={onScroll}>
-				{users.map((item) => {
+				{items.map((item) => {
 					const { id } = item || {}
 					const actionType = getFriendActionType(item, myUserId)
 					const showFriendAction =
@@ -531,7 +508,7 @@ function PeopleCommunity() {
 						</div>
 					)
 				})}
-				{loading.user &&
+				{isLoading &&
 					arrayFrom(5).map((_, index) => (
 						<Skeleton.Input
 							key={index}
@@ -539,7 +516,7 @@ function PeopleCommunity() {
 							className={classes.skeletonMember}
 						/>
 					))}
-				{!loading.user && canLoadMoreUser.current && isArray(users, 1) && (
+				{!isLoading && canLoadMore.current && isArray(items, 1) && (
 					<div className={classes.loadMore}>
 						<CButton ctype="oranger" onClick={onLoadMore}>
 							Load more
@@ -564,9 +541,7 @@ function PeopleCommunity() {
 						<React.Fragment key={id}>
 							<div
 								className={classes.communityItem}
-								onClick={() =>
-									onChangeRoute(`${mainRoutes.community}/${id}`)
-								}
+								onClick={() => onChangeRoute(`${mainRoutes.community}/${id}`)}
 							>
 								<div className={classes.communityAvatarCol}>
 									{renderCommunityAvatar(item)}
@@ -574,16 +549,14 @@ function PeopleCommunity() {
 								<div className={classes.communityInfo}>
 									<div className={classes.communityTitle}>{title}</div>
 									{category ? (
-										<div className={classes.communityCategory}>
-											{category}
-										</div>
+										<div className={classes.communityCategory}>{category}</div>
 									) : null}
 									{renderCommunityMeta(item)}
-									{updated_at ? (
+									{/* {updated_at ? (
 										<div className={classes.communityUpdatedAt}>
 											{formatRelativeAgo(updated_at)}
 										</div>
-									) : null}
+									) : null} */}
 								</div>
 								<div
 									className={classes.communityActions}
@@ -647,10 +620,23 @@ function PeopleCommunity() {
 				</Flex>
 
 				<div className={classes.listBody}>
-					{activeTab === 'user' && renderMemberList()}
-					{activeTab === 'club' && renderCommunityList()}
 					{activeTab === 'friends' &&
-						renderEmpty('Try a different search keyword')}
+						renderMemberList(
+							friends,
+							loading.friends,
+							canLoadMoreFriends,
+							filter.q?.trim()
+								? 'Try a different search keyword'
+								: 'You have no friends yet',
+						)}
+					{activeTab === 'user' &&
+						renderMemberList(
+							users,
+							loading.user,
+							canLoadMoreUser,
+							'Try a different search keyword',
+						)}
+					{activeTab === 'club' && renderCommunityList()}
 				</div>
 			</div>
 		</div>
