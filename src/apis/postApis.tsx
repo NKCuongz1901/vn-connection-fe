@@ -60,6 +60,19 @@ export const getDetailPost = async ({
 	})
 }
 
+export const getPublicEventDetail = async ({
+	id,
+	params,
+}: {
+	id: string
+	params: any
+}) => {
+	const url = `${POST_ROUTES.publicEventDetail}/${id}`
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
 export const deletePost = async ({
 	id,
 	params,

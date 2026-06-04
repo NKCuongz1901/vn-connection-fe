@@ -17,3 +17,5 @@ export const appLayoutAuth = [
 	'socketLogout',
 	'open-app',
 ]
+
+export const appLayoutPublic = [mainRoutes.publicEvent]

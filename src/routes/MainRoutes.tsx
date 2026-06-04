@@ -22,4 +22,5 @@ export const mainRoutes = {
 	chatRoom: 'chat-room',
 	miniApps: 'mini-apps',
 	peopleCommunity: 'people-community',
+	publicEvent: 'public-event',
 }

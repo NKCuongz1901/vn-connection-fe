@@ -6,12 +6,13 @@ import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
 
 import { isLogin } from '@/ultis/storage'
 import { useLocalePath } from '@/ultis/route'
+import { useModal } from '@/context/ModalContext'
 import { useNewInbox } from '@/context/NewInboxContext'
 
 import AuthLayout from './Child/AuthLayout'
 import HeaderMainLayout from './Child/HeaderMainLayout'
 
-import { appLayoutAuth } from '@/app/variable/layoutData'
+import { appLayoutAuth, appLayoutPublic } from '@/app/variable/layoutData'
 import { Menus } from '@/routes'
 import { mainRoutes } from '@/routes/MainRoutes'
 
@@ -26,16 +27,34 @@ const MainLayout = (props: MainLayoutProps) => {
 	const { children } = props
 	const { pathname, onGetPath, localePathname, onChangeRoute } = useLocalePath()
 	const { hasNewInboxMessage } = useNewInbox()
+	const { openConfirm } = useModal()
 	const ref = useRef<HTMLDivElement>(null)
+
+	const isPublicRoute = appLayoutPublic.some((i) => pathname.includes(i))
+	const shouldGuardMenu = isPublicRoute && !isLogin()
 
 	const [openMenu, setOpenMenu] = useState(false)
 	const [content, setContent] = useState(null) as any
 	const toggleMenus = useCallback(() => {
 		setOpenMenu((prev) => !prev)
 	}, [])
-	const handleMenuNavigate = useCallback(() => {
-		setOpenMenu(false)
-	}, [])
+
+	const handleMenuItemClick = useCallback(
+		(e: React.MouseEvent<HTMLAnchorElement>) => {
+			setOpenMenu(false)
+			if (!shouldGuardMenu) return
+
+			e.preventDefault()
+			openConfirm({
+				titleLabel: 'Login required',
+				message: 'Please sign in to access this page.',
+				confirmLabel: 'Sign in',
+				cancelLabel: 'Cancel',
+				onAccept: () => onChangeRoute(mainRoutes.login),
+			})
+		},
+		[shouldGuardMenu, openConfirm, onChangeRoute],
+	)
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (ref.current && !ref.current.contains(event.target as Node)) {
@@ -80,7 +99,7 @@ const MainLayout = (props: MainLayoutProps) => {
 								<Link
 									key={title}
 									href={onGetPath(path)}
-									onClick={handleMenuNavigate}
+									onClick={handleMenuItemClick}
 								>
 									<Flex
 										gap={12}
@@ -115,23 +134,30 @@ const MainLayout = (props: MainLayoutProps) => {
 			</Flex>
 		)
 	}
+
+	const _renderAppShell = () => (
+		<Flex vertical className="wrapperMainLayout">
+			<HeaderMainLayout onToggleMenus={toggleMenus} />
+			<Flex className="bodyMainLayout">
+				{_renderSideBar()}
+				<Flex vertical className="contentMainLayout">
+					{children}
+				</Flex>
+			</Flex>
+		</Flex>
+	)
+
 	useEffect(() => {
 		const login = isLogin()
+		if (appLayoutPublic.some((i) => pathname.includes(i))) {
+			setContent(_renderAppShell())
+			return
+		}
 		if (!appLayoutAuth.some((i) => pathname.includes(i))) {
 			if (!login) {
 				onChangeRoute(mainRoutes.login)
 			} else {
-				setContent(
-					<Flex vertical className="wrapperMainLayout">
-						<HeaderMainLayout onToggleMenus={toggleMenus} />
-						<Flex className="bodyMainLayout">
-							{_renderSideBar()}
-							<Flex vertical className="contentMainLayout">
-								{children}
-							</Flex>
-						</Flex>
-					</Flex>,
-				)
+				setContent(_renderAppShell())
 			}
 		} else {
 			const isOpenAppPage = pathname.includes('open-app')

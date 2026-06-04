@@ -109,8 +109,11 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 	}
 
 	useEffect(() => {
-		setLogin(Boolean(isLogin()))
-		handleGetCount()
+		const isLoggedIn = Boolean(isLogin())
+		setLogin(isLoggedIn)
+		if (isLoggedIn) {
+			handleGetCount()
+		}
 		const handleClickOutside = (event: MouseEvent) => {
 			if (ref.current && !ref.current.contains(event.target as Node)) {
 				toggleNoti(false)
@@ -306,21 +309,23 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 					<LogoSvg />
 					<div>UniVini</div>
 				</Flex>
-				<Flex className="headerSearchMainLayout">
-					<CInputMap
-						title="Location"
-						value={location.address}
-						longitude={location.longitude}
-						latitude={location.latitude}
-						placeholder="Search location to find people, events & communities."
-						onSubmitModal={setLocationFromMap}
-						onInputClick={handleSearchInputClick}
-						open={mapOpen}
-						onOpenChange={setMapOpen}
-						prefix={<SearchOutlined className="headerSeachOutline" />}
-						style={{ borderRadius: 40, height: 44, width: 415 }}
-					/>
-				</Flex>
+				{login && (
+					<Flex className="headerSearchMainLayout">
+						<CInputMap
+							title="Location"
+							value={location.address}
+							longitude={location.longitude}
+							latitude={location.latitude}
+							placeholder="Search location to find people, events & communities."
+							onSubmitModal={setLocationFromMap}
+							onInputClick={handleSearchInputClick}
+							open={mapOpen}
+							onOpenChange={setMapOpen}
+							prefix={<SearchOutlined className="headerSeachOutline" />}
+							style={{ borderRadius: 40, height: 44, width: 415 }}
+						/>
+					</Flex>
+				)}
 			</Flex>
 			<Flex className="headerButton">
 				{login ? (
@@ -345,17 +350,10 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 					<>
 						<CButton
 							ctype="oranger"
-							style={{ height: 40, width: 86, padding: 12 }}
+							style={{ height: 40, width: 82 }}
 							onClick={() => onChangeRoute(mainRoutes.login)}
 						>
 							Sign In
-						</CButton>
-						<CButton
-							ctype="disabled"
-							style={{ height: 40, width: 86, padding: 12 }}
-							onClick={() => onChangeRoute(mainRoutes.register)}
-						>
-							Sign Up
 						</CButton>
 					</>
 				)}

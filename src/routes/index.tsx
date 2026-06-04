@@ -46,6 +46,7 @@ export const POST_ROUTES = {
 	likeComment: 'comment/like',
 	myEventsJoined: 'post/my-events-joined',
 	myEventsPassed: 'post/my-events-passed',
+	publicEventDetail: 'post/public',
 }
 export const CONVERSATION_ROUTES = {
 	name: 'conversation',

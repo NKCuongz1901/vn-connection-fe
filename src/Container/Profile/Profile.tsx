@@ -390,8 +390,12 @@ const Profile = (props: ProfileProps) => {
 		if (!isArray(nativeLanguages, 1) && !isArray(practicingLanguages, 1))
 			return null
 
-		const displayItems: { key: string; name: string; level: string; combined?: boolean }[] =
-			[]
+		const displayItems: {
+			key: string
+			name: string
+			level: string
+			combined?: boolean
+		}[] = []
 
 		if (nativeLanguages.length > 2) {
 			displayItems.push({
@@ -542,7 +546,7 @@ const Profile = (props: ProfileProps) => {
 							</span>
 						</div>
 					</Flex>
-					<CButton className={classes.inviteBtn}>Invite now</CButton>
+					{/* <CButton className={classes.inviteBtn}>Invite now</CButton> */}
 				</Flex>
 			</Flex>
 		)
