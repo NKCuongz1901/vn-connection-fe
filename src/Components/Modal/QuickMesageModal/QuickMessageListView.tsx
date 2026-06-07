@@ -56,12 +56,19 @@ export const QuickMessageListItem = memo(function QuickMessageListItem({
 }: QuickMessageListItemProps) {
 	const mediaUrl = getQuickMessageMediaUrl(item)
 
+	const handleRowClick = () => {
+		if (mode === 'pick') {
+			onClick?.()
+			return
+		}
+		if (mode === 'manage' && !mediaUrl) {
+			onEdit?.()
+		}
+	}
+
 	return (
 		<>
-			<div
-				className={classes.listItem}
-				onClick={mode === 'pick' ? onClick : undefined}
-			>
+			<div className={classes.listItem} onClick={handleRowClick}>
 				<div className={classes.listItemText}>
 					<span className={classes.shortcutTag}>
 						{formatShortcutLabel(item.shortcut)}
