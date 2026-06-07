@@ -366,3 +366,49 @@ export const getMessageReadMessage = async (id: string) => {
 
 	return await axios.get(url, {})
 }
+
+export interface QuickMessageMedia {
+	url: string
+	width?: number
+	height?: number
+	ratio?: number
+	type?: string
+	duration?: number
+}
+
+export interface QuickMessagePayload {
+	shortcut: string
+	content: string
+	media?: string
+	medias?: QuickMessageMedia[]
+}
+
+export const getQuickMessage = async ({
+	params = {},
+}: {
+	params?: Record<string, any>
+} = {}) => {
+	const url = CONVERSATION_ROUTES.quickMessage
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const createQuickMessage = async (payload: QuickMessagePayload) => {
+	const url = CONVERSATION_ROUTES.quickMessage
+
+	return await axios.post(url, payload)
+}
+
+export const updateQuickMessage = async (id: string, payload: QuickMessagePayload) => {
+	const url = `${CONVERSATION_ROUTES.quickMessage}/${id}`
+
+	return await axios.put(url, payload)
+}
+
+export const deleteQuickMessage = async (id: string) => {
+	const url = `${CONVERSATION_ROUTES.quickMessage}/${id}`
+
+	return await axios.delete(url)
+}

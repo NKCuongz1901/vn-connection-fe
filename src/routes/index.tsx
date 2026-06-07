@@ -78,6 +78,7 @@ export const CONVERSATION_ROUTES = {
 	messReaction: 'message/reaction',
 	language: 'language',
 	readMessage: 'message/read_message',
+	quickMessage: 'quick-chat',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',

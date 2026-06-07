@@ -25,10 +25,12 @@ import {
 } from '@/ultis/file'
 import { getUserInfo } from '@/ultis/storage'
 
+import QuickMessageModal from '@/Components/Modal/QuickMesageModal/QuickMessageModal'
 import HappyIcon from '@/svg/HappyIcon'
 import ImageIcon from '@/svg/ImageIcon'
 import ReplyIcon from '@/svg/ReplyIcon'
 import SendIcon from '@/svg/SendIcon'
+import MiniApp from '@/svg/MiniApp'
 import Heart from '@/svg/Heart'
 import CAvatar from '../Custom/CAvatar'
 import CImage from '../Custom/CImage'
@@ -37,7 +39,11 @@ import CLoading from '../Custom/CLoading/CLoading'
 import CTextSpecial from '../Custom/CTextSpecial'
 import CUploadMuti from '../Custom/CUploadMuti'
 
-import { languageOpts, specialTypeMessage } from '@/Variable/common.variable'
+import {
+	ACTION_ITEMS,
+	languageOpts,
+	specialTypeMessage,
+} from '@/Variable/common.variable'
 
 import MoreIcon from '@/svg/MoreIcon'
 import classes from './ChatBox.module.scss'
@@ -112,6 +118,7 @@ const ChatBox = ({
 	const { openConfirm, closeModal } = useModal()
 	const cancelEditRef = useRef<() => void>(() => {})
 	const [fileList, setFileList] = useState([])
+	const [openQuickMessage, setOpenQuickMessage] = useState(false)
 	const messageRefs = useRef<Record<string, HTMLDivElement | null>>({})
 	const [jumpHighlightId, setJumpHighlightId] = useState('')
 	const [pendingScroll, setPendingScroll] = useState<{
@@ -138,7 +145,7 @@ const ChatBox = ({
 		reactList,
 		language,
 		searchCountry,
-
+		showActionMenu,
 		setSearchCountry,
 		onStopAudio,
 
@@ -148,6 +155,7 @@ const ChatBox = ({
 		setText,
 		setActiveSticker,
 		setShowSticker,
+		setShowActionMenu,
 		onScroll,
 		onGetMenus,
 		onAddSpToText,
@@ -832,11 +840,82 @@ const ChatBox = ({
 		setActiveSticker,
 	])
 
+	const handleActionMenuClick = useCallback(
+		(key: string) => {
+			if (key !== 'quick') return
+			setShowActionMenu(false)
+			setOpenQuickMessage(true)
+		},
+		[setShowActionMenu],
+	)
+
+	const handleSelectQuickMessage = useCallback(
+		(item: any) => {
+			setText(item?.content || '')
+			const medias = item?.medias?.length
+				? item.medias
+				: item?.media
+					? [{ url: item.media, type: 'IMAGE' }]
+					: []
+			if (medias.length) {
+				setFileList(
+					medias.map((media: any) => ({
+						type: media?.type || 'IMAGE',
+						url: media?.url,
+					})),
+				)
+			}
+			setOpenQuickMessage(false)
+			_refInput?.current?.focus()
+		},
+		[_refInput, setText],
+	)
+
+	const _renderActionMenu = () => (
+		<Flex
+			className={clsx(classes.chatBoxActionMenu, {
+				[classes.showActionMenu]: showActionMenu,
+			})}
+		>
+			{ACTION_ITEMS.map(({ key, label, Icon, enabled, width, height }) => (
+				<Flex
+					key={key}
+					vertical
+					align="center"
+					className={classes.actionMenuItem}
+					onClick={() => handleActionMenuClick(key)}
+				>
+					<Flex
+						className={clsx(classes.actionMenuIcon, {
+							[classes.actionMenuIconActive]: enabled,
+						})}
+					>
+						<Icon
+							fill={enabled ? '#006B35' : '#48546B'}
+							width={width}
+							height={height}
+						/>
+					</Flex>
+					<span
+						className={clsx(classes.actionMenuLabel, {
+							[classes.actionMenuLabelActive]: enabled,
+						})}
+					>
+						{label}
+					</span>
+				</Flex>
+			))}
+		</Flex>
+	)
+
 	const _renderIconHappy = () => {
 		return (
 			<Flex
 				className={classes.iconHappi}
-				onClick={() => setShowSticker((pre) => !pre)}
+				onClick={() => {
+					setShowSticker((pre) => !pre)
+					setShowActionMenu(false)
+				}}
 			>
 				<HappyIcon />
 			</Flex>
@@ -990,16 +1069,27 @@ const ChatBox = ({
 				</Flex>
 			)}
 			<Flex className={clsx(classes.chatBox)}>
-				<Flex className={classes.chooseImg}>
-					<CUploadMuti
-						fileList={fileList.filter((i) => i?.file).map((i) => i.file)}
-						onChange={({ file: _file, fileList: newList }) => {
-							hangleImportImg(newList)
+				<Flex align="center" justify="center" gap={10}>
+					<div
+						className={classes.miniAppIcon}
+						onClick={() => {
+							setShowActionMenu((prev) => !prev)
+							setShowSticker(false)
 						}}
-						accept="image/*,video/*"
 					>
-						<ImageIcon />
-					</CUploadMuti>
+						<MiniApp fill="#006B35" />
+					</div>
+					<Flex className={classes.chooseImg}>
+						<CUploadMuti
+							fileList={fileList.filter((i) => i?.file).map((i) => i.file)}
+							onChange={({ file: _file, fileList: newList }) => {
+								hangleImportImg(newList)
+							}}
+							accept="image/*,video/*"
+						>
+							<ImageIcon />
+						</CUploadMuti>
+					</Flex>
 				</Flex>
 				<CInputTag
 					ref={_refInput}
@@ -1055,6 +1145,14 @@ const ChatBox = ({
 				</div>
 			)}
 			{_renderSticketList()}
+			{_renderActionMenu()}
+			{openQuickMessage && (
+				<QuickMessageModal
+					open
+					onClose={() => setOpenQuickMessage(false)}
+					onSelect={handleSelectQuickMessage}
+				/>
+			)}
 		</div>
 	)
 }

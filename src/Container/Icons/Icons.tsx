@@ -101,6 +101,10 @@ import CupIcon from '@/svg/CupIcon'
 import FriendPendingIcon from '@/svg/FriendPendingIcon'
 import FriendAcceptIcon from '@/svg/FriendAcceptIcon'
 import FriendNormalIcon from '@/svg/FriendNormalIcon'
+import QuickMessageIcon from '@/svg/QuickMessageIcon'
+import NoQuickMessage from '@/svg/NoQuickMessage'
+import ReminderIcon from '@/svg/ReminderIcon'
+import PollIcon from '@/svg/PollIcon'
 
 const Icons = () => {
 	const icons = [
@@ -453,6 +457,26 @@ const Icons = () => {
 		{
 			ICON: FriendNormalIcon,
 			name: '@/svg/Event/FriendNormalIcon',
+			key: randomString(),
+		},
+		{
+			ICON: QuickMessageIcon,
+			name: '@/svg/Event/QuickMessageIcon',
+			key: randomString(),
+		},
+		{
+			ICON: NoQuickMessage,
+			name: '@/svg/Event/NoQuickMessage',
+			key: randomString(),
+		},
+		{
+			ICON: ReminderIcon,
+			name: '@/svg/Event/ReminderIcon',
+			key: randomString(),
+		},
+		{
+			ICON: PollIcon,
+			name: '@/svg/Event/PollIcon',
 			key: randomString(),
 		},
 	]

@@ -1,5 +1,44 @@
 import { PaginationType } from '@/interface/common/common.interface'
+import QuickMessageIcon from '@/svg/QuickMessageIcon'
+import ReminderIcon from '@/svg/ReminderIcon'
+import PollIcon from '@/svg/PollIcon'
+import LocationIcon from '@/svg/MarkIcon'
 export const DEFAULT_FALLBACK = '/images/defaultCover.png'
+
+export const ACTION_ITEMS = [
+	{
+		key: 'quick',
+		label: 'Quick messages',
+		Icon: QuickMessageIcon,
+		enabled: true,
+		width: 26,
+		height: 26,
+	},
+	{
+		key: 'reminder',
+		label: 'Reminder',
+		Icon: ReminderIcon,
+		enabled: false,
+		width: 23,
+		height: 26,
+	},
+	{
+		key: 'poll',
+		label: 'Poll',
+		Icon: PollIcon,
+		enabled: false,
+		width: 32,
+		height: 32,
+	},
+	{
+		key: 'location',
+		label: 'Location',
+		Icon: LocationIcon,
+		enabled: false,
+		width: 23,
+		height: 27,
+	},
+]
 
 export const countryCodes = [
 	{

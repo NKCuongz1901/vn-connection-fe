@@ -32,6 +32,7 @@ export default function useChatBox({
 	const [openReact, setOpenReact] = useState() as any
 	const [activeSticker, setActiveSticker] = useState(0)
 	const [showSticker, setShowSticker] = useState(false)
+	const [showActionMenu, setShowActionMenu] = useState<boolean>(false)
 	const [text, setText] = useState('')
 	const [reply, setReply] = useState() as any
 
@@ -231,8 +232,7 @@ export default function useChatBox({
 			default:
 				break
 		}
-		const canEdit =
-			isMe && (item?.type === 'TEXT' || item?.type === 'MEDIAS')
+		const canEdit = isMe && (item?.type === 'TEXT' || item?.type === 'MEDIAS')
 
 		const menus: ItemType[] = [
 			...(canEdit
@@ -306,6 +306,7 @@ export default function useChatBox({
 		listTranslate,
 		language,
 		searchCountry,
+		showActionMenu,
 
 		setSearchCountry,
 		setIsAudio,
@@ -314,6 +315,7 @@ export default function useChatBox({
 		setOpenReact,
 		setActiveSticker,
 		setShowSticker,
+		setShowActionMenu,
 		onScroll: handleScroll,
 		onGetMenus: handleGetMenus,
 		onOpenReact: handleOpenReact,
