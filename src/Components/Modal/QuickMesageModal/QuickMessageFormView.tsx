@@ -24,7 +24,11 @@ import CImage from '@/Components/Custom/CImage/CImage'
 import DocumentUpload from '@/svg/DocumentUpload'
 import TrashIcon from '@/svg/TrashIcon'
 
-import { normalizeShortcut } from './quickMessageUtils'
+import {
+	isValidShortcut,
+	normalizeShortcut,
+	sanitizeShortcutInput,
+} from './quickMessageUtils'
 import classes from './QuickMessageModal.module.scss'
 
 export interface QuickMessageFormRef {
@@ -95,7 +99,7 @@ const QuickMessageFormView = forwardRef<
 	)
 
 	const canSubmit = useMemo(
-		() => !!normalizeShortcut(shortcut) && !!content.trim(),
+		() => isValidShortcut(shortcut) && !!content.trim(),
 		[shortcut, content],
 	)
 
@@ -131,6 +135,9 @@ const QuickMessageFormView = forwardRef<
 		const nextErrors: { shortcut?: string; content?: string } = {}
 		if (!normalizeShortcut(shortcut)) {
 			nextErrors.shortcut = 'Shortcut is required'
+		} else if (!isValidShortcut(shortcut)) {
+			nextErrors.shortcut =
+				'Shortcut must contain letters only (no numbers, spaces or special characters)'
 		}
 		if (!content.trim()) {
 			nextErrors.content = 'Content is required'
@@ -192,7 +199,7 @@ const QuickMessageFormView = forwardRef<
 						value={shortcut}
 						placeholder="Enter short cut"
 						onChange={(e) => {
-							setShortcut(e.target.value.replace(/^\//, ''))
+							setShortcut(sanitizeShortcutInput(e.target.value))
 							setErrors((prev) => ({ ...prev, shortcut: '' }))
 						}}
 					/>
