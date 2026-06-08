@@ -2,7 +2,7 @@
 import { IconChevronRight } from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 
 import { arrayFrom, isArray } from '@/ultis/array'
 import { toJson } from '@/ultis/common'
@@ -31,6 +31,14 @@ const mappingTopicTitle = {
 	explore: 'Channels Suggestions',
 	join: 'My Channels',
 }
+
+const filterCategoryByTopic = (categories: any[] = [], search = '') => {
+	const keyword = search.toLocaleLowerCase()
+	return categories.filter((item) =>
+		item?.title?.toLocaleLowerCase()?.includes(keyword),
+	)
+}
+
 const Discussion = () => {
 	const {
 		loadingShare,
@@ -59,6 +67,18 @@ const Discussion = () => {
 		onGetMyCategory,
 		onGeRecommendCategory,
 	} = useDiscussion({})
+
+	const filteredMyCategory = useMemo(
+		() => filterCategoryByTopic(myCategory, titleTopic),
+		[myCategory, titleTopic],
+	)
+	const filteredRecommendCategory = useMemo(
+		() => filterCategoryByTopic(recommendCategory, titleTopic),
+		[recommendCategory, titleTopic],
+	)
+	const myCategoryCount = myCategory?.length ?? 0
+	const recommendCategoryCount = recommendCategory?.length ?? 0
+
 	const _renderNoPost = () => {
 		if (loading.discuss) return <></>
 		return (
@@ -187,33 +207,33 @@ const Discussion = () => {
 					className={classes.titleTopic}
 					onClick={() => setModal({ type: 'topic', data: 'join' })}
 				>
-					<div className={classes.title}>{mappingTopicTitle.join}</div>
+					<div className={classes.title}>
+						{mappingTopicTitle.join}
+						<span className={classes.titleCount}>({myCategoryCount})</span>
+					</div>
 					<div className={classes.arrowIcon}>
 						<IconChevronRight />
 					</div>
 				</Flex>
 				<Flex className={classes.topicList} vertical>
-					{(myCategory || []).map(
-						(item) =>
-							item?.title
-								?.toLocaleLowerCase()
-								?.includes(titleTopic.toLocaleLowerCase()) && (
-								<div
-									key={item.id}
-									onClick={() => {
-										onChangeUrl({ key: 'category_id', value: item })
-									}}
-									className={classes.categoryItem}
-								>
-									<CategoryItem item={item} hiddenJoin />
-								</div>
-							),
-					)}
+					{filteredMyCategory.map((item) => (
+						<div
+							key={item.id}
+							onClick={() => {
+								onChangeUrl({ key: 'category_id', value: item })
+							}}
+							className={classes.categoryItem}
+						>
+							<CategoryItem item={item} hiddenJoin />
+						</div>
+					))}
 				</Flex>
 			</Flex>
 		)
 	}
 	const _renderSuggestion = (vertical = false) => {
+		if (recommendCategoryCount === 0) return null
+
 		return (
 			<Flex
 				vertical
@@ -223,33 +243,32 @@ const Discussion = () => {
 					className={classes.titleTopic}
 					onClick={() => setModal({ type: 'topic', data: 'explore' })}
 				>
-					<div className={classes.title}>{mappingTopicTitle.explore}</div>
+					<div className={classes.title}>
+						{mappingTopicTitle.explore}
+						<span className={classes.titleCount}>
+							({recommendCategoryCount})
+						</span>
+					</div>
 					<div className={classes.arrowIcon}>
 						<IconChevronRight />
 					</div>
 				</Flex>
 				<Flex className={classes.topicList} vertical>
-					{(recommendCategory || []).map(
-						(item) =>
-							item?.title
-								?.toLocaleLowerCase()
-								?.includes(titleTopic.toLocaleLowerCase()) && (
-								<div
-									className={classes.categoryItem}
-									key={item.id}
-									onClick={() => {
-										onChangeUrl({ key: 'category_id', value: item })
-									}}
-								>
-									<CategoryItem
-										key={item.id}
-										loading={loadingJoin}
-										item={item}
-										onJoinCategory={onJoinCategory}
-									/>
-								</div>
-							),
-					)}
+					{filteredRecommendCategory.map((item) => (
+						<div
+							className={classes.categoryItem}
+							key={item.id}
+							onClick={() => {
+								onChangeUrl({ key: 'category_id', value: item })
+							}}
+						>
+							<CategoryItem
+								loading={loadingJoin}
+								item={item}
+								onJoinCategory={onJoinCategory}
+							/>
+						</div>
+					))}
 				</Flex>
 			</Flex>
 		)
