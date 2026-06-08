@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 
 import useChatRoomChatBox from '@/hooks/ChatRoomChatBox/useChatRoomChatBox'
+import { QuickMessageItem } from '@/hooks/QuickMesage/useQuickMessage'
 import { useModal } from '@/context/ModalContext'
 
 import { arrayFrom, isArray } from '@/ultis/array'
@@ -26,8 +27,11 @@ import MicroPhoneIcon from '@/svg/MicroPhoneIcon'
 import MoreIcon from '@/svg/MoreIcon'
 import ReplyIcon from '@/svg/ReplyIcon'
 import SendIcon from '@/svg/SendIcon'
+import MiniApp from '@/svg/MiniApp'
 import TranslateIcon from '@/svg/TranslateIcon'
 import VolumeIcon from '@/svg/VolumeIcon'
+import QuickMessageModal from '@/Components/Modal/QuickMesageModal/QuickMessageModal'
+import { mapQuickMessageToSendMedias } from '@/Components/Modal/QuickMesageModal/quickMessageUtils'
 import AudioRecorder from '../AudioRecorder'
 import CAvatar from '../Custom/CAvatar'
 import CImage from '../Custom/CImage'
@@ -38,7 +42,11 @@ import CTextSpecial from '../Custom/CTextSpecial'
 import CUploadMuti from '../Custom/CUploadMuti'
 import VisualizerWithPlay from '../VisualizerWithPlay'
 
-import { languageOpts, specialTypeMessage } from '@/Variable/common.variable'
+import {
+	ACTION_ITEMS,
+	languageOpts,
+	specialTypeMessage,
+} from '@/Variable/common.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import classes from './ChatRoomChatBox.module.scss'
@@ -134,6 +142,8 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 	})
 
 	const [fileList, setFileList] = useState([])
+	const [openQuickMessage, setOpenQuickMessage] = useState(false)
+	const [showActionMenu, setShowActionMenu] = useState(false)
 	const messageRefs = useRef<Record<string, HTMLDivElement | null>>({})
 	const [jumpHighlightId, setJumpHighlightId] = useState('')
 	const isJumpingRef = useRef(false)
@@ -730,6 +740,91 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 			</Flex>
 		)
 	}
+	const handleActionMenuClick = useCallback(
+		(key: string) => {
+			if (key !== 'quick') return
+			setShowActionMenu(false)
+			setOpenQuickMessage(true)
+		},
+		[],
+	)
+
+	const handleSendQuickMessage = useCallback(
+		(item: QuickMessageItem) => {
+			const content = item?.content || ''
+			const medias = mapQuickMessageToSendMedias(item)
+			if (!content.trim() && !medias.length) return
+
+			onSendMessage({
+				type: 'TEXT',
+				content,
+				parent: reply,
+				medias,
+			})
+			setReply(null)
+		},
+		[onSendMessage, reply, setReply],
+	)
+
+	const handleSelectQuickMessage = useCallback(
+		(item: QuickMessageItem) => {
+			setText(item?.content || '')
+			const medias = item?.medias?.length
+				? item.medias
+				: item?.media
+					? [{ url: item.media, type: 'IMAGE' }]
+					: []
+			if (medias.length) {
+				setFileList(
+					medias.map((media: any) => ({
+						type: media?.type || 'IMAGE',
+						url: media?.url,
+					})),
+				)
+			}
+			setOpenQuickMessage(false)
+			_refInput?.current?.focus()
+		},
+		[_refInput, setText],
+	)
+
+	const _renderActionMenu = () => (
+		<Flex
+			className={clsx(classes.chatBoxActionMenu, {
+				[classes.showActionMenu]: showActionMenu,
+			})}
+		>
+			{ACTION_ITEMS.map(({ key, label, Icon, enabled, width, height }) => (
+				<Flex
+					key={key}
+					vertical
+					align="center"
+					className={classes.actionMenuItem}
+					onClick={() => handleActionMenuClick(key)}
+				>
+					<Flex
+						className={clsx(classes.actionMenuIcon, {
+							[classes.actionMenuIconActive]: enabled,
+						})}
+					>
+						<Icon
+							fill={enabled ? '#006B35' : '#48546B'}
+							width={width}
+							height={height}
+						/>
+					</Flex>
+					<span
+						className={clsx(classes.actionMenuLabel, {
+							[classes.actionMenuLabelActive]: enabled,
+						})}
+					>
+						{label}
+					</span>
+				</Flex>
+			))}
+		</Flex>
+	)
+
 	const _renderSticketList = useCallback(() => {
 		const contentSticker =
 			(stickerList[activeSticker] || stickerList[0])?.sticker_items || []
@@ -779,7 +874,10 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		return (
 			<Flex
 				className={classes.iconHappi}
-				onClick={() => setShowSticker((pre) => !pre)}
+				onClick={() => {
+					setShowSticker((pre) => !pre)
+					setShowActionMenu(false)
+				}}
 			>
 				<HappyIcon />
 			</Flex>
@@ -930,16 +1028,27 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 				</Flex>
 			)}
 			<Flex className={clsx(classes.chatBox)}>
-				<Flex className={classes.chooseImg}>
-					<CUploadMuti
-						fileList={fileList.filter((i) => i?.file).map((i) => i.file)}
-						onChange={({ file: _file, fileList: newList }) => {
-							handleImportMedia(newList)
+				<Flex align="center" justify="center" gap={10}>
+					<div
+						className={classes.miniAppIcon}
+						onClick={() => {
+							setShowActionMenu((prev) => !prev)
+							setShowSticker(false)
 						}}
-						accept="image/*,video/*"
 					>
-						<ImageIcon />
-					</CUploadMuti>
+						<MiniApp fill="#006B35" />
+					</div>
+					<Flex className={classes.chooseImg}>
+						<CUploadMuti
+							fileList={fileList.filter((i) => i?.file).map((i) => i.file)}
+							onChange={({ file: _file, fileList: newList }) => {
+								handleImportMedia(newList)
+							}}
+							accept="image/*,video/*"
+						>
+							<ImageIcon />
+						</CUploadMuti>
+					</Flex>
 				</Flex>
 				<CInputTag
 					ref={_refInput}
@@ -949,6 +1058,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 					style={{ height: 40 }}
 					suffix={_renderIconHappy()}
 					placeholder="Enter your text ..."
+					onQuickMessageSelect={handleSendQuickMessage}
 					// disabled={fileList?.length > 0}
 					onChange={(e) => setText(e.target.value)}
 					onSendMessage={(e) => {
@@ -994,6 +1104,14 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 				</div>
 			)}
 			{_renderSticketList()}
+			{_renderActionMenu()}
+			{openQuickMessage && (
+				<QuickMessageModal
+					open
+					onClose={() => setOpenQuickMessage(false)}
+					onSelect={handleSelectQuickMessage}
+				/>
+			)}
 		</div>
 	)
 }
