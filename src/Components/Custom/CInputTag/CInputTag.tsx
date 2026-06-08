@@ -13,13 +13,16 @@ import {
 } from 'react'
 import { Mention, MentionsInput } from 'react-mentions'
 
-import { getMemberInConv } from '@/apis/conversationApis'
+import { getMemberInConv, getQuickMessage } from '@/apis/conversationApis'
 
 import { arrayFrom, isArray, uniqueArray } from '@/ultis/array'
 import { handleScrollCallback } from '@/ultis/common'
 
 import People from '@/svg/People'
 import CAvatar from '../CAvatar'
+
+import { QuickMessageListItem } from '@/Components/Modal/QuickMesageModal/QuickMessageListView'
+import { QuickMessageItem } from '@/hooks/QuickMesage/useQuickMessage'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { optionFriends, paginationCommon } from '@/Variable/common.variable'
@@ -45,12 +48,27 @@ interface CInputTagProps {
 	suffix?: any
 	source?: 'conversation' | 'comment'
 	mentionData?: MentionUser[]
+	onQuickMessageSelect?: (item: QuickMessageItem) => void
 }
 
 const defaultUser = {
 	id: 'allg7pQm2aKtx',
 	display: 'all',
 	avatar: '',
+}
+
+const getQuickMessageQuery = (plainText: string, cursorPos: number) => {
+	for (let i = cursorPos - 1; i >= 0; i--) {
+		if (plainText[i] === '/') {
+			const query = plainText.slice(i + 1, cursorPos)
+			if (/^[a-zA-Z]*$/.test(query)) {
+				return { start: i, query }
+			}
+			return null
+		}
+		if (plainText[i] === ' ' || plainText[i] === '\n') break
+	}
+	return null
 }
 
 const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
@@ -63,9 +81,13 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 		value = '',
 		source = 'conversation',
 		mentionData,
+		onQuickMessageSelect,
 	} = _props
 
 	const debounceRef = useRef<any>(null)
+	const quickMessageDebounceRef = useRef<any>(null)
+	const quickMessageSearchTokenRef = useRef(0)
+	const slashInfoRef = useRef<{ start: number; query: string } | null>(null)
 	const searchTokenRef = useRef(0)
 	const pagination = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const loadMore = useRef(true)
@@ -77,6 +99,10 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 	const [openMention, setOpenMention] = useState(false)
 	const [loading, setLoading] = useState(false)
 	const [users, setUsers] = useState<any[]>([])
+	const [openQuickMessage, setOpenQuickMessage] = useState(false)
+	const [quickMessageLoading, setQuickMessageLoading] = useState(false)
+	const [quickMessageList, setQuickMessageList] = useState<QuickMessageItem[]>([])
+	const [focusedQuickMessageIndex, setFocusedQuickMessageIndex] = useState(0)
 
 	useImperativeHandle(ref, () => inputRef.current, [])
 
@@ -293,6 +319,105 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 		return map
 	}
 
+	const fetchQuickMessages = async (query: string) => {
+		const currentToken = ++quickMessageSearchTokenRef.current
+		setQuickMessageLoading(true)
+		try {
+			const res: any = await getQuickMessage({
+				params: {
+					fields: ['$all'],
+					page: 1,
+					limit: 20,
+					...(query ? { shortcut: query } : {}),
+				},
+			})
+			if (currentToken !== quickMessageSearchTokenRef.current) return
+
+			const rows = res?.results?.objects?.rows || []
+			setQuickMessageList(rows)
+			setFocusedQuickMessageIndex(0)
+		} catch (error) {
+			console.log('fetchQuickMessages', error)
+			if (currentToken === quickMessageSearchTokenRef.current) {
+				setQuickMessageList([])
+			}
+		} finally {
+			if (currentToken === quickMessageSearchTokenRef.current) {
+				setQuickMessageLoading(false)
+			}
+		}
+	}
+
+	const searchQuickMessages = (query: string) => {
+		if (quickMessageDebounceRef.current) {
+			clearTimeout(quickMessageDebounceRef.current)
+		}
+
+		quickMessageDebounceRef.current = setTimeout(() => {
+			fetchQuickMessages(query)
+		}, 200)
+	}
+
+	const removeSlashQueryFromValue = (
+		plain: string,
+		markup: string,
+		startPlain: number,
+		endPlain: number,
+	) => {
+		const map = buildMapping(plain, markup)
+		const startMarkup = map[startPlain] ?? 0
+		const endMarkup = map[endPlain] ?? markup.length
+		return markup.slice(0, startMarkup) + markup.slice(endMarkup)
+	}
+
+	const handleSelectQuickMessage = (item: QuickMessageItem) => {
+		const el = inputRef.current
+		const plain = el?.value || ''
+		const cursorPos = el?.selectionStart ?? plain.length
+		const slashInfo =
+			slashInfoRef.current || getQuickMessageQuery(plain, cursorPos)
+
+		if (slashInfo) {
+			const newMarkup = removeSlashQueryFromValue(
+				plain,
+				value || '',
+				slashInfo.start,
+				cursorPos,
+			)
+			onChange?.({ target: { value: newMarkup } })
+		}
+
+		setOpenQuickMessage(false)
+		slashInfoRef.current = null
+		setQuickMessageList([])
+		onQuickMessageSelect?.(item)
+	}
+
+	const handleMentionsChange = (
+		event: any,
+		_newValue: string,
+		newPlainTextValue: string,
+	) => {
+		onChange?.(event)
+
+		if (source !== 'conversation' || !onQuickMessageSelect) return
+
+		const el = inputRef.current
+		const cursorPos = el?.selectionStart ?? newPlainTextValue.length
+		const slashInfo = getQuickMessageQuery(newPlainTextValue, cursorPos)
+
+		if (slashInfo) {
+			slashInfoRef.current = slashInfo
+			setOpenQuickMessage(true)
+			searchQuickMessages(slashInfo.query)
+			return
+		}
+
+		setOpenQuickMessage(false)
+		slashInfoRef.current = null
+		setQuickMessageList([])
+	}
+
 	const handleChangeValue = (item: any) => {
 		const el = inputRef.current
 		if (!el) return
@@ -374,6 +499,38 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 	}
 
 	const handleKeyDown = (e: any) => {
+		if (openQuickMessage) {
+			if (e.key === 'ArrowDown' && quickMessageList.length > 0) {
+				e.preventDefault()
+				setFocusedQuickMessageIndex((prev) =>
+					prev >= quickMessageList.length - 1 ? 0 : prev + 1,
+				)
+				return
+			}
+			if (e.key === 'ArrowUp' && quickMessageList.length > 0) {
+				e.preventDefault()
+				setFocusedQuickMessageIndex((prev) =>
+					prev <= 0 ? quickMessageList.length - 1 : prev - 1,
+				)
+				return
+			}
+			if (e.key === 'Enter') {
+				e.preventDefault()
+				e.stopPropagation()
+				if (quickMessageList.length > 0) {
+					handleSelectQuickMessage(quickMessageList[focusedQuickMessageIndex])
+				}
+				return
+			}
+		}
+
+		if (e.key === 'Escape' && openQuickMessage) {
+			e.preventDefault()
+			setOpenQuickMessage(false)
+			slashInfoRef.current = null
+			return
+		}
+
 		if (e.key !== 'Enter') return
 
 		if (e.shiftKey) return
@@ -382,7 +539,7 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 		const pendingMention = hasPendingMention(inputValue, value || '')
 		const suggestionOpen = isMentionSuggestionOpen()
 
-		if (suggestionOpen || (openMention && pendingMention)) {
+		if (suggestionOpen || (openMention && pendingMention) || openQuickMessage) {
 			return
 		}
 
@@ -468,6 +625,9 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 			if (debounceRef.current) {
 				clearTimeout(debounceRef.current)
 			}
+			if (quickMessageDebounceRef.current) {
+				clearTimeout(quickMessageDebounceRef.current)
+			}
 		}
 	}, [])
 
@@ -483,7 +643,7 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 				inputRef={inputRef}
 				placeholder="Text message"
 				value={value}
-				onChange={onChange}
+				onChange={handleMentionsChange}
 				onKeyDown={handleKeyDown}
 				allowSpaceInQuery={true}
 				a11ySuggestionsListLabel="Suggested mentions"
@@ -509,6 +669,38 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 					displayTransform={(_id, display) => `@${display}`}
 				/>
 			</MentionsInput>
+
+			{openQuickMessage && onQuickMessageSelect && (
+				<div className={classes.wrapperQuickMessageSuggest}>
+					{quickMessageLoading &&
+						arrayFrom(3).map((_, index) => (
+							<div key={index} className={classes.quickMessageSkeleton}>
+								<Skeleton.Input active block />
+							</div>
+						))}
+					{!quickMessageLoading &&
+						quickMessageList.map((item, index) => (
+							<QuickMessageListItem
+								key={item.id}
+								item={item}
+								mode="pick"
+								size="compact"
+								active={index === focusedQuickMessageIndex}
+								showDivider={index < quickMessageList.length - 1}
+								onMouseDown={(e) => {
+									e.preventDefault()
+									handleSelectQuickMessage(item)
+								}}
+								onMouseEnter={() => setFocusedQuickMessageIndex(index)}
+							/>
+						))}
+					{!quickMessageLoading && quickMessageList.length === 0 && (
+						<div className={classes.quickMessageEmpty}>
+							No quick messages found
+						</div>
+					)}
+				</div>
+			)}
 
 			{!!suffix && <div className={classes.suffix}>{suffix}</div>}
 		</div>

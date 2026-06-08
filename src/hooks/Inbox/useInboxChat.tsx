@@ -19,9 +19,8 @@ import {
 } from '@/apis/conversationApis'
 import {
 	handleUploadAudio,
-	handleUploadImage,
-	handleUploadVideo,
 } from '@/apis/uploadApis'
+import { buildChatMediasPayload } from '@/ultis/chatMedia'
 
 import { mappingMessageChat, uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay } from '@/ultis/common'
@@ -68,50 +67,6 @@ export default function useInboxChat(props: useHangoutChatProps) {
 	const reactList = useRef<{ [key: string]: ReactionPtops }>({})
 	const [openReact, setOpenReact] = useState() as any
 	const [editingMessage, setEditingMessage] = useState<any>(null)
-
-	const getMediaThumbnail = (item: {
-		thumbnail?: string | null
-		url?: string
-	}) => {
-		if (typeof item?.thumbnail === 'string' && item.thumbnail) {
-			return item.thumbnail
-		}
-		return item?.url || ''
-	}
-
-	const buildMediasPayload = async (_medias: any[] = []) => {
-		const medias: any[] = []
-		for (const item of _medias) {
-			if (item?.file) {
-				const url =
-					item.type === 'IMAGE'
-						? await handleUploadImage(item.file)
-						: await handleUploadVideo(item.file)
-				medias.push({
-					url,
-					type: item?.type || 'IMAGE',
-					fileName: null,
-					width: 692,
-					height: 1500,
-					ratio: 0.4613333333333333,
-					thumbnail: getMediaThumbnail({ url }),
-					duration: 0,
-				})
-			} else if (item?.url) {
-				medias.push({
-					url: item.url,
-					type: item?.type || 'IMAGE',
-					fileName: item.fileName ?? null,
-					width: item.width ?? 692,
-					height: item.height ?? 1500,
-					ratio: item.ratio ?? 0.4613333333333333,
-					thumbnail: getMediaThumbnail(item),
-					duration: item.duration ?? 0,
-				})
-			}
-		}
-		return medias
-	}
 
 	const handleStartEdit = (message: any) => {
 		if (!['TEXT', 'MEDIAS'].includes(message?.type)) return
@@ -346,29 +301,13 @@ export default function useInboxChat(props: useHangoutChatProps) {
 	}) => {
 		try {
 			let type = _type
-			let medias = []
+			let medias: any[] = []
 
 			if (_medias?.length > 0) {
-				const uploadPromises = _medias.map((media) =>
-					media?.type === 'IMAGE'
-						? handleUploadImage(media.file)
-						: handleUploadVideo(media.file),
-				)
-				const resList = await Promise.all(uploadPromises)
-				type = 'MEDIAS'
-				medias = (_medias || []).map((i, index) => {
-					const url = resList[index]
-					return {
-						url,
-						type: i?.type || 'IMAGE',
-						fileName: null,
-						width: 692,
-						height: 1500,
-						ratio: 0.4613333333333333,
-						thumbnail: url || '',
-						duration: 0,
-					}
-				})
+				medias = await buildChatMediasPayload(_medias)
+				if (medias.length > 0) {
+					type = 'MEDIAS'
+				}
 			}
 
 			if (!!audio) {
@@ -537,7 +476,7 @@ export default function useInboxChat(props: useHangoutChatProps) {
 	}) => {
 		if (!message?.id) return
 		try {
-			const medias = await buildMediasPayload(
+			const medias = await buildChatMediasPayload(
 				(_medias || []).slice(0, MAX_CHAT_MEDIAS),
 			)
 			const type = medias.length > 0 ? 'MEDIAS' : 'TEXT'

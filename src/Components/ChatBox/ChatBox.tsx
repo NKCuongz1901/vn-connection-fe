@@ -26,6 +26,8 @@ import {
 import { getUserInfo } from '@/ultis/storage'
 
 import QuickMessageModal from '@/Components/Modal/QuickMesageModal/QuickMessageModal'
+import { mapQuickMessageToSendMedias } from '@/Components/Modal/QuickMesageModal/quickMessageUtils'
+import { QuickMessageItem } from '@/hooks/QuickMesage/useQuickMessage'
 import HappyIcon from '@/svg/HappyIcon'
 import ImageIcon from '@/svg/ImageIcon'
 import ReplyIcon from '@/svg/ReplyIcon'
@@ -849,6 +851,23 @@ const ChatBox = ({
 		[setShowActionMenu],
 	)
 
+	const handleSendQuickMessage = useCallback(
+		(item: QuickMessageItem) => {
+			const content = item?.content || ''
+			const medias = mapQuickMessageToSendMedias(item)
+			if (!content.trim() && !medias.length) return
+
+			onSendMessage({
+				type: 'TEXT',
+				content,
+				parent: reply,
+				medias,
+			})
+			setReply(null)
+		},
+		[onSendMessage, reply, setReply],
+	)
+
 	const handleSelectQuickMessage = useCallback(
 		(item: any) => {
 			setText(item?.content || '')
@@ -1100,6 +1119,7 @@ const ChatBox = ({
 					style={{ height: 40 }}
 					suffix={_renderIconHappy()}
 					placeholder="Enter your text ..."
+					onQuickMessageSelect={handleSendQuickMessage}
 					// disabled={fileList?.length > 0}
 					onChange={(e) => setText(e.target.value)}
 					onSendMessage={(e) => {

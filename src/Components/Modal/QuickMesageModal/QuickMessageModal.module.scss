@@ -69,6 +69,10 @@
 	}
 }
 
+.listItemActive {
+	background: #f0f3f9;
+}
+
 .listItemText {
 	flex: 1;
 	min-width: 0;
@@ -112,6 +116,17 @@
 		width: 64px;
 		height: 64px;
 		object-fit: cover;
+	}
+}
+
+.thumbnailCompact {
+	width: 48px;
+	height: 48px;
+
+	:global(.ant-image),
+	img {
+		width: 48px;
+		height: 48px;
 	}
 }
 

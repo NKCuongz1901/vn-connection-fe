@@ -28,9 +28,8 @@ import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'
 import {
 	handleUploadAudio,
-	handleUploadImage,
-	handleUploadVideo,
 } from '@/apis/uploadApis'
+import { buildChatMediasPayload } from '@/ultis/chatMedia'
 const libraries: any = ['places']
 
 type useHangoutChatProps = {
@@ -205,25 +204,12 @@ export default function useHangoutChat({
 		try {
 			const { _id: parent_id } = parent || {}
 			let type = _type
-			let medias = []
+			let medias: any[] = []
 			if (_medias?.length > 0) {
-				const uploadPromises = _medias.map((media) =>
-					media?.type === 'IMAGE'
-						? handleUploadImage(media.file)
-						: handleUploadVideo(media.file),
-				)
-				const resList = await Promise.all(uploadPromises)
-				type = 'MEDIAS'
-				medias = (_medias || []).map((i, index) => ({
-					url: resList[index],
-					type: i?.type || 'IMAGE',
-					fileName: null,
-					width: 692,
-					height: 1500,
-					ratio: 0.4613333333333333,
-					thumbnail: null,
-					duration: 0,
-				}))
+				medias = await buildChatMediasPayload(_medias)
+				if (medias.length > 0) {
+					type = 'MEDIAS'
+				}
 			}
 			if (!!audio) {
 				const resAudio = await handleUploadAudio(audio)

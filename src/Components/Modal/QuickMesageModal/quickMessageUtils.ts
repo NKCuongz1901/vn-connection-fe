@@ -26,3 +26,22 @@ export const getQuickMessageMediaUrl = (item?: QuickMessageItem | null) => {
 	if (!item) return ''
 	return item.media || item.medias?.[0]?.url || ''
 }
+
+export const mapQuickMessageToSendMedias = (item?: QuickMessageItem | null) => {
+	if (!item) return []
+	if (item.medias?.length) {
+		return item.medias.map((media) => ({
+			url: media.url,
+			type: media.type || 'IMAGE',
+			width: media.width,
+			height: media.height,
+			ratio: media.ratio,
+			duration: media.duration,
+			thumbnail: media.url,
+		}))
+	}
+	if (item.media) {
+		return [{ url: item.media, type: 'IMAGE', thumbnail: item.media }]
+	}
+	return []
+}

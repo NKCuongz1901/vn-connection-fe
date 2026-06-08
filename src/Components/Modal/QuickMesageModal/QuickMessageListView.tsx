@@ -1,5 +1,6 @@
 import { IconEdit } from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
+import clsx from 'clsx'
 import { memo } from 'react'
 
 import {
@@ -42,19 +43,28 @@ export const QuickMessageGuideBanner = memo(function QuickMessageGuideBanner({
 interface QuickMessageListItemProps {
 	item: QuickMessageItem
 	mode?: 'pick' | 'manage'
+	size?: 'default' | 'compact'
+	active?: boolean
 	onClick?: () => void
 	onEdit?: () => void
+	onMouseDown?: (e: React.MouseEvent<HTMLDivElement>) => void
+	onMouseEnter?: () => void
 	showDivider?: boolean
 }
 
 export const QuickMessageListItem = memo(function QuickMessageListItem({
 	item,
 	mode = 'pick',
+	size = 'default',
+	active = false,
 	onClick,
 	onEdit,
+	onMouseDown,
+	onMouseEnter,
 	showDivider = true,
 }: QuickMessageListItemProps) {
 	const mediaUrl = getQuickMessageMediaUrl(item)
+	const isCompact = size === 'compact'
 
 	const handleRowClick = () => {
 		if (mode === 'pick') {
@@ -68,7 +78,14 @@ export const QuickMessageListItem = memo(function QuickMessageListItem({
 
 	return (
 		<>
-			<div className={classes.listItem} onClick={handleRowClick}>
+			<div
+				className={clsx(classes.listItem, {
+					[classes.listItemActive]: active,
+				})}
+				onClick={onMouseDown ? undefined : handleRowClick}
+				onMouseDown={onMouseDown}
+				onMouseEnter={onMouseEnter}
+			>
 				<div className={classes.listItemText}>
 					<span className={classes.shortcutTag}>
 						{formatShortcutLabel(item.shortcut)}
@@ -90,7 +107,11 @@ export const QuickMessageListItem = memo(function QuickMessageListItem({
 							</div>
 						</div>
 					) : (
-						<div className={classes.thumbnail}>
+						<div
+							className={clsx(classes.thumbnail, {
+								[classes.thumbnailCompact]: isCompact,
+							})}
+						>
 							<CImage src={mediaUrl} alt="" preview={false} />
 						</div>
 					))}

@@ -78,6 +78,40 @@
 	background: #f2f4f7;
 }
 
+.wrapperQuickMessageSuggest {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: calc(100% + 8px);
+	width: 100%;
+	max-height: 240px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	background: #fff;
+	border-radius: 8px;
+	box-shadow:
+		0px 4px 24px 0px rgba(0, 8, 25, 0.04),
+		0px 0px 1px 0px rgba(0, 8, 25, 0.08);
+	z-index: 10;
+}
+
+.quickMessageSkeleton {
+	padding: 8px 16px;
+
+	:global(.ant-skeleton-input) {
+		width: 100% !important;
+		height: 56px !important;
+		border-radius: 8px;
+	}
+}
+
+.quickMessageEmpty {
+	padding: 12px 16px;
+	color: #7987a4;
+	font-size: 14px;
+	line-height: 20px;
+}
+
 @media (min-width: 0px) and (max-width: 769px) {
 	.layout {
 		max-width: calc(100dvw - 148px);
