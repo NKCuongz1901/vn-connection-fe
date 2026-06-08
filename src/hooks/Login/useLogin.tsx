@@ -22,12 +22,17 @@ export default function useLogin(options?: UseLoginOptions) {
 	const { toggleLoadingContext } = useLoading()
 	const { openError } = useModal()
 	const { onChangeRoute } = useLocalePath()
+	const [loginStep, setLoginStep] = useState<'phone' | 'password'>('phone')
 	const [account, setAccount] = useState({
 		phone: '',
 		password: '',
 		isRemember: true,
 		prefix: '+84',
 	})
+
+	const isPhoneValid = useMemo(() => {
+		return account.phone.length >= 9
+	}, [account.phone])
 
 	const isValidate = useMemo(() => {
 		const { phone, password } = account
@@ -42,15 +47,37 @@ export default function useLogin(options?: UseLoginOptions) {
 				case 'phone':
 					value = _value.replace(/[^0-9]/g, '')
 					break
+				case 'prefix':
+					if (loginStep === 'password') {
+						setLoginStep('phone')
+						setAccount((pre) => ({
+							...pre,
+							prefix: value,
+							password: '',
+						}))
+						return
+					}
+					break
 				default:
 					break
 			}
+
+			if (key === 'phone' && loginStep === 'password') {
+				setLoginStep('phone')
+				setAccount((pre) => ({
+					...pre,
+					phone: value,
+					password: '',
+				}))
+				return
+			}
+
 			setAccount((pre) => ({
 				...pre,
 				[key]: value,
 			}))
 		},
-		[],
+		[loginStep],
 	)
 
 	const persistLoginSession = useCallback(
@@ -104,8 +131,8 @@ export default function useLogin(options?: UseLoginOptions) {
 		[onChangeRoute],
 	)
 
-	const handleLogin = async () => {
-		const { phone, password, prefix, isRemember } = account
+	const handleContinuePhone = async () => {
+		const { phone, prefix } = account
 		const formattedPhone = formatPhone(prefix, phone)
 
 		toggleLoadingContext(true)
@@ -118,6 +145,20 @@ export default function useLogin(options?: UseLoginOptions) {
 				return
 			}
 
+			setLoginStep('password')
+		} catch (error: any) {
+			openError(error)
+		} finally {
+			toggleLoadingContext(false)
+		}
+	}
+
+	const handleLogin = async () => {
+		const { phone, password, prefix, isRemember } = account
+		const formattedPhone = formatPhone(prefix, phone)
+
+		toggleLoadingContext(true)
+		try {
 			const res: any = await loginByPhone({
 				phone: formattedPhone,
 				password: md5(password),
@@ -139,9 +180,12 @@ export default function useLogin(options?: UseLoginOptions) {
 	}, [])
 
 	return {
+		loginStep,
+		isPhoneValid,
 		isValidate,
 		account,
 		onChange: handleChange,
+		onContinuePhone: handleContinuePhone,
 		onLogin: handleLogin,
 	}
 }

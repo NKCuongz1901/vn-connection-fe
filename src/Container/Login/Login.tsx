@@ -39,7 +39,15 @@ const Login = () => {
 		useState(false)
 	const [notFoundPhone, setNotFoundPhone] = useState('')
 
-	const { account, onChange, isValidate, onLogin } = useLogin({
+	const {
+		loginStep,
+		account,
+		onChange,
+		isPhoneValid,
+		isValidate,
+		onContinuePhone,
+		onLogin,
+	} = useLogin({
 		onAccountNotFound: (displayPhone) => {
 			setNotFoundPhone(displayPhone)
 			setOpenModalNotFoundAccount(true)
@@ -75,7 +83,9 @@ const Login = () => {
 
 	const _renderRight = () => {
 		const { phone, password, isRemember, prefix } = account
-		const disable = !isValidate || loadingContext
+		const isPasswordStep = loginStep === 'password'
+		const disable =
+			loadingContext || (isPasswordStep ? !isValidate : !isPhoneValid)
 		return (
 			<Flex className={classes.right} vertical>
 				<Flex className={classes.rightHeader} justify="flex-end" align="center">
@@ -92,7 +102,17 @@ const Login = () => {
 				>
 					<Flex vertical gap={20} className={classes.form}>
 						<div className={classes.rightTop3}>
-							Just enter your <br /> phone number to get started
+							{isPasswordStep ? (
+								<>
+									Welcome back!
+									<br />
+									Enter your password to continue
+								</>
+							) : (
+								<>
+									Just enter your <br /> phone number to get started
+								</>
+							)}
 						</div>
 						<div
 							className={classes.fieldLabel}
@@ -121,44 +141,53 @@ const Login = () => {
 								}}
 							/>
 						</div>
-						<div
-							className={classes.passwordField}
-							style={{
-								color: '#0f1729',
-								fontSize: '14px',
-								fontWeight: 500,
-								lineHeight: '20px',
-							}}
-						>
-							<CInputPassword
-								isNotBold={true}
-								isRequired
-								label="Password"
-								value={password}
-								onChange={(e) => onChange('password')(e.target.value)}
-								placeholder="Password"
-							/>
-						</div>
-						<Flex justify="space-between" align="flex-start">
-							<Checkbox
-								checked={isRemember}
-								onChange={(e) => onChange('isRemember')(e.target.checked)}
-							>
-								Remember me
-							</Checkbox>
-							<Flex vertical gap={16} align="flex-end">
-								<Link href={onGetPath(forgetPassword)}>
-									<span className={classes.color}>Forgot password?</span>
-								</Link>
-								<span onClick={() => setOpenModalReport(true)}>
-									<span className={classes.color}>Need help?</span>
-								</span>
-							</Flex>
-						</Flex>
+						{isPasswordStep && (
+							<>
+								<div
+									className={classes.passwordField}
+									style={{
+										color: '#0f1729',
+										fontSize: '14px',
+										fontWeight: 500,
+										lineHeight: '20px',
+									}}
+								>
+									<CInputPassword
+										isNotBold={true}
+										isRequired
+										label="Password"
+										value={password}
+										onChange={(e) => onChange('password')(e.target.value)}
+										placeholder="Password"
+									/>
+								</div>
+								<Flex justify="space-between" align="flex-start">
+									<Checkbox
+										checked={isRemember}
+										onChange={(e) => onChange('isRemember')(e.target.checked)}
+									>
+										Remember me
+									</Checkbox>
+									<Flex vertical gap={16} align="flex-end">
+										<Link href={onGetPath(forgetPassword)}>
+											<span className={classes.color}>Forgot password?</span>
+										</Link>
+										<span onClick={() => setOpenModalReport(true)}>
+											<span className={classes.color}>Need help?</span>
+										</span>
+									</Flex>
+								</Flex>
+							</>
+						)}
+						{!isPasswordStep && (
+							<span onClick={() => setOpenModalReport(true)}>
+								<span className={classes.color}>Need help?</span>
+							</span>
+						)}
 						<CButton
 							disabled={disable}
 							ctype={!disable ? 'oranger' : null}
-							onClick={onLogin}
+							onClick={isPasswordStep ? onLogin : onContinuePhone}
 						>
 							Continue
 						</CButton>
