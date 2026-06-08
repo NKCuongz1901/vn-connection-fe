@@ -75,3 +75,7 @@ export const getSystemSettings = async ({
 		params: convertParams(params),
 	})
 }
+
+export const sendToMail = async () => {
+	return await axios.post(AUTH_ROUTES.sendToMail)
+}

@@ -5,7 +5,6 @@ import { memo, useMemo } from 'react'
 
 import useRegisterAndReset from '@/hooks/RegisterAndReset/useRegisterAndReset'
 import { useLoading } from '@/context/LoadingContext'
-import { formatPhone } from '@/ultis/common'
 import { useLocalePath } from '@/ultis/route'
 
 import ChangePassword from '@/Components/Auth/ChangePassword'
@@ -35,11 +34,17 @@ const ForgetPassword = ({
 		step,
 		accountInfo,
 		errors,
+		fromAccount,
+		otpChannel,
+		otpDestination,
 		onChangeStep,
 		onChangeData,
 		onSubmitPhone,
 		onSubmitOtp,
 		onSubmitPass,
+		onResendOtp,
+		onSwitchToSms,
+		onClearForgetSession,
 	} = useRegisterAndReset({
 		type,
 		steps,
@@ -58,6 +63,15 @@ const ForgetPassword = ({
 	} = accountInfo
 	const isRegister = useMemo(() => type === OTP_TYPE.REGISTER, [type])
 
+	const handleClose = () => {
+		onClearForgetSession()
+		onChangeRoute(
+			fromAccount
+				? `${mainRoutes.accountSetting}/manage-account/change`
+				: mainRoutes.login,
+		)
+	}
+
 	const _renderContent = () => {
 		const disabled = !isValidate || loadingContext
 		switch (step) {
@@ -71,19 +85,23 @@ const ForgetPassword = ({
 						onChangePrefix={onChangeData('prefix')}
 						onChange={(e: any) => onChangeData('phone')(e.target.value)}
 						onAccept={onSubmitPhone}
-						onCancel={() => onChangeRoute(mainRoutes.login)}
+						onCancel={handleClose}
 					/>
 				)
 			case 1:
 				return (
 					<VerifyOTP
-						title={steps[step]}
-						phone={formatPhone(prefix, phone)}
+						title="Enter Your Verification Code"
+						destination={otpDestination}
+						channel={otpChannel}
 						value={otp}
 						onChange={onChangeData('otp')}
 						onInput={onChangeData('otp')}
 						onAccept={onSubmitOtp}
-						onSendAgain={onSubmitPhone}
+						onSendAgain={onResendOtp}
+						onSwitchToSms={onSwitchToSms}
+						showSwitchToPhone={Boolean(phone) && otpChannel === 'email'}
+						hiddenChangeStep={fromAccount}
 						onChangeStep={onChangeStep}
 					/>
 				)
@@ -116,10 +134,7 @@ const ForgetPassword = ({
 		<Flex className={classes.wrapper} vertical align="center">
 			<Flex className={classes.title}>
 				<Flex>{title}</Flex>
-				<CloseOutlined
-					className="icon-1"
-					onClick={() => onChangeRoute(mainRoutes.login)}
-				/>
+				<CloseOutlined className="icon-1" onClick={handleClose} />
 			</Flex>
 			<Flex className={classes.step} align="center">
 				<div className={classes.stepContent}>

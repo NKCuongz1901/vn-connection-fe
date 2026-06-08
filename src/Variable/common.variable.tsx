@@ -1198,6 +1198,8 @@ export const countryCodes = [
 }))
 
 export const REGISTER_FROM_LOGIN_SESSION_KEY = 'register_from_login'
+export const FORGET_PASSWORD_FROM_ACCOUNT_SESSION_KEY =
+	'forget_password_from_account'
 
 export enum OTP_TYPE {
 	REGISTER = 'REGISTER',

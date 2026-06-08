@@ -161,7 +161,10 @@ const MainLayout = (props: MainLayoutProps) => {
 			}
 		} else {
 			const isOpenAppPage = pathname.includes('open-app')
-			if (login && !isOpenAppPage) {
+			const isGuestOnlyAuth = [mainRoutes.login, mainRoutes.register].some((i) =>
+				pathname.includes(i),
+			)
+			if (login && !isOpenAppPage && isGuestOnlyAuth) {
 				onChangeRoute(mainRoutes.overview)
 			} else {
 				setContent(<AuthLayout>{children}</AuthLayout>)

@@ -21,6 +21,7 @@ export const AUTH_ROUTES = {
 	checkOTP: 'auth/otp/check',
 	forgetPassword: '/auth/forget_password',
 	registerByPhone: '/auth/register_by_phone',
+	sendToMail: 'auth/otp/send-to-mail',
 	logout: '/auth/logout',
 }
 

@@ -1,5 +1,5 @@
 import md5 from 'md5'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
@@ -9,26 +9,71 @@ import {
 	forgetPasswordByPhone,
 	registerByPhone,
 	sendOTP,
+	sendToMail,
 	verifyOTP,
 } from '@/apis/authApis'
 
 import { isArray } from '@/ultis/array'
 import { formatPhone, toJson } from '@/ultis/common'
 import { useLocalePath } from '@/ultis/route'
+import { getSessionStorage, getUserInfo } from '@/ultis/storage'
 
 import {
+	FORGET_PASSWORD_FROM_ACCOUNT_SESSION_KEY,
 	OTP_TYPE,
 	OTPType,
 	REGISTER_FROM_LOGIN_SESSION_KEY,
 } from '@/Variable/common.variable'
-import { getSessionStorage } from '@/ultis/storage'
 import { emailRegex, passwordRegex } from '@/Variable/regex.variable'
+import { STORAGE_KEY } from '@/Variable/storage.variable'
 import { forgetPasswordStep } from '@/Variable/step.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 type RegisterFromLoginInit = {
 	phone: string
 	prefix: string
+}
+
+type ForgetPasswordFromAccountInit = {
+	phone: string
+	prefix: string
+	channel: 'email' | 'sms'
+	email_masked?: string
+	fromAccount: true
+}
+
+type OtpChannel = 'email' | 'sms'
+
+let forgetPasswordFromAccountCache:
+	| ForgetPasswordFromAccountInit
+	| null
+	| undefined
+
+export const clearForgetPasswordFromAccount = () => {
+	forgetPasswordFromAccountCache = undefined
+	if (typeof window !== 'undefined') {
+		sessionStorage.removeItem(FORGET_PASSWORD_FROM_ACCOUNT_SESSION_KEY)
+	}
+}
+
+const readForgetPasswordFromQuery = (): ForgetPasswordFromAccountInit | null => {
+	if (typeof window === 'undefined') return null
+
+	const params = new URLSearchParams(window.location.search)
+	if (params.get('fromAccount') !== '1') return null
+
+	const user = {
+		...(getUserInfo() || {}),
+		...(getSessionStorage(STORAGE_KEY.USER) || {}),
+	}
+
+	return {
+		phone: params.get('phone') || user?.phone || '',
+		prefix: params.get('prefix') || user?.prefix_phone || '+84',
+		channel: params.get('channel') === 'sms' ? 'sms' : 'email',
+		email_masked: params.get('email') || undefined,
+		fromAccount: true,
+	}
 }
 
 const readRegisterFromLogin = (type: OTPType): RegisterFromLoginInit | null => {
@@ -46,23 +91,55 @@ const readRegisterFromLogin = (type: OTPType): RegisterFromLoginInit | null => {
 	}
 }
 
+const readForgetPasswordFromAccount = (
+	type: OTPType,
+): ForgetPasswordFromAccountInit | null => {
+	if (typeof window === 'undefined') return null
+	if (type !== OTP_TYPE.FORGET_PASSWORD) return null
+
+	if (forgetPasswordFromAccountCache !== undefined) {
+		return forgetPasswordFromAccountCache
+	}
+
+	const init = getSessionStorage(FORGET_PASSWORD_FROM_ACCOUNT_SESSION_KEY)
+	let result: ForgetPasswordFromAccountInit | null = null
+
+	if (init?.fromAccount) {
+		result = {
+			phone: init.phone ?? '',
+			prefix: init.prefix || '+84',
+			channel: init.channel === 'sms' ? 'sms' : 'email',
+			email_masked: init.email_masked,
+			fromAccount: true,
+		}
+	} else {
+		result = readForgetPasswordFromQuery()
+	}
+
+	forgetPasswordFromAccountCache = result
+	return result
+}
+
 const createInitialAccountInfo = (
 	type: OTPType,
 	steps: string[],
 	loginInit: RegisterFromLoginInit | null,
+	forgetInit: ForgetPasswordFromAccountInit | null,
 ) => ({
-	title: loginInit
-		? (steps[1] ?? 'OTP Verify')
-		: (steps[0] ?? 'Verify Phone Number'),
+	title: forgetInit
+		? (steps[1] ?? 'Code Verification')
+		: loginInit
+			? (steps[1] ?? 'Code Verification')
+			: (steps[0] ?? 'Enter Phone Number'),
 	otp: '',
-	phone: loginInit?.phone ?? '',
+	phone: forgetInit?.phone ?? loginInit?.phone ?? '',
 	password: '',
 	confirmPassword: '',
-	prefix: loginInit?.prefix ?? '+84',
+	prefix: forgetInit?.prefix ?? loginInit?.prefix ?? '+84',
 	uid: '',
 	name: '',
 	invite_code: '',
-	email: '',
+	email: forgetInit?.email_masked ?? '',
 	type,
 	checked: false,
 })
@@ -80,12 +157,32 @@ export default function useRegisterAndReset({
 	const otpFromLoginSentRef = useRef(false)
 
 	const [loginInit] = useState(() => readRegisterFromLogin(type))
-	const [step, setStep] = useState(() => (loginInit ? 1 : 0))
+	const [forgetInit] = useState(() => readForgetPasswordFromAccount(type))
+	const [fromAccount] = useState(() => Boolean(forgetInit?.fromAccount))
+	const [step, setStep] = useState(() => (loginInit || forgetInit ? 1 : 0))
+	const [otpChannel, setOtpChannel] = useState<OtpChannel>(
+		() => forgetInit?.channel ?? 'sms',
+	)
+	const [otpDestination, setOtpDestination] = useState(() => {
+		if (forgetInit?.channel === 'email' && forgetInit.email_masked) {
+			return forgetInit.email_masked
+		}
+		if (forgetInit?.phone) {
+			return formatPhone(forgetInit.prefix, forgetInit.phone)
+		}
+		return ''
+	})
 	const [accountInfo, setAccountInfo] = useState(() =>
-		createInitialAccountInfo(type, steps, loginInit),
+		createInitialAccountInfo(type, steps, loginInit, forgetInit),
 	)
 	const [errors, setErrors] = useState({})
 	const [isValidate, setIsValidate] = useState(false)
+
+	const formattedPhone = useMemo(
+		() => formatPhone(accountInfo.prefix, accountInfo.phone),
+		[accountInfo.phone, accountInfo.prefix],
+	)
+
 	const handleChangeStep = useCallback((value: number) => {
 		setStep(value)
 	}, [])
@@ -139,6 +236,8 @@ export default function useRegisterAndReset({
 				phone: formatPhone(prefix, phone),
 			})
 			if (dataSendOtp?.results?.object?.sid === 'success') {
+				setOtpChannel('sms')
+				setOtpDestination(formatPhone(prefix, phone))
 				setStep(1)
 			}
 		} catch (error) {
@@ -148,6 +247,70 @@ export default function useRegisterAndReset({
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [toJson(accountInfo)])
+
+	const handleResendEmailOtp = useCallback(async () => {
+		const res: any = await sendToMail()
+		const { sid, email_masked } = res?.results?.object ?? {}
+		if (sid !== 'success') {
+			throw res
+		}
+		if (email_masked) {
+			setOtpDestination(email_masked)
+			setAccountInfo((pre) => ({ ...pre, email: email_masked }))
+		}
+	}, [])
+
+	const handleResendSmsOtp = useCallback(async () => {
+		const { prefix, phone } = accountInfo
+		const res: any = await sendOTP({ phone: formatPhone(prefix, phone) })
+		if (res?.results?.object?.sid !== 'success') {
+			throw res
+		}
+		setOtpDestination(formatPhone(prefix, phone))
+	}, [accountInfo])
+
+	const handleResendOtp = useCallback(async () => {
+		toggleLoadingContext(true)
+		try {
+			if (otpChannel === 'email') {
+				await handleResendEmailOtp()
+			} else {
+				await handleResendSmsOtp()
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			toggleLoadingContext(false)
+		}
+	}, [
+		handleResendEmailOtp,
+		handleResendSmsOtp,
+		openError,
+		otpChannel,
+		toggleLoadingContext,
+	])
+
+	const handleSwitchToSms = useCallback(async () => {
+		if (!accountInfo.phone) {
+			openError({ message: 'No phone number found' })
+			return
+		}
+
+		toggleLoadingContext(true)
+		try {
+			await handleResendSmsOtp()
+			setOtpChannel('sms')
+		} catch (error) {
+			openError(error)
+		} finally {
+			toggleLoadingContext(false)
+		}
+	}, [
+		accountInfo.phone,
+		handleResendSmsOtp,
+		openError,
+		toggleLoadingContext,
+	])
 
 	const handleSubmitOtp = useCallback(async () => {
 		toggleLoadingContext(true)
@@ -188,7 +351,6 @@ export default function useRegisterAndReset({
 				payload = {
 					...payload,
 					name: name,
-					// name: formatPhone(prefix, phone),
 					email: email || '',
 					invite_code: invite_code || '',
 				}
@@ -197,11 +359,17 @@ export default function useRegisterAndReset({
 				? await registerByPhone(payload)
 				: await forgetPasswordByPhone(payload)
 			if (data?.code === 200) {
+				clearForgetPasswordFromAccount()
 				openSuccess({
 					message: isRegister
 						? 'Registration successful, move to login'
-						: 'Password changed successfully, move to login',
-					onAccept: () => onChangeRoute(mainRoutes.login),
+						: 'Password changed successfully',
+					onAccept: () =>
+						onChangeRoute(
+							fromAccount
+								? `${mainRoutes.accountSetting}/manage-account`
+								: mainRoutes.login,
+						),
 				})
 			}
 		} catch (error) {
@@ -210,7 +378,8 @@ export default function useRegisterAndReset({
 			toggleLoadingContext()
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [toJson(accountInfo), step])
+	}, [fromAccount, toJson(accountInfo), step])
+
 	const handleValidate = useCallback(() => {
 		const {
 			phone,
@@ -315,6 +484,9 @@ export default function useRegisterAndReset({
 				})
 				if (dataSendOtp?.results?.object?.sid !== 'success') {
 					openError({ message: 'Failed to send OTP. Please try again.' })
+				} else {
+					setOtpChannel('sms')
+					setOtpDestination(formatPhone(prefix, phone))
 				}
 			} catch (error) {
 				openError(error)
@@ -332,10 +504,17 @@ export default function useRegisterAndReset({
 		step: step,
 		accountInfo: accountInfo,
 		errors: errors,
+		fromAccount,
+		otpChannel,
+		otpDestination,
+		formattedPhone,
 		onChangeStep: handleChangeStep,
 		onChangeData: handleChangeAccountInfo,
 		onSubmitPhone: handleSubmitPhone,
 		onSubmitOtp: handleSubmitOtp,
 		onSubmitPass: handleSubmitPass,
+		onResendOtp: handleResendOtp,
+		onSwitchToSms: handleSwitchToSms,
+		onClearForgetSession: clearForgetPasswordFromAccount,
 	}
 }
