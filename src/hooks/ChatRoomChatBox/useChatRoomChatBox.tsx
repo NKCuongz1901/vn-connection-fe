@@ -153,7 +153,7 @@ export default function useChatRoomChatBox({
 		_refInput?.current?.focus()
 	}
 	const handleOpenReact = (item) => {
-		setOpenReact(item)
+		setOpenReact((prev) => (prev?.id === item?.id ? null : item))
 	}
 	const handleCopy = (data) => {
 		copyToClipboard(data, {

@@ -105,6 +105,8 @@ import QuickMessageIcon from '@/svg/QuickMessageIcon'
 import NoQuickMessage from '@/svg/NoQuickMessage'
 import ReminderIcon from '@/svg/ReminderIcon'
 import PollIcon from '@/svg/PollIcon'
+import CopyIcon from '@/svg/ChatBox/CopyIcon'
+import EditIcon from '@/svg/ChatBox/EditIcon'
 
 const Icons = () => {
 	const icons = [
@@ -477,6 +479,21 @@ const Icons = () => {
 		{
 			ICON: PollIcon,
 			name: '@/svg/Event/PollIcon',
+			key: randomString(),
+		},
+		{
+			ICON: CopyIcon,
+			name: '@/svg/Event/CopyIcon',
+			key: randomString(),
+		},
+		{
+			ICON: EditIcon,
+			name: '@/svg/Event/EditIcon',
+			key: randomString(),
+		},
+		{
+			ICON: ReplyIcon,
+			name: '@/svg/Event/ReplyIcon',
 			key: randomString(),
 		},
 	]

@@ -1,0 +1,119 @@
+.popover {
+	position: absolute;
+	bottom: calc(100% + 4px);
+	z-index: 10;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	pointer-events: auto;
+}
+
+.alignEnd {
+	right: 0;
+	align-items: flex-end;
+}
+
+.alignStart {
+	left: 0;
+	align-items: flex-start;
+}
+
+.reactionBar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 4px;
+	border-radius: 999px;
+	background: #fff;
+	box-shadow: 0px 8px 8px rgba(0, 8, 25, 0.16);
+}
+
+.reactionList {
+	display: flex;
+	align-items: center;
+}
+
+.reactionItem {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px;
+	cursor: pointer;
+	border-radius: 999px;
+
+	&:hover {
+		background: #f0f3f9;
+	}
+}
+
+.reactionItemActive {
+	background: #f0f3f9;
+}
+
+.reactionIcon {
+	width: 32px;
+	height: 32px;
+	flex-shrink: 0;
+
+	:global(.ant-image),
+	img {
+		width: 32px;
+		height: 32px;
+		object-fit: cover;
+	}
+}
+
+.menu {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 8px;
+	border-radius: 16px;
+	background: #fff;
+	box-shadow: 0px 0px 8px rgba(0, 8, 25, 0.08);
+	min-width: 160px;
+}
+
+.menuItem {
+	display: flex;
+	align-items: center;
+	border-radius: 8px;
+	cursor: pointer;
+	min-width: 0;
+
+	&:hover {
+		background: #fafbfd;
+	}
+}
+
+.menuItemIcon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	padding: 8px 12px 8px 16px;
+
+	svg {
+		width: 24px;
+		height: 24px;
+	}
+}
+
+.menuItemLabel {
+	flex: 1;
+	min-width: 0;
+	padding: 12px 16px 12px 0;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+	color: #0f1729;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.menuItemDanger {
+	.menuItemLabel {
+		color: #cd3031;
+	}
+}

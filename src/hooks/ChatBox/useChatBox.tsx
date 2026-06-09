@@ -264,7 +264,7 @@ export default function useChatBox({
 		return menus
 	}
 	const handleOpenReact = (item) => {
-		setOpenReact(item)
+		setOpenReact((prev) => (prev?.id === item?.id ? null : item))
 	}
 	const handleAddReact = async (values) => {
 		if (onAddReact) {

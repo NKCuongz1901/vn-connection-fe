@@ -82,6 +82,12 @@
 					}
 					.content {
 						max-width: 100%;
+						.messageBubbleHitArea {
+							max-width: 100%;
+						}
+						.messageBubbleInteractive {
+							cursor: pointer;
+						}
 						.moreIconWrapper {
 							align-items: center;
 							justify-content: center;
