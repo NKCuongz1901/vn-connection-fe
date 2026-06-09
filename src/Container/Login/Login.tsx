@@ -102,17 +102,9 @@ const Login = () => {
 				>
 					<Flex vertical gap={20} className={classes.form}>
 						<div className={classes.rightTop3}>
-							{isPasswordStep ? (
-								<>
-									Welcome back!
-									<br />
-									Enter your password to continue
-								</>
-							) : (
-								<>
-									Just enter your <br /> phone number to get started
-								</>
-							)}
+							<>
+								Just enter your <br /> phone number to get started
+							</>
 						</div>
 						<div
 							className={classes.fieldLabel}
