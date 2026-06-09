@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { sendOTP, sendToMail } from '@/apis/authApis'
 import { changeUserPassword } from '@/apis/userApis'
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 import { mainRoutes } from '@/routes/MainRoutes'
-import { formatPhone } from '@/ultis/common'
 import { useLocalePath } from '@/ultis/route'
 import { getSessionStorage, getUserInfo, setSessionStorage } from '@/ultis/storage'
 import { FORGET_PASSWORD_FROM_ACCOUNT_SESSION_KEY } from '@/Variable/common.variable'
@@ -89,77 +87,31 @@ export default function useChangePasswordAccount() {
 		onChangeRoute(`${mainRoutes.accountSetting}/manage-account`)
 	}, [onChangeRoute])
 
-	const handleForgotPassword = useCallback(async () => {
-		toggleLoadingContext(true)
-		try {
-			const user = {
-				...(getUserInfo() || {}),
-				...(getSessionStorage(STORAGE_KEY.USER) || {}),
-			}
-			const hasEmail = Boolean(user?.email?.trim())
-			const prefix = user?.prefix_phone ?? '+84'
-			const phone = user?.phone ?? ''
-
-			const navigateToForgetPassword = (data: {
-				channel: 'email' | 'sms'
-				email_masked?: string
-			}) => {
-				setSessionStorage({
-					key: FORGET_PASSWORD_FROM_ACCOUNT_SESSION_KEY,
-					data: {
-						phone,
-						prefix,
-						channel: data.channel,
-						email_masked: data.email_masked,
-						fromAccount: true,
-					},
-				})
-
-				const params = new URLSearchParams({
-					fromAccount: '1',
-					channel: data.channel,
-				})
-				if (data.email_masked) {
-					params.set('email', data.email_masked)
-				}
-				if (phone) {
-					params.set('phone', phone)
-					params.set('prefix', prefix)
-				}
-
-				onChangeRoute(`${mainRoutes.forgetPassword}?${params.toString()}`)
-			}
-
-			if (hasEmail) {
-				const res: any = await sendToMail()
-				const { sid, email_masked } = res?.results?.object ?? {}
-
-				if (sid === 'success' && email_masked) {
-					navigateToForgetPassword({ channel: 'email', email_masked })
-					return
-				}
-			}
-
-			if (!phone) {
-				openError({
-					message: 'Unable to send OTP. Please update your phone number.',
-				})
-				return
-			}
-
-			const res: any = await sendOTP({ phone: formatPhone(prefix, phone) })
-			if (res?.results?.object?.sid === 'success') {
-				navigateToForgetPassword({ channel: 'sms' })
-				return
-			}
-
-			openError({ message: 'Failed to send OTP' })
-		} catch (error) {
-			openError(error)
-		} finally {
-			toggleLoadingContext(false)
+	const handleForgotPassword = useCallback(() => {
+		const user = {
+			...(getUserInfo() || {}),
+			...(getSessionStorage(STORAGE_KEY.USER) || {}),
 		}
-	}, [onChangeRoute, openError, toggleLoadingContext])
+		const prefix = user?.prefix_phone ?? '+84'
+		const phone = user?.phone ?? ''
+
+		setSessionStorage({
+			key: FORGET_PASSWORD_FROM_ACCOUNT_SESSION_KEY,
+			data: {
+				phone,
+				prefix,
+				fromAccount: true,
+			},
+		})
+
+		const params = new URLSearchParams({ fromAccount: '1' })
+		if (phone) {
+			params.set('phone', phone)
+			params.set('prefix', prefix)
+		}
+
+		onChangeRoute(`${mainRoutes.forgetPassword}?${params.toString()}`)
+	}, [onChangeRoute])
 
 	return {
 		oldPassword,

@@ -28,6 +28,7 @@ export function useLocalePath() {
 	return {
 		pathname: pathname,
 		localePathname: localePathname,
+		locale,
 		onGetPath: handleGetPath,
 		onChangeRoute: handleChangeRoute,
 		onGetParam: handleGetParam,

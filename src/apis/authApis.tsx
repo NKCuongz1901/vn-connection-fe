@@ -76,6 +76,10 @@ export const getSystemSettings = async ({
 	})
 }
 
-export const sendToMail = async () => {
-	return await axios.post(AUTH_ROUTES.sendToMail)
+export const sendToMail = async (payload: {
+	phone: string
+	language?: string
+	[key: string]: any
+}) => {
+	return await axios.post(AUTH_ROUTES.sendToMail, payload)
 }
