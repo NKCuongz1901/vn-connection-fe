@@ -7,6 +7,12 @@
 	.container {
 		height: 100%;
 		width: 100%;
+		.columnDivider {
+			flex-shrink: 0;
+			align-self: stretch;
+			width: 1px;
+			background: #edf0f5;
+		}
 		.convContainer {
 			gap: 8px;
 			min-width: 392px;
@@ -280,6 +286,9 @@
 				}
 			}
 			.mini {
+				display: none;
+			}
+			.columnDivider {
 				display: none;
 			}
 

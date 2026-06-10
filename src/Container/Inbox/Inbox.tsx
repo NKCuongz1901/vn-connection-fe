@@ -361,6 +361,7 @@ const Inbox = () => {
 					{_renderPersonal()}
 					{_renderStranger()}
 				</Flex>
+				<div className={classes.columnDivider} />
 				<Flex className={classes.chatContainer}>
 					{convId && (
 						<InboxChat
