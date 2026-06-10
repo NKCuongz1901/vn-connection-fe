@@ -133,8 +133,11 @@ const ForgetPassword = ({
 	return (
 		<Flex className={classes.wrapper} vertical align="center">
 			<Flex className={classes.title}>
-				<Flex>{title}</Flex>
-				<CloseOutlined className="icon-1" onClick={handleClose} />
+				{/* <Flex>{title}</Flex> */}
+				<div></div>
+				<div className={classes.titleWrapper}>
+					<CloseOutlined className="icon-1" onClick={handleClose} />
+				</div>
 			</Flex>
 			<Flex className={classes.step} align="center">
 				<div className={classes.stepContent}>

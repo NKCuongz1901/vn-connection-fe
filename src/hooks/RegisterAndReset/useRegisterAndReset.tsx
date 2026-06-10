@@ -16,7 +16,7 @@ import {
 import { isArray } from '@/ultis/array'
 import { formatPhone, toJson } from '@/ultis/common'
 import { useLocalePath } from '@/ultis/route'
-import { getSessionStorage, getUserInfo } from '@/ultis/storage'
+import { getSessionStorage } from '@/ultis/storage'
 
 import {
 	FORGET_PASSWORD_FROM_ACCOUNT_SESSION_KEY,
@@ -25,7 +25,6 @@ import {
 	REGISTER_FROM_LOGIN_SESSION_KEY,
 } from '@/Variable/common.variable'
 import { emailRegex, passwordRegex } from '@/Variable/regex.variable'
-import { STORAGE_KEY } from '@/Variable/storage.variable'
 import { forgetPasswordStep } from '@/Variable/step.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
@@ -35,11 +34,7 @@ type RegisterFromLoginInit = {
 }
 
 type ForgetPasswordFromAccountInit = {
-	phone: string
-	prefix: string
 	fromAccount: true
-	channel?: 'email' | 'sms'
-	email_masked?: string
 }
 
 type OtpChannel = 'email' | 'sms'
@@ -62,16 +57,7 @@ const readForgetPasswordFromQuery = (): ForgetPasswordFromAccountInit | null => 
 	const params = new URLSearchParams(window.location.search)
 	if (params.get('fromAccount') !== '1') return null
 
-	const user = {
-		...(getUserInfo() || {}),
-		...(getSessionStorage(STORAGE_KEY.USER) || {}),
-	}
-
-	return {
-		phone: params.get('phone') || user?.phone || '',
-		prefix: params.get('prefix') || user?.prefix_phone || '+84',
-		fromAccount: true,
-	}
+	return { fromAccount: true }
 }
 
 const readRegisterFromLogin = (type: OTPType): RegisterFromLoginInit | null => {
@@ -103,11 +89,7 @@ const readForgetPasswordFromAccount = (
 	let result: ForgetPasswordFromAccountInit | null = null
 
 	if (init?.fromAccount) {
-		result = {
-			phone: init.phone ?? '',
-			prefix: init.prefix || '+84',
-			fromAccount: true,
-		}
+		result = { fromAccount: true }
 	} else {
 		result = readForgetPasswordFromQuery()
 	}
@@ -126,10 +108,10 @@ const createInitialAccountInfo = (
 		? (steps[1] ?? 'Code Verification')
 		: (steps[0] ?? 'Enter Phone Number'),
 	otp: '',
-	phone: forgetInit?.phone ?? loginInit?.phone ?? '',
+	phone: loginInit?.phone ?? '',
 	password: '',
 	confirmPassword: '',
-	prefix: forgetInit?.prefix ?? loginInit?.prefix ?? '+84',
+	prefix: loginInit?.prefix ?? '+84',
 	uid: '',
 	name: '',
 	invite_code: '',

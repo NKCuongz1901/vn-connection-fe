@@ -5,10 +5,9 @@ import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { useLocalePath } from '@/ultis/route'
-import { getSessionStorage, getUserInfo, setSessionStorage } from '@/ultis/storage'
+import { setSessionStorage } from '@/ultis/storage'
 import { FORGET_PASSWORD_FROM_ACCOUNT_SESSION_KEY } from '@/Variable/common.variable'
 import { passwordRegex } from '@/Variable/regex.variable'
-import { STORAGE_KEY } from '@/Variable/storage.variable'
 
 type FormErrors = {
 	oldPassword?: string
@@ -88,29 +87,12 @@ export default function useChangePasswordAccount() {
 	}, [onChangeRoute])
 
 	const handleForgotPassword = useCallback(() => {
-		const user = {
-			...(getUserInfo() || {}),
-			...(getSessionStorage(STORAGE_KEY.USER) || {}),
-		}
-		const prefix = user?.prefix_phone ?? '+84'
-		const phone = user?.phone ?? ''
-
 		setSessionStorage({
 			key: FORGET_PASSWORD_FROM_ACCOUNT_SESSION_KEY,
-			data: {
-				phone,
-				prefix,
-				fromAccount: true,
-			},
+			data: { fromAccount: true },
 		})
 
-		const params = new URLSearchParams({ fromAccount: '1' })
-		if (phone) {
-			params.set('phone', phone)
-			params.set('prefix', prefix)
-		}
-
-		onChangeRoute(`${mainRoutes.forgetPassword}?${params.toString()}`)
+		onChangeRoute(`${mainRoutes.forgetPassword}?fromAccount=1`)
 	}, [onChangeRoute])
 
 	return {

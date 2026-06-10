@@ -42,7 +42,7 @@ const VerifyPhone = ({
 				<Flex vertical align="center" gap={4}>
 					<div className={classes.title}>{title}</div>
 					<span className="gray">
-						Enter your phone number we’ll verify your phone
+						Enter your phone number we’ll reset your password
 					</span>
 				</Flex>
 				<CInputPhone

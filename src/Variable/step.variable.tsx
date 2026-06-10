@@ -1,5 +1,5 @@
 export const forgetPasswordStep = [
-	'Enter Phone Number',
+	'Reset your password',
 	'Code Verification',
 	'Change Password',
 ]
