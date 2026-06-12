@@ -546,7 +546,12 @@ const Profile = (props: ProfileProps) => {
 							</span>
 						</div>
 					</Flex>
-					{/* <CButton className={classes.inviteBtn}>Invite now</CButton> */}
+					<CButton
+						className={classes.inviteBtn}
+						onClick={() => onChangeRoute(mainRoutes.referral)}
+					>
+						Invite now
+					</CButton>
 				</Flex>
 			</Flex>
 		)

@@ -130,6 +130,12 @@ export const SEARCH_ROUTES = {
 	searchUserNetwork: 'search/user',
 	searchCommunityNetwork: 'search/club',
 }
+
+export const REFERRAL_ROUTES = {
+	leaderBoard: 'user/leader-board',
+	walletHistoryGroupByMonth: 'wallet-history/grouped-by-month',
+	walletHistory: 'wallet-history',
+}
 export const MAP_ROUTES = {
 	name: 'map/google/place/textsearch/json',
 }

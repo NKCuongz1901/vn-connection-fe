@@ -23,4 +23,5 @@ export const mainRoutes = {
 	miniApps: 'mini-apps',
 	peopleCommunity: 'people-community',
 	publicEvent: 'public-event',
+	referral: 'referral',
 }

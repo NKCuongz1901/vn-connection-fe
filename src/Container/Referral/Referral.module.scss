@@ -1,0 +1,175 @@
+.wrapper {
+	display: flex;
+	padding: var(--Spacing-S12, 12px) var(--Spacing-S32, 32px);
+	flex-direction: column;
+	align-items: flex-start;
+	flex: 1 0 0;
+
+	.title {
+		color: var(--color-grey-700-p-text, #0f1729);
+
+		font-size: 18px;
+		font-style: normal;
+		font-weight: 600;
+		line-height: 28px; /* 155.556% */
+	}
+
+	.content {
+		margin-top: 12px;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		padding: var(--Spacing-S12, 12px) 16px;
+		justify-content: center;
+		align-items: flex-start;
+		align-self: stretch;
+		border-radius: var(--Spacing-S8, 8px);
+		background: var(--Color-Grey-000, #fff);
+
+		.contentLeft {
+			flex: 2;
+
+			.normalText {
+				color: var(--text-secondary, #48546b);
+
+				/* body/small */
+				font-size: var(--body-small-size, 12px);
+				font-style: normal;
+				font-weight: 400;
+				line-height: var(--body-small-line-height, 16px); /* 133.333% */
+				letter-spacing: var(--body-small-tracking, 0);
+			}
+
+			.redeemText {
+				color: var(--component-button-primary-fg-default, #fff);
+
+				/* body/base-emphasis */
+				font-size: var(--body-base-size, 14px);
+				font-style: normal;
+				font-weight: 600;
+				line-height: var(--body-base-line-height, 20px); /* 142.857% */
+				letter-spacing: var(--body-base-tracking, 0);
+			}
+
+			.myTotalRefContainer {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background-image: url('/images/refBg.png');
+				gap: 8px;
+				width: 100%;
+				height: 254px;
+				border-radius: 8px;
+				background-size: cover;
+				background-position: center;
+				background-repeat: no-repeat;
+
+				.myTotalRefCard {
+					display: flex;
+					gap: 12px;
+					width: 312px;
+					padding: var(--spacing-spacer-3, 12px);
+					flex-direction: column;
+					align-items: flex-start;
+					border-radius: var(--radius-4, 16px);
+					background: var(--background-primary, #fff);
+
+					/* elavation/below/100 */
+					box-shadow: var(--below-100-layer-1-x, 0)
+						var(--below-100-layer-1-y, 0) var(--below-100-layer-1-blur, 16px) 0
+						var(--below-100-layer-1-color, rgba(0, 8, 25, 0.08));
+
+					.myTotalRefCardTitle {
+						color: var(--text-primary, #0f1729);
+
+						font-size: var(--body-small-size, 12px);
+						font-style: normal;
+						font-weight: 400;
+						line-height: var(--body-small-line-height, 16px); /* 133.333% */
+						letter-spacing: var(--body-small-tracking, 0);
+					}
+
+					.myTotalRefCardPoint {
+						color: var(--text-brand-primary, #e55a0f);
+
+						/* display/large */
+						font-size: var(--display-large-size, 40px);
+						font-style: normal;
+						font-weight: 600;
+						line-height: var(--display-large-line-height, 48px); /* 120% */
+						letter-spacing: var(--display-large-tracking, 0);
+
+						span {
+							color: var(--text-brand-primary, #e55a0f);
+
+							/* title/small */
+							font-size: var(--title-small-size, 16px);
+							font-style: normal;
+							font-weight: 600;
+							line-height: var(--title-small-line-height, 24px);
+						}
+					}
+
+					.actionRow {
+						display: flex;
+						align-items: center;
+						gap: 8px;
+						width: 100%;
+					}
+
+					.redeemHistoryBtn,
+					.redeemBtn {
+						flex: 1;
+						min-width: 0;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						gap: 4px;
+						padding: 10px 12px;
+						border: none;
+						border-radius: 999px;
+						font-size: 14px;
+						font-weight: 600;
+						line-height: 20px;
+						cursor: pointer;
+						white-space: nowrap;
+					}
+
+					.redeemHistoryBtn {
+						background: #f0f3f9;
+						color: #0f1729;
+					}
+
+					.redeemBtn {
+						background: #e55a0f;
+						color: #fff;
+					}
+
+					.myTotalRefCardMoney {
+						display: flex;
+						padding: 2px 8px 2px 2px;
+						align-items: center;
+						gap: 4px;
+						border-radius: 999px;
+						background: var(--background-secondary, #f0f3f9);
+
+						.myTotalRefCardMoneyText {
+							color: var(--text-primary, #0f1729);
+
+							/* body/small-emphasis */
+							font-size: var(--body-small-size, 12px);
+							font-style: normal;
+							font-weight: 600;
+							line-height: var(--body-small-line-height, 16px); /* 133.333% */
+							letter-spacing: var(--body-small-tracking, 0);
+						}
+					}
+				}
+			}
+		}
+		.contentRight {
+			flex: 1;
+			background-color: #006b34;
+		}
+	}
+}

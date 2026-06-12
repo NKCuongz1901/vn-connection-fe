@@ -107,6 +107,7 @@ import ReminderIcon from '@/svg/ReminderIcon'
 import PollIcon from '@/svg/PollIcon'
 import CopyIcon from '@/svg/ChatBox/CopyIcon'
 import EditIcon from '@/svg/ChatBox/EditIcon'
+import GiftBoxIcon from '@/svg/GiftBoxIcon'
 
 const Icons = () => {
 	const icons = [
@@ -494,6 +495,11 @@ const Icons = () => {
 		{
 			ICON: ReplyIcon,
 			name: '@/svg/Event/ReplyIcon',
+			key: randomString(),
+		},
+		{
+			ICON: GiftBoxIcon,
+			name: '@/svg/Event/GiftBoxIcon',
 			key: randomString(),
 		},
 	]
