@@ -4,20 +4,30 @@ import React, { useCallback } from 'react'
 import ReferralTabPanel from '@/Components/Referral/ReferralTabPanel/ReferralTabPanel'
 import classes from './Referral.module.scss'
 import useReferral from '@/hooks/Referral/useReferral'
-import { Divider, Flex } from 'antd'
+import { Divider, Flex, Skeleton } from 'antd'
 import GiftBoxIcon from '@/svg/GiftBoxIcon'
 import CoinIcon from '@/svg/CoinIcon'
 import ReceiptIcon from '@/svg/ReceiptIcon'
 import useProfile from '@/hooks/Profile/useProfile'
 import { formatNumberString } from '@/ultis/string'
+
+const skeletonItems = [
+	{ id: '2', value: 220 },
+	{ id: '1', value: 120 },
+	{ id: '3', value: 320 },
+	{ id: '4', value: 240 },
+]
 function Referral() {
 	const {
 		loading,
+		loadingHistory,
 		myPosition,
 		leaderBoard,
 		walletHistory,
 		walletHistoryGroupByMonth,
 		topInvitees,
+		onLoadMoreHistory,
+		onScrollHistory,
 	} = useReferral()
 	const { userData } = useProfile({})
 	const { wallet } = userData
@@ -63,6 +73,24 @@ function Referral() {
 			</div>
 		)
 	}, [wallet])
+
+	if (loading) {
+		return (
+			<Flex className={classes.wrapper} vertical>
+				<Flex className={classes.totalInfo} vertical>
+					<Skeleton.Input active style={{ width: '100%', height: 320 }} />
+				</Flex>
+				{skeletonItems.map((i) => (
+					<Skeleton.Input
+						key={i.id}
+						active
+						className={classes.contentBody}
+						style={{ width: '100%', height: i.value }}
+					/>
+				))}
+			</Flex>
+		)
+	}
 	return (
 		<div className={classes.wrapper}>
 			<h3 className={classes.title}>Referral</h3>
@@ -71,12 +99,15 @@ function Referral() {
 					{_renderMyTotalRef()}
 					<ReferralTabPanel
 						loading={loading}
+						loadingHistory={loadingHistory}
 						leaderBoard={leaderBoard}
 						topInvitees={topInvitees}
 						myPosition={myPosition}
 						userData={userData}
 						walletHistory={walletHistory}
 						walletHistoryGroupByMonth={walletHistoryGroupByMonth}
+						onLoadMoreHistory={onLoadMoreHistory}
+						onScrollHistory={onScrollHistory}
 					/>
 				</div>
 				<div className={classes.contentRight}></div>

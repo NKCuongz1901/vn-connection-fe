@@ -1,0 +1,179 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	min-height: 0;
+	border-top: 2px solid #eef3f6;
+	padding-top: 12px;
+
+	h3 {
+		color: var(--text-primary, #0f1729);
+
+		/* title/small */
+		font-size: var(--title-small-size, 16px);
+		font-style: normal;
+		font-weight: 600;
+		line-height: var(--title-small-line-height, 24px); /* 150% */
+	}
+
+	.allYears {
+		cursor: pointer;
+		display: flex;
+		min-height: 24px;
+		max-height: 30px;
+		justify-content: center;
+		align-items: center;
+		gap: var(--spacing-spacer-0, 4px);
+		border-radius: var(--radius-2, 8px);
+		background: var(--component-button-secondary-bg-default, #f0f3f9);
+
+		.allYearsText {
+			color: var(--component-button-secondary-fg-default, #0f1729);
+
+			font-size: var(--body-small-size, 12px);
+			font-style: normal;
+			font-weight: 600;
+			line-height: var(--body-small-line-height, 16px);
+			letter-spacing: var(--body-small-tracking, 0);
+		}
+	}
+
+	.monthHeader {
+		flex-shrink: 0;
+		padding: 8px 16px;
+		margin-bottom: 12px;
+	}
+
+	.refByMonthWrapper {
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		align-self: stretch;
+		margin: 0 16px 12px;
+		padding: 12px 0;
+		border-radius: 16px;
+		background: var(--background-primary, #fff);
+		box-shadow: var(--below-100-layer-1-x, 0) var(--below-100-layer-1-y, 0)
+			var(--below-100-layer-1-blur, 16px) 0
+			var(--below-100-layer-1-color, rgba(0, 8, 25, 0.08));
+	}
+
+	.refByMonthItemWrap {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		min-width: 0;
+	}
+
+	.refByMonthDivider {
+		flex-shrink: 0;
+		width: 1px;
+		height: 72px;
+		background: #edf0f5;
+		margin-right: 12px;
+	}
+
+	.refByMonthCard {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+		min-width: 0;
+	}
+
+	.refByMonthLabel {
+		width: 100%;
+		text-align: center;
+		font-size: 12px;
+		font-weight: 400;
+		line-height: 16px;
+		color: #48546b;
+	}
+
+	.refByMonthValue {
+		width: 100%;
+		text-align: center;
+		font-size: 32px;
+		font-weight: 600;
+		line-height: 40px;
+		color: #0f1729;
+	}
+
+	.refByMonthCaption {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 4px;
+		font-size: 12px;
+		font-weight: 400;
+		line-height: 16px;
+		color: #48546b;
+	}
+
+	.refByMonthCoin {
+		display: flex;
+		line-height: 0;
+
+		svg {
+			width: 12px;
+			height: 12px;
+		}
+	}
+
+	.latestReferral {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+		width: 100%;
+		max-height: 360px;
+		overflow: hidden;
+	}
+
+	.latestReferralHeader {
+		flex-shrink: 0;
+		padding: 8px 16px 12px;
+
+		h3 {
+			margin: 0;
+		}
+	}
+
+	.listScroll {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		overflow-x: hidden;
+		padding-bottom: 12px;
+		-webkit-overflow-scrolling: touch;
+	}
+}
+
+.listContent {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.skeletonRow {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 4px 16px;
+}
+
+.loadingMore {
+	padding: 8px 16px;
+	text-align: center;
+	font-size: 12px;
+	color: #7987a4;
+}
+
+.empty {
+	padding: 24px 16px;
+	text-align: center;
+	font-size: 14px;
+	color: #7987a4;
+}

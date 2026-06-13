@@ -25,6 +25,8 @@ export interface ReferralTabPanelProps {
 	walletHistory?: any[]
 	walletHistoryGroupByMonth?: any[]
 	onLoadMoreHistory?: () => void
+	onScrollHistory?: (e: React.UIEvent<HTMLDivElement>) => void
+	loadingHistory?: boolean
 }
 
 function ReferralTabPanel({
@@ -36,6 +38,8 @@ function ReferralTabPanel({
 	walletHistory = [],
 	walletHistoryGroupByMonth = [],
 	onLoadMoreHistory,
+	onScrollHistory,
+	loadingHistory,
 }: ReferralTabPanelProps) {
 	const [activeTab, setActiveTab] = useState<ReferralTab>('leaderboard')
 
@@ -70,9 +74,11 @@ function ReferralTabPanel({
 				{activeTab === 'history' && (
 					<ReferralHistory
 						loading={loading}
+						loadingHistory={loadingHistory}
 						walletHistory={walletHistory}
 						walletHistoryGroupByMonth={walletHistoryGroupByMonth}
 						onLoadMore={onLoadMoreHistory}
+						onScroll={onScrollHistory}
 					/>
 				)}
 			</div>

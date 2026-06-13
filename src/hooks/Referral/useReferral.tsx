@@ -5,11 +5,13 @@ import {
 } from '@/apis/referralApis'
 import { useModal } from '@/context/ModalContext'
 import { isArray } from '@/ultis/array'
-import { useEffect, useState, useRef, useMemo } from 'react'
+import { handleScrollCallback } from '@/ultis/common'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 export default function useReferral() {
 	const { openError } = useModal()
 	const [loading, setLoading] = useState<boolean>(false)
+	const [loadingHistory, setLoadingHistory] = useState<boolean>(false)
 	const [myPosition, setMyPosition] = useState<number>(0)
 	const [leaderBoard, setLeaderBoard] = useState<any[]>([])
 	const [walletHistory, setWalletHistory] = useState<any[]>([])
@@ -17,13 +19,16 @@ export default function useReferral() {
 		any[]
 	>([])
 
+	const paginationRef = useRef({ page: 1, limit: 30 })
+	const canLoadMoreHistoryRef = useRef(true)
+
 	const handleGetLeaderBoard = async () => {
 		setLoading(true)
 		try {
 			const res: any = await getLeaderBoard()
 			const { code, results } = res || {}
 			if (code === 200) {
-				setLeaderBoard(results?.object?.board)
+				setLeaderBoard(results?.object?.board ?? [])
 				setMyPosition(results?.object?.my_position)
 			}
 		} catch (error) {
@@ -47,12 +52,23 @@ export default function useReferral() {
 			}
 		} catch (error) {
 			openError(error)
+		} finally {
+			setLoading(false)
 		}
 	}
 
-	const paginationRef = useRef({ page: 1, limit: 30 })
 	const handleGetWalletHistoryandInvite = async (isLoadMore = false) => {
-		setLoading(true)
+		if (isLoadMore && !canLoadMoreHistoryRef.current) return
+		if (isLoadMore && loadingHistory) return
+
+		if (isLoadMore) {
+			setLoadingHistory(true)
+		} else {
+			setLoading(true)
+			paginationRef.current.page = 1
+			canLoadMoreHistoryRef.current = true
+		}
+
 		try {
 			const page = isLoadMore ? paginationRef.current.page + 1 : 1
 			const limit = paginationRef.current.limit
@@ -65,29 +81,50 @@ export default function useReferral() {
 			if (code === 200) {
 				const { rows = [], count = 0 } = results?.objects || {}
 				paginationRef.current.page = page
+				canLoadMoreHistoryRef.current =
+					isArray(rows, limit) && page * limit < count
 				setWalletHistory((prev) => (page === 1 ? rows : [...prev, ...rows]))
-				// optional: lưu count để biết còn load more không
-				// setTotal(count)
 			}
 		} catch (error) {
 			openError(error)
 		} finally {
-			setLoading(false)
+			if (isLoadMore) {
+				setLoadingHistory(false)
+			} else {
+				setLoading(false)
+			}
 		}
 	}
+
+	const handleLoadMoreHistory = useCallback(async () => {
+		if (!canLoadMoreHistoryRef.current || loadingHistory) return
+		await handleGetWalletHistoryandInvite(true)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [loadingHistory])
+
+	const handleScrollHistory = useCallback(
+		(e: React.UIEvent<HTMLDivElement>) => {
+			handleScrollCallback(e, handleLoadMoreHistory)
+		},
+		[handleLoadMoreHistory],
+	)
 
 	useEffect(() => {
 		handleGetLeaderBoard()
 		handleGetWalletHistoryGroupByMonth()
 		handleGetWalletHistoryandInvite()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	return {
 		loading,
+		loadingHistory,
 		myPosition,
 		leaderBoard,
 		walletHistory,
 		walletHistoryGroupByMonth,
 		topInvitees,
+		onLoadMoreHistory: handleLoadMoreHistory,
+		onScrollHistory: handleScrollHistory,
 	}
 }

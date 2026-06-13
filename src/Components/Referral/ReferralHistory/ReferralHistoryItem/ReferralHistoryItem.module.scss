@@ -1,0 +1,45 @@
+.row {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	width: 100%;
+	padding: 4px 16px;
+	box-sizing: border-box;
+}
+
+.content {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-width: 0;
+}
+
+.avatarWrap {
+	flex-shrink: 0;
+	line-height: 0;
+}
+
+.info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.name {
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+	color: #0f1729;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.date {
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+	color: #48546b;
+}
