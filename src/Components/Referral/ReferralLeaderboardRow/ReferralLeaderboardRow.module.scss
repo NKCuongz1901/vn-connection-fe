@@ -1,0 +1,83 @@
+.row {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	width: 100%;
+	padding: 12px;
+	box-sizing: border-box;
+}
+
+.left {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+}
+
+.rank {
+	flex-shrink: 0;
+	width: 20px;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+	color: #006b35;
+	text-align: center;
+}
+
+.person {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-width: 0;
+}
+
+.avatarWrap {
+	flex-shrink: 0;
+	line-height: 0;
+}
+
+.name {
+	flex: 1;
+	min-width: 0;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+	color: #0f1729;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.points {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+}
+
+.pointsValue {
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	color: #e55a0f;
+}
+
+.myPosition {
+	background: #f0f3f9;
+	border-radius: 8px;
+
+	.rank,
+	.name {
+		color: #006b35;
+		font-weight: 600;
+	}
+
+	.avatarWrap {
+		:global(.ant-avatar) {
+			border: 2px solid #006b35;
+		}
+	}
+}

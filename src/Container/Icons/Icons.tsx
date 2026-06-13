@@ -108,6 +108,10 @@ import PollIcon from '@/svg/PollIcon'
 import CopyIcon from '@/svg/ChatBox/CopyIcon'
 import EditIcon from '@/svg/ChatBox/EditIcon'
 import GiftBoxIcon from '@/svg/GiftBoxIcon'
+import Top1Icon from '@/svg/Referral/Top1Icon'
+import Top2Icon from '@/svg/Referral/Top2Icon'
+import Top3Icon from '@/svg/Referral/Top3Icon'
+import CrownIcon from '@/svg/Referral/CrownIcon'
 
 const Icons = () => {
 	const icons = [
@@ -500,6 +504,26 @@ const Icons = () => {
 		{
 			ICON: GiftBoxIcon,
 			name: '@/svg/Event/GiftBoxIcon',
+			key: randomString(),
+		},
+		{
+			ICON: CrownIcon,
+			name: '@/svg/Event/CrownIcon',
+			key: randomString(),
+		},
+		{
+			ICON: Top1Icon,
+			name: '@/svg/Event/Top1Icon',
+			key: randomString(),
+		},
+		{
+			ICON: Top2Icon,
+			name: '@/svg/Event/Top2Icon',
+			key: randomString(),
+		},
+		{
+			ICON: Top3Icon,
+			name: '@/svg/Event/Top3Icon',
 			key: randomString(),
 		},
 	]

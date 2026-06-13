@@ -28,6 +28,9 @@
 
 		.contentLeft {
 			flex: 2;
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
 
 			.normalText {
 				color: var(--text-secondary, #48546b);

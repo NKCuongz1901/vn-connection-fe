@@ -1,12 +1,15 @@
 'use client'
 import React, { useCallback } from 'react'
 
+import ReferralTabPanel from '@/Components/Referral/ReferralTabPanel/ReferralTabPanel'
 import classes from './Referral.module.scss'
 import useReferral from '@/hooks/Referral/useReferral'
 import { Divider, Flex } from 'antd'
 import GiftBoxIcon from '@/svg/GiftBoxIcon'
 import CoinIcon from '@/svg/CoinIcon'
 import ReceiptIcon from '@/svg/ReceiptIcon'
+import useProfile from '@/hooks/Profile/useProfile'
+import { formatNumberString } from '@/ultis/string'
 function Referral() {
 	const {
 		loading,
@@ -16,14 +19,8 @@ function Referral() {
 		walletHistoryGroupByMonth,
 		topInvitees,
 	} = useReferral()
-	console.log(
-		loading,
-		myPosition,
-		leaderBoard,
-		walletHistory,
-		walletHistoryGroupByMonth,
-		topInvitees,
-	)
+	const { userData } = useProfile({})
+	const { wallet } = userData
 
 	const _renderMyTotalRef = useCallback(() => {
 		return (
@@ -38,7 +35,7 @@ function Referral() {
 						<Flex vertical align="flex-start" justify="center" gap={4}>
 							<div className={classes.myTotalRefCardTitle}>Total earnings</div>
 							<div className={classes.myTotalRefCardPoint}>
-								100 <span>points</span>
+								{wallet} <span>points</span>
 							</div>
 						</Flex>
 						<GiftBoxIcon />
@@ -46,7 +43,9 @@ function Referral() {
 					<Flex align="flex-start" gap={4} style={{ width: '100%' }}>
 						<div className={classes.myTotalRefCardMoney}>
 							<CoinIcon />{' '}
-							<span className={classes.myTotalRefCardMoneyText}>500,000 đ</span>
+							<span className={classes.myTotalRefCardMoneyText}>
+								{formatNumberString(wallet * 5000)} đ
+							</span>
 						</div>
 						<Divider type="vertical" />
 						<div className={classes.normalText}>1 point = 5,000 đ</div>
@@ -63,12 +62,23 @@ function Referral() {
 				</div>
 			</div>
 		)
-	}, [])
+	}, [wallet])
 	return (
 		<div className={classes.wrapper}>
 			<h3 className={classes.title}>Referral</h3>
 			<div className={classes.content}>
-				<div className={classes.contentLeft}>{_renderMyTotalRef()}</div>
+				<div className={classes.contentLeft}>
+					{_renderMyTotalRef()}
+					<ReferralTabPanel
+						loading={loading}
+						leaderBoard={leaderBoard}
+						topInvitees={topInvitees}
+						myPosition={myPosition}
+						userData={userData}
+						walletHistory={walletHistory}
+						walletHistoryGroupByMonth={walletHistoryGroupByMonth}
+					/>
+				</div>
 				<div className={classes.contentRight}></div>
 			</div>
 		</div>

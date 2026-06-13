@@ -1,0 +1,107 @@
+.podiumItem {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-width: 0;
+	position: relative;
+}
+
+.rank1 {
+	gap: 7px;
+	padding-top: 20px;
+}
+
+.rank2 {
+	gap: 8px;
+}
+
+.rank3 {
+	gap: 6px;
+}
+
+.isEmpty {
+	opacity: 0.5;
+}
+
+.crown {
+	position: absolute;
+	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 2;
+	line-height: 0;
+}
+
+.avatarBlock {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.avatarRing {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	box-sizing: border-box;
+	margin-bottom: -12px;
+}
+
+.avatarRing1 {
+	width: 68px;
+	height: 68px;
+	border: 2px solid #ffc242;
+}
+
+.avatarRing2 {
+	width: 60px;
+	height: 60px;
+	border: 2px solid #8eb5e4;
+}
+
+.avatarRing3 {
+	width: 60px;
+	height: 60px;
+	border: 2px solid #e8955a;
+}
+
+.medal {
+	z-index: 999;
+	flex-shrink: 0;
+	line-height: 0;
+}
+
+.info {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	width: 100%;
+}
+
+.name {
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+	color: #0f1729;
+	text-align: center;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 100%;
+}
+
+.points {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+}
+
+.pointsValue {
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	color: #e55a0f;
+}
