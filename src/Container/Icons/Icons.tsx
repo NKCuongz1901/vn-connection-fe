@@ -112,6 +112,7 @@ import Top1Icon from '@/svg/Referral/Top1Icon'
 import Top2Icon from '@/svg/Referral/Top2Icon'
 import Top3Icon from '@/svg/Referral/Top3Icon'
 import CrownIcon from '@/svg/Referral/CrownIcon'
+import UnboxGiftIcon from '@/svg/Referral/UnboxGiftIcon'
 
 const Icons = () => {
 	const icons = [
@@ -524,6 +525,11 @@ const Icons = () => {
 		{
 			ICON: Top3Icon,
 			name: '@/svg/Event/Top3Icon',
+			key: randomString(),
+		},
+		{
+			ICON: UnboxGiftIcon,
+			name: '@/svg/Event/UnboxGiftIcon',
 			key: randomString(),
 		},
 	]

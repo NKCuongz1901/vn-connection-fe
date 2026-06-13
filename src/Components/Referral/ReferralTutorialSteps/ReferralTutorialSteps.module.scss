@@ -1,0 +1,73 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	width: 100%;
+}
+
+.header {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	width: 100%;
+}
+
+.title {
+	margin: 0;
+	color: #48546b;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+}
+
+.description {
+	margin: 0;
+	color: #7987a4;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+}
+
+.steps {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	width: 100%;
+}
+
+.step {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	width: 100%;
+}
+
+.stepBadge {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 99px;
+	background: #eef3f6;
+	color: #006b35;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 20px;
+}
+
+.stepContent {
+	flex: 1;
+	min-width: 0;
+	color: #0f1729;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 20px;
+}
+
+.highlight {
+	color: #e55a0f;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}

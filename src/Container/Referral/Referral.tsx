@@ -1,15 +1,21 @@
 'use client'
 import React, { useCallback } from 'react'
 
+import CInput from '@/Components/Custom/CInput'
 import ReferralTabPanel from '@/Components/Referral/ReferralTabPanel/ReferralTabPanel'
-import classes from './Referral.module.scss'
+import ReferralTutorialSteps from '@/Components/Referral/ReferralTutorialSteps/ReferralTutorialSteps'
+import { useModal } from '@/context/ModalContext'
 import useReferral from '@/hooks/Referral/useReferral'
-import { Divider, Flex, Skeleton } from 'antd'
-import GiftBoxIcon from '@/svg/GiftBoxIcon'
-import CoinIcon from '@/svg/CoinIcon'
-import ReceiptIcon from '@/svg/ReceiptIcon'
 import useProfile from '@/hooks/Profile/useProfile'
-import { formatNumberString } from '@/ultis/string'
+import CopyIcon from '@/svg/ChatBox/CopyIcon'
+import CoinIcon from '@/svg/CoinIcon'
+import GiftBoxIcon from '@/svg/GiftBoxIcon'
+import ReceiptIcon from '@/svg/ReceiptIcon'
+import UnboxGiftIcon from '@/svg/Referral/UnboxGiftIcon'
+import { formatNumberString, copyToClipboard } from '@/ultis/string'
+import { Divider, Flex, Skeleton } from 'antd'
+
+import classes from './Referral.module.scss'
 
 const skeletonItems = [
 	{ id: '2', value: 220 },
@@ -30,7 +36,31 @@ function Referral() {
 		onScrollHistory,
 	} = useReferral()
 	const { userData } = useProfile({})
-	const { wallet } = userData
+	const { openSuccess } = useModal()
+	const { wallet, invite_code, share_link } = userData || {}
+
+	const handleCopy = useCallback(
+		(text?: string) => {
+			if (!text) return
+			copyToClipboard(text)
+			openSuccess({ message: 'Copied successfully!' })
+		},
+		[openSuccess],
+	)
+
+	const _renderCopySuffix = useCallback(
+		(value?: string) => (
+			<button
+				type="button"
+				className={classes.copyIcon}
+				onClick={() => handleCopy(value)}
+				aria-label="Copy"
+			>
+				<CopyIcon fill="#7987A4" width={20} height={20} />
+			</button>
+		),
+		[handleCopy],
+	)
 
 	const _renderMyTotalRef = useCallback(() => {
 		return (
@@ -74,6 +104,66 @@ function Referral() {
 		)
 	}, [wallet])
 
+	const _renderContentRightTop = () => {
+		return (
+			<div className={classes.contentRightTop}>
+				<UnboxGiftIcon />
+				<div className={classes.contentRightTopTitle}>
+					Refer to your friends to receive rewards
+				</div>
+			</div>
+		)
+	}
+
+	const _renderContentRightMiddle = () => {
+		return (
+			<div className={classes.contentRightMiddle}>
+				<div className={classes.contentRightMiddleTitle}>
+					Send referral link to friends
+				</div>
+				<div className={classes.referralFields}>
+					<div className={classes.referralField}>
+						<CInput
+							label="Referral code"
+							isNotBold
+							value={invite_code || ''}
+							readOnly
+							allowClear={false}
+							bordered={false}
+							suffix={_renderCopySuffix(invite_code)}
+						/>
+					</div>
+					<div className={classes.referralField}>
+						<CInput
+							label="Referral link"
+							isNotBold
+							value={share_link || ''}
+							readOnly
+							allowClear={false}
+							bordered={false}
+							suffix={_renderCopySuffix(share_link)}
+						/>
+					</div>
+					<button
+						type="button"
+						className={classes.inviteNowBtn}
+						onClick={() => handleCopy(share_link)}
+					>
+						Invite now
+					</button>
+				</div>
+			</div>
+		)
+	}
+
+	const _renderContentRightBottom = () => {
+		return (
+			<div className={classes.contentRightBottom}>
+				<ReferralTutorialSteps />
+			</div>
+		)
+	}
+
 	if (loading) {
 		return (
 			<Flex className={classes.wrapper} vertical>
@@ -110,7 +200,15 @@ function Referral() {
 						onScrollHistory={onScrollHistory}
 					/>
 				</div>
-				<div className={classes.contentRight}></div>
+				<div className={classes.contentDivider}></div>
+				<div className={classes.contentRight}>
+					{_renderContentRightTop()}
+					<div className={classes.topDivider}></div>
+					{_renderContentRightMiddle()}
+					<div className={classes.topDivider}></div>
+
+					{_renderContentRightBottom()}
+				</div>
 			</div>
 		</div>
 	)
