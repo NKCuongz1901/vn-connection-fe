@@ -1,25 +1,26 @@
 'use client'
 
 import { Flex, Skeleton } from 'antd'
+import { useMemo, useState } from 'react'
 
+import ReferralAllYearsModal from '@/Components/Referral/ReferralHistory/ReferralAllYearsModal/ReferralAllYearsModal'
 import ReferralHistoryItem from '@/Components/Referral/ReferralHistory/ReferralHistoryItem/ReferralHistoryItem'
 import CalenderIcon from '@/svg/CalenderIcon'
 import CoinIcon from '@/svg/CoinIcon'
 
 import classes from './ReferralHistory.module.scss'
-import type { ReferralWalletHistoryItem } from './referralHistory.utils'
-
-const REF_BY_MONTH_STATS = [
-	{ label: 'May 2025', value: 18 },
-	{ label: 'June 2025', value: 17 },
-	{ label: 'Total', value: 35 },
-] as const
+import {
+	buildAllYearsModalData,
+	buildRefByMonthStats,
+	type ReferralWalletHistoryItem,
+	type ReferralWalletHistoryYearGroup,
+} from './referralHistory.utils'
 
 export interface ReferralHistoryProps {
 	loading?: boolean
 	loadingHistory?: boolean
 	walletHistory?: ReferralWalletHistoryItem[]
-	walletHistoryGroupByMonth?: any[]
+	walletHistoryGroupByMonth?: ReferralWalletHistoryYearGroup[]
 	onLoadMore?: () => void
 	onScroll?: (e: React.UIEvent<HTMLDivElement>) => void
 }
@@ -28,12 +29,25 @@ function ReferralHistory({
 	loading,
 	loadingHistory,
 	walletHistory = [],
+	walletHistoryGroupByMonth = [],
 	onScroll,
 }: ReferralHistoryProps) {
+	const [openAllYearsModal, setOpenAllYearsModal] = useState(false)
+
+	const refByMonthStats = useMemo(
+		() => buildRefByMonthStats(walletHistoryGroupByMonth),
+		[walletHistoryGroupByMonth],
+	)
+
+	const allYearsModalData = useMemo(
+		() => buildAllYearsModalData(walletHistoryGroupByMonth),
+		[walletHistoryGroupByMonth],
+	)
+
 	const _renderRefByMonth = () => {
 		return (
 			<div className={classes.refByMonthWrapper}>
-				{REF_BY_MONTH_STATS.map((item, index) => (
+				{refByMonthStats.map((item, index) => (
 					<div key={item.label} className={classes.refByMonthItemWrap}>
 						{index > 0 && <div className={classes.refByMonthDivider} />}
 						<div className={classes.refByMonthCard}>
@@ -101,13 +115,30 @@ function ReferralHistory({
 				className={classes.monthHeader}
 			>
 				<h3>Referrals by month</h3>
-				<div className={classes.allYears}>
+				<div
+					className={classes.allYears}
+					onClick={() => setOpenAllYearsModal(true)}
+					role="button"
+					tabIndex={0}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							setOpenAllYearsModal(true)
+						}
+					}}
+				>
 					<CalenderIcon fill="#0F1729" />
 					<span className={classes.allYearsText}>All years</span>
 				</div>
 			</Flex>
 			{_renderRefByMonth()}
 			{_renderLatestReferral()}
+			{openAllYearsModal && (
+				<ReferralAllYearsModal
+					onClose={() => setOpenAllYearsModal(false)}
+					years={allYearsModalData.years}
+					total={allYearsModalData.total}
+				/>
+			)}
 		</div>
 	)
 }
