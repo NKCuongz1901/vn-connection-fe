@@ -13,9 +13,13 @@ import GiftBoxIcon from '@/svg/GiftBoxIcon'
 import ReceiptIcon from '@/svg/ReceiptIcon'
 import UnboxGiftIcon from '@/svg/Referral/UnboxGiftIcon'
 import { formatNumberString, copyToClipboard } from '@/ultis/string'
+import { useLocalePath } from '@/ultis/route'
+import { mainRoutes } from '@/routes/MainRoutes'
 import { Divider, Flex, Skeleton } from 'antd'
 
 import classes from './Referral.module.scss'
+import WalletIcon from '@/svg/Referral/WalletIcon'
+import ShareSquareIcon from '@/svg/Referral/ShareSquareIcon'
 
 const skeletonItems = [
 	{ id: '2', value: 220 },
@@ -37,6 +41,7 @@ function Referral() {
 	} = useReferral()
 	const { userData } = useProfile({})
 	const { openSuccess } = useModal()
+	const { onChangeRoute } = useLocalePath()
 	const { wallet, invite_code, share_link } = userData || {}
 
 	const handleCopy = useCallback(
@@ -62,9 +67,40 @@ function Referral() {
 		[handleCopy],
 	)
 
+	const handleShare = useCallback(async () => {
+		if (!share_link) return
+		if (navigator.share) {
+			try {
+				await navigator.share({ url: share_link })
+				return
+			} catch {
+				// User cancelled or share failed — fall back to copy
+			}
+		}
+		handleCopy(share_link)
+	}, [share_link, handleCopy])
+
 	const _renderMyTotalRef = useCallback(() => {
 		return (
 			<div className={classes.myTotalRefContainer}>
+				<div className={classes.myTotalRefCardCta}>
+					<button
+						type="button"
+						className={classes.myTotalRefCardAction}
+						onClick={() => onChangeRoute(mainRoutes.referralAddBankCard)}
+						aria-label="Wallet"
+					>
+						<WalletIcon />
+					</button>
+					<button
+						type="button"
+						className={classes.myTotalRefCardAction}
+						onClick={handleShare}
+						aria-label="Share referral link"
+					>
+						<ShareSquareIcon />
+					</button>
+				</div>
 				<div className={classes.myTotalRefCard}>
 					<Flex
 						align="center"
@@ -102,7 +138,7 @@ function Referral() {
 				</div>
 			</div>
 		)
-	}, [wallet])
+	}, [wallet, handleShare, onChangeRoute])
 
 	const _renderContentRightTop = () => {
 		return (
@@ -206,7 +242,6 @@ function Referral() {
 					<div className={classes.topDivider}></div>
 					{_renderContentRightMiddle()}
 					<div className={classes.topDivider}></div>
-
 					{_renderContentRightBottom()}
 				</div>
 			</div>
