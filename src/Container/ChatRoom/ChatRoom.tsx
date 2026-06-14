@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import { memo } from 'react'
 
 import { arrayFrom, isArray } from '@/ultis/array'
+import { getDiffFromNow } from '@/ultis/date'
 import { onPushState, useLocalePath, useSafeBack } from '@/ultis/route'
 import { formatNumberString } from '@/ultis/string'
 
@@ -122,7 +123,13 @@ const ChatRoom = () => {
 						amount_of_user_online,
 						avatar,
 						users_in_conversation,
-					} = room || {}
+						last_message,
+					} = room
+					const lastMessageAt = last_message?.created_at
+					const { value: timeAgo, unit } = lastMessageAt
+						? getDiffFromNow({ input: lastMessageAt })
+						: { value: '', unit: '' }
+
 					return (
 						<Flex
 							key={_id}
@@ -132,6 +139,12 @@ const ChatRoom = () => {
 							})}
 							onClick={() => onPushState({ type: 'language', id: _id })}
 						>
+							{lastMessageAt && (
+								<span className={classes.lastMessageTime}>
+									{timeAgo}
+									{unit ? ` ${unit}s ago` : ''}
+								</span>
+							)}
 							<CAvatar
 								src={avatar}
 								className={clsx(classes.chatRoomAva, {

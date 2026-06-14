@@ -68,6 +68,7 @@
 				padding: 16px;
 				width: 100%;
 				.chatRoomWrapper {
+					position: relative;
 					padding: 12px;
 					gap: 8px;
 					align-items: center;
@@ -79,6 +80,21 @@
 					border-radius: 12px;
 					border: 1px solid #edf0f5;
 					background: #edf0f5;
+
+					.lastMessageTime {
+						position: absolute;
+						top: 6px;
+						right: 6px;
+						z-index: 1;
+						padding: 0 4px;
+						border-radius: 999px;
+						background: #fff;
+						color: #006b35;
+						font-size: 8px;
+						font-weight: 400;
+						line-height: 14px;
+						white-space: nowrap;
+					}
 					.chatRoomAva {
 						min-height: 48px;
 						min-width: 48px;

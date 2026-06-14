@@ -255,7 +255,10 @@ const Profile = (props: ProfileProps) => {
 										</Flex>
 									</div>
 								) : (
-									<div className={classes.completedScoreWrapperComplete}>
+									<div
+										className={classes.completedScoreWrapperComplete}
+										onClick={() => setOpenModalProfileComplete(true)}
+									>
 										<Flex gap={4} align="center">
 											<TickCircleIcon fill="#006B35" width={16} height={16} />
 											<span className={classes.completedScoreCompleteText}>
@@ -528,7 +531,7 @@ const Profile = (props: ProfileProps) => {
 	}, [toJson(userData)])
 
 	const _renderReferences = useCallback(() => {
-		const { id } = userData || {}
+		const { id, wallet } = userData || {}
 		const isMe = id === getUserInfo('id')
 		if (!isMe) return null
 		return (
@@ -542,7 +545,7 @@ const Profile = (props: ProfileProps) => {
 						<div className={classes.DetailTextSub}>
 							Community builder:{' '}
 							<span className={classes.DetailTextSubBold}>
-								5 friends invited
+								{wallet} friends invited
 							</span>
 						</div>
 					</Flex>

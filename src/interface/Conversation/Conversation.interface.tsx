@@ -25,6 +25,18 @@ export interface ConversationChatRoomProps {
 	users_in_conversation: UserInConversation[]
 	host: any
 	friend: any
+	last_message?: {
+		id: string
+		created_at: string
+		sender_id?: string
+		sender?: {
+			id: string
+			name: string
+			avatar: string
+			is_deleted?: boolean
+		}
+	}
+	is_read?: boolean
 }
 
 export interface MemberProps {
