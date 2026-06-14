@@ -86,6 +86,7 @@ export const FRIEND_ROUTES = {
 	myFriend: 'friend/my',
 	myRequest: 'friend/my-request',
 	mySent: 'friend/my-sent',
+	myFriendOnline: 'friend/my-online',
 }
 export const UPLOAD_ROUTES = {
 	name: '/image/upload',

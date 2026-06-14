@@ -39,3 +39,10 @@ export const addFriend = async (payload: any) => {
 	const url = FRIEND_ROUTES.name
 	return await axios.post(url, payload)
 }
+
+export const getMyFriendOnline = async (params: any) => {
+	const url = FRIEND_ROUTES.myFriendOnline
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}

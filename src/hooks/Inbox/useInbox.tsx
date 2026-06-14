@@ -9,7 +9,7 @@ import {
 	getConvPersonal,
 	getConvStranger,
 } from '@/apis/conversationApis'
-import { getFriends } from '@/apis/friendApis'
+import { getFriends, getMyFriendOnline } from '@/apis/friendApis'
 
 import { isArray, uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay, handleScrollCallback, toJson } from '@/ultis/common'
@@ -38,12 +38,16 @@ export default function useInbox() {
 
 	const _paginationFriend = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const _paginationConv = useRef<PaginationType>(cloneDeep(paginationCommon))
+	const _paginationFriendOnline = useRef<PaginationType>(
+		cloneDeep(paginationCommon),
+	)
 
 	const loadMore = useRef({
 		stranger: true,
 		personal: true,
 		conv: true,
 		friend: true,
+		friendOnline: true,
 	})
 
 	const [loadingConv, setLoadingConv] = useState({
@@ -51,6 +55,7 @@ export default function useInbox() {
 		personal: false,
 		conv: false,
 		friend: false,
+		friendOnline: false,
 	})
 
 	const [listConvStranger, setListConvStranger] = useState<any[]>([])
@@ -67,6 +72,40 @@ export default function useInbox() {
 	const [show, setShow] = useState(false)
 	const [showSearch, setShowSearch] = useState(false)
 	const [searchType, setSearchType] = useState('conv')
+	const [listMyFriendOnline, setListMyFriendOnline] = useState<any[]>([])
+
+	const handleGetMyFriendOnline = async () => {
+		setLoadingConv((prev) => ({ ...prev, friendOnline: true }))
+		const { page, limit } = _paginationFriendOnline.current
+
+		try {
+			const isNew = page === 1
+			if (isNew) {
+				setListMyFriendOnline([])
+			}
+
+			const res: any = await getMyFriendOnline({ page, limit })
+			await delay(500)
+			const { code, results } = res || {}
+
+			if (code === 200) {
+				const { rows } = results?.objects || {}
+				if (!isArray(rows, limit)) {
+					loadMore.current.friendOnline = false
+				}
+				if (isArray(rows)) {
+					setListMyFriendOnline((prev) => {
+						const contents = isNew ? [] : prev
+						return uniqueArray([...contents, ...rows], 'id') as any[]
+					})
+				}
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoadingConv((prev) => ({ ...prev, friendOnline: false }))
+		}
+	}
 
 	const handleGetConvStranger = async () => {
 		setLoadingConv((prev) => ({ ...prev, stranger: true }))
@@ -340,6 +379,7 @@ export default function useInbox() {
 	useEffect(() => {
 		handleGetConvStranger()
 		handleGetConvPersonal()
+		handleGetMyFriendOnline()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 	useEffect(() => {
@@ -406,6 +446,7 @@ export default function useInbox() {
 		keyword,
 		listFriend,
 		listConv,
+		listMyFriendOnline,
 		searchType,
 		setSearchType,
 		setKeyword,

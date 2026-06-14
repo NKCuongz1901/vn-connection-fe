@@ -1,5 +1,5 @@
 'use client'
-import { IconChevronLeft, IconCircleXFilled } from '@tabler/icons-react'
+import { IconChevronLeft, IconCircleXFilled, IconPlus } from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
 import { Fragment, memo, useCallback } from 'react'
@@ -39,6 +39,7 @@ const Inbox = () => {
 		keyword,
 		listFriend,
 		listConv,
+		listMyFriendOnline,
 		searchType,
 		setSearchType,
 		setKeyword,
@@ -308,6 +309,61 @@ const Inbox = () => {
 			</Flex>
 		)
 	}
+
+	const _renderMyFriendOnline = () => {
+		if (showSearch) return null
+
+		const me = getUserInfo()
+		const { avatar } = me || {}
+
+		return (
+			<Flex className={classes.friendStoryList}>
+				<div className={classes.friendStoryMe}>
+					<div className={classes.thoughtBubble}>Drop a thought</div>
+					<div className={classes.friendStoryMeAvatarWrap}>
+						<CAvatar
+							src={avatar}
+							size={64}
+							className={classes.friendStoryAvatarBorder}
+						/>
+						<button
+							type="button"
+							className={classes.addThoughtBtn}
+							aria-label="Drop a thought"
+						>
+							<IconPlus size={16} color="#006B35" stroke={2} />
+						</button>
+					</div>
+				</div>
+
+				{listMyFriendOnline.map((item) => {
+					const { id, friend } = item || {}
+					const { id: friendId, avatar: friendAvatar } = friend || {}
+
+					return (
+						<div
+							key={id}
+							className={classes.friendStoryItem}
+							onClick={() => friendId && onCreateConv(friendId)}
+							role="button"
+							tabIndex={0}
+							onKeyDown={(e) => {
+								if ((e.key === 'Enter' || e.key === ' ') && friendId) {
+									onCreateConv(friendId)
+								}
+							}}
+						>
+							<div className={classes.friendStoryAvatarWrap}>
+								<CAvatar src={friendAvatar} size={64} />
+								<span className={classes.onlineDot} aria-label="Online" />
+							</div>
+						</div>
+					)
+				})}
+			</Flex>
+		)
+	}
+
 	const _renderPersonal = () => {
 		if (show) return
 		return (
@@ -321,6 +377,7 @@ const Inbox = () => {
 						onChange={(e) => setKeyword(e.target.value)}
 					/>
 				</Flex>
+				{_renderMyFriendOnline()}
 				{_renderPersonalConv()}
 				{_renderSearch()}
 			</>
