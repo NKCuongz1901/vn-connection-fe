@@ -127,7 +127,11 @@ function Referral() {
 						<div className={classes.normalText}>1 point = 5,000 đ</div>
 					</Flex>
 					<div className={classes.actionRow}>
-						<button type="button" className={classes.redeemHistoryBtn}>
+						<button
+							type="button"
+							className={classes.redeemHistoryBtn}
+							onClick={() => onChangeRoute(mainRoutes.referralRedeemHistory)}
+						>
 							<ReceiptIcon />
 							<span className={classes.normalText}>Redeem history</span>
 						</button>
@@ -195,7 +199,9 @@ function Referral() {
 	const _renderContentRightBottom = () => {
 		return (
 			<div className={classes.contentRightBottom}>
-				<ReferralTutorialSteps />
+				<ReferralTutorialSteps
+					completeData={userData?.complete_profile}
+				/>
 			</div>
 		)
 	}

@@ -25,4 +25,5 @@ export const mainRoutes = {
 	publicEvent: 'public-event',
 	referral: 'referral',
 	referralAddBankCard: 'referral/add-bank-card',
+	referralRedeemHistory: 'referral/redeem-history',
 }

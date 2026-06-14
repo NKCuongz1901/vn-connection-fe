@@ -1,0 +1,197 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	padding: 12px 32px;
+}
+
+.header {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	width: 100%;
+	margin: 0 auto;
+}
+
+.titleRow {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 16px;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	width: fit-content;
+}
+
+.title {
+	color: #0f1729;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 28px;
+}
+
+.description {
+	margin: 0;
+	padding: 0 16px;
+	color: #48546b;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+}
+
+.list {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	width: 100%;
+	max-width: 678px;
+	margin: 16px auto 0;
+}
+
+.card {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	width: 100%;
+	padding: 12px 16px;
+	border-radius: 16px;
+	background: #fff;
+}
+
+.cardHeader {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	width: 100%;
+}
+
+.dateWrap {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	gap: 4px;
+	min-width: 0;
+
+	svg {
+		flex-shrink: 0;
+		width: 16px;
+		height: 16px;
+	}
+}
+
+.date {
+	color: #0f1729;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+	white-space: nowrap;
+}
+
+.statusTag {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	padding: 4px;
+	border-radius: 40px;
+
+	svg {
+		display: block;
+		width: 16px;
+		height: 16px;
+	}
+
+	span {
+		padding: 0 8px;
+		font-size: 12px;
+		font-weight: 600;
+		line-height: 16px;
+		white-space: nowrap;
+	}
+}
+
+.statusPending {
+	background: #fff6f0;
+
+	span {
+		color: #e55a0f;
+	}
+}
+
+.statusPaid {
+	background: #e7f5e9;
+
+	span {
+		color: #1b8024;
+	}
+}
+
+.cardContent {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+}
+
+.walletIconWrap {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	padding: 12px;
+	border-radius: 999px;
+	background: #fff6f0;
+
+	svg {
+		display: block;
+		width: 24px;
+		height: 24px;
+	}
+}
+
+.priceWrap {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	align-items: flex-start;
+}
+
+.amount {
+	color: #0f1729;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 28px;
+}
+
+.pointsWrap {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+
+	svg {
+		display: block;
+		width: 12px;
+		height: 12px;
+	}
+
+	span {
+		color: #48546b;
+		font-size: 12px;
+		font-weight: 400;
+		line-height: 16px;
+	}
+}
+
+.divider {
+	width: 100%;
+	height: 1px;
+	background: #edf0f5;
+}
+
+.paidAt {
+	color: #48546b;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+}

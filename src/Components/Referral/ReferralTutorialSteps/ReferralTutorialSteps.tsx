@@ -1,6 +1,10 @@
 'use client'
 
-import { memo } from 'react'
+import { memo, useState } from 'react'
+
+import ModalProfileComplete from '@/Components/Notification/ModalProfileComplete/ModalProfileComplete'
+import { mainRoutes } from '@/routes/MainRoutes'
+import { useLocalePath } from '@/ultis/route'
 
 import {
 	REFERRAL_TUTORIAL_STEPS,
@@ -8,20 +12,71 @@ import {
 } from './referralTutorialSteps.constants'
 import classes from './ReferralTutorialSteps.module.scss'
 
-function renderStepContent(item: ReferralTutorialStepItem) {
-	if (item.step === 2) {
-		return (
-			<>
-				Earn 1 point when a friend completes{' '}
-				<span className={classes.highlight}>50%</span> their profile
-			</>
-		)
-	}
-
-	return item.content
+type CompleteProfileData = {
+	about_me?: boolean
+	email_verified?: boolean
+	profile_photo?: boolean
+	interests?: boolean
+	friend_about?: boolean
+	languages?: boolean
+	countries?: boolean
+	reference_1?: boolean
+	reference_2?: boolean
+	point?: number
 }
 
-function ReferralTutorialSteps() {
+interface ReferralTutorialStepsProps {
+	completeData?: CompleteProfileData
+	onCompleteProfile?: () => void
+}
+
+function ReferralTutorialSteps({
+	completeData,
+	onCompleteProfile,
+}: ReferralTutorialStepsProps) {
+	const [openModalProfileComplete, setOpenModalProfileComplete] =
+		useState(false)
+	const { onChangeRoute } = useLocalePath()
+
+	const handleOpenProfileCompleteModal = () => {
+		setOpenModalProfileComplete(true)
+	}
+
+	const handleCompleteProfile = () => {
+		setOpenModalProfileComplete(false)
+		if (onCompleteProfile) {
+			onCompleteProfile()
+			return
+		}
+		onChangeRoute(mainRoutes.profile)
+	}
+
+	const renderStepContent = (item: ReferralTutorialStepItem) => {
+		if (item.step === 2) {
+			return (
+				<>
+					Earn 1 point when a friend completes{' '}
+					<span
+						className={classes.highlight}
+						onClick={handleOpenProfileCompleteModal}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								handleOpenProfileCompleteModal()
+							}
+						}}
+						role="button"
+						tabIndex={0}
+					>
+						50%
+					</span>{' '}
+					their profile
+				</>
+			)
+		}
+
+		return item.content
+	}
+
 	return (
 		<div className={classes.wrapper}>
 			<div className={classes.header}>
@@ -40,6 +95,13 @@ function ReferralTutorialSteps() {
 					</div>
 				))}
 			</div>
+			{openModalProfileComplete && (
+				<ModalProfileComplete
+					completeData={completeData}
+					onClose={() => setOpenModalProfileComplete(false)}
+					onCompleteProfile={handleCompleteProfile}
+				/>
+			)}
 		</div>
 	)
 }
