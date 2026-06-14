@@ -6,9 +6,10 @@ import {
 } from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
-import { memo } from 'react'
+import { memo, useState } from 'react'
 
 import useExploreInterest from '@/hooks/ExploreInterest/useExploreInterest'
+import useExploreInterestCommunities from '@/hooks/ExploreInterest/useExploreInterestCommunities'
 
 import { arrayFrom, isArray } from '@/ultis/array'
 import { useLocalePath } from '@/ultis/route'
@@ -19,6 +20,9 @@ import CImage from '@/Components/Custom/CImage'
 import CInputMap from '@/Components/Custom/CInputMap'
 import CSelect from '@/Components/Custom/CSelect'
 import ModalInviteCommunity from '@/Components/ExploreInterest/ModalInviteCommunity'
+import ExploreInterestCommunitiesView, {
+	ExploreInterestCommunitiesCountBadge,
+} from '@/Container/ExploreInterest/ExploreInterestCommunitiesView/ExploreInterestCommunitiesView'
 import ArrrowLeftIcon from '@/svg/ArrrowLeftIcon'
 import MapIcon from '@/svg/MapIcon'
 import MarkIcon from '@/svg/MarkIcon'
@@ -69,6 +73,7 @@ const GENDER = {
 }
 const ExploreInterest = () => {
 	const { onChangeRoute } = useLocalePath()
+	const [viewAllCommunities, setViewAllCommunities] = useState(false)
 	const {
 		loadingInvite,
 		invited,
@@ -99,11 +104,42 @@ const ExploreInterest = () => {
 		onScrollUser,
 		onInviteUser,
 	} = useExploreInterest({})
-	console.log('tab data:', tabsData)
+
+	const {
+		clubs,
+		filter: communityFilter,
+		loading: loadingCommunities,
+		total: communitiesTotal,
+		canLoadMoreClub,
+		onChangeFilter: onChangeCommunityFilter,
+		onLoadMore: onLoadMoreCommunities,
+		onScroll: onScrollCommunities,
+		updateClub,
+	} = useExploreInterestCommunities({
+		enabled: viewAllCommunities,
+		latitude: filters.latitude,
+		longitude: filters.longitude,
+		radius: filters.radius,
+	})
+
 	const _renderNoData = () => {
 		return <Flex className={classes.noData}>No matching Data</Flex>
 	}
 	const _renderHeader = () => {
+		if (viewAllCommunities) {
+			return (
+				<Flex
+					className={classes.header}
+					onClick={() => setViewAllCommunities(false)}
+				>
+					<ArrrowLeftIcon />
+					<Flex align="center" gap={4}>
+						<div>Communities</div>
+						<ExploreInterestCommunitiesCountBadge total={communitiesTotal} />
+					</Flex>
+				</Flex>
+			)
+		}
 		if (matching) {
 			return (
 				<Flex className={classes.header} onClick={() => setMatching(false)}>
@@ -446,22 +482,49 @@ const ExploreInterest = () => {
 		<div className={classes.wrapper}>
 			<Flex vertical className={classes.container}>
 				{_renderHeader()}
-				<Flex className={classes.content} vertical>
-					{_renderSearch()}
-					{_renderTabBnt()}
-					{!matching ? _renderTabData() : _renderMatching()}
-					{!matching && (
-						<Flex className={classes.matching}>
-							<CButton
-								disabled={!isArray(selects, 1)}
-								ctype={isArray(selects, 1) ? 'oranger' : 'disabled'}
-								onClick={onSearchMatching}
-							>
-								See Matching Communities
-							</CButton>
-						</Flex>
-					)}
-				</Flex>
+				{viewAllCommunities ? (
+					<ExploreInterestCommunitiesView
+						address={filters.address}
+						keyword={communityFilter.q}
+						clubs={clubs}
+						loading={loadingCommunities}
+						canLoadMoreClub={canLoadMoreClub}
+						onChangeFilter={onChangeCommunityFilter}
+						onScroll={onScrollCommunities}
+						onLoadMore={onLoadMoreCommunities}
+						onUpdateClub={updateClub}
+					/>
+				) : (
+					<Flex className={classes.content} vertical>
+						{_renderSearch()}
+						<div
+							className={classes.viewAll}
+							onClick={() => setViewAllCommunities(true)}
+							role="button"
+							tabIndex={0}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									setViewAllCommunities(true)
+								}
+							}}
+						>
+							View all
+						</div>
+						{_renderTabBnt()}
+						{!matching ? _renderTabData() : _renderMatching()}
+						{!matching && (
+							<Flex className={classes.matching}>
+								<CButton
+									disabled={!isArray(selects, 1)}
+									ctype={isArray(selects, 1) ? 'oranger' : 'disabled'}
+									onClick={onSearchMatching}
+								>
+									See Matching Communities
+								</CButton>
+							</Flex>
+						)}
+					</Flex>
+				)}
 			</Flex>
 			{_renderModal()}
 		</div>

@@ -22,6 +22,17 @@
 			border-radius: 16px;
 			height: 100%;
 			gap: 12px;
+
+			.viewAll {
+				align-self: flex-end;
+				cursor: pointer;
+				color: var(--Colors-Text-text-action, #e55a0f);
+
+				font-size: 14px;
+				font-style: normal;
+				font-weight: 600;
+				line-height: 20px; /* 142.857% */
+			}
 			.search {
 				width: 100%;
 				gap: 12px;

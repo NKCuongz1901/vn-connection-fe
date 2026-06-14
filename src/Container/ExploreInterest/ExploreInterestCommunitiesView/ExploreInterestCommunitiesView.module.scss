@@ -1,0 +1,83 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	width: 100%;
+	min-height: 0;
+	background: #fff;
+	border-radius: 16px;
+	overflow: hidden;
+}
+
+.locationRow {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 16px 16px 0;
+	color: #48546b;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+
+	svg {
+		flex-shrink: 0;
+		width: 16px;
+		height: 16px;
+	}
+}
+
+.searchRow {
+	padding: 12px 16px 0;
+	width: 100%;
+}
+
+.searchInput {
+	width: 100%;
+
+	:global(.ant-input) {
+		border-radius: 999px !important;
+		background: #f0f3f9 !important;
+		border: none !important;
+		padding: 12px 8px !important;
+	}
+}
+
+.searchIcon {
+	color: #7987a4;
+	font-size: 16px;
+}
+
+.listBody {
+	flex: 1;
+	min-height: 0;
+	width: 100%;
+	padding-top: 12px;
+	display: flex;
+	flex-direction: column;
+}
+
+.communityListScroll {
+	flex: 1;
+	max-height: calc(100dvh - 320px);
+}
+
+.countBadge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 20px;
+	height: 20px;
+	padding: 0 8px;
+	border-radius: 99px;
+	background: #fff;
+	color: #006b35;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 16px;
+}
+
+.headerTitle {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
