@@ -286,7 +286,7 @@ const Profile = (props: ProfileProps) => {
 					<Flex className={classes.endButton}>
 						{isMe ? (
 							<>
-								<CButton
+								{/* <CButton
 									ctype="oranger"
 									style={{ height: 40 }}
 									onClick={() => onChangeRoute(mainRoutes.search)}
@@ -295,7 +295,7 @@ const Profile = (props: ProfileProps) => {
 										<ShareIcon />
 									</Flex>
 									<span>Invite friend</span>
-								</CButton>
+								</CButton> */}
 								<CButton
 									ctype="disabled"
 									style={{ height: 40 }}

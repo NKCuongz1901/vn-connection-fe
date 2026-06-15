@@ -152,8 +152,15 @@ export default function useChatRoomChatBox({
 		setReply(item)
 		_refInput?.current?.focus()
 	}
-	const handleOpenReact = (item) => {
-		setOpenReact((prev) => (prev?.id === item?.id ? null : item))
+	const handleOpenReact = (item, event?: React.MouseEvent) => {
+		setOpenReact((prev) => {
+			if (prev?.id === item?.id) return null
+			return {
+				...item,
+				menuAnchorX: event?.clientX ?? 0,
+				menuAnchorY: event?.clientY ?? 0,
+			}
+		})
 	}
 	const handleCopy = (data) => {
 		copyToClipboard(data, {

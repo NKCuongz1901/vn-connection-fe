@@ -44,9 +44,8 @@ import {
 } from '@/Variable/common.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
 
-import MessageActionPopover, {
-	MessageActionMenuItem,
-} from '@/Components/ChatBox/MessageActionPopover'
+import { MessageActionMenuItem } from '@/Components/ChatBox/MessageActionPopover'
+import MessageActionFloatingPopover from '@/Components/ChatBox/MessageActionFloatingPopover'
 import classes from './ChatRoomChatBox.module.scss'
 interface ChatRoomChatBoxProps {
 	type?: string
@@ -522,24 +521,28 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 				return <Flex className={classes.memberAccept}>{type}</Flex>
 		}
 	}
-	const _renderMessageActionPopover = (item, isMe) => {
-		if (item?.id !== openReact?.id) return null
+	const _renderFloatingMessageMenu = () => {
+		if (!openReact?.id) return null
 
-		const { reactions } = item || {}
+		const isMe = getUserInfo('id') === openReact.user_id
+		const { reactions } = openReact || {}
 		const reactType = (reactions || []).find(
 			(i) => i.user_id === getUserInfo('id'),
 		)
 
 		return (
-			<MessageActionPopover
+			<MessageActionFloatingPopover
+				open={!!openReact}
+				anchorX={openReact.menuAnchorX ?? 0}
+				anchorY={openReact.menuAnchorY ?? 0}
 				align={isMe ? 'end' : 'start'}
 				reactList={reactList}
 				activeReactionId={reactType?.reaction_id}
-				menus={onGetMenus({ item, isMe }) as MessageActionMenuItem[]}
+				menus={onGetMenus({ item: openReact, isMe }) as MessageActionMenuItem[]}
 				onReact={(react) => {
 					const isActive = reactType?.reaction_id === react.id
 					onAddReact({
-						item,
+						item: openReact,
 						react,
 						type: isActive ? 'remove' : 'add',
 					})
@@ -630,13 +633,12 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 									onClick={(e) => {
 										if (!canOpenMessageMenu) return
 										e.stopPropagation()
-										onOpenReact(item)
+										onOpenReact(item, e)
 									}}
 								>
 									{_renderContentChat(item)}
 								</div>
 							</Flex>
-							{_renderMessageActionPopover(item, isMe)}
 						</Flex>
 					</Flex>
 				</Flex>
@@ -882,9 +884,10 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		<div
 			className={classes.wrapper}
 			onClick={() => {
-				if (openReact) setOpenReact(false)
+				if (openReact) setOpenReact(null)
 			}}
 		>
+			{_renderFloatingMessageMenu()}
 			<Flex
 				className={classes.chatContent}
 				vertical
