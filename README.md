@@ -1,9 +1,9 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-build 2
+build 2222
+
 ## Getting Started
 
 First, run the development server:
-
 
 ```bash
 npm run dev
@@ -33,7 +33,7 @@ npm run dev
 3. Common type
 4. Function
 5. Build change
-5. Build change 2
+6. Build change 2
 
 ## Rule commit code
 
