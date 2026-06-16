@@ -36,6 +36,9 @@ import CLoading from '../Custom/CLoading/CLoading'
 import CTextSpecial from '../Custom/CTextSpecial'
 import CUploadMuti from '../Custom/CUploadMuti'
 import VisualizerWithPlay from '../VisualizerWithPlay'
+import CcIcon from '@/svg/CcIcon'
+import TranslateIcon from '@/svg/TranslateIcon'
+import VolumeIcon from '@/svg/VolumeIcon'
 
 import {
 	ACTION_ITEMS,
@@ -98,6 +101,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 	const cancelEditRef = useRef<() => void>(() => {})
 	const { onChangeRoute } = useLocalePath()
 	const {
+		listTranslateLoading,
 		isAudio,
 		_refInput,
 		activeSticker,
@@ -106,13 +110,16 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		text,
 		reply,
 		listSpToText,
+		listSpToTextLoading,
+		listTextToSpeechLoading,
+		playAudioId,
 		listTranslate,
 		openReact,
 		reactList,
 		language,
 		searchCountry,
-
 		setSearchCountry,
+		onStopAudio,
 
 		setReply,
 		setOpenReact,
@@ -122,6 +129,9 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		setShowSticker,
 		onScroll,
 		onGetMenus,
+		onAddSpToText,
+		onAddTextToSpeech,
+		onAddTranslate,
 		onAddReact,
 		onOpenReact,
 		onChangeLanguage,
@@ -475,6 +485,23 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 				return (
 					<Flex className={classes.medias} vertical>
 						<Flex>
+							{!(isTemp || isMemberAction) && isAudioMedia && !isMe && (
+								<Flex
+									className={classes.moreIconWrapper}
+									onClick={(e) => e.stopPropagation()}
+								>
+									<Flex
+										className={clsx(classes.moreIcon, {
+											[classes.disabled]: listSpToTextLoading[id],
+										})}
+										onClick={() =>
+											!listSpToTextLoading[id] && onAddSpToText(item)
+										}
+									>
+										{listSpToTextLoading[id] ? <CLoading /> : <CcIcon />}
+									</Flex>
+								</Flex>
+							)}
 							<Flex className={classes.mediasWrapper}>
 								{_renderParentItem(parent)}
 								<div
@@ -521,6 +548,46 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 				return <Flex className={classes.memberAccept}>{type}</Flex>
 		}
 	}
+	const _renderMessageAiIcons = (item, { isMe, isTemp, isMemberAction, type }) => {
+		const { id } = item || {}
+		if (isTemp || isMemberAction || isMe || type === 'MEDIAS') return null
+
+		return (
+			<Flex
+				className={classes.moreIconWrapper}
+				onClick={(e) => e.stopPropagation()}
+			>
+				{type === 'TEXT' && (
+					<Flex
+						className={clsx(classes.moreIcon, {
+							[classes.disabled]: listTranslateLoading[id],
+						})}
+						onClick={() => onAddTranslate(item)}
+					>
+						{listTranslateLoading[id] ? <CLoading /> : <TranslateIcon />}
+					</Flex>
+				)}
+				{type === 'TEXT' && (
+					<Flex
+						className={clsx(classes.moreIcon, {
+							[classes.disabled]: listTextToSpeechLoading[id],
+							[classes.isPlaying]: playAudioId === id,
+						})}
+						onClick={() => {
+							if (playAudioId === id) {
+								onStopAudio(id)
+							} else if (!listTextToSpeechLoading[id]) {
+								onAddTextToSpeech(item)
+							}
+						}}
+					>
+						{listTextToSpeechLoading[id] ? <CLoading /> : <VolumeIcon />}
+					</Flex>
+				)}
+			</Flex>
+		)
+	}
+
 	const _renderFloatingMessageMenu = () => {
 		if (!openReact?.id) return null
 
@@ -626,6 +693,12 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 									[classes.isReaction]: isArray(reactions, 1),
 								})}
 							>
+								{_renderMessageAiIcons(item, {
+									isMe,
+									isTemp,
+									isMemberAction,
+									type,
+								})}
 								<div
 									className={clsx(classes.messageBubbleHitArea, {
 										[classes.messageBubbleInteractive]: canOpenMessageMenu,

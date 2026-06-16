@@ -54,6 +54,9 @@ import AudioRecorder from '../AudioRecorder'
 import DotIcon from '@/svg/DotIcon'
 import CInput from '../Custom/CInput'
 import VisualizerWithPlay from '../VisualizerWithPlay'
+import CcIcon from '@/svg/CcIcon'
+import TranslateIcon from '@/svg/TranslateIcon'
+import VolumeIcon from '@/svg/VolumeIcon'
 
 interface ChatBoxProps {
 	isDisabledChat?: boolean
@@ -127,6 +130,7 @@ const ChatBox = ({
 	const isJumpingRef = useRef(false)
 
 	const {
+		listTranslateLoading,
 		isAudio,
 		_refInput,
 		activeSticker,
@@ -135,6 +139,9 @@ const ChatBox = ({
 		text,
 		reply,
 		listSpToText,
+		listSpToTextLoading,
+		listTextToSpeechLoading,
+		playAudioId,
 		listTranslate,
 		openReact,
 		reactList,
@@ -142,6 +149,7 @@ const ChatBox = ({
 		searchCountry,
 		showActionMenu,
 		setSearchCountry,
+		onStopAudio,
 
 		setReply,
 		setOpenReact,
@@ -152,6 +160,9 @@ const ChatBox = ({
 		setShowActionMenu,
 		onScroll,
 		onGetMenus,
+		onAddSpToText,
+		onAddTextToSpeech,
+		onAddTranslate,
 		onAddReact: onActionReact,
 		onOpenReact,
 		onChangeLanguage,
@@ -501,6 +512,23 @@ const ChatBox = ({
 				return (
 					<Flex className={classes.medias} vertical>
 						<Flex>
+							{!(isTemp || isMemberAction) && isAudioMedia && !isMe && (
+								<Flex
+									className={classes.moreIconWrapper}
+									onClick={(e) => e.stopPropagation()}
+								>
+									<Flex
+										className={clsx(classes.moreIcon, {
+											[classes.disabled]: listSpToTextLoading[id],
+										})}
+										onClick={() =>
+											!listSpToTextLoading[id] && onAddSpToText(item)
+										}
+									>
+										{listSpToTextLoading[id] ? <CLoading /> : <CcIcon />}
+									</Flex>
+								</Flex>
+							)}
 							<Flex className={classes.mediasWrapper}>
 								{_renderParentItem(parent)}
 								<div
@@ -564,6 +592,46 @@ const ChatBox = ({
 			</Flex>
 		)
 	}
+	const _renderMessageAiIcons = (item, { isMe, isTemp, isMemberAction, type }) => {
+		const { id } = item || {}
+		if (isTemp || isMemberAction || isMe || type === 'MEDIAS') return null
+
+		return (
+			<Flex
+				className={classes.moreIconWrapper}
+				onClick={(e) => e.stopPropagation()}
+			>
+				{type === 'TEXT' && (
+					<Flex
+						className={clsx(classes.moreIcon, {
+							[classes.disabled]: listTranslateLoading[id],
+						})}
+						onClick={() => onAddTranslate(item)}
+					>
+						{listTranslateLoading[id] ? <CLoading /> : <TranslateIcon />}
+					</Flex>
+				)}
+				{type === 'TEXT' && (
+					<Flex
+						className={clsx(classes.moreIcon, {
+							[classes.disabled]: listTextToSpeechLoading[id],
+							[classes.isPlaying]: playAudioId === id,
+						})}
+						onClick={() => {
+							if (playAudioId === id) {
+								onStopAudio(id)
+							} else if (!listTextToSpeechLoading[id]) {
+								onAddTextToSpeech(item)
+							}
+						}}
+					>
+						{listTextToSpeechLoading[id] ? <CLoading /> : <VolumeIcon />}
+					</Flex>
+				)}
+			</Flex>
+		)
+	}
+
 	const _renderFloatingMessageMenu = () => {
 		if (!openReact?.id) return null
 
@@ -665,6 +733,12 @@ const ChatBox = ({
 									[classes.isReaction]: isArray(reactions, 1),
 								})}
 							>
+								{_renderMessageAiIcons(item, {
+									isMe,
+									isTemp,
+									isMemberAction,
+									type,
+								})}
 								<div
 									className={clsx(classes.messageBubbleHitArea, {
 										[classes.messageBubbleInteractive]: canOpenMessageMenu,
