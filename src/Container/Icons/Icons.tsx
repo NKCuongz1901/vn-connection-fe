@@ -115,6 +115,7 @@ import CrownIcon from '@/svg/Referral/CrownIcon'
 import UnboxGiftIcon from '@/svg/Referral/UnboxGiftIcon'
 import ShareSquareIcon from '@/svg/Referral/ShareSquareIcon'
 import WalletIcon from '@/svg/Referral/WalletIcon'
+import AppealIcon from '@/svg/AppealIcon'
 
 const Icons = () => {
 	const icons = [
@@ -542,6 +543,11 @@ const Icons = () => {
 		{
 			ICON: WalletIcon,
 			name: '@/svg/Event/WalletIcon',
+			key: randomString(),
+		},
+		{
+			ICON: AppealIcon,
+			name: '@/svg/Event/AppealIcon',
 			key: randomString(),
 		},
 	]

@@ -2,6 +2,7 @@
 import CModalConfirm from '@/Components/Custom/CModal/CModalConfirm'
 import CModalError from '@/Components/Custom/CModal/CModalError'
 import CModalSuccess from '@/Components/Custom/CModal/CModalSuccess'
+import AccountSuspendedModal from '@/Components/Modal/AccountSuspendedModal'
 import { usePathname } from 'next/navigation'
 import {
 	createContext,
@@ -10,6 +11,14 @@ import {
 	useEffect,
 	useState,
 } from 'react'
+
+import { mainRoutes } from '@/routes/MainRoutes'
+import { useLocalePath } from '@/ultis/route'
+import {
+	isAccountSuspendedError,
+	parseAccountSuspendedPayload,
+} from '@/ultis/string'
+import { handleRemoveAllCookie, isLogin } from '@/ultis/storage'
 
 interface openSuccessProps {
 	message: string
@@ -34,8 +43,16 @@ const ModalContext = createContext({
 })
 export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 	const [open, setOpen] = useState({ type: '' }) as any
+	const { onChangeRoute } = useLocalePath()
 
 	const openError = useCallback((error: any) => {
+		if (isAccountSuspendedError(error)) {
+			setOpen({
+				type: 'accountSuspended',
+				payload: parseAccountSuspendedPayload(error),
+			})
+			return
+		}
 		setOpen({ type: 'error', error: error })
 	}, [])
 	const openSuccess = useCallback((data: openSuccessProps) => {
@@ -47,6 +64,14 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 	const closeModal = useCallback(() => {
 		setOpen('')
 	}, [])
+
+	const handleCloseAccountSuspended = useCallback(() => {
+		closeModal()
+		if (isLogin()) {
+			handleRemoveAllCookie()
+			onChangeRoute(mainRoutes.login)
+		}
+	}, [closeModal, onChangeRoute])
 	const pathname = usePathname()
 	useEffect(() => {
 		closeModal()
@@ -82,6 +107,16 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 							onAccept?.()
 						}}
 						{...open}
+					/>
+				)
+				break
+			case 'accountSuspended':
+				content = (
+					<AccountSuspendedModal
+						open
+						payload={open.payload || {}}
+						onClose={handleCloseAccountSuspended}
+						onAppeal={handleCloseAccountSuspended}
 					/>
 				)
 				break

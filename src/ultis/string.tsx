@@ -1,3 +1,12 @@
+export type AccountSuspendedPayload = {
+	reason?: string
+	unblocked_at?: string | number
+	blocked_at?: string | number
+	type_block?: 'ONE_DAY' | 'THREE_DAYS' | 'FOREVER'
+	amount_of_appeal?: number
+	name?: string
+}
+
 export const formatNumberString = (input: any): string => {
 	if (!['string', 'number'].includes(typeof input)) return ''
 	const onlyDigits = String(input).replace(/[^\d]/g, '') // loại bỏ chữ cái và ký tự không phải số
@@ -108,3 +117,91 @@ export const parseMentions = (str) => {
 	result.text += str.slice(last)
 	return result
 }
+
+export type SuspensionType = 'temporary' | 'permanent'
+
+const normalizeSuspensionTimestamp = (value?: string | number) => {
+	if (value == null || value === '') return undefined
+	const timestamp = Number(value)
+	if (Number.isNaN(timestamp) || timestamp <= 0) return undefined
+	return timestamp
+}
+
+export const parseAccountSuspendedPayload = (
+	error: any,
+): AccountSuspendedPayload => {
+	const raw = error?.message || error?.message_debug
+	if (!raw) return {}
+
+	try {
+		const parsed =
+			typeof raw === 'string' ? JSON.parse(raw) : raw
+
+		if (!parsed || typeof parsed !== 'object') return {}
+
+		return {
+			...parsed,
+			unblocked_at: normalizeSuspensionTimestamp(parsed.unblocked_at),
+			blocked_at: normalizeSuspensionTimestamp(parsed.blocked_at),
+			type_block: parsed.type_block,
+			amount_of_appeal:
+				parsed.amount_of_appeal !== undefined
+					? Number(parsed.amount_of_appeal)
+					: undefined,
+		}
+	} catch {
+		return {}
+	}
+}
+
+export const isAccountSuspendedError = (error: any) =>
+	error?.code === 412 && error?.isSkipAlert === false
+
+export const getSuspensionType = (
+	unblockedAt?: string | number,
+): SuspensionType => {
+	if (
+		unblockedAt == null ||
+		unblockedAt === '' ||
+		Number(unblockedAt) <= 0 ||
+		Number.isNaN(Number(unblockedAt))
+	) {
+		return 'permanent'
+	}
+	return 'temporary'
+}
+
+export const getSuspensionDurationText = (
+	payload:
+		| Pick<AccountSuspendedPayload, 'unblocked_at' | 'blocked_at' | 'type_block'>
+		| string
+		| number
+		| undefined,
+): '24 hours' | '3 days' | null => {
+	const data =
+		typeof payload === 'object' && payload !== null
+			? payload
+			: { unblocked_at: payload as string | number | undefined }
+
+	if (data.type_block === 'ONE_DAY') return '24 hours'
+	if (data.type_block === 'THREE_DAYS') return '3 days'
+
+	const unblockedAt = normalizeSuspensionTimestamp(data.unblocked_at)
+	const blockedAt = normalizeSuspensionTimestamp(data.blocked_at)
+
+	if (blockedAt && unblockedAt && unblockedAt > blockedAt) {
+		const totalHours = (unblockedAt - blockedAt) / (1000 * 60 * 60)
+		return totalHours > 36 ? '3 days' : '24 hours'
+	}
+
+	if (!unblockedAt) return null
+
+	const remainingHours = (unblockedAt - Date.now()) / (1000 * 60 * 60)
+	if (remainingHours <= 0) return null
+
+	// Ban 1 ngày tối đa ~24h còn lại; ban 3 ngày thường còn > 24h
+	return remainingHours > 24 ? '3 days' : '24 hours'
+}
+
+export const canShowAppealButton = (amountOfAppeal?: number) =>
+	amountOfAppeal === undefined || amountOfAppeal === 0

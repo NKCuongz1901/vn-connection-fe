@@ -11,11 +11,10 @@ import CModal from './CModal'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import './CModal.scss'
-const codes = [409, 401, 410, 412]
+const codes = [409, 401, 410]
 const codeMessage = {
 	409: 'Login expired, please login again 🍁',
 	410: 'Change password',
-	412: 'User was blocked',
 }
 const CModalError = (_props: CModalProps) => {
 	const { onCancel, error, ...props } = _props

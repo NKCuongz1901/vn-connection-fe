@@ -61,3 +61,7 @@ export const getReportIssueTypes = async (params: { type: string }) => {
 export const getConfigBootstrap = async () => {
 	return await axios.post(CONFIG_BOOTSTRAP.configBootstrap)
 }
+
+export const appealAccountSuspended = async (payload: { phone: string }) => {
+	return await axios.post(USER_ROUTES.appeal, payload)
+}

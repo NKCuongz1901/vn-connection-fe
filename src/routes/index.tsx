@@ -33,6 +33,7 @@ export const USER_ROUTES = {
 	user: '/user',
 	block: '/user/block',
 	report: '/feedback',
+	appeal: '/user/appeal',
 }
 export const POST_ROUTES = {
 	name: 'post',
