@@ -83,6 +83,7 @@ const ModalCRUDEvent = ({
 				)}
 				<Flex className={classes.eventTitle}>
 					<CInput
+						maxLength={255}
 						value={title}
 						error={error.title}
 						placeholder="Activities title"
