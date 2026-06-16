@@ -3,7 +3,7 @@ import md5 from 'md5'
 import axios from '../axios'
 import { getStorageCookie } from '@/ultis/storage'
 
-import { USER_ROUTES } from '@/routes'
+import { CONFIG_BOOTSTRAP, USER_ROUTES } from '@/routes'
 
 export const getUserProfile = async ({
 	id,
@@ -56,4 +56,8 @@ export const getReportIssueTypes = async (params: { type: string }) => {
 	return await axios.get(`${USER_ROUTES.report}/issuse-types`, {
 		params: convertParams(params),
 	})
+}
+
+export const getConfigBootstrap = async () => {
+	return await axios.post(CONFIG_BOOTSTRAP.configBootstrap)
 }

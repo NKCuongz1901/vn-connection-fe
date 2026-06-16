@@ -140,6 +140,9 @@ export const REFERRAL_ROUTES = {
 export const MAP_ROUTES = {
 	name: 'map/google/place/textsearch/json',
 }
+export const CONFIG_BOOTSTRAP = {
+	configBootstrap: 'config/bootstrap',
+}
 export const Menus = [
 	{
 		title: 'Overview',

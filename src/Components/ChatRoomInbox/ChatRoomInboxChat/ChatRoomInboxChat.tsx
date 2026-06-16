@@ -8,6 +8,9 @@ import { onPushState } from '@/ultis/route'
 import { formatNumberString } from '@/ultis/string'
 
 import ChatRoomChatBox from '@/Components/ChatRoomChatBox'
+import AdminDeleteMessageModal, {
+	AdminDeleteMessageReasonModal,
+} from '@/Components/Modal/AdminDeleteMessageModal'
 import CAvatar from '@/Components/Custom/CAvatar'
 import ArrrowRightIcon from '@/svg/ArrrowRightIcon'
 import BookIcon from '@/svg/BookIcon'
@@ -59,6 +62,14 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 		onAddReact,
 		onEnsureMessageLoaded,
 		loadingEnsureMessage,
+		adminDeleteTarget,
+		openAdminDeleteReason,
+		reportContents,
+		loadingReportContents,
+		onCloseAdminDelete,
+		onCloseAdminDeleteReason,
+		onAdminDeleteConfirm,
+		onAdminDeleteReasonConfirm,
 	} = useChatRoomInboxChat(props)
 	const { avatar, title } = convInfo || {}
 	const _renderHeader = () => {
@@ -208,6 +219,21 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 			)}
 
 			{modal?.type && _renderModal()}
+
+			<AdminDeleteMessageModal
+				open={!!adminDeleteTarget && !openAdminDeleteReason}
+				senderName={adminDeleteTarget?.user?.name || ''}
+				onClose={onCloseAdminDelete}
+				onConfirm={onAdminDeleteConfirm}
+			/>
+
+			<AdminDeleteMessageReasonModal
+				open={openAdminDeleteReason}
+				options={reportContents}
+				loading={loadingReportContents}
+				onClose={onCloseAdminDeleteReason}
+				onConfirm={onAdminDeleteReasonConfirm}
+			/>
 		</div>
 	)
 }

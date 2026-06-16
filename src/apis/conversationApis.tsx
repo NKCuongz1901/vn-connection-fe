@@ -2,6 +2,7 @@ import { convertParams } from '@/ultis/object'
 import axios from '../axios'
 
 import { CONVERSATION_ROUTES } from '@/routes'
+import { AdminDeleteMessageParams } from '@/interface/Conversation/Conversation.interface'
 
 export const sendMessageById = async (payload: any) => {
 	const url = CONVERSATION_ROUTES.sendById
@@ -401,7 +402,10 @@ export const createQuickMessage = async (payload: QuickMessagePayload) => {
 	return await axios.post(url, payload)
 }
 
-export const updateQuickMessage = async (id: string, payload: QuickMessagePayload) => {
+export const updateQuickMessage = async (
+	id: string,
+	payload: QuickMessagePayload,
+) => {
 	const url = `${CONVERSATION_ROUTES.quickMessage}/${id}`
 
 	return await axios.put(url, payload)
@@ -411,4 +415,30 @@ export const deleteQuickMessage = async (id: string) => {
 	const url = `${CONVERSATION_ROUTES.quickMessage}/${id}`
 
 	return await axios.delete(url)
+}
+
+export const adminDeleteMessage = async ({
+	id,
+	is_report_spam,
+	is_delete_all_from_user,
+	is_ban_user,
+	type_block,
+	title,
+	content,
+}: AdminDeleteMessageParams) => {
+	const url = `${CONVERSATION_ROUTES.message}/${id}`
+	const query = Object.fromEntries(
+		Object.entries({
+			is_report_spam,
+			is_delete_all_from_user,
+			is_ban_user,
+			type_block,
+			title,
+			content,
+		}).filter(([, value]) => value !== undefined && value !== ''),
+	)
+	return await axios.delete(url, {
+		params: convertParams(query),
+		data: {},
+	})
 }

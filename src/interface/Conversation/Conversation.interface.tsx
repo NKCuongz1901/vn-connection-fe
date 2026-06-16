@@ -86,3 +86,15 @@ export interface LanguageProps {
 	updated_at: string
 	deleted_at: string | null
 }
+
+export type MessageBlockType = 'ONE_DAY' | 'THREE_DAYS' | 'FOREVER'
+
+export interface AdminDeleteMessageParams {
+	id: string
+	is_report_spam?: boolean
+	is_delete_all_from_user?: boolean
+	is_ban_user?: boolean
+	type_block?: MessageBlockType
+	title?: string
+	content?: string
+}

@@ -1,0 +1,162 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.header {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 16px;
+	min-height: 44px;
+}
+
+.title {
+	color: #0f1729;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 28px;
+	text-align: center;
+}
+
+.closeBtn {
+	position: absolute;
+	top: 4px;
+	right: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 4px;
+	cursor: pointer;
+	color: #7987a4;
+	background: none;
+	border: none;
+
+	&:hover {
+		color: #48546b;
+	}
+}
+
+.divider {
+	height: 1px;
+	width: 100%;
+	background: #edf0f5;
+}
+
+.body {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.list {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.optionRow {
+	display: flex;
+	align-items: flex-start;
+	width: 100%;
+	padding-right: 16px;
+	cursor: pointer;
+
+	&:hover {
+		background: #fafbfd;
+	}
+}
+
+.radioCol {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	padding: 12px 16px;
+}
+
+.optionText {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+	padding: 8px 0;
+}
+
+.optionTitle {
+	color: #0f1729;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+}
+
+.optionDesc {
+	color: #48546b;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+}
+
+.radio {
+	margin: 0;
+
+	:global(.ant-radio-inner) {
+		width: 20px;
+		height: 20px;
+		border-color: #7987a4;
+	}
+
+	:global(.ant-radio-checked .ant-radio-inner) {
+		border-color: #006b35;
+		background-color: #006b35;
+	}
+
+	:global(.ant-radio-checked .ant-radio-inner::after) {
+		background-color: #fff;
+	}
+}
+
+.empty {
+	color: #7987a4;
+	font-size: 14px;
+	line-height: 20px;
+	text-align: center;
+	padding: 16px;
+}
+
+.footer {
+	padding: 16px;
+	width: 100%;
+}
+
+.submitBtn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	min-height: 48px;
+	padding: 8px 16px;
+	border: none;
+	border-radius: 999px;
+	background: #edf0f5;
+	color: #94a3b8;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	cursor: pointer;
+
+	&:disabled {
+		cursor: not-allowed;
+	}
+
+	&:not(:disabled) {
+		background: #e55a0f;
+		color: #fff;
+
+		&:hover {
+			background: #005a2d;
+		}
+	}
+}

@@ -11,6 +11,7 @@ import { handleUploadFile } from '@/apis/uploadApis'
 
 import { playAudio, stopAudio } from '@/ultis/file'
 import { copyToClipboard } from '@/ultis/string'
+import { getUserInfo } from '@/ultis/storage'
 
 import { ReactionPtops } from '@/interface/Conversation/Conversation.interface'
 
@@ -178,6 +179,7 @@ export default function useChatRoomChatBox({
 		}
 	}
 	const handleGetMenus = ({ isMe, item }: { [key: string]: any }) => {
+		const isVerified = !!getUserInfo('is_verified')
 		const _props = []
 		const { type: typeMessage } = item || {}
 		switch (typeMessage) {
@@ -239,10 +241,25 @@ export default function useChatRoomChatBox({
 							key: 'DELETE',
 							label: 'Delete',
 							style: { color: '#F80024' },
-							onClick: () => onActionMessage({ key: 'delete', value: item }),
+							onClick: () => {
+								setOpenReact(null)
+								onActionMessage({ key: 'delete', value: item })
+							},
 						},
 					]
-				: []),
+				: isVerified
+					? [
+							{
+								key: 'DELETE',
+								label: 'Delete',
+								style: { color: '#F80024' },
+								onClick: () => {
+									setOpenReact(null)
+									onActionMessage({ key: 'admin_delete', value: item })
+								},
+							},
+						]
+					: []),
 		]
 		return menus
 	}

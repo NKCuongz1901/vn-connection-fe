@@ -4,6 +4,7 @@ import { useModal } from '@/context/ModalContext'
 import { useSocket } from '@/context/SocketContext'
 
 import {
+	adminDeleteMessage,
 	deleteMessageById,
 	getConvInfoById,
 	getConvMembersById,
@@ -16,6 +17,7 @@ import {
 	sendMessage,
 	editMessageById,
 } from '@/apis/conversationApis'
+import { getConfigBootstrap } from '@/apis/userApis'
 import {
 	handleUploadAudio,
 } from '@/apis/uploadApis'
@@ -30,6 +32,11 @@ import { generateCustomUuid, parseMentions, randomString } from '@/ultis/string'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { ReactionPtops } from '@/interface/Conversation/Conversation.interface'
+import {
+	AdminDeleteSelection,
+	buildAdminDeleteMessageParams,
+	ReportContentItem,
+} from '@/Components/Modal/AdminDeleteMessageModal'
 import {
 	MAX_CHAT_MEDIAS,
 	paginationCommon,
@@ -70,6 +77,12 @@ export default function useChatRoomInboxChat({
 
 	const reactList = useRef<{ [key: string]: ReactionPtops }>({})
 	const [editingMessage, setEditingMessage] = useState<any>(null)
+	const [adminDeleteTarget, setAdminDeleteTarget] = useState<any>(null)
+	const [adminDeleteSelection, setAdminDeleteSelection] =
+		useState<AdminDeleteSelection | null>(null)
+	const [openAdminDeleteReason, setOpenAdminDeleteReason] = useState(false)
+	const [reportContents, setReportContents] = useState<ReportContentItem[]>([])
+	const [loadingReportContents, setLoadingReportContents] = useState(false)
 
 	const handleStartEdit = (message: any) => {
 		if (!['TEXT', 'MEDIAS'].includes(message?.type)) return
@@ -449,6 +462,94 @@ export default function useChatRoomInboxChat({
 		}
 	}
 
+	const closeAdminDeleteFlow = () => {
+		setAdminDeleteTarget(null)
+		setAdminDeleteSelection(null)
+		setOpenAdminDeleteReason(false)
+	}
+
+	const handleLoadReportContents = async () => {
+		if (reportContents.length) return
+		setLoadingReportContents(true)
+		try {
+			const res: any = await getConfigBootstrap()
+			setReportContents(res?.results?.object?.report_contents ?? [])
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoadingReportContents(false)
+		}
+	}
+
+	const handleAdminDeleteMessage = async (
+		message: any,
+		selection: AdminDeleteSelection,
+		reason?: { title?: string; content?: string },
+	) => {
+		const { id, user_id } = message || {}
+		if (!id) return
+
+		try {
+			setMessList((prev) =>
+				prev.map((i) => (i.id === id ? { ...i, isTemp: true } : i)),
+			)
+
+			const res: any = await adminDeleteMessage(
+				buildAdminDeleteMessageParams({ id, selection, reason }),
+			)
+
+			if (res?.results?.object) {
+				if (pinList.some((item) => item.id === id)) {
+					handleGetPinMessage()
+				}
+
+				if (selection.isDeleteAllFromUser) {
+					setMessList((prev) => {
+						const _data = prev.filter((i) => i.user_id !== user_id)
+						return mappingMessageChat(_data)
+					})
+				} else {
+					setMessList((prev) => {
+						const _data = prev.filter((i) => i.id !== id)
+						return mappingMessageChat(_data)
+					})
+				}
+			}
+		} catch (error) {
+			openError(error)
+			setMessList((prev) =>
+				prev.map((i) => (i.id === id ? { ...i, isTemp: false } : i)),
+			)
+		} finally {
+			closeAdminDeleteFlow()
+		}
+	}
+
+	const handleAdminDeleteConfirm = async (selection: AdminDeleteSelection) => {
+		if (!adminDeleteTarget) return
+		setAdminDeleteSelection(selection)
+
+		if (selection.isReportSpam) {
+			await handleLoadReportContents()
+			setOpenAdminDeleteReason(true)
+			return
+		}
+
+		handleAdminDeleteMessage(adminDeleteTarget, selection)
+	}
+
+	const handleAdminDeleteReasonConfirm = (reason: {
+		title: string
+		content: string
+	}) => {
+		if (!adminDeleteTarget || !adminDeleteSelection) return
+		handleAdminDeleteMessage(adminDeleteTarget, adminDeleteSelection, reason)
+	}
+
+	const handleCloseAdminDeleteReason = () => {
+		setOpenAdminDeleteReason(false)
+	}
+
 	const handleEditMessage = async ({
 		message,
 		content,
@@ -549,6 +650,11 @@ export default function useChatRoomInboxChat({
 				break
 			case 'delete':
 				handleDeleteMessage(value)
+				break
+			case 'admin_delete':
+				setAdminDeleteTarget(value)
+				setAdminDeleteSelection(null)
+				setOpenAdminDeleteReason(false)
 				break
 			case 'pin':
 			case 'unpin':
@@ -752,5 +858,13 @@ export default function useChatRoomInboxChat({
 		onAddReact: handleAddReact,
 		onEnsureMessageLoaded: handleEnsureMessageLoaded,
 		loadingEnsureMessage,
+		adminDeleteTarget,
+		openAdminDeleteReason,
+		reportContents,
+		loadingReportContents,
+		onCloseAdminDelete: closeAdminDeleteFlow,
+		onCloseAdminDeleteReason: handleCloseAdminDeleteReason,
+		onAdminDeleteConfirm: handleAdminDeleteConfirm,
+		onAdminDeleteReasonConfirm: handleAdminDeleteReasonConfirm,
 	}
 }
