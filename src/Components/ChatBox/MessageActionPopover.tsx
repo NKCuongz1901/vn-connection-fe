@@ -72,6 +72,11 @@ const MessageActionPopover = ({
 		e.stopPropagation()
 	}
 
+	const handlePopoverClick = (e: MouseEvent) => {
+		e.stopPropagation()
+		onClose?.()
+	}
+
 	return (
 		<div
 			className={clsx(
@@ -79,11 +84,11 @@ const MessageActionPopover = ({
 				align === 'end' ? classes.alignEnd : classes.alignStart,
 				className,
 			)}
-			onClick={stopPropagation}
+			onClick={handlePopoverClick}
 			onMouseDown={stopPropagation}
 		>
 			{!!reactList?.length && (
-				<div className={classes.reactionBar}>
+				<div className={classes.reactionBar} onClick={stopPropagation}>
 					<div className={classes.reactionList}>
 						{reactList.map((react) => {
 							const isActive = activeReactionId === react.id
@@ -106,7 +111,7 @@ const MessageActionPopover = ({
 			)}
 
 			{!!menus?.length && (
-				<div className={classes.menu}>
+				<div className={classes.menu} onClick={stopPropagation}>
 					{menus.map((menu) => {
 						const isDanger =
 							menu?.key === 'DELETE' ||
