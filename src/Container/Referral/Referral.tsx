@@ -1,7 +1,10 @@
 'use client'
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 
+import { sendMessageById } from '@/apis/conversationApis'
+import CButton from '@/Components/Custom/CButton'
 import CInput from '@/Components/Custom/CInput'
+import ModalMyFriend from '@/Components/Friend/ModalMyFriend'
 import ReferralTabPanel from '@/Components/Referral/ReferralTabPanel/ReferralTabPanel'
 import ReferralTutorialSteps from '@/Components/Referral/ReferralTutorialSteps/ReferralTutorialSteps'
 import { useModal } from '@/context/ModalContext'
@@ -40,9 +43,12 @@ function Referral() {
 		onScrollHistory,
 	} = useReferral()
 	const { userData } = useProfile({})
-	const { openSuccess } = useModal()
+	const { openSuccess, openError } = useModal()
 	const { onChangeRoute } = useLocalePath()
 	const { wallet, invite_code, share_link } = userData || {}
+	const [shareModalOpen, setShareModalOpen] = useState(false)
+	const [loadingShare, setLoadingShare] = useState<Record<string, boolean>>({})
+	const [shareList, setShareList] = useState<Record<string, boolean>>({})
 
 	const handleCopy = useCallback(
 		(text?: string) => {
@@ -79,6 +85,70 @@ function Referral() {
 		}
 		handleCopy(share_link)
 	}, [share_link, handleCopy])
+
+	const handleCloseShareModal = useCallback(() => {
+		setShareModalOpen(false)
+		setShareList({})
+	}, [])
+
+	const handleShareFriend = useCallback(
+		async (friendId: string) => {
+			if (!share_link) return
+
+			setLoadingShare((prev) => ({ ...prev, [friendId]: true }))
+			try {
+				const res: any = await sendMessageById({
+					receiver_id: friendId,
+					message: {
+						content: share_link,
+						type: 'TEXT',
+					},
+				})
+
+				if (res?.code === 200) {
+					setShareList((prev) => ({ ...prev, [friendId]: true }))
+					openSuccess({ message: 'Share link to your friend successfully' })
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingShare((prev) => ({ ...prev, [friendId]: false }))
+			}
+		},
+		[share_link, openSuccess, openError],
+	)
+
+	const _renderMyFriendComp = useCallback(
+		(data: { friend?: { id?: string } }) => {
+			const friendId = data?.friend?.id
+			return (
+				<div className={classes.btnShareFriend}>
+					<CButton
+						ctype="oranger"
+						onClick={() => friendId && handleShareFriend(friendId)}
+						loading={friendId ? loadingShare?.[friendId] : false}
+						disabled={friendId ? shareList?.[friendId] : false}
+					>
+						Send
+					</CButton>
+				</div>
+			)
+		},
+		[handleShareFriend, loadingShare, shareList],
+	)
+
+	const _renderShareModal = () => {
+		if (!shareModalOpen) return null
+
+		return (
+			<ModalMyFriend
+				title="Share friend"
+				onClose={handleCloseShareModal}
+				onCopy={() => handleCopy(share_link)}
+				customComp={_renderMyFriendComp}
+			/>
+		)
+	}
 
 	const _renderMyTotalRef = useCallback(() => {
 		return (
@@ -187,7 +257,7 @@ function Referral() {
 					<button
 						type="button"
 						className={classes.inviteNowBtn}
-						onClick={() => handleCopy(share_link)}
+						onClick={() => setShareModalOpen(true)}
 					>
 						Invite now
 					</button>
@@ -225,6 +295,7 @@ function Referral() {
 	}
 	return (
 		<div className={classes.wrapper}>
+			{_renderShareModal()}
 			<h3 className={classes.title}>Referral</h3>
 			<div className={classes.content}>
 				<div className={classes.contentLeft}>
