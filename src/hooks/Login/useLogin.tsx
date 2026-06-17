@@ -81,7 +81,7 @@ export default function useLogin(options?: UseLoginOptions) {
 	)
 
 	const persistLoginSession = useCallback(
-		async (res: any, isRemember: boolean) => {
+		async (res: any, isRemember: boolean, formattedPhone?: string) => {
 			const { object, refresh_token, token } = res.results || {}
 			const {
 				id,
@@ -93,7 +93,16 @@ export default function useLogin(options?: UseLoginOptions) {
 				latitude,
 				longitude,
 				is_verified,
+				phone,
+				prefix_phone,
 			} = object || {}
+			const appealPhone =
+				formattedPhone ||
+				(phone
+					? phone.startsWith('+')
+						? phone
+						: formatPhone(prefix_phone || '+84', phone)
+					: undefined)
 			const dataInfo = {
 				id,
 				name,
@@ -104,6 +113,7 @@ export default function useLogin(options?: UseLoginOptions) {
 				latitude,
 				longitude,
 				is_verified,
+				...(appealPhone ? { appeal_phone: appealPhone } : {}),
 			}
 			if (isRemember) {
 				handleStorageCookie({
@@ -165,10 +175,13 @@ export default function useLogin(options?: UseLoginOptions) {
 			})
 
 			if (res.code === 200) {
-				await persistLoginSession(res, isRemember)
+				await persistLoginSession(res, isRemember, formattedPhone)
 			}
 		} catch (error: any) {
-			openError(error)
+			openError({
+				...error,
+				appealPhone: formattedPhone,
+			})
 		} finally {
 			toggleLoadingContext(false)
 		}

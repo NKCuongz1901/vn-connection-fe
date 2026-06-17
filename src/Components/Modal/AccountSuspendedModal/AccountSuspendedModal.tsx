@@ -24,6 +24,7 @@ export interface AccountSuspendedModalProps {
 	payload: AccountSuspendedPayload
 	onClose: () => void
 	onAppeal?: () => void
+	appealLoading?: boolean
 }
 
 function AccountSuspendedModal({
@@ -31,6 +32,7 @@ function AccountSuspendedModal({
 	payload,
 	onClose,
 	onAppeal,
+	appealLoading,
 }: AccountSuspendedModalProps) {
 	const suspensionType = getSuspensionType(payload.unblocked_at)
 	const duration = getSuspensionDurationText(payload)
@@ -136,7 +138,12 @@ function AccountSuspendedModal({
 				{showAppeal && (
 					<div className={classes.footer}>
 						<div className={classes.appealBtn}>
-							<CButton ctype="oranger" onClick={onAppeal || onClose}>
+							<CButton
+								ctype="oranger"
+								loading={appealLoading}
+								disabled={appealLoading}
+								onClick={onAppeal || onClose}
+							>
 								Appeal now
 							</CButton>
 						</div>
