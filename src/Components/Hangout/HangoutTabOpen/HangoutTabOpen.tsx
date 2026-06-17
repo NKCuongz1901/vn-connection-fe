@@ -47,7 +47,7 @@ function HangoutTabOpen(props, ref) {
 			<Flex className={classes.infoPeople}>
 				<Flex className={classes.people}>
 					<span className={classes.number}>{open + search}</span>
-					<span className={classes.title}>people hangouts</span>
+					<span className={classes.title}>Open Requests</span>
 				</Flex>
 				<Flex className={classes.radius}>
 					<CSelect
