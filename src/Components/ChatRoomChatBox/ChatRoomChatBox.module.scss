@@ -334,6 +334,15 @@
 									white-space: pre-wrap;
 									word-break: break-word;
 								}
+
+								&:has(.mediaCaption) {
+									padding-bottom: 14px;
+								}
+
+								&:has(.mediaCaption) .reactView {
+									bottom: 4px;
+									transform: none;
+								}
 							}
 							.mediaContent {
 								position: relative;

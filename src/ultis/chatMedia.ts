@@ -1,5 +1,15 @@
 import { handleUploadImage, handleUploadVideo } from '@/apis/uploadApis'
 
+export const isImageOnlyMediaMessage = (item?: {
+	type?: string
+	medias?: { type?: string }[]
+}) => {
+	if (item?.type !== 'MEDIAS') return false
+	const medias = item.medias || []
+	if (!medias.length) return false
+	return medias.every((media) => media?.type === 'IMAGE')
+}
+
 const getMediaThumbnail = (item: { thumbnail?: string; url?: string }) => {
 	if (typeof item?.thumbnail === 'string' && item.thumbnail) {
 		return item.thumbnail

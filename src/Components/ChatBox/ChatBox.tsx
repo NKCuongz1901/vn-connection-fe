@@ -18,6 +18,7 @@ import { useModal } from '@/context/ModalContext'
 import { arrayFrom, isArray } from '@/ultis/array'
 import { isMobile } from '@/ultis/common'
 import { parseDayFromIsNewDate } from '@/ultis/date'
+import { isImageOnlyMediaMessage } from '@/ultis/chatMedia'
 import {
 	handleParseFileImg,
 	handleParseFileVideo,
@@ -495,7 +496,9 @@ const ChatBox = ({
 							return (
 								<Flex className={classes.media} key={index}>
 									{isImg ? (
-										<CImage preview src={media.url} />
+										<div onClick={(e) => e.stopPropagation()}>
+											<CImage preview src={media.url} />
+										</div>
 									) : (
 										<video controls>
 											<source src={media.url} type="video/mp4" />
@@ -540,7 +543,18 @@ const ChatBox = ({
 									{Content}
 								</div>
 								{!!String(content || '').trim() && !isAudioMedia && (
-									<div className={classes.mediaCaption}>
+									<div
+										className={classes.mediaCaption}
+										onClick={
+											isImageOnlyMediaMessage(item)
+												? (e) => {
+														if (isTemp || isMemberAction) return
+														e.stopPropagation()
+														onOpenReact(item, e)
+													}
+												: undefined
+										}
+									>
 										<CTextSpecial data={content} mentions={mentions} />
 									</div>
 								)}
@@ -681,6 +695,7 @@ const ChatBox = ({
 		const isMemberAction = specialTypeMessage.includes(type)
 		const isNot = isMe || isMemberAction
 		const canOpenMessageMenu = !(isTemp || isMemberAction)
+		const isImageMediaMessage = isImageOnlyMediaMessage(item)
 
 		return (
 			<Flex
@@ -744,7 +759,13 @@ const ChatBox = ({
 										[classes.messageBubbleInteractive]: canOpenMessageMenu,
 									})}
 									onClick={(e) => {
-										if (!canOpenMessageMenu) return
+										if (!canOpenMessageMenu || isImageMediaMessage) return
+										e.stopPropagation()
+										onOpenReact(item, e)
+									}}
+									onContextMenu={(e) => {
+										if (!canOpenMessageMenu || !isImageMediaMessage) return
+										e.preventDefault()
 										e.stopPropagation()
 										onOpenReact(item, e)
 									}}

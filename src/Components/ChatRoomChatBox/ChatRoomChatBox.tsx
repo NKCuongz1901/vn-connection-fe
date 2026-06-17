@@ -9,6 +9,7 @@ import { QuickMessageItem } from '@/hooks/QuickMesage/useQuickMessage'
 import { useModal } from '@/context/ModalContext'
 
 import { arrayFrom, isArray } from '@/ultis/array'
+import { isImageOnlyMediaMessage } from '@/ultis/chatMedia'
 import { parseDayFromIsNewDate } from '@/ultis/date'
 import {
 	handleParseFileImg,
@@ -469,7 +470,9 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 							return (
 								<Flex className={classes.media} key={index}>
 									{isImg ? (
-										<CImage preview src={media.url} />
+										<div onClick={(e) => e.stopPropagation()}>
+											<CImage preview src={media.url} />
+										</div>
 									) : (
 										<video controls>
 											<source src={media.url} type="video/mp4" />
@@ -513,7 +516,18 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 									{Content}
 								</div>
 								{!!String(content || '').trim() && !isAudioMedia && (
-									<div className={classes.mediaCaption}>
+									<div
+										className={classes.mediaCaption}
+										onClick={
+											isImageOnlyMediaMessage(item)
+												? (e) => {
+														if (isTemp || isMemberAction) return
+														e.stopPropagation()
+														onOpenReact(item, e)
+													}
+												: undefined
+										}
+									>
 										<CTextSpecial data={content} mentions={mentions} />
 									</div>
 								)}
@@ -639,6 +653,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		if (isMemberAction) return
 		const isNot = isMe || isMemberAction
 		const canOpenMessageMenu = !(isTemp || isMemberAction)
+		const isImageMediaMessage = isImageOnlyMediaMessage(item)
 
 		return (
 			<Flex
@@ -704,7 +719,13 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 										[classes.messageBubbleInteractive]: canOpenMessageMenu,
 									})}
 									onClick={(e) => {
-										if (!canOpenMessageMenu) return
+										if (!canOpenMessageMenu || isImageMediaMessage) return
+										e.stopPropagation()
+										onOpenReact(item, e)
+									}}
+									onContextMenu={(e) => {
+										if (!canOpenMessageMenu || !isImageMediaMessage) return
+										e.preventDefault()
 										e.stopPropagation()
 										onOpenReact(item, e)
 									}}
