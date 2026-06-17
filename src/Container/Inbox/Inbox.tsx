@@ -338,7 +338,13 @@ const Inbox = () => {
 
 				{listMyFriendOnline.map((item) => {
 					const { id, friend } = item || {}
-					const { id: friendId, avatar: friendAvatar } = friend || {}
+					const {
+						id: friendId,
+						avatar: friendAvatar,
+						visibility,
+						online_time,
+					} = friend || {}
+					const isOnline = visibility === 'ONLINE'
 
 					return (
 						<div
@@ -355,7 +361,15 @@ const Inbox = () => {
 						>
 							<div className={classes.friendStoryAvatarWrap}>
 								<CAvatar src={friendAvatar} size={64} />
-								<span className={classes.onlineDot} aria-label="Online" />
+								{isOnline ? (
+									<span className={classes.onlineDot} aria-label="Online" />
+								) : (
+									online_time && (
+										<span className={classes.lastSeen}>
+											{formatLastOnlineShort(online_time)}
+										</span>
+									)
+								)}
 							</div>
 						</div>
 					)

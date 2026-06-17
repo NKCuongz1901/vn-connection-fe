@@ -134,6 +134,21 @@
 					border: 2px solid #fff;
 					box-sizing: border-box;
 				}
+
+				.lastSeen {
+					position: absolute;
+					left: 0;
+					bottom: 0;
+					padding: var(--spacing-spacer-0, 0) var(--spacing-spacer-05, 2px);
+					border-radius: 999px;
+					background: #e7f5e9;
+					color: #006b35;
+					font-size: 7px;
+					font-style: normal;
+					font-weight: 400;
+					line-height: var(--body-xsmall-line-height, 14px);
+					letter-spacing: var(--body-xsmall-tracking, 0);
+				}
 			}
 			.searchContainer {
 				width: 100%;
