@@ -1,7 +1,7 @@
-import React from 'react'
+import FeedbackSupport from '@/Container/AccountSetting/FeedbackSupport/FeedbackSupport'
 
-function page() {
-	return <div>page</div>
+function FeedbackSupportPage() {
+	return <FeedbackSupport />
 }
 
-export default page
+export default FeedbackSupportPage
