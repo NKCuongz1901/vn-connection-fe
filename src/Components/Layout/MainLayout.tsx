@@ -1,6 +1,11 @@
 'use client'
 import { CloseOutlined } from '@ant-design/icons'
-import { Flex } from 'antd'
+import {
+	IconLayoutSidebarLeftCollapse,
+	IconLayoutSidebarLeftExpand,
+	IconLayoutSidebarRight,
+} from '@tabler/icons-react'
+import { Flex, Tooltip } from 'antd'
 import Link from 'next/link'
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
 
@@ -34,9 +39,13 @@ const MainLayout = (props: MainLayoutProps) => {
 	const shouldGuardMenu = isPublicRoute && !isLogin()
 
 	const [openMenu, setOpenMenu] = useState(false)
+	const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 	const [content, setContent] = useState(null) as any
 	const toggleMenus = useCallback(() => {
 		setOpenMenu((prev) => !prev)
+	}, [])
+	const toggleSidebarCollapsed = useCallback(() => {
+		setSidebarCollapsed((prev) => !prev)
 	}, [])
 
 	const handleMenuItemClick = useCallback(
@@ -73,7 +82,7 @@ const MainLayout = (props: MainLayoutProps) => {
 			<Flex
 				className={`sideBarMainLayoutWrapper ${
 					openMenu ? 'openLayoutMenu' : 'closeLayoutMenu'
-				}`}
+				} ${sidebarCollapsed ? 'sidebarCollapsed' : ''}`}
 			>
 				<Flex
 					ref={ref}
@@ -81,12 +90,23 @@ const MainLayout = (props: MainLayoutProps) => {
 					className="sideBarMainLayout"
 					style={{ height: '100%' }}
 				>
-					<Flex className="sideBarMenuToggle">
+					<Flex className="sideBarMenuToggle" align="center">
 						<CloseOutlined
-							className="sideBarMenuToggleICon"
+							className="sideBarMenuToggleICon sideBarMenuToggleMobile"
 							onClick={toggleMenus}
 						/>
-						<span>Menu</span>
+						<span className="sideBarMenuToggleLabel">Menu</span>
+						<div
+							className="sideBarCollapseBtn"
+							onClick={toggleSidebarCollapsed}
+							aria-label={sidebarCollapsed ? 'Expand menu' : 'Collapse menu'}
+						>
+							{sidebarCollapsed ? (
+								<IconLayoutSidebarRight stroke={1} size={20} />
+							) : (
+								<IconLayoutSidebarRight size={20} />
+							)}
+						</div>
 					</Flex>
 					<Flex vertical className="sideBarMainLayoutItem">
 						{Menus.map((menu) => {
@@ -95,10 +115,10 @@ const MainLayout = (props: MainLayoutProps) => {
 							const isInboxMenu = path === mainRoutes.inbox
 							const showDot = isInboxMenu && hasNewInboxMessage && !active
 
-							return (
+							const menuItem = (
 								<Link
-									key={title}
 									href={onGetPath(path)}
+									className="menuLink"
 									onClick={handleMenuItemClick}
 								>
 									<Flex
@@ -113,14 +133,25 @@ const MainLayout = (props: MainLayoutProps) => {
 												<span className="inboxUnreadDot" aria-hidden />
 											)}
 										</div>
-										<span>{title}</span>
+										<span className="menuItemLabel">{title}</span>
 									</Flex>
 								</Link>
+							)
+
+							return (
+								<Tooltip
+									key={title}
+									title={sidebarCollapsed ? title : null}
+									placement="right"
+									mouseEnterDelay={0.1}
+								>
+									{menuItem}
+								</Tooltip>
 							)
 						})}
 					</Flex>
 					<Flex
-						className="justify-end items-end item"
+						className="sidebarVersion justify-end items-end item"
 						style={{
 							marginTop: 'auto',
 							padding: '12px',
@@ -161,8 +192,8 @@ const MainLayout = (props: MainLayoutProps) => {
 			}
 		} else {
 			const isOpenAppPage = pathname.includes('open-app')
-			const isGuestOnlyAuth = [mainRoutes.login, mainRoutes.register].some((i) =>
-				pathname.includes(i),
+			const isGuestOnlyAuth = [mainRoutes.login, mainRoutes.register].some(
+				(i) => pathname.includes(i),
 			)
 			if (login && !isOpenAppPage && isGuestOnlyAuth) {
 				onChangeRoute(mainRoutes.overview)
@@ -171,7 +202,7 @@ const MainLayout = (props: MainLayoutProps) => {
 			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [localePathname, openMenu, hasNewInboxMessage])
+	}, [localePathname, openMenu, sidebarCollapsed, hasNewInboxMessage])
 
 	return <div className="mainLayout">{content}</div>
 }

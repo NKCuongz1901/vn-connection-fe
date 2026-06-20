@@ -36,8 +36,14 @@
 				height: 100%;
 				border-right: 1px solid #eef3f6;
 				background: #fff;
+				transition: width 0.2s ease;
 				.sideBarMenuToggle {
 					display: none;
+				}
+				.menuLink {
+					display: block;
+					text-decoration: none;
+					color: inherit;
 				}
 				.sideBarMainLayoutItem {
 					overflow: auto;
@@ -97,6 +103,91 @@
 		}
 	}
 }
+@media (min-width: 1025px) {
+	.wrapperMainLayout {
+		.bodyMainLayout {
+			.sideBarMainLayoutWrapper {
+				.sideBarMainLayout {
+					.sideBarMenuToggle {
+						display: flex;
+						min-height: 56px;
+						padding: 0 16px;
+						gap: 12px;
+						justify-content: space-between;
+						border-bottom: 1px solid #eef3f6;
+
+						.sideBarMenuToggleMobile {
+							display: none;
+						}
+
+						.sideBarMenuToggleLabel {
+							color: var(--Colors-Text-text-primary, #0f1729);
+
+							font-size: 20px;
+							font-style: normal;
+							font-weight: 600;
+							line-height: 26px; /* 130% */
+						}
+
+						.sideBarCollapseBtn {
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							width: 32px;
+							height: 32px;
+							border-radius: 8px;
+							background: #fff;
+							cursor: pointer;
+							color: #7987a4;
+							padding: 0;
+							flex-shrink: 0;
+
+							&:hover {
+								color: #006b35;
+								border-color: #c8e6d4;
+							}
+						}
+					}
+				}
+
+				&.sidebarCollapsed {
+					.sideBarMainLayout {
+						width: 72px;
+
+						.sideBarMenuToggle {
+							justify-content: center;
+							padding: 0 8px;
+
+							.sideBarMenuToggleLabel {
+								display: none;
+							}
+						}
+
+						.menuItem {
+							justify-content: center;
+							padding: 8px 12px;
+						}
+
+						.menuItemLabel {
+							display: none;
+						}
+
+						.menuItemActive {
+							background: #e6f4ea;
+							border-radius: 8px;
+							margin: 0 8px;
+							width: calc(100% - 16px);
+						}
+
+						.sidebarVersion {
+							display: none;
+						}
+					}
+				}
+			}
+		}
+	}
+}
 @media (max-width: 1440px) {
 	.mainLayout {
 		justify-content: initial;
@@ -122,6 +213,7 @@
 				top: 0;
 				background: rgba(0, 0, 0, 0.5);
 				.sideBarMainLayout {
+					width: 240px;
 					.sideBarMenuToggle {
 						display: flex;
 						min-height: 56px;
@@ -138,7 +230,10 @@
 							cursor: pointer;
 							color: #7987a4;
 						}
-						span {
+						.sideBarCollapseBtn {
+							display: none;
+						}
+						.sideBarMenuToggleLabel {
 							font-weight: 600;
 						}
 					}
@@ -151,6 +246,31 @@
 			.openLayoutMenu {
 				width: 100%;
 				transform: translateX(0);
+			}
+			&.sidebarCollapsed {
+				.sideBarMainLayout {
+					width: 240px;
+
+					.menuItemLabel {
+						display: inline;
+					}
+
+					.menuItem {
+						justify-content: flex-start;
+						padding: 8px 24px;
+					}
+
+					.menuItemActive {
+						background: transparent;
+						border-radius: 0;
+						margin: 0;
+						width: auto;
+					}
+
+					.sidebarVersion {
+						display: flex;
+					}
+				}
 			}
 			.contentMainLayout {
 				height: 100%;
