@@ -3,7 +3,7 @@ import md5 from 'md5'
 import axios from '../axios'
 import { getStorageCookie } from '@/ultis/storage'
 
-import { CONFIG_BOOTSTRAP, USER_ROUTES } from '@/routes'
+import { AUTH_ROUTES, CONFIG_BOOTSTRAP, USER_ROUTES } from '@/routes'
 
 export const getUserProfile = async ({
 	id,
@@ -64,4 +64,11 @@ export const getConfigBootstrap = async () => {
 
 export const appealAccountSuspended = async (payload: { phone: string }) => {
 	return await axios.post(USER_ROUTES.appeal, payload)
+}
+
+export const requestFeature = async (payload: {
+	title: string
+	content: string
+}) => {
+	return await axios.post(AUTH_ROUTES.requestFeature, payload)
 }

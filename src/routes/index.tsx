@@ -23,6 +23,7 @@ export const AUTH_ROUTES = {
 	registerByPhone: '/auth/register_by_phone',
 	sendToMail: 'auth/otp/send-to-mail',
 	logout: '/auth/logout',
+	requestFeature: '/inquiries',
 }
 
 export const SYSTEM = {
