@@ -145,6 +145,9 @@ export const MAP_ROUTES = {
 export const CONFIG_BOOTSTRAP = {
 	configBootstrap: 'config/bootstrap',
 }
+export const TALKROOM_ROUTES = {
+	talkRoomOverview: 'talkroom/overview',
+}
 export const Menus = [
 	{
 		title: 'Overview',

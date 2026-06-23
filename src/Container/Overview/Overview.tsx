@@ -34,6 +34,7 @@ import PeopleSmileIcon from '@/svg/PeopleSmileIcon'
 import SearchIcon from '@/svg/SearchIcon'
 import MicroPhoneIcon from '@/svg/MicroPhoneIcon'
 import UpcomingEvent from '@/svg/UpcomingEvent'
+import CalendarIcon from '@/svg/CalenderIcon'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import { mappingEventTitle } from '@/Variable/event.variable'
@@ -42,6 +43,8 @@ import { radiusOpts, typeEvent } from '@/Variable/select.variable'
 import CSwitch from '@/Components/Custom/CSwitch'
 import { LEFT_FLAG } from '@/Variable/countryVariable'
 import classes from './Overview.module.scss'
+import TalkRoomCard from '@/Components/TalkRoom/TalkRoomCard/TalkRoomCard'
+import LiveIcon from '@/svg/Talkroom/LiveIcon'
 
 const Overview = () => {
 	const { loadingContext } = useLoading()
@@ -61,6 +64,9 @@ const Overview = () => {
 		listChatRoom,
 		defaultTitleHangout,
 		checkmail,
+		listTalkroom,
+		totalTalkroom,
+		statsTalkroom,
 
 		setModal,
 		OnChangeTitleHangout,
@@ -498,27 +504,84 @@ const Overview = () => {
 				>
 					<EventTitle
 						label="Talk room"
-						number={total.chatroom}
+						number={totalTalkroom}
 						labelCreateBtn="Create talk room"
 						icon={<MicroPhoneIcon />}
 					/>
 				</Flex>
+				<Flex className={classes.statsTalkroom}>
+					<div className={classes.statsItem}>
+						<LiveIcon />
+						<div className={classes.statsItemLabel}>
+							Live: {statsTalkroom?.live_rooms_count}
+						</div>
+					</div>
+					<div className={classes.statsItem}>
+						<CalendarIcon fill="#1B8024" width={16} height={16} />
+						<div className={classes.statsItemLabel}>
+							Scheduled: {statsTalkroom?.scheduled_rooms_count}
+						</div>
+					</div>
+					<div className={classes.statsItemJoining}>
+						<div className={classes.statsJoiningItemLabel}>
+							Joining: {statsTalkroom?.total_count_me_in_in_scheduled_rooms}
+						</div>
+					</div>
+				</Flex>
 				<Flex vertical className={classes.talkRoom}>
-					<Flex
-						className={classes.talkRoomEmptyWrapper}
-						vertical
-						align="center"
-						onClick={() => onChangeRoute(mainRoutes.talkroom)}
-					>
-						<img
-							src="/images/emptyRoom.png"
-							alt=""
-							className={classes.talkRoomEmptyImage}
-						/>
-						<span className={classes.talkRoomEmptyLabel}>
-							Start a Talk Room
-						</span>
-					</Flex>
+					{!loading.talkroom && totalTalkroom === 0 ? (
+						<Flex
+							className={classes.talkRoomEmptyWrapper}
+							vertical
+							align="center"
+							onClick={() => onChangeRoute(mainRoutes.talkroom)}
+						>
+							<img
+								src="/images/emptyRoom.png"
+								alt=""
+								className={classes.talkRoomEmptyImage}
+							/>
+							<span className={classes.talkRoomEmptyLabel}>
+								Start a Talk Room
+							</span>
+						</Flex>
+					) : (
+						<Flex className={classes.talkRoomListWrapper}>
+							{loading.talkroom
+								? arrayFrom(5).map((_, index) => (
+										<Flex
+											key={index}
+											vertical
+											className={classes.talkRoomItemSkeleton}
+										>
+											<Skeleton.Avatar
+												active
+												className={classes.talkRoomSkeletonAvatar}
+											/>
+											<Skeleton.Input
+												active
+												className={classes.talkRoomSkeletonTag}
+											/>
+											<Skeleton.Input
+												active
+												className={classes.talkRoomSkeletonStatus}
+											/>
+										</Flex>
+									))
+								: isArray(listTalkroom, 1) &&
+									listTalkroom.map((room) => (
+										<TalkRoomCard
+											key={room.id}
+											room={room}
+											onClick={() =>
+												onChangeRoute(
+													`${mainRoutes.talkroom}?id=${room.id}`,
+												)
+											}
+										/>
+									))}
+						</Flex>
+					)}
 				</Flex>
 			</Flex>
 		)

@@ -2,13 +2,15 @@ import { memo } from 'react'
 
 import { SvgProps } from '@/interface/common/common.interface'
 
-const CalenderIcon = ({ fill }: SvgProps) => {
+const CalenderIcon = ({ fill, width, height }: SvgProps) => {
 	const _fill = fill || '#7987A4'
+	const _width = width || '15'
+	const _height = height || '18'
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
-			width="15"
-			height="18"
+			width={_width}
+			height={_height}
 			viewBox="0 0 15 18"
 			fill="none"
 		>

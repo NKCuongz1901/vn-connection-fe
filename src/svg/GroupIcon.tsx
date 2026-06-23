@@ -10,7 +10,8 @@ const GroupIcon = (_props: SvgProps) => {
 			animationData={animationData}
 			loop
 			autoplay
-			style={{ width: 20, height: 14 }}
+			style={{ width: 16, height: 16 }}
+			{..._props}
 		/>
 	)
 }

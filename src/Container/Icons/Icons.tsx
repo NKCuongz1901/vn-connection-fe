@@ -117,6 +117,9 @@ import ShareSquareIcon from '@/svg/Referral/ShareSquareIcon'
 import WalletIcon from '@/svg/Referral/WalletIcon'
 import AppealIcon from '@/svg/AppealIcon'
 import StarIcon2 from '@/svg/StarIcon2'
+import BgIcon1 from '@/svg/Talkroom/BgIcon1'
+import BgIcon2 from '@/svg/Talkroom/BgIcon2'
+import BgIcon3 from '@/svg/Talkroom/BgIcon3'
 
 const Icons = () => {
 	const icons = [
@@ -554,6 +557,21 @@ const Icons = () => {
 		{
 			ICON: StarIcon2,
 			name: '@/svg/Event/StarIcon2',
+			key: randomString(),
+		},
+		{
+			ICON: BgIcon1,
+			name: '@/svg/Event/BgIcon1',
+			key: randomString(),
+		},
+		{
+			ICON: BgIcon2,
+			name: '@/svg/Event/BgIcon2',
+			key: randomString(),
+		},
+		{
+			ICON: BgIcon3,
+			name: '@/svg/Event/BgIcon3',
 			key: randomString(),
 		},
 	]

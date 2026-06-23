@@ -20,6 +20,7 @@ import { ConversationChatRoomProps } from '@/interface/Conversation/Conversation
 import { mainRoutes } from '@/routes/MainRoutes'
 import { paginationCommon } from '@/Variable/common.variable'
 import { STORAGE_KEY } from '@/Variable/storage.variable'
+import { getTalkRoomOverview } from '@/apis/talkRoomApis'
 
 type userDataProps = {
 	is_open_hangout: boolean
@@ -78,6 +79,7 @@ export default function useOverview() {
 		event: false,
 		network: false,
 		chatroom: false,
+		talkroom: false,
 	})
 	const [total, setTotal] = useState({ event: 0, network: 0, chatroom: 0 })
 
@@ -88,6 +90,30 @@ export default function useOverview() {
 		categories: null,
 		title: '',
 	})
+	const [totalTalkroom, setTotalTalkroom] = useState(0)
+	const [statsTalkroom, setStatsTalkroom] = useState<any>({})
+	const [listTalkroom, setListTalkroom] = useState<any[]>([])
+
+	const handleGetTalkroomOverview = async () => {
+		setLoading((prev) => ({ ...prev, talkroom: true }))
+		try {
+			const res: any = await getTalkRoomOverview({
+				params: {
+					fields: ['$all'],
+				},
+			})
+			const { code, results } = res || {}
+			if (code === 200) {
+				const { rooms, stats } = results?.object || {}
+				setListTalkroom(rooms.rows || [])
+				setStatsTalkroom(stats || {})
+				setTotalTalkroom(stats?.live_rooms_count + stats?.scheduled_rooms_count)
+			}
+		} catch (error) {
+		} finally {
+			setLoading((prev) => ({ ...prev, talkroom: false }))
+		}
+	}
 
 	const handleChangeFilter = (type: string) => (value) => {
 		switch (type) {
@@ -483,6 +509,7 @@ export default function useOverview() {
 		handleGetListPost()
 		handleGetListNetwork()
 		handleGetListChatRoom()
+		handleGetTalkroomOverview()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -513,6 +540,9 @@ export default function useOverview() {
 		listChatRoom,
 		defaultTitleHangout,
 		checkmail,
+		listTalkroom,
+		totalTalkroom,
+		statsTalkroom,
 
 		OnChangeTitleHangout: handleOnChangeTitleHangout,
 		onUpdateUserInfo: handleUpdateUserInfo,
