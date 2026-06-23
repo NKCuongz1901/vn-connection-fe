@@ -1,6 +1,6 @@
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
-import { memo } from 'react'
+import { memo, useState } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import useOverview from '@/hooks/Overview/useOverview'
@@ -44,6 +44,7 @@ import CSwitch from '@/Components/Custom/CSwitch'
 import { LEFT_FLAG } from '@/Variable/countryVariable'
 import classes from './Overview.module.scss'
 import TalkRoomCard from '@/Components/TalkRoom/TalkRoomCard/TalkRoomCard'
+import ModalTalkRoomSoundQuality from '@/Components/Modal/ModalTalkRoomSoundQuality'
 import LiveIcon from '@/svg/Talkroom/LiveIcon'
 
 const Overview = () => {
@@ -86,6 +87,27 @@ const Overview = () => {
 		onCheckMailSubmit,
 		onUpdateUserInfo,
 	} = useOverview()
+	const [talkRoomJoinModal, setTalkRoomJoinModal] = useState<{
+		open: boolean
+		roomId?: string
+	}>({ open: false })
+
+	const handleOpenTalkRoomJoinModal = () => {
+		setTalkRoomJoinModal({ open: true })
+	}
+
+	const handleCloseTalkRoomJoinModal = () => {
+		setTalkRoomJoinModal({ open: false })
+	}
+
+	const handleConfirmTalkRoomJoin = () => {
+		const { roomId } = talkRoomJoinModal
+		setTalkRoomJoinModal({ open: false })
+		if (roomId) {
+			onChangeRoute(`${mainRoutes.talkroom}?id=${roomId}`)
+		}
+	}
+
 	const handleGoOnline = async () => {
 		await onUpdateUserInfo({ is_open_hangout: true })
 		onChangeRoute(mainRoutes.hangout)
@@ -522,7 +544,10 @@ const Overview = () => {
 							Scheduled: {statsTalkroom?.scheduled_rooms_count}
 						</div>
 					</div>
-					<div className={classes.statsItemJoining}>
+					<div
+						className={classes.statsItemJoining}
+						onClick={() => handleOpenTalkRoomJoinModal()}
+					>
 						<div className={classes.statsJoiningItemLabel}>
 							Joining: {statsTalkroom?.total_count_me_in_in_scheduled_rooms}
 						</div>
@@ -574,9 +599,7 @@ const Overview = () => {
 											key={room.id}
 											room={room}
 											onClick={() =>
-												onChangeRoute(
-													`${mainRoutes.talkroom}?id=${room.id}`,
-												)
+												onChangeRoute(`${mainRoutes.talkroom}?id=${room.id}`)
 											}
 										/>
 									))}
@@ -645,6 +668,11 @@ const Overview = () => {
 				</Flex>
 			</Flex>
 			{_renderModal()}
+			<ModalTalkRoomSoundQuality
+				open={talkRoomJoinModal.open}
+				onClose={handleCloseTalkRoomJoinModal}
+				onConfirm={handleConfirmTalkRoomJoin}
+			/>
 			{!!checkmail?.open && (
 				<CheckEmail
 					onSubmit={() => {
