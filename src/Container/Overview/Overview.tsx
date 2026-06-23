@@ -44,7 +44,7 @@ import CSwitch from '@/Components/Custom/CSwitch'
 import { LEFT_FLAG } from '@/Variable/countryVariable'
 import classes from './Overview.module.scss'
 import TalkRoomCard from '@/Components/TalkRoom/TalkRoomCard/TalkRoomCard'
-import ModalTalkRoomSoundQuality from '@/Components/Modal/ModalTalkRoomSoundQuality'
+import ModalTalkRoomWelcome from '@/Components/Modal/ModalTalkRoomWelcome'
 import LiveIcon from '@/svg/Talkroom/LiveIcon'
 
 const Overview = () => {
@@ -92,8 +92,8 @@ const Overview = () => {
 		roomId?: string
 	}>({ open: false })
 
-	const handleOpenTalkRoomJoinModal = () => {
-		setTalkRoomJoinModal({ open: true })
+	const handleOpenTalkRoomJoinModal = (roomId: string) => {
+		setTalkRoomJoinModal({ open: true, roomId })
 	}
 
 	const handleCloseTalkRoomJoinModal = () => {
@@ -544,10 +544,7 @@ const Overview = () => {
 							Scheduled: {statsTalkroom?.scheduled_rooms_count}
 						</div>
 					</div>
-					<div
-						className={classes.statsItemJoining}
-						onClick={() => handleOpenTalkRoomJoinModal()}
-					>
+					<div className={classes.statsItemJoining}>
 						<div className={classes.statsJoiningItemLabel}>
 							Joining: {statsTalkroom?.total_count_me_in_in_scheduled_rooms}
 						</div>
@@ -599,7 +596,7 @@ const Overview = () => {
 											key={room.id}
 											room={room}
 											onClick={() =>
-												onChangeRoute(`${mainRoutes.talkroom}?id=${room.id}`)
+												handleOpenTalkRoomJoinModal(room.id)
 											}
 										/>
 									))}
@@ -668,7 +665,7 @@ const Overview = () => {
 				</Flex>
 			</Flex>
 			{_renderModal()}
-			<ModalTalkRoomSoundQuality
+			<ModalTalkRoomWelcome
 				open={talkRoomJoinModal.open}
 				onClose={handleCloseTalkRoomJoinModal}
 				onConfirm={handleConfirmTalkRoomJoin}
