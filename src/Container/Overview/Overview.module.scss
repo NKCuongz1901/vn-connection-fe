@@ -328,6 +328,43 @@
 				}
 			}
 		}
+		.talkRoomWrapper {
+			padding: 0 32px;
+			gap: 12px;
+			width: 100%;
+			.talkRoom {
+				border-radius: 16px;
+				background: #fff;
+				min-height: 138px;
+				align-items: center;
+				justify-content: center;
+				padding: 12px;
+
+				.talkRoomEmptyWrapper {
+					align-items: center;
+					justify-content: center;
+					gap: 4px;
+					width: 100%;
+					max-width: 311px;
+					cursor: pointer;
+				}
+
+				.talkRoomEmptyImage {
+					width: 80px;
+					height: 80px;
+					object-fit: contain;
+				}
+
+				.talkRoomEmptyLabel {
+					width: 100%;
+					color: #48546b;
+					text-align: center;
+					font-size: 16px;
+					font-weight: 600;
+					line-height: 24px;
+				}
+			}
+		}
 		.notData {
 			padding: 16px 0;
 			align-items: center;

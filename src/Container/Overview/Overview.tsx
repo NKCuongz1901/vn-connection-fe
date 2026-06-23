@@ -32,6 +32,7 @@ import Party from '@/svg/Party'
 import People from '@/svg/People'
 import PeopleSmileIcon from '@/svg/PeopleSmileIcon'
 import SearchIcon from '@/svg/SearchIcon'
+import MicroPhoneIcon from '@/svg/MicroPhoneIcon'
 import UpcomingEvent from '@/svg/UpcomingEvent'
 
 import { mainRoutes } from '@/routes/MainRoutes'
@@ -488,6 +489,40 @@ const Overview = () => {
 		}
 		return Content
 	}
+	const _renderTalRoomOverview = () => {
+		return (
+			<Flex vertical className={classes.talkRoomWrapper}>
+				<Flex
+					className={classes.title}
+					onClick={() => onChangeRoute(mainRoutes.talkroom)}
+				>
+					<EventTitle
+						label="Talk room"
+						number={total.chatroom}
+						labelCreateBtn="Create talk room"
+						icon={<MicroPhoneIcon />}
+					/>
+				</Flex>
+				<Flex vertical className={classes.talkRoom}>
+					<Flex
+						className={classes.talkRoomEmptyWrapper}
+						vertical
+						align="center"
+						onClick={() => onChangeRoute(mainRoutes.talkroom)}
+					>
+						<img
+							src="/images/emptyRoom.png"
+							alt=""
+							className={classes.talkRoomEmptyImage}
+						/>
+						<span className={classes.talkRoomEmptyLabel}>
+							Start a Talk Room
+						</span>
+					</Flex>
+				</Flex>
+			</Flex>
+		)
+	}
 	return (
 		<div className={classes.wrapper} ref={_parentRef}>
 			<Flex
@@ -498,6 +533,7 @@ const Overview = () => {
 			>
 				{_renderHangout()}
 				{_renderChatRoom()}
+				{_renderTalRoomOverview()}
 				{_renderMyCommunity()}
 				{_renderMyEvent()}
 				<Flex className={classes.wrapperUp} vertical>
