@@ -1,32 +1,60 @@
 .wrapper {
 	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	min-height: calc(100dvh - 180px);
-	padding: 12px 24px;
-}
-
-.emptyState {
-	display: flex;
+	padding: 24px var(--spacing-spacer-8, 32px);
 	flex-direction: column;
-	align-items: center;
-	gap: 4px;
-	width: 100%;
-	max-width: 311px;
-}
+	align-items: flex-start;
+	gap: 16px;
+	flex: 1 0 0;
+	align-self: stretch;
 
-.emptyImage {
-	width: 80px;
-	height: 80px;
-	object-fit: contain;
-}
+	.header {
+		align-items: center;
+		gap: var(--spacing-spacer-12, 12px);
+		.title {
+			color: var(--color-grey-700-p-text, #0f1729);
 
-.emptyLabel {
-	width: 100%;
-	color: #48546b;
-	text-align: center;
-	font-size: 16px;
-	font-weight: 600;
-	line-height: 24px;
+			font-size: 18px;
+			font-style: normal;
+			font-weight: 600;
+			line-height: 28px; /* 155.556% */
+		}
+
+		.iconBook {
+			display: flex;
+			min-height: 32px;
+			min-width: 32px;
+			padding: 0 var(--spacing-spacer-2, 8px);
+			justify-content: center;
+			align-items: center;
+			gap: var(--spacing-spacer-0, 0);
+			border-radius: var(--radius-component-button, 999px);
+			background: var(--component-button-tertiary-bg-default, #006b35);
+			cursor: pointer;
+		}
+	}
+
+	.content {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		gap: 12px;
+		.rightContent {
+			flex: 2;
+
+			.profileContainer {
+				display: flex;
+				padding: 16px;
+				flex-direction: column;
+				justify-content: center;
+				align-items: flex-start;
+				gap: 12px;
+				align-self: stretch;
+				border-radius: 8px;
+				background: #fff;
+			}
+		}
+		.leftContent {
+			flex: 1;
+		}
+	}
 }

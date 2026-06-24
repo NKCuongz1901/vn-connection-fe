@@ -147,6 +147,7 @@ export const CONFIG_BOOTSTRAP = {
 }
 export const TALKROOM_ROUTES = {
 	talkRoomOverview: 'talkroom/overview',
+	myTalkRoomAnalysis: 'talkroom/my-status',
 }
 export const Menus = [
 	{

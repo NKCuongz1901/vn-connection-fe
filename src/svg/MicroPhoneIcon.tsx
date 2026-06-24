@@ -2,13 +2,15 @@ import { memo } from 'react'
 
 import { SvgProps } from '@/interface/common/common.interface'
 
-const MicroPhoneIcon = ({ fill }: SvgProps) => {
+const MicroPhoneIcon = ({ fill, width, height }: SvgProps) => {
 	const _fill = fill || '#48546B'
+	const _width = width || 16
+	const _height = height || 20
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
-			width="16"
-			height="20"
+			width={_width}
+			height={_height}
 			viewBox="0 0 16 20"
 			fill="none"
 		>

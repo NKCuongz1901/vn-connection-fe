@@ -1,0 +1,104 @@
+.profileInfo {
+	display: flex;
+	align-items: center;
+	gap: 32px;
+	width: 100%;
+}
+
+.avatarSection {
+	flex-shrink: 0;
+}
+
+.avatarWrap {
+	position: relative;
+	width: 96px;
+	height: 96px;
+}
+
+.avatar {
+	width: 96px;
+	height: 96px;
+	border: none;
+}
+
+.flagWrapper {
+	position: absolute;
+	right: 0;
+	bottom: -4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	overflow: hidden;
+	border: 1px solid #fff;
+	border-radius: 999px;
+
+	.flag {
+		transform: translateX(-4px);
+		min-width: 28px;
+		min-height: 24px;
+	}
+}
+
+.profileDetails {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.profileName {
+	color: #0f1729;
+	font-size: 20px;
+	font-weight: 600;
+	line-height: 28px;
+	word-break: break-word;
+}
+
+.languageSkills {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+	overflow-x: auto;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+.languageItem {
+	display: flex;
+	flex-direction: column;
+	flex-shrink: 0;
+}
+
+.languageName {
+	color: #0f1729;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 16px;
+	white-space: nowrap;
+}
+
+.languageNameCombined {
+	white-space: normal;
+	max-width: 280px;
+}
+
+.languageLevel {
+	color: #48546b;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+	white-space: nowrap;
+}
+
+.languageDivider {
+	width: 1px;
+	height: 32px;
+	flex-shrink: 0;
+	background: #edf0f5;
+}

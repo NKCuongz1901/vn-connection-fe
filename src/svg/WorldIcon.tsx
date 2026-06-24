@@ -2,13 +2,15 @@ import { memo } from 'react'
 
 import { SvgProps } from '@/interface/common/common.interface'
 
-const WorldIcon = ({ fill }: SvgProps) => {
+const WorldIcon = ({ fill, width, height }: SvgProps) => {
 	const _fill = fill || '#006B35'
+	const _width = width || 20
+	const _height = height || 20
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
-			width="20"
-			height="20"
+			width={_width}
+			height={_height}
 			viewBox="0 0 20 20"
 			fill="none"
 		>
