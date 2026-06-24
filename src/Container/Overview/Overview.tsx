@@ -46,6 +46,7 @@ import classes from './Overview.module.scss'
 import TalkRoomCard from '@/Components/TalkRoom/TalkRoomCard/TalkRoomCard'
 import ModalTalkRoomWelcome from '@/Components/Modal/ModalTalkRoomWelcome'
 import LiveIcon from '@/svg/Talkroom/LiveIcon'
+import ModalTalkRoomSoundQuality from '@/Components/Modal/ModalTalkRoomSoundQuality'
 
 const Overview = () => {
 	const { loadingContext } = useLoading()
@@ -91,13 +92,24 @@ const Overview = () => {
 		open: boolean
 		roomId?: string
 	}>({ open: false })
+	const [modalSoundQuality, setModalSoundQuality] = useState<{
+		open: boolean
+	}>({ open: false })
 
 	const handleOpenTalkRoomJoinModal = (roomId: string) => {
 		setTalkRoomJoinModal({ open: true, roomId })
 	}
 
+	const handleOpenModalSoundQuality = () => {
+		setModalSoundQuality({ open: true })
+	}
+
 	const handleCloseTalkRoomJoinModal = () => {
 		setTalkRoomJoinModal({ open: false })
+	}
+
+	const handleCloseModalSoundQuality = () => {
+		setModalSoundQuality({ open: false })
 	}
 
 	const handleConfirmTalkRoomJoin = () => {
@@ -544,7 +556,10 @@ const Overview = () => {
 							Scheduled: {statsTalkroom?.scheduled_rooms_count}
 						</div>
 					</div>
-					<div className={classes.statsItemJoining}>
+					<div
+						className={classes.statsItemJoining}
+						onClick={() => handleOpenModalSoundQuality()}
+					>
 						<div className={classes.statsJoiningItemLabel}>
 							Joining: {statsTalkroom?.total_count_me_in_in_scheduled_rooms}
 						</div>
@@ -595,9 +610,7 @@ const Overview = () => {
 										<TalkRoomCard
 											key={room.id}
 											room={room}
-											onClick={() =>
-												handleOpenTalkRoomJoinModal(room.id)
-											}
+											onClick={() => handleOpenTalkRoomJoinModal(room.id)}
 										/>
 									))}
 						</Flex>
@@ -668,6 +681,11 @@ const Overview = () => {
 			<ModalTalkRoomWelcome
 				open={talkRoomJoinModal.open}
 				onClose={handleCloseTalkRoomJoinModal}
+				onConfirm={handleConfirmTalkRoomJoin}
+			/>
+			<ModalTalkRoomSoundQuality
+				open={modalSoundQuality.open}
+				onClose={handleCloseModalSoundQuality}
 				onConfirm={handleConfirmTalkRoomJoin}
 			/>
 			{!!checkmail?.open && (
