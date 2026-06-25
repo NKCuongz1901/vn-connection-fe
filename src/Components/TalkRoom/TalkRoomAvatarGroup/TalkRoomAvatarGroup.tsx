@@ -39,45 +39,65 @@ function TalkRoomAvatarGroup({ room }: TalkRoomAvatarGroupProps) {
 			case 'double':
 				return (
 					<>
-						<CAvatar
-							src={getSpeakerAvatar(visibleSpeakers[0])}
-							size={36}
-							className={`${classes.avatar} ${classes.avatarTopRight}`}
-						/>
-						<CAvatar
-							src={getSpeakerAvatar(visibleSpeakers[1])}
-							size={36}
-							className={`${classes.avatar} ${classes.avatarBottomLeft}`}
-						/>
+						<div
+							className={`${classes.avatarSlot} ${classes.avatarBottomLeft}`}
+						>
+							<CAvatar
+								src={getSpeakerAvatar(visibleSpeakers[0])}
+								size={36}
+								className={classes.avatar}
+							/>
+						</div>
+						<div
+							className={`${classes.avatarSlot} ${classes.avatarTopRight}`}
+						>
+							<CAvatar
+								src={getSpeakerAvatar(visibleSpeakers[1])}
+								size={36}
+								className={classes.avatar}
+							/>
+						</div>
 					</>
 				)
 			case 'triple':
 				return (
 					<>
-						<CAvatar
-							src={getSpeakerAvatar(visibleSpeakers[0])}
-							size={32}
-							className={`${classes.avatar} ${classes.avatarTop}`}
-						/>
-						<CAvatar
-							src={getSpeakerAvatar(visibleSpeakers[1])}
-							size={32}
-							className={`${classes.avatar} ${classes.avatarBottomLeft}`}
-						/>
-						<CAvatar
-							src={getSpeakerAvatar(visibleSpeakers[2])}
-							size={32}
-							className={`${classes.avatar} ${classes.avatarBottomRight}`}
-						/>
+						<div className={`${classes.avatarSlot} ${classes.avatarTripleTop}`}>
+							<CAvatar
+								src={getSpeakerAvatar(visibleSpeakers[0])}
+								size={32}
+								className={classes.avatar}
+							/>
+						</div>
+						<div
+							className={`${classes.avatarSlot} ${classes.avatarTripleBottomLeft}`}
+						>
+							<CAvatar
+								src={getSpeakerAvatar(visibleSpeakers[1])}
+								size={32}
+								className={classes.avatar}
+							/>
+						</div>
+						<div
+							className={`${classes.avatarSlot} ${classes.avatarTripleBottomRight}`}
+						>
+							<CAvatar
+								src={getSpeakerAvatar(visibleSpeakers[2])}
+								size={32}
+								className={classes.avatar}
+							/>
+						</div>
 					</>
 				)
 			default:
 				return (
-					<CAvatar
-						src={getSpeakerAvatar(visibleSpeakers[0])}
-						size={40}
-						className={`${classes.avatar} ${classes.avatarSingle}`}
-					/>
+					<div className={`${classes.avatarSlot} ${classes.avatarSingle}`}>
+						<CAvatar
+							src={getSpeakerAvatar(visibleSpeakers[0])}
+							size={40}
+							className={classes.avatar}
+						/>
+					</div>
 				)
 		}
 	}
