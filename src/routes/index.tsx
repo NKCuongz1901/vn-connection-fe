@@ -146,10 +146,15 @@ export const MAP_ROUTES = {
 }
 export const CONFIG_BOOTSTRAP = {
 	configBootstrap: 'config/bootstrap',
+	getListLanguage: 'language',
+	getTalkRoomCategories: 'talkroom/categories',
 }
 export const TALKROOM_ROUTES = {
 	talkRoomOverview: 'talkroom/overview',
 	myTalkRoomAnalysis: 'talkroom/my-status',
+	createTalkRoom: 'talkroom',
+	checkBookingSlots: 'talkroom/booking-slots',
+	checkCanCreateTalkRoom: 'validation/can-create-room',
 }
 export const Menus = [
 	{
