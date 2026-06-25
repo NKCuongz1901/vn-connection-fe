@@ -9,7 +9,6 @@ import { useModal } from '@/context/ModalContext'
 import {
 	buildScheduleAtIso,
 	buildScheduleDayOptions,
-	mergeBookingTimeSlots,
 	type ScheduleDayOption,
 } from '@/ultis/talkRoomSchedule'
 
@@ -59,25 +58,17 @@ export default function useTalkRoomSchedule() {
 			if (slots?.isFull) return
 
 			setScheduleByDay((prev) => {
-				const current = prev[key] ?? { checked: false, fromTime: null }
-				const nextChecked = !current.checked
+				const current = prev[key]
+				const isCurrentlyChecked = current?.checked ?? false
 
-				if (!nextChecked) {
-					return {
-						...prev,
-						[key]: { checked: false, fromTime: null },
-					}
+				if (isCurrentlyChecked) {
+					return {}
 				}
 
-				const timeSlots = mergeBookingTimeSlots(slots?.timeSlots ?? [])
-				const defaultFrom =
-					current.fromTime ?? (timeSlots.length > 0 ? timeSlots[0] : null)
-
 				return {
-					...prev,
 					[key]: {
 						checked: true,
-						fromTime: defaultFrom,
+						fromTime: null,
 					},
 				}
 			})
@@ -86,13 +77,12 @@ export default function useTalkRoomSchedule() {
 	)
 
 	const onChangeFromTime = useCallback((key: string, fromTime: string) => {
-		setScheduleByDay((prev) => ({
-			...prev,
+		setScheduleByDay({
 			[key]: {
 				checked: true,
 				fromTime,
 			},
-		}))
+		})
 	}, [])
 
 	const buildSchedules = useCallback(

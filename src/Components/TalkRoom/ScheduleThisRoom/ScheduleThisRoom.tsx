@@ -6,10 +6,9 @@ import { memo } from 'react'
 
 import type { BookingSlotsData } from '@/apis/talkRoomApis'
 import CSwitch from '@/Components/Custom/CSwitch'
-import CTimeSlotSelect from '@/Components/Custom/CTimeSlotSelect'
+import CScheduleTimePicker from '@/Components/Custom/CScheduleTimePicker'
 import {
 	getScheduleEndTime,
-	mergeBookingTimeSlots,
 	type ScheduleDayOption,
 } from '@/ultis/talkRoomSchedule'
 
@@ -69,7 +68,6 @@ function ScheduleThisRoom({
 						}
 						const isFull = slots?.isFull ?? false
 						const isActive = state.checked && !isFull
-						const timeOptions = mergeBookingTimeSlots(slots?.timeSlots ?? [])
 						const fromTimeValue = isActive ? state.fromTime : null
 						const toTimeValue =
 							isActive && state.fromTime
@@ -105,9 +103,8 @@ function ScheduleThisRoom({
 								<div className={classes.timeSection}>
 									<div className={classes.timeGroup}>
 										<span className={classes.timeLabel}>From:</span>
-										<CTimeSlotSelect
+										<CScheduleTimePicker
 											value={fromTimeValue}
-											options={timeOptions}
 											disabled={!isActive || loading}
 											onChange={(value) => onChangeFromTime(day.key, value)}
 										/>
@@ -115,7 +112,7 @@ function ScheduleThisRoom({
 
 									<div className={classes.timeGroup}>
 										<span className={classes.timeLabel}>To:</span>
-										<CTimeSlotSelect
+										<CScheduleTimePicker
 											value={toTimeValue}
 											readOnly
 											disabled={!isActive}
