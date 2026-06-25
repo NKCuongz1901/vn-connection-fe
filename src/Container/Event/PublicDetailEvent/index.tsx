@@ -1,1 +1,1 @@
-export { default } from './PublicDetailEvent'
+export { default } from '@/Container/Event/DetailEvent'

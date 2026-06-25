@@ -9,6 +9,8 @@ import {
 	deletePost,
 	getDetailPost,
 	getListParticipant,
+	getPublicEventDetail,
+	getPublicListParticipant,
 	joinPost,
 } from '@/apis/postApis'
 
@@ -22,9 +24,15 @@ import { repeatOpt } from '@/Variable/select.variable'
 
 interface useDetailEventProps {
 	id: string
+	isPublic?: boolean
+	onRequireLogin?: () => void
 	[key: string]: any
 }
-export default function useDetailEvent({ id: _id }: useDetailEventProps) {
+export default function useDetailEvent({
+	id: _id,
+	isPublic,
+	onRequireLogin,
+}: useDetailEventProps) {
 	const { openConfirm, openError, openSuccess, closeModal } = useModal()
 	const { toggleLoadingContext } = useLoading()
 	const { onChangeRoute } = useLocalePath()
@@ -58,8 +66,10 @@ export default function useDetailEvent({ id: _id }: useDetailEventProps) {
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'id'] }],
 			}
 			const [res, _]: any[] = await Promise.all([
-				getDetailPost({ id, params }),
-				handleGetListParticipant(),
+				isPublic
+					? getPublicEventDetail({ id, params })
+					: getDetailPost({ id, params }),
+				isPublic ? Promise.resolve() : handleGetListParticipant(),
 			])
 			const { code, results } = res || {}
 			if (code === 200) {
@@ -130,6 +140,10 @@ export default function useDetailEvent({ id: _id }: useDetailEventProps) {
 		}
 	}
 	const handleJoinPostConfirm = (type: string) => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
 		switch (type) {
 			case 'join':
 				handleJoinPost()
@@ -158,7 +172,9 @@ export default function useDetailEvent({ id: _id }: useDetailEventProps) {
 				page: 1,
 				limit: 10,
 			}
-			const res: any = await getListParticipant(params)
+			const res: any = await (isPublic
+				? getPublicListParticipant(params)
+				: getListParticipant(params))
 			const { code, results } = res || {}
 			await delay(1000)
 			if (code === 200) {
@@ -172,6 +188,10 @@ export default function useDetailEvent({ id: _id }: useDetailEventProps) {
 	}
 
 	const handleShareFriend = async (id: string) => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
 		setLoadingShare((prev: any) => ({ ...prev, [id]: true }))
 		try {
 			const { share_link } = detailPost || {}
@@ -196,6 +216,10 @@ export default function useDetailEvent({ id: _id }: useDetailEventProps) {
 	}
 
 	const handleMenusClick = ({ key }) => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
 		switch (key) {
 			case 'share':
 				handleSetOpenModal({ type: key })
@@ -242,6 +266,15 @@ export default function useDetailEvent({ id: _id }: useDetailEventProps) {
 
 	const postMenus: ItemType[] = useMemo(
 		() => {
+			if (isPublic) {
+				return [
+					{
+						key: 'share',
+						label: 'Share activity',
+						onClick: () => handleMenusClick({ key: 'share' }),
+					},
+				]
+			}
 			const { user_id, repeat_type } = detailPost || {}
 			const { type } = repeat_type || {}
 
@@ -302,7 +335,7 @@ export default function useDetailEvent({ id: _id }: useDetailEventProps) {
 			]
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[JSON.stringify(detailPost), JSON.stringify(participantList)],
+		[JSON.stringify(detailPost), JSON.stringify(participantList), isPublic],
 	)
 
 	const editMenus: ItemType[] = useMemo(

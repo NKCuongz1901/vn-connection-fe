@@ -1,5 +1,4 @@
 import { Flex, Skeleton } from 'antd'
-import Link from 'next/link'
 import { memo } from 'react'
 
 import useEventParticipant from '@/hooks/Event/useEventParticipant'
@@ -19,13 +18,20 @@ import classes from './EventParticipant.module.scss'
 
 interface EventParticipant {
 	id?: any
+	isPublic?: boolean
+	onRequireLogin?: () => void
 }
 const limit = 5
-const EventParticipant = ({ id }: EventParticipant) => {
+const EventParticipant = ({
+	id,
+	isPublic,
+	onRequireLogin,
+}: EventParticipant) => {
 	const { onGetPath } = useLocalePath()
 	const { loading, total, participantList, openModal, setOpenModal } =
 		useEventParticipant({
 			id,
+			isPublic,
 		})
 	const _renderSkeleton = () => {
 		return arrayFrom(3).map((_, id) => <Skeleton.Avatar key={id} />)
@@ -39,16 +45,25 @@ const EventParticipant = ({ id }: EventParticipant) => {
 					const Content = isOnwer || isAdmin ? CAvatarBandage : CAvatar
 
 					return (
-						<Link
+						<div
 							key={id}
-							href={onGetPath(`${mainRoutes.profile}/${user_id}`)}
-							target="_blank"
+							onClick={() => {
+								if (isPublic) {
+									onRequireLogin?.()
+									return
+								}
+								window.open(
+									onGetPath(`${mainRoutes.profile}/${user_id}`),
+									'_blank',
+								)
+							}}
+							style={{ cursor: 'pointer' }}
 						>
 							<Content
 								src={avatar}
 								{...(isAdmin && { customeBandage: <StarIcon /> })}
 							/>
-						</Link>
+						</div>
 					)
 				})}
 
@@ -67,6 +82,8 @@ const EventParticipant = ({ id }: EventParticipant) => {
 		return (
 			<ModalEventParticipant
 				id={id}
+				isPublic={isPublic}
+				onRequireLogin={onRequireLogin}
 				onClose={() => {
 					setOpenModal(false)
 				}}

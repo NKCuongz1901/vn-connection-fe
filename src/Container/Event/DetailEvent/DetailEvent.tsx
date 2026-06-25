@@ -17,6 +17,7 @@ import { memo } from 'react'
 
 import { useLoading } from '@/context/LoadingContext'
 import useDetailEvent from '@/hooks/Event/useDetailEvent'
+import useRequireLogin from '@/hooks/useRequireLogin'
 
 import { isArray } from '@/ultis/array'
 import { cloneDeep } from '@/ultis/common'
@@ -54,9 +55,12 @@ const skeletonItems = [
 interface DetailEventProps {
 	id: string
 	type?: string
+	isPublic?: boolean
 	[key: string]: any
 }
-const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
+const DetailEvent = ({ id: _id, type, isPublic }: DetailEventProps) => {
+	const { requireLogin } = useRequireLogin()
+	const onRequireLogin = isPublic ? requireLogin : undefined
 	const {
 		eventCommentRef,
 
@@ -77,12 +81,11 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 		onCopy,
 		setId,
 		onScroll,
-	} = useDetailEvent({ id: _id })
+	} = useDetailEvent({ id: _id, isPublic, onRequireLogin })
 	const { detailLoad } = loading
 	const { loadingContext } = useLoading()
 	const { goBackOrPush } = useSafeBack()
 	const { events } = detailPost || {}
-	console.log('detailPost', detailPost)
 	const _renderSkeleton = () => {
 		return (
 			<Flex className={classes.container} vertical>
@@ -150,7 +153,11 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 			<Flex className={classes.action}>
 				<Flex
 					className={classes.icon}
-					onClick={() => goBackOrPush(type || mainRoutes.event)}
+					onClick={() =>
+						goBackOrPush(
+							isPublic ? mainRoutes.login : type || mainRoutes.event,
+						)
+					}
 				>
 					<IconChevronLeft />
 				</Flex>
@@ -177,7 +184,7 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 		} = detailPost || {}
 		const { type } = repeat_type || {}
 		const id = getUserInfo('id')
-		const isHost = id === user_id
+		const isHost = !isPublic && id === user_id
 		const isRepeat = type !== repeatOpt[0].value
 		const isFull =
 			limit_participant !== null &&
@@ -253,9 +260,13 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 						) : (
 							<CButton
 								ctype="oranger"
-								disabled={loadingContext}
+								disabled={!isPublic && loadingContext}
 								icon={<GroupPeopleJoinIcon />}
-								onClick={() => onJoinPostConfirm('join')}
+								onClick={() =>
+									isPublic
+										? onRequireLogin?.()
+										: onJoinPostConfirm('join')
+								}
 							>
 								Interested
 							</CButton>
@@ -263,7 +274,11 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 						<CButton
 							ctype="success"
 							icon={<IconShare3 />}
-							onClick={() => onSetOpenModal({ type: 'share' })}
+							onClick={() =>
+								isPublic
+									? onRequireLogin?.()
+									: onSetOpenModal({ type: 'share' })
+							}
 						>
 							Invite friend
 						</CButton>
@@ -358,6 +373,8 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 						id={id}
 						user={user}
 						detailPost={detailPost}
+						isPublic={isPublic}
+						onRequireLogin={onRequireLogin}
 						onCallBack={() =>
 							(_refKeyEventParticipant.current = randomString())
 						}
@@ -365,7 +382,12 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 				)}
 
 				{id && (
-					<EventParticipant id={id} key={_refKeyEventParticipant.current} />
+					<EventParticipant
+						id={id}
+						isPublic={isPublic}
+						onRequireLogin={onRequireLogin}
+						key={_refKeyEventParticipant.current}
+					/>
 				)}
 
 				<Flex className={classes.detailInfo} vertical>
@@ -519,9 +541,14 @@ const DetailEvent = ({ id: _id, type }: DetailEventProps) => {
 					{_renderDetail()}
 					{_renderDesc()}
 					<Flex className={classes.comment}>
-						<EventComment id={id} ref={eventCommentRef} />
+						<EventComment
+							id={id}
+							ref={eventCommentRef}
+							isPublic={isPublic}
+							onRequireLogin={onRequireLogin}
+						/>
 					</Flex>
-					{_renderModal()}
+					{!isPublic && _renderModal()}
 				</Flex>
 			) : (
 				<Flex className={classes.noData}>Post does not exist</Flex>

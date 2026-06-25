@@ -43,6 +43,8 @@ export const POST_ROUTES = {
 	actionMultiWaiting: 'participant/action-multi-waiting',
 	search: 'post/search',
 	comment: 'comment',
+	commentPublic: 'comment/public',
+	participantPublic: 'participant/public',
 	updateMember: 'post/update-member',
 	sticker: 'sticker',
 	myEventInHome: 'post/my-event-in-home',

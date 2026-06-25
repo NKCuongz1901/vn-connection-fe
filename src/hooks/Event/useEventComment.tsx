@@ -13,6 +13,7 @@ import { useModal } from '@/context/ModalContext'
 import {
 	deleteCommentPost,
 	getListCommentById,
+	getPublicListCommentById,
 	sendCommentPost,
 } from '@/apis/postApis'
 import { handleUploadImage, handleUploadVideo } from '@/apis/uploadApis'
@@ -28,9 +29,14 @@ import { parseMentions } from '@/ultis/string'
 
 interface useEventCommentProps {
 	id: string
+	isPublic?: boolean
+	onRequireLogin?: () => void
 	[key: string]: any
 }
-export default function useEventComment({ id }: useEventCommentProps, ref) {
+export default function useEventComment(
+	{ id, isPublic, onRequireLogin }: useEventCommentProps,
+	ref,
+) {
 	const { openError, openConfirm, closeModal } = useModal()
 	const { toggleLoadingContext, loadingContext } = useLoading()
 
@@ -46,16 +52,22 @@ export default function useEventComment({ id }: useEventCommentProps, ref) {
 	const [fileList, setFileList] = useState([])
 
 	const handleChangeComment = (e) => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
 		const content = e.target.value
 		setCommentContent(content)
 	}
+
+	const fetchComments = isPublic ? getPublicListCommentById : getListCommentById
 
 	const handleGetListCommentById = async () => {
 		setLoading(true)
 		try {
 			const { page, limit } = _paginationRefs.current
 			const isNew = page === 1
-			const res: any = await getListCommentById({
+			const res: any = await fetchComments({
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
 				where: { post_id: id, parent_id: null },
 				page,
@@ -85,7 +97,7 @@ export default function useEventComment({ id }: useEventCommentProps, ref) {
 	}
 	const handleGetCommentTotal = async () => {
 		try {
-			const res: any = await getListCommentById({
+			const res: any = await fetchComments({
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
 				where: { post_id: id },
 				page: 1,
@@ -173,6 +185,10 @@ export default function useEventComment({ id }: useEventCommentProps, ref) {
 		}
 	}
 	const handleSendCommentPost = async () => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
 		if ((!commentContent.trim() && !isArray(fileList, 1)) || loadingContext) {
 			return
 		}
@@ -221,6 +237,10 @@ export default function useEventComment({ id }: useEventCommentProps, ref) {
 	}
 
 	const handleDeletePost = async (id: string) => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
 		try {
 			setDeleteLoading((prev) => [...prev, id])
 			const res: any = await deleteCommentPost(id)
@@ -237,6 +257,10 @@ export default function useEventComment({ id }: useEventCommentProps, ref) {
 	}
 
 	const handleImportImg = debounce(async (_values) => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
 		const values = []
 
 		for (const i of _values || []) {

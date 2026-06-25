@@ -105,10 +105,23 @@ export const getListParticipant = async (_params: any) => {
 		params: convertParams(params),
 	})
 }
+
+export const getPublicListParticipant = async (params: any) => {
+	return await axios.get(POST_ROUTES.participantPublic, {
+		params: convertParams(params),
+	})
+}
+
 export const getListCommentById = async (params: any) => {
 	const url = POST_ROUTES.comment
 
 	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const getPublicListCommentById = async (params: any) => {
+	return await axios.get(POST_ROUTES.commentPublic, {
 		params: convertParams(params),
 	})
 }

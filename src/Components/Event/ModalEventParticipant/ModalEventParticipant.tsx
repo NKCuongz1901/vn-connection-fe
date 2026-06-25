@@ -23,11 +23,13 @@ import { stateFriends } from '@/Variable/common.variable'
 
 interface ModalEventParticipantProps {
 	id: string
+	isPublic?: boolean
+	onRequireLogin?: () => void
 	onClose?: any
 }
 
 const ModalEventParticipant = (_props: ModalEventParticipantProps) => {
-	const { id, onClose } = _props
+	const { id, isPublic, onRequireLogin, onClose } = _props
 	const { onGetPath } = useLocalePath()
 	const {
 		loading,
@@ -39,8 +41,15 @@ const ModalEventParticipant = (_props: ModalEventParticipantProps) => {
 		onAddFriend,
 		onRemoveFriend,
 		onOpenModalRemoveFriend,
-	} = useModalEventParticipant({ id })
+	} = useModalEventParticipant({ id, isPublic })
 	const { id: idMe } = getUserInfo()
+
+	const handleProfileClick = (e: React.MouseEvent) => {
+		if (!isPublic) return
+		e.preventDefault()
+		onRequireLogin?.()
+	}
+
 	const _renderStatusFriend = (item) => {
 		const { is_friend } = item || {}
 
@@ -112,6 +121,7 @@ const ModalEventParticipant = (_props: ModalEventParticipantProps) => {
 										<Link
 											href={onGetPath(`${mainRoutes.profile}/${user_id}`)}
 											target="_blank"
+											onClick={handleProfileClick}
 										>
 											<Flex className={classes.left}>
 												<Content
@@ -121,7 +131,7 @@ const ModalEventParticipant = (_props: ModalEventParticipantProps) => {
 												<span className={classes.name}>{name}</span>
 											</Flex>
 										</Link>
-										{!isMe && _renderStatusFriend(item)}
+										{!isMe && !isPublic && _renderStatusFriend(item)}
 									</Flex>
 								)
 							})}

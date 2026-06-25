@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useModal } from '@/context/ModalContext'
 
 import { addFriend, deleteFriend } from '@/apis/friendApis'
-import { getListParticipant } from '@/apis/postApis'
+import { getListParticipant, getPublicListParticipant } from '@/apis/postApis'
 
 import { uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay } from '@/ultis/common'
@@ -12,7 +12,13 @@ import { PaginationType } from '@/interface/common/common.interface'
 import { paginationCommon } from '@/Variable/common.variable'
 import { participantType } from '@/Variable/event.variable'
 
-export default function useModalEventParticipant({ id }: any) {
+export default function useModalEventParticipant({
+	id,
+	isPublic,
+}: {
+	id: string
+	isPublic?: boolean
+}) {
 	const { openError, openConfirm, closeModal } = useModal()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const _parentRef = useRef<HTMLDivElement | null>(null)
@@ -35,7 +41,9 @@ export default function useModalEventParticipant({ id }: any) {
 				page,
 				limit,
 			}
-			const res: any = await getListParticipant(params)
+			const res: any = await (isPublic
+				? getPublicListParticipant(params)
+				: getListParticipant(params))
 			const { code, results } = res || {}
 			await delay(1000)
 			if (code === 200) {

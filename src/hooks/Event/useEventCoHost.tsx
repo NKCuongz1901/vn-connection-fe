@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { getListParticipant, updateMemberPost } from '@/apis/postApis'
+import { getListParticipant, getPublicListParticipant, updateMemberPost } from '@/apis/postApis'
 
 import { uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay } from '@/ultis/common'
@@ -17,7 +17,13 @@ export default function useEventCoHost({
 	id,
 	user,
 	onCallBack = () => null,
-}: any) {
+	isPublic,
+}: {
+	id: string
+	user: any
+	onCallBack?: () => void
+	isPublic?: boolean
+}) {
 	const { openError, openConfirm, openSuccess } = useModal()
 	const { toggleLoadingContext } = useLoading()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
@@ -46,7 +52,9 @@ export default function useEventCoHost({
 				page,
 				limit,
 			}
-			const res: any = await getListParticipant(params)
+			const res: any = await (isPublic
+				? getPublicListParticipant(params)
+				: getListParticipant(params))
 			const { code, results } = res || {}
 			await delay(1000)
 			if (code === 200) {

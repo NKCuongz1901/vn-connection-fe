@@ -22,7 +22,16 @@ import classes from './EventComment.module.scss'
 import { DEFAULT_FALLBACK } from '@/Variable/common.variable'
 import CInputTag from '@/Components/Custom/CInputTag'
 
-const EventComment = ({ id }, ref) => {
+interface EventCommentProps {
+	id: string
+	isPublic?: boolean
+	onRequireLogin?: () => void
+}
+
+const EventComment = (
+	{ id, isPublic, onRequireLogin }: EventCommentProps,
+	ref,
+) => {
 	const {
 		_parentRef,
 		_childRef,
@@ -44,9 +53,18 @@ const EventComment = ({ id }, ref) => {
 	} = useEventComment(
 		{
 			id,
+			isPublic,
+			onRequireLogin,
 		},
 		ref,
 	)
+	const handleCommentAction = (action) => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
+		onAction(action)
+	}
 	const _renderSendCommentBox = () => {
 		return (
 			<Flex vertical className={classes.commentBoxWrapper}>
@@ -218,7 +236,11 @@ const EventComment = ({ id }, ref) => {
 					>
 						{/* {commentList.map((item) => _renderItemComment(item))} */}
 						{commentList.map((item) => (
-							<CCommentItem item={item} key={item.id} onAction={onAction} />
+							<CCommentItem
+								item={item}
+								key={item.id}
+								onAction={handleCommentAction}
+							/>
 						))}
 						{loading &&
 							arrayFrom(3).map((_, index) => (

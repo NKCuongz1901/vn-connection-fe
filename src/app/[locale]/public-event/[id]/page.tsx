@@ -1,12 +1,12 @@
 'use client'
 
-import PublicDetailEvent from '@/Container/Event/PublicDetailEvent'
+import DetailEvent from '@/Container/Event/DetailEvent'
 import { useQuery } from '@/ultis/route'
 
 const PublicEventDetailPage = () => {
 	const { onGetParams } = useQuery()
 	const id = onGetParams('id') as string
-	return <PublicDetailEvent id={id} />
+	return <DetailEvent id={id} isPublic />
 }
 
 export default PublicEventDetailPage

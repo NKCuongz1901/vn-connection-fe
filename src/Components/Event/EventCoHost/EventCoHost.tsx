@@ -22,7 +22,14 @@ import { mainRoutes } from '@/routes/MainRoutes'
 import classes from './EventCoHost.module.scss'
 import { repeatOpt } from '@/Variable/select.variable'
 
-const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
+const EventCoHost = ({
+	id,
+	user,
+	detailPost,
+	onCallBack = () => null,
+	isPublic,
+	onRequireLogin,
+}) => {
 	const { onGetPath } = useLocalePath()
 	const { avatar: uAvatar, name, id: user_id } = user || {}
 	const {
@@ -34,14 +41,32 @@ const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
 		onSetOpenModal,
 		onGetMenus,
 		onMenusClick,
-	} = useEventCoHost({ id, user, onCallBack })
+	} = useEventCoHost({ id, user, onCallBack, isPublic })
 	const { repeat_type } = detailPost || {}
 	const { type } = repeat_type || {}
 	const isRepeat = type !== repeatOpt[0].value
 	const isAdd =
-		(!isArray(participantList, 3) &&
+		!isPublic &&
+		((!isArray(participantList, 3) &&
 			!!participantList.find((item) => item.user_id === getUserInfo('id'))) ||
-		user?.id === getUserInfo('id')
+			user?.id === getUserInfo('id'))
+
+	const handleOpenModal = (payload: { type: any; dataModal?: any }) => {
+		if (isPublic && payload.type !== 'allHost') {
+			onRequireLogin?.()
+			return
+		}
+		onSetOpenModal(payload)
+	}
+
+	const handleProfileClick = (
+		e: React.MouseEvent,
+		profileUserId: string,
+	) => {
+		if (!isPublic) return
+		e.preventDefault()
+		onRequireLogin?.()
+	}
 
 	const _renderModalAllCoHost = (_props: {
 		dataModal: any
@@ -69,6 +94,7 @@ const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
 						<Link
 							href={onGetPath(`${mainRoutes.profile}/${user_id}`)}
 							target="_blank"
+							onClick={(e) => handleProfileClick(e, user_id)}
 						>
 							<Flex className={classes.left}>
 								<CAvatarBandage src={uAvatar} />
@@ -91,6 +117,7 @@ const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
 									<Link
 										href={onGetPath(`${mainRoutes.profile}/${user_id}`)}
 										target="_blank"
+										onClick={(e) => handleProfileClick(e, user_id)}
 									>
 										<Flex className={classes.left}>
 											<Content
@@ -101,27 +128,28 @@ const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
 										</Flex>
 									</Link>
 									<Flex className={classes.right}>
-										{isRepeat ? (
-											<Dropdown
-												menu={{ items: menus }}
-												trigger={['click']}
-												disabled={loadingCoHost}
-											>
-												<IconTrash className={classes.iconTrash} />
-											</Dropdown>
-										) : (
-											<div
-												onClick={() =>
-													onMenusClick({
-														key: 'ALL',
-														id: user_id,
-														isUpgrate: false,
-													})
-												}
-											>
-												<IconTrash className={classes.iconTrash} />
-											</div>
-										)}
+										{!isPublic &&
+											(isRepeat ? (
+												<Dropdown
+													menu={{ items: menus }}
+													trigger={['click']}
+													disabled={loadingCoHost}
+												>
+													<IconTrash className={classes.iconTrash} />
+												</Dropdown>
+											) : (
+												<div
+													onClick={() =>
+														onMenusClick({
+															key: 'ALL',
+															id: user_id,
+															isUpgrate: false,
+														})
+													}
+												>
+													<IconTrash className={classes.iconTrash} />
+												</div>
+											))}
 									</Flex>
 								</Flex>
 							)
@@ -213,7 +241,7 @@ const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
 					<div
 						className={classes.title}
 						onClick={() =>
-							onSetOpenModal({ type: 'allHost', dataModal: participantList })
+							handleOpenModal({ type: 'allHost', dataModal: participantList })
 						}
 					>
 						Host by
@@ -224,7 +252,7 @@ const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
 					{isAdd && !loading && (
 						<div
 							className={classes.addHost}
-							onClick={() => onSetOpenModal({ type: 'coHost' })}
+							onClick={() => handleOpenModal({ type: 'coHost' })}
 						>
 							+
 						</div>
@@ -234,6 +262,7 @@ const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
 							href={onGetPath(`${mainRoutes.profile}/${item.user_id}`)}
 							key={item.id}
 							target="_blank"
+							onClick={(e) => handleProfileClick(e, item.user_id)}
 						>
 							<CAvatarBandage
 								src={item.user.avatar}
@@ -245,6 +274,7 @@ const EventCoHost = ({ id, user, detailPost, onCallBack = () => null }) => {
 					<Link
 						href={onGetPath(`${mainRoutes.profile}/${user.id}`)}
 						target="_blank"
+						onClick={(e) => handleProfileClick(e, user.id)}
 					>
 						<CAvatarBandage src={uAvatar} />
 					</Link>
