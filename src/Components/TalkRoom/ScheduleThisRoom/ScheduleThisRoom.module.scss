@@ -1,0 +1,141 @@
+.divider {
+	width: 100%;
+	height: 1px;
+	margin-top: 16px;
+	background: #edf0f5;
+}
+
+.scheduleSection {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.scheduleHeader {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	padding: 16px 0 12px;
+}
+
+.scheduleHeaderText {
+	flex: 1;
+	min-width: 0;
+}
+
+.scheduleTitle {
+	margin: 0;
+	color: #0f1729;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+}
+
+.scheduleSubtitle {
+	margin: 4px 0 0;
+	color: #48546b;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+}
+
+.dateList {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.dateRow {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	width: 100%;
+	min-height: 56px;
+	flex-wrap: nowrap;
+}
+
+.dateInfo {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	min-width: 0;
+}
+
+.checkboxWrap {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	height: 56px;
+	padding: 12px 8px 12px 0;
+}
+
+.checkbox {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	border: 1px solid #7987a4;
+	border-radius: 4px;
+	background: #fff;
+	cursor: pointer;
+	flex-shrink: 0;
+
+	&:disabled {
+		cursor: not-allowed;
+		background: #edf0f5;
+		border-color: #7987a4;
+	}
+}
+
+.checkboxChecked {
+	border-color: #006b35;
+	background: #006b35;
+	color: #fff;
+}
+
+.dateTexts {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	min-width: 0;
+}
+
+.dateLabel {
+	color: #0f1729;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+	white-space: nowrap;
+}
+
+.dateHint {
+	color: #48546b;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+	white-space: nowrap;
+}
+
+.timeSection {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+	gap: 16px;
+}
+
+.timeGroup {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-shrink: 0;
+}
+
+.timeLabel {
+	color: #48546b;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+	white-space: nowrap;
+}

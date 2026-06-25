@@ -5,50 +5,49 @@ import { Popover } from 'antd'
 import clsx from 'clsx'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 
-import { isArray } from '@/ultis/array'
-
 import CButton from '@/Components/Custom/CButton'
-import CSelectionItem from '@/Components/Custom/CSelectionItem'
+import CRadioItem from '@/Components/Custom/CRadioItem'
 
-import classes from './CCheckboxSelect.module.scss'
+import classes from './CRadioSelect.module.scss'
 
-export type CCheckboxSelectOption = {
+export type CRadioSelectOption = {
 	label: string
 	value: string
 	[key: string]: any
 }
 
-export type CCheckboxSelectProps = {
+export type CRadioSelectProps = {
 	label?: string
 	placeholder?: string
-	options?: CCheckboxSelectOption[]
-	value?: string[]
-	onChange?: (values: string[]) => void
-	maxSelected?: number
+	options?: CRadioSelectOption[]
+	value?: string
+	onChange?: (value: string) => void
 	isRequired?: boolean
 	error?: string
 	disabled?: boolean
+	className?: string
+	/** Chọn xong đóng popover ngay (mặc định). false = cần bấm Select */
+	immediateSelect?: boolean
 	cancelLabel?: string
 	confirmLabel?: string
-	className?: string
 }
 
-const CCheckboxSelect = ({
+const CRadioSelect = ({
 	label,
 	placeholder = 'Select',
 	options = [],
-	value = [],
+	value,
 	onChange,
-	maxSelected,
 	isRequired,
 	error,
 	disabled,
+	className,
+	immediateSelect = true,
 	cancelLabel = 'Cancel',
 	confirmLabel = 'Select',
-	className,
-}: CCheckboxSelectProps) => {
+}: CRadioSelectProps) => {
 	const [open, setOpen] = useState(false)
-	const [draft, setDraft] = useState<string[]>(value)
+	const [draft, setDraft] = useState<string | undefined>(value)
 
 	useEffect(() => {
 		if (!open) {
@@ -57,11 +56,8 @@ const CCheckboxSelect = ({
 	}, [open, value])
 
 	const displayText = useMemo(() => {
-		if (!isArray(value, 1)) return placeholder
-		return options
-			.filter((item) => value.includes(item.value))
-			.map((item) => item.label)
-			.join(', ')
+		if (!value) return placeholder
+		return options.find((item) => item.value === value)?.label || placeholder
 	}, [value, options, placeholder])
 
 	const handleOpenChange = useCallback(
@@ -75,19 +71,15 @@ const CCheckboxSelect = ({
 		[disabled, value],
 	)
 
-	const handleToggle = useCallback(
+	const handleSelect = useCallback(
 		(optionValue: string) => {
-			setDraft((prev) => {
-				if (prev.includes(optionValue)) {
-					return prev.filter((item) => item !== optionValue)
-				}
-				if (maxSelected && prev.length >= maxSelected) {
-					return prev
-				}
-				return [...prev, optionValue]
-			})
+			setDraft(optionValue)
+			if (immediateSelect) {
+				onChange?.(optionValue)
+				setOpen(false)
+			}
 		},
-		[maxSelected],
+		[immediateSelect, onChange],
 	)
 
 	const handleCancel = useCallback(() => {
@@ -96,34 +88,46 @@ const CCheckboxSelect = ({
 	}, [value])
 
 	const handleConfirm = useCallback(() => {
-		onChange?.(draft)
+		if (draft) {
+			onChange?.(draft)
+		}
 		setOpen(false)
 	}, [draft, onChange])
 
 	const panelContent = (
 		<div className={classes.panel}>
-			<div className={classes.list}>
+			<div
+				className={clsx(classes.list, {
+					[classes.listWithFooter]: !immediateSelect,
+				})}
+			>
 				{options.map((item) => (
-					<CSelectionItem
+					<CRadioItem
 						key={item.value}
 						label={item.label}
-						checked={draft.includes(item.value)}
-						onClick={() => handleToggle(item.value)}
+						checked={draft === item.value}
+						onClick={() => handleSelect(item.value)}
 					/>
 				))}
 			</div>
-			<div className={classes.footer}>
-				<div className={classes.footerBtn}>
-					<CButton ctype="disabled" onClick={handleCancel}>
-						{cancelLabel}
-					</CButton>
+			{!immediateSelect && (
+				<div className={classes.footer}>
+					<div className={classes.footerBtn}>
+						<CButton ctype="disabled" onClick={handleCancel}>
+							{cancelLabel}
+						</CButton>
+					</div>
+					<div className={classes.footerBtn}>
+						<CButton
+							ctype="oranger"
+							onClick={handleConfirm}
+							disabled={!draft}
+						>
+							{confirmLabel}
+						</CButton>
+					</div>
 				</div>
-				<div className={classes.footerBtn}>
-					<CButton ctype="oranger" onClick={handleConfirm}>
-						{confirmLabel}
-					</CButton>
-				</div>
-			</div>
+			)}
 		</div>
 	)
 
@@ -152,7 +156,7 @@ const CCheckboxSelect = ({
 				>
 					<span
 						className={clsx(classes.triggerText, {
-							[classes.triggerPlaceholder]: !isArray(value, 1),
+							[classes.triggerPlaceholder]: !value,
 						})}
 					>
 						{displayText}
@@ -167,4 +171,4 @@ const CCheckboxSelect = ({
 	)
 }
 
-export default memo(CCheckboxSelect)
+export default memo(CRadioSelect)

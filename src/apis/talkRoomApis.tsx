@@ -105,10 +105,78 @@ export const getListCategories = getTalkRoomCategories
 /** @deprecated Use getTalkRoomLanguages */
 export const getListLanguage = getTalkRoomLanguages
 
-export const getBookingSlots = async (payload: { schedule_at: string }) => {
+export type BookingSlotItem = {
+	date: string
+	available_spots: number
+	max_spots: number
+	is_fully_booked: boolean
+}
+
+export type BookingSlotsResponseObject = {
+	slots: BookingSlotItem[]
+	cached_at?: string
+	ttl_seconds?: number
+	your_timezone_offset?: number
+}
+
+export type BookingSlotsData = {
+	availableCount: number
+	totalCount: number
+	usedCount: number
+	isFull: boolean
+	availabilityText: string
+	timeSlots: string[]
+}
+
+export const parseBookingSlotItem = (item: BookingSlotItem): BookingSlotsData => {
+	const available = item.available_spots ?? 0
+	const total = item.max_spots ?? 0
+	const used = Math.max(total - available, 0)
+	const isFull = item.is_fully_booked ?? available <= 0
+
+	return {
+		availableCount: available,
+		totalCount: total,
+		usedCount: used,
+		isFull,
+		availabilityText: isFull
+			? `Full (${used}/${total}). Create live instead`
+			: `${available} spots available`,
+		timeSlots: [],
+	}
+}
+
+export const parseBookingSlotsMap = (
+	res: any,
+	dateKeys: string[],
+): Record<string, BookingSlotsData> => {
+	const obj: BookingSlotsResponseObject =
+		res?.results?.object ?? res?.object ?? { slots: [] }
+	const slots = obj.slots ?? []
+
+	const byDate = slots.reduce<Record<string, BookingSlotItem>>((acc, item) => {
+		acc[item.date] = item
+		return acc
+	}, {})
+
+	return dateKeys.reduce<Record<string, BookingSlotsData>>((acc, key) => {
+		const item = byDate[key]
+		acc[key] = item
+			? parseBookingSlotItem(item)
+			: {
+					availableCount: 0,
+					totalCount: 0,
+					usedCount: 0,
+					isFull: true,
+					availabilityText: 'No slots available',
+					timeSlots: [],
+				}
+		return acc
+	}, {})
+}
+
+export const getBookingSlots = async () => {
 	const url = TALKROOM_ROUTES.checkBookingSlots
 
-	return await axios.get(url, {
-		params: payload,
-	})
+	return await axios.get(url)
 }

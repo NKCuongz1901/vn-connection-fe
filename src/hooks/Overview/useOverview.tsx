@@ -554,5 +554,6 @@ export default function useOverview() {
 		onCheckEmail: handleCheckEmail,
 		setCheckmail,
 		onCheckMailSubmit: handleCheckMailSubmit,
+		onRefreshTalkroomOverview: handleGetTalkroomOverview,
 	}
 }

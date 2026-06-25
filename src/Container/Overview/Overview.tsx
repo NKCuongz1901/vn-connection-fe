@@ -47,6 +47,7 @@ import TalkRoomCard from '@/Components/TalkRoom/TalkRoomCard/TalkRoomCard'
 import ModalTalkRoomWelcome from '@/Components/Modal/ModalTalkRoomWelcome'
 import LiveIcon from '@/svg/Talkroom/LiveIcon'
 import ModalTalkRoomSoundQuality from '@/Components/Modal/ModalTalkRoomSoundQuality'
+import ModalCreateTalkRoom from '@/Components/Modal/ModalCreateTalkRoom'
 
 const Overview = () => {
 	const { loadingContext } = useLoading()
@@ -87,12 +88,16 @@ const Overview = () => {
 		setCheckmail,
 		onCheckMailSubmit,
 		onUpdateUserInfo,
+		onRefreshTalkroomOverview,
 	} = useOverview()
 	const [talkRoomJoinModal, setTalkRoomJoinModal] = useState<{
 		open: boolean
 		roomId?: string
 	}>({ open: false })
 	const [modalSoundQuality, setModalSoundQuality] = useState<{
+		open: boolean
+	}>({ open: false })
+	const [createTalkRoomModal, setCreateTalkRoomModal] = useState<{
 		open: boolean
 	}>({ open: false })
 
@@ -110,6 +115,15 @@ const Overview = () => {
 
 	const handleCloseModalSoundQuality = () => {
 		setModalSoundQuality({ open: false })
+	}
+
+	const handleOpenCreateTalkRoomModal = (e?: React.MouseEvent) => {
+		e?.stopPropagation?.()
+		setCreateTalkRoomModal({ open: true })
+	}
+
+	const handleCloseCreateTalkRoomModal = () => {
+		setCreateTalkRoomModal({ open: false })
 	}
 
 	const handleConfirmTalkRoomJoin = () => {
@@ -541,6 +555,7 @@ const Overview = () => {
 						number={totalTalkroom}
 						labelCreateBtn="Create talk room"
 						icon={<MicroPhoneIcon />}
+						onAddNew={handleOpenCreateTalkRoomModal}
 					/>
 				</Flex>
 				<Flex className={classes.statsTalkroom}>
@@ -688,6 +703,13 @@ const Overview = () => {
 				onClose={handleCloseModalSoundQuality}
 				onConfirm={handleConfirmTalkRoomJoin}
 			/>
+			{createTalkRoomModal.open && (
+				<ModalCreateTalkRoom
+					open
+					onClose={handleCloseCreateTalkRoomModal}
+					onSuccess={onRefreshTalkroomOverview}
+				/>
+			)}
 			{!!checkmail?.open && (
 				<CheckEmail
 					onSubmit={() => {
