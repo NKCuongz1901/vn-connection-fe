@@ -1,7 +1,7 @@
 'use client'
 
 import { IconX } from '@tabler/icons-react'
-import { memo } from 'react'
+import { memo, useState } from 'react'
 
 import useCreateTalkRoom from '@/hooks/TalkRoom/useCreateTalkRoom'
 
@@ -10,7 +10,9 @@ import CCheckboxSelect from '@/Components/Custom/CCheckboxSelect'
 import CInput from '@/Components/Custom/CInput'
 import CModal from '@/Components/Custom/CModal/CModal'
 import CRadioSelect from '@/Components/Custom/CRadioSelect'
+import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
 import ScheduleThisRoom from '@/Components/TalkRoom/ScheduleThisRoom'
+import TalkRoomRuleUsage from '@/Components/TalkRoom/TalkRoomRuleUsage'
 
 import classes from './ModalCreateTalkRoom.module.scss'
 
@@ -50,6 +52,8 @@ function ModalCreateTalkRoom({
 		handleSubmit,
 		handleClose,
 	} = useCreateTalkRoom({ onClose, onSuccess })
+
+	const [ruleModalOpen, setRuleModalOpen] = useState(false)
 
 	if (!open) return null
 
@@ -152,6 +156,8 @@ function ModalCreateTalkRoom({
 						onToggleDay={onToggleDay}
 						onChangeFromTime={onChangeFromTime}
 					/>
+
+					<TalkRoomRuleUsage onClick={() => setRuleModalOpen(true)} />
 				</div>
 
 				<div className={classes.footer}>
@@ -166,6 +172,14 @@ function ModalCreateTalkRoom({
 					</CButton>
 				</div>
 			</div>
+
+			{ruleModalOpen && (
+				<ModalNotiChatRoom
+					open
+					onClose={() => setRuleModalOpen(false)}
+					onSubmit={() => setRuleModalOpen(false)}
+				/>
+			)}
 		</CModal>
 	)
 }
