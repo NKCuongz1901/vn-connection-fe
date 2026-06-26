@@ -128,7 +128,9 @@ export type BookingSlotsData = {
 	timeSlots: string[]
 }
 
-export const parseBookingSlotItem = (item: BookingSlotItem): BookingSlotsData => {
+export const parseBookingSlotItem = (
+	item: BookingSlotItem,
+): BookingSlotsData => {
 	const available = item.available_spots ?? 0
 	const total = item.max_spots ?? 0
 	const used = Math.max(total - available, 0)
@@ -150,8 +152,8 @@ export const parseBookingSlotsMap = (
 	res: any,
 	dateKeys: string[],
 ): Record<string, BookingSlotsData> => {
-	const obj: BookingSlotsResponseObject =
-		res?.results?.object ?? res?.object ?? { slots: [] }
+	const obj: BookingSlotsResponseObject = res?.results?.object ??
+		res?.object ?? { slots: [] }
 	const slots = obj.slots ?? []
 
 	const byDate = slots.reduce<Record<string, BookingSlotItem>>((acc, item) => {
@@ -179,4 +181,77 @@ export const getBookingSlots = async () => {
 	const url = TALKROOM_ROUTES.checkBookingSlots
 
 	return await axios.get(url)
+}
+
+export type TalkRoomListFilters = {
+	levels?: string[]
+	languageIds?: string[]
+}
+
+export type TalkRoomListItem = {
+	id: string
+	name: string
+	language_id?: string
+	level?: string[]
+	status?: string
+	total_participants?: number
+	max_participants?: number
+	next_schedule_at?: string | null
+	speakers?: {
+		id?: string
+		name?: string
+		avatar?: string
+		role?: string
+		talking_time?: number
+		i_am_from?: string
+	}[]
+	created_by_user?: {
+		id?: string
+		name?: string
+		avatar?: string
+	}
+	language?: {
+		id?: string
+		name?: string
+		code?: string
+		flag?: string
+	}
+	[key: string]: any
+}
+
+export const buildTalkRoomListWhere = (filters?: TalkRoomListFilters) => {
+	const where: Record<string, unknown> = {}
+
+	if (filters?.levels?.length) {
+		where.level = { $overlap: filters.levels }
+	}
+	if (filters?.languageIds?.length) {
+		where.language_id = { $in: filters.languageIds }
+	}
+
+	return where
+}
+
+export const getListTalkRoom = async ({
+	params = {},
+}: {
+	params?: { [key: string]: any }
+}) => {
+	const url = TALKROOM_ROUTES.getListTalkRoom
+
+	return await axios.get(url, {
+		params: convertParams(params || {}),
+	})
+}
+
+export const getListMyFriendTalkRoom = async ({
+	params = {},
+}: {
+	params?: { [key: string]: any }
+}) => {
+	const url = TALKROOM_ROUTES.getListMyFriendTalkRoom
+
+	return await axios.get(url, {
+		params: convertParams(params || {}),
+	})
 }

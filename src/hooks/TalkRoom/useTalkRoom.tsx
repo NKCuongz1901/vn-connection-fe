@@ -1,16 +1,24 @@
 import {
+	buildTalkRoomListWhere,
 	createTalkRoom,
 	CreateTalkRoomInput,
+	getListTalkRoom,
 	getMyTalkRoomAnalysis,
 	getTalkRoomCategories,
 	getTalkRoomLanguages,
 	TalkRoomCategoryItem,
 	TalkRoomLanguageItem,
+	TalkRoomListFilters,
+	TalkRoomListItem,
 } from '@/apis/talkRoomApis'
 import { useModal } from '@/context/ModalContext'
-import { isArray } from '@/ultis/array'
+import { PaginationType } from '@/interface/common/common.interface'
+import { isArray, uniqueArray } from '@/ultis/array'
+import { cloneDeep } from '@/ultis/common'
+import { isEmptyObject } from '@/ultis/object'
 import { generateCustomUuid } from '@/ultis/string'
-import { useCallback, useEffect, useState } from 'react'
+import { paginationCommon } from '@/Variable/common.variable'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export default function useTalkRoom() {
 	const { openError, openSuccess } = useModal()
@@ -21,6 +29,85 @@ export default function useTalkRoom() {
 	const [myTalkRoomAnalysis, setMyTalkRoomAnalysis] = useState<any>(null)
 	const [languages, setLanguages] = useState<TalkRoomLanguageItem[]>([])
 	const [categories, setCategories] = useState<TalkRoomCategoryItem[]>([])
+	const [listTalkRooms, setListTalkRooms] = useState<TalkRoomListItem[]>([])
+	const [totalTalkRooms, setTotalTalkRooms] = useState(0)
+	const [loadingListTalkRooms, setLoadingListTalkRooms] = useState(false)
+	const [listTalkRoomFilters, setListTalkRoomFilters] =
+		useState<TalkRoomListFilters>({})
+
+	const _listTalkRoomPaginationRef = useRef<PaginationType>(
+		cloneDeep({ ...paginationCommon, limit: 30 }),
+	)
+	const _listTalkRoomFilterRef = useRef<TalkRoomListFilters>({})
+
+	const handleGetListTalkRoom = useCallback(
+		async (isNotLoading = false) => {
+			setLoadingListTalkRooms(true)
+			try {
+				const { page, limit } = _listTalkRoomPaginationRef.current
+				const filters = _listTalkRoomFilterRef.current
+				const isNew = page === 1
+				const where = buildTalkRoomListWhere(filters)
+
+				if (isNew && !isNotLoading) {
+					setListTalkRooms([])
+				}
+
+				const res: any = await getListTalkRoom({
+					params: {
+						fields: ['$all'],
+						...(isEmptyObject(where) ? {} : { where }),
+						page: !isNotLoading ? page : 1,
+						limit: !isNotLoading ? limit : limit * page,
+					},
+				})
+				const { code, results, pagination } = res || {}
+
+				if (code === 200) {
+					const rows: TalkRoomListItem[] = results?.objects?.rows ?? []
+					const count =
+						results?.objects?.count ?? pagination?.total ?? rows.length
+
+					_listTalkRoomPaginationRef.current.totalPage =
+						Math.ceil(count / limit) || 0
+
+					setListTalkRooms((prev) => {
+						const contents = isNew && !isNotLoading ? [] : prev
+						return uniqueArray(
+							[...contents, ...rows],
+							'id',
+						) as TalkRoomListItem[]
+					})
+					setTotalTalkRooms(count)
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingListTalkRooms(false)
+			}
+		},
+		[openError],
+	)
+
+	const handleChangeListTalkRoomFilters = useCallback(
+		(filters: TalkRoomListFilters) => {
+			_listTalkRoomFilterRef.current = filters
+			_listTalkRoomPaginationRef.current.page = 1
+			setListTalkRoomFilters(filters)
+			handleGetListTalkRoom()
+		},
+		[handleGetListTalkRoom],
+	)
+
+	const handleLoadMoreListTalkRooms = useCallback(async () => {
+		const { page, totalPage } = _listTalkRoomPaginationRef.current
+		if (loadingListTalkRooms || page >= totalPage) return
+
+		_listTalkRoomPaginationRef.current.page += 1
+		await handleGetListTalkRoom()
+	}, [handleGetListTalkRoom, loadingListTalkRooms])
+
+	const handleGetListMyFriendTalkRoom = async () => {}
 
 	const handleGetMyTalkRoomAnalysis = async () => {
 		setLoading(true)
@@ -112,6 +199,7 @@ export default function useTalkRoom() {
 		handleGetMyTalkRoomAnalysis()
 		handleGetLanguages()
 		handleGetCategories()
+		handleGetListTalkRoom()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -120,12 +208,21 @@ export default function useTalkRoom() {
 		loadingCreate,
 		loadingLanguages,
 		loadingCategories,
+		loadingListTalkRooms,
 		myTalkRoomAnalysis,
 		languages,
 		categories,
+		listTalkRooms,
+		totalTalkRooms,
+		listTalkRoomFilters,
+
+		// ===== ACTIONS =====
 		onGetLanguages: handleGetLanguages,
 		onGetCategories: handleGetCategories,
 		onGetMyTalkRoomAnalysis: handleGetMyTalkRoomAnalysis,
+		onGetListTalkRoom: handleGetListTalkRoom,
+		onChangeListTalkRoomFilters: handleChangeListTalkRoomFilters,
+		onLoadMoreListTalkRooms: handleLoadMoreListTalkRooms,
 		onCreateTalkRoom: handleCreateTalkRoom,
 	}
 }

@@ -43,6 +43,9 @@
 		gap: 12px;
 		.rightContent {
 			flex: 2;
+			display: flex;
+			flex-direction: column;
+			gap: 24px;
 
 			.profileContainer {
 				display: flex;
@@ -54,6 +57,18 @@
 				align-self: stretch;
 				border-radius: 8px;
 				background: #fff;
+			}
+
+			.listTalkroomContainer {
+				padding: 16px;
+				border-radius: 8px;
+				background: #fff;
+				width: 100%;
+				height: 100%;
+
+				.listTalkroomInner {
+					width: 100%;
+				}
 			}
 		}
 		.leftContent {

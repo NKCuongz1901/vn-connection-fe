@@ -1,10 +1,11 @@
 'use client'
 
 import { IconChevronLeft } from '@tabler/icons-react'
-import { Flex } from 'antd'
+import { Flex, Skeleton } from 'antd'
 import { useState } from 'react'
 
 import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
+import RoomCard from '@/Components/TalkRoom/RoomCard'
 import TalkRoomProfileInfo from '@/Components/TalkRoom/TalkRoomProfileInfo/TalkRoomProfileInfo'
 import TalkRoomStats from '@/Components/TalkRoom/TalkRoomStats/TalkRoomStats'
 import useTalkRoom from '@/hooks/TalkRoom/useTalkRoom'
@@ -19,14 +20,46 @@ function TalkRoom() {
 	const [ruleModalOpen, setRuleModalOpen] = useState(false)
 	const { onChangeRoute } = useLocalePath()
 
-	const { loading, myTalkRoomAnalysis } = useTalkRoom()
+	const { loading, myTalkRoomAnalysis, listTalkRooms, loadingListTalkRooms } =
+		useTalkRoom()
 	const { userData } = useProfile({})
+	console.log(listTalkRooms)
 
 	const _renderProfile = () => {
 		return (
 			<div className={classes.profileContainer}>
 				<TalkRoomProfileInfo user={userData} />
 				<TalkRoomStats data={myTalkRoomAnalysis} loading={loading} />
+			</div>
+		)
+	}
+
+	const handleShareRoom = (room: { dynamic_link?: string }) => {
+		if (!room?.dynamic_link) return
+		if (navigator.share) {
+			navigator.share({ url: room.dynamic_link }).catch(() => undefined)
+			return
+		}
+		navigator.clipboard?.writeText(room.dynamic_link)
+	}
+
+	const _renderListTalkRoom = () => {
+		return (
+			<div className={classes.listTalkroomContainer}>
+				<Flex vertical gap={12} className={classes.listTalkroomInner}>
+					{loadingListTalkRooms && !listTalkRooms.length
+						? Array.from({ length: 3 }).map((_, index) => (
+								<Skeleton.Input
+									key={index}
+									active
+									block
+									style={{ height: 180, borderRadius: 16 }}
+								/>
+							))
+						: listTalkRooms.map((room) => (
+								<RoomCard key={room.id} room={room} onShare={handleShareRoom} />
+							))}
+				</Flex>
 			</div>
 		)
 	}
@@ -46,7 +79,10 @@ function TalkRoom() {
 				</div>
 			</Flex>
 			<Flex className={classes.content}>
-				<div className={classes.rightContent}>{_renderProfile()}</div>
+				<div className={classes.rightContent}>
+					{_renderProfile()}
+					{_renderListTalkRoom()}
+				</div>
 				<div className={classes.leftContent}></div>
 			</Flex>
 

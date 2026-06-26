@@ -2,13 +2,15 @@ import { memo } from 'react'
 
 import { SvgProps } from '@/interface/common/common.interface'
 
-const StarIcon2 = ({ fill }: SvgProps) => {
+const StarIcon2 = ({ fill, width, height }: SvgProps) => {
 	const _fill = fill || '#94A3B8'
+	const _width = width || '24'
+	const _height = height || '24'
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
-			width="24"
-			height="24"
+			width={_width}
+			height={_height}
 			viewBox="0 0 24 24"
 			fill="none"
 		>

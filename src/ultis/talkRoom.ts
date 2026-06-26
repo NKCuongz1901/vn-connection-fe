@@ -18,8 +18,17 @@ export type TalkRoomLanguage = {
 	flag?: string
 }
 
+export type TalkRoomCategory = {
+	slug?: string
+	category_details?: {
+		slug?: string
+		name?: string
+	}
+}
+
 export type TalkRoomRoom = {
 	id?: string
+	name?: string
 	status?: string
 	speakers?: TalkRoomSpeaker[]
 	created_by_user?: TalkRoomSpeaker
@@ -27,6 +36,15 @@ export type TalkRoomRoom = {
 	max_participants?: number
 	next_schedule_at?: string | null
 	language?: TalkRoomLanguage
+	level?: string[]
+	categories?: TalkRoomCategory[]
+	cmi_users?: TalkRoomSpeaker[]
+	total_cmi?: number
+	is_cmi?: boolean
+	user_notified?: boolean
+	is_joined?: boolean
+	is_your_room?: boolean
+	dynamic_link?: string
 }
 
 export const getSpeakerAvatar = (speaker?: TalkRoomSpeaker) => speaker?.avatar
@@ -68,3 +86,93 @@ export const formatTalkRoomSchedule = (date?: string | null) => {
 }
 
 export const isTalkRoomLive = (status?: string) => status === 'live'
+
+export const formatTalkRoomLevelLabel = (level?: string) => {
+	if (!level) return ''
+	return level.charAt(0).toUpperCase() + level.slice(1)
+}
+
+export const getTalkRoomPrimaryTopic = (categories?: TalkRoomCategory[]) => {
+	return categories?.[0]?.category_details?.name || ''
+}
+
+export const getTalkRoomCategoryLabels = (categories?: TalkRoomCategory[]) => {
+	return (categories || [])
+		.map((category) => category?.category_details?.name)
+		.filter(Boolean) as string[]
+}
+
+export const formatTalkRoomCategoriesText = (
+	categories?: TalkRoomCategory[],
+) => {
+	return getTalkRoomCategoryLabels(categories).join(', ')
+}
+
+export const formatTalkRoomCmiText = (
+	cmiUsers?: TalkRoomSpeaker[],
+	totalCmi?: number,
+) => {
+	const total = totalCmi ?? 0
+	if (total <= 0) return ''
+
+	const names = (cmiUsers || [])
+		.map((user) => user?.name)
+		.filter(Boolean) as string[]
+
+	if (!names.length) {
+		return total === 1
+			? '1 person plans to join'
+			: `${total} people plan to join`
+	}
+
+	if (total > 3) {
+		const namesText = names.slice(0, 3).join(', ')
+		const othersCount = total - 3
+		const othersLabel = othersCount === 1 ? '1 other' : `${othersCount} others`
+		return `${namesText} and ${othersLabel} plan to join`
+	}
+
+	const displayNames = names.slice(0, total)
+	const namesText = displayNames.join(', ')
+	return displayNames.length === 1
+		? `${namesText} plans to join`
+		: `${namesText} plan to join`
+}
+
+export type TalkRoomLiveParticipantsDisplay = {
+	highlight: string
+	regular: string
+}
+
+export const formatTalkRoomLiveParticipantsText = (
+	room?: TalkRoomRoom,
+): TalkRoomLiveParticipantsDisplay => {
+	const speakers = room?.speakers ?? []
+	const names = speakers
+		.map((speaker) => speaker?.name)
+		.filter(Boolean)
+		.slice(0, 3) as string[]
+	const total = room?.total_participants ?? names.length
+	const othersCount = Math.max(total - names.length, 0)
+
+	if (!names.length) {
+		return {
+			highlight: 'Live',
+			regular: ` ${total}/${room?.max_participants ?? 0}`,
+		}
+	}
+
+	const namesText = names.join(', ')
+	if (othersCount <= 0) {
+		return {
+			highlight: namesText,
+			regular: names.length === 1 ? ' is in the room' : ' are in the room',
+		}
+	}
+
+	const othersLabel = othersCount === 1 ? '1 other' : `${othersCount} others`
+	return {
+		highlight: namesText,
+		regular: ` and ${othersLabel} are in the room`,
+	}
+}
