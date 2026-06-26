@@ -30,6 +30,8 @@ export type CRadioSelectProps = {
 	immediateSelect?: boolean
 	cancelLabel?: string
 	confirmLabel?: string
+	/** compact pill style for filter chips */
+	variant?: 'default' | 'chip'
 }
 
 const CRadioSelect = ({
@@ -45,6 +47,7 @@ const CRadioSelect = ({
 	immediateSelect = true,
 	cancelLabel = 'Cancel',
 	confirmLabel = 'Select',
+	variant = 'default',
 }: CRadioSelectProps) => {
 	const [open, setOpen] = useState(false)
 	const [draft, setDraft] = useState<string | undefined>(value)
@@ -131,8 +134,14 @@ const CRadioSelect = ({
 		</div>
 	)
 
+	const isChip = variant === 'chip'
+
 	return (
-		<div className={clsx(classes.wrapper, className)}>
+		<div
+			className={clsx(classes.wrapper, className, {
+				[classes.wrapperChip]: isChip,
+			})}
+		>
 			{label && (
 				<div className={classes.label}>
 					{label}
@@ -150,19 +159,25 @@ const CRadioSelect = ({
 			>
 				<div
 					className={clsx(classes.trigger, {
+						[classes.triggerChip]: isChip,
 						[classes.triggerDisabled]: disabled,
 						[classes.triggerError]: !!error,
 					})}
 				>
 					<span
 						className={clsx(classes.triggerText, {
-							[classes.triggerPlaceholder]: !value,
+							[classes.triggerPlaceholder]: !value && !isChip,
+							[classes.triggerTextChip]: isChip,
 						})}
 					>
 						{displayText}
 					</span>
-					<span className={classes.triggerIcon}>
-						<IconChevronDown size={20} />
+					<span
+						className={clsx(classes.triggerIcon, {
+							[classes.triggerIconChip]: isChip,
+						})}
+					>
+						<IconChevronDown size={isChip ? 16 : 20} />
 					</span>
 				</div>
 			</Popover>

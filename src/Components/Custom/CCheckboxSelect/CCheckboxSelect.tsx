@@ -31,6 +31,10 @@ export type CCheckboxSelectProps = {
 	cancelLabel?: string
 	confirmLabel?: string
 	className?: string
+	/** Chọn xong áp dụng ngay, không cần bấm Select */
+	immediateSelect?: boolean
+	/** compact pill style for filter chips */
+	variant?: 'default' | 'chip'
 }
 
 const CCheckboxSelect = ({
@@ -46,6 +50,8 @@ const CCheckboxSelect = ({
 	cancelLabel = 'Cancel',
 	confirmLabel = 'Select',
 	className,
+	immediateSelect = false,
+	variant = 'default',
 }: CCheckboxSelectProps) => {
 	const [open, setOpen] = useState(false)
 	const [draft, setDraft] = useState<string[]>(value)
@@ -78,16 +84,21 @@ const CCheckboxSelect = ({
 	const handleToggle = useCallback(
 		(optionValue: string) => {
 			setDraft((prev) => {
+				let next: string[]
 				if (prev.includes(optionValue)) {
-					return prev.filter((item) => item !== optionValue)
+					next = prev.filter((item) => item !== optionValue)
+				} else if (maxSelected && prev.length >= maxSelected) {
+					next = prev
+				} else {
+					next = [...prev, optionValue]
 				}
-				if (maxSelected && prev.length >= maxSelected) {
-					return prev
+				if (immediateSelect) {
+					onChange?.(next)
 				}
-				return [...prev, optionValue]
+				return next
 			})
 		},
-		[maxSelected],
+		[maxSelected, immediateSelect, onChange],
 	)
 
 	const handleCancel = useCallback(() => {
@@ -102,7 +113,11 @@ const CCheckboxSelect = ({
 
 	const panelContent = (
 		<div className={classes.panel}>
-			<div className={classes.list}>
+			<div
+				className={clsx(classes.list, {
+					[classes.listWithFooter]: !immediateSelect,
+				})}
+			>
 				{options.map((item) => (
 					<CSelectionItem
 						key={item.value}
@@ -112,23 +127,31 @@ const CCheckboxSelect = ({
 					/>
 				))}
 			</div>
-			<div className={classes.footer}>
-				<div className={classes.footerBtn}>
-					<CButton ctype="disabled" onClick={handleCancel}>
-						{cancelLabel}
-					</CButton>
+			{!immediateSelect && (
+				<div className={classes.footer}>
+					<div className={classes.footerBtn}>
+						<CButton ctype="disabled" onClick={handleCancel}>
+							{cancelLabel}
+						</CButton>
+					</div>
+					<div className={classes.footerBtn}>
+						<CButton ctype="oranger" onClick={handleConfirm}>
+							{confirmLabel}
+						</CButton>
+					</div>
 				</div>
-				<div className={classes.footerBtn}>
-					<CButton ctype="oranger" onClick={handleConfirm}>
-						{confirmLabel}
-					</CButton>
-				</div>
-			</div>
+			)}
 		</div>
 	)
 
+	const isChip = variant === 'chip'
+
 	return (
-		<div className={clsx(classes.wrapper, className)}>
+		<div
+			className={clsx(classes.wrapper, className, {
+				[classes.wrapperChip]: isChip,
+			})}
+		>
 			{label && (
 				<div className={classes.label}>
 					{label}
@@ -146,19 +169,25 @@ const CCheckboxSelect = ({
 			>
 				<div
 					className={clsx(classes.trigger, {
+						[classes.triggerChip]: isChip,
 						[classes.triggerDisabled]: disabled,
 						[classes.triggerError]: !!error,
 					})}
 				>
 					<span
 						className={clsx(classes.triggerText, {
-							[classes.triggerPlaceholder]: !isArray(value, 1),
+							[classes.triggerPlaceholder]: !isArray(value, 1) && !isChip,
+							[classes.triggerTextChip]: isChip,
 						})}
 					>
 						{displayText}
 					</span>
-					<span className={classes.triggerIcon}>
-						<IconChevronDown size={20} />
+					<span
+						className={clsx(classes.triggerIcon, {
+							[classes.triggerIconChip]: isChip,
+						})}
+					>
+						<IconChevronDown size={isChip ? 16 : 20} />
 					</span>
 				</div>
 			</Popover>

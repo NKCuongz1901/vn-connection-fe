@@ -42,6 +42,12 @@ export type TalkRoomRoom = {
 	total_cmi?: number
 	is_cmi?: boolean
 	user_notified?: boolean
+	host_user?: {
+		id?: string
+		name?: string
+		avatar?: string
+		i_am_from?: string
+	}
 	is_joined?: boolean
 	is_your_room?: boolean
 	dynamic_link?: string
@@ -106,6 +112,29 @@ export const formatTalkRoomCategoriesText = (
 	categories?: TalkRoomCategory[],
 ) => {
 	return getTalkRoomCategoryLabels(categories).join(', ')
+}
+
+export const filterTalkRoomsByKeyword = (
+	rooms: TalkRoomRoom[],
+	keyword?: string,
+) => {
+	const search = keyword?.trim().toLowerCase()
+	if (!search) return rooms
+
+	return rooms.filter((room) => {
+		const name = room?.name?.toLowerCase() || ''
+		const hostName =
+			room?.host_user?.name?.toLowerCase() ||
+			room?.created_by_user?.name?.toLowerCase() ||
+			''
+		const topics = formatTalkRoomCategoriesText(room?.categories).toLowerCase()
+
+		return (
+			name.includes(search) ||
+			hostName.includes(search) ||
+			topics.includes(search)
+		)
+	})
 }
 
 export const formatTalkRoomCmiText = (

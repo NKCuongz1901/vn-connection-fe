@@ -16,9 +16,10 @@ import { PaginationType } from '@/interface/common/common.interface'
 import { isArray, uniqueArray } from '@/ultis/array'
 import { cloneDeep } from '@/ultis/common'
 import { isEmptyObject } from '@/ultis/object'
+import { filterTalkRoomsByKeyword } from '@/ultis/talkRoom'
 import { generateCustomUuid } from '@/ultis/string'
 import { paginationCommon } from '@/Variable/common.variable'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 export default function useTalkRoom() {
 	const { openError, openSuccess } = useModal()
@@ -34,6 +35,7 @@ export default function useTalkRoom() {
 	const [loadingListTalkRooms, setLoadingListTalkRooms] = useState(false)
 	const [listTalkRoomFilters, setListTalkRoomFilters] =
 		useState<TalkRoomListFilters>({})
+	const [searchKeyword, setSearchKeyword] = useState('')
 
 	const _listTalkRoomPaginationRef = useRef<PaginationType>(
 		cloneDeep({ ...paginationCommon, limit: 30 }),
@@ -97,6 +99,64 @@ export default function useTalkRoom() {
 			handleGetListTalkRoom()
 		},
 		[handleGetListTalkRoom],
+	)
+
+	const handleChangeLanguageFilter = useCallback(
+		(languageId: string) => {
+			const next: TalkRoomListFilters = {
+				..._listTalkRoomFilterRef.current,
+			}
+
+			if (languageId) {
+				next.languageIds = [languageId]
+			} else {
+				delete next.languageIds
+			}
+
+			handleChangeListTalkRoomFilters(next)
+		},
+		[handleChangeListTalkRoomFilters],
+	)
+
+	const handleChangeLevelFilter = useCallback(
+		(levels: string[]) => {
+			const next: TalkRoomListFilters = {
+				..._listTalkRoomFilterRef.current,
+			}
+			const apiLevels = levels.map((item) => item.toLowerCase())
+
+			if (isArray(apiLevels, 1)) {
+				next.levels = apiLevels
+			} else {
+				delete next.levels
+			}
+
+			handleChangeListTalkRoomFilters(next)
+		},
+		[handleChangeListTalkRoomFilters],
+	)
+
+	const handleChangeSearchKeyword = useCallback((keyword: string) => {
+		setSearchKeyword(keyword)
+	}, [])
+
+	const languageFilterOptions = useMemo(
+		() =>
+			languages.map((item) => ({
+				label: item.name,
+				value: item.id,
+			})),
+		[languages],
+	)
+
+	const selectedLevelFilters = useMemo(
+		() => (listTalkRoomFilters.levels || []).map((item) => item.toUpperCase()),
+		[listTalkRoomFilters.levels],
+	)
+
+	const displayTalkRooms = useMemo(
+		() => filterTalkRoomsByKeyword(listTalkRooms, searchKeyword),
+		[listTalkRooms, searchKeyword],
 	)
 
 	const handleLoadMoreListTalkRooms = useCallback(async () => {
@@ -213,8 +273,12 @@ export default function useTalkRoom() {
 		languages,
 		categories,
 		listTalkRooms,
+		displayTalkRooms,
 		totalTalkRooms,
 		listTalkRoomFilters,
+		searchKeyword,
+		languageFilterOptions,
+		selectedLevelFilters,
 
 		// ===== ACTIONS =====
 		onGetLanguages: handleGetLanguages,
@@ -222,6 +286,9 @@ export default function useTalkRoom() {
 		onGetMyTalkRoomAnalysis: handleGetMyTalkRoomAnalysis,
 		onGetListTalkRoom: handleGetListTalkRoom,
 		onChangeListTalkRoomFilters: handleChangeListTalkRoomFilters,
+		onChangeLanguageFilter: handleChangeLanguageFilter,
+		onChangeLevelFilter: handleChangeLevelFilter,
+		onChangeSearchKeyword: handleChangeSearchKeyword,
 		onLoadMoreListTalkRooms: handleLoadMoreListTalkRooms,
 		onCreateTalkRoom: handleCreateTalkRoom,
 	}

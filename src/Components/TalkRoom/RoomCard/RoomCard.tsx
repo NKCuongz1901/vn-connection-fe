@@ -24,6 +24,7 @@ import {
 	isTalkRoomLive,
 	TalkRoomRoom,
 } from '@/ultis/talkRoom'
+import MinusCircleFill from '@/svg/Talkroom/MinusCircleFill'
 
 export type RoomCardProps = {
 	room: TalkRoomRoom
@@ -53,7 +54,7 @@ function RoomCard({
 	const liveParticipantsText = formatTalkRoomLiveParticipantsText(room)
 	const scheduleText = formatTalkRoomSchedule(room?.next_schedule_at)
 	const hasCmi = (room?.total_cmi ?? 0) > 0 && !!cmiText
-	const showCmiSection = !isLive
+	const showCmiSection = !isLive && (hasCmi || !isYourRoom)
 	const showScheduleSection = !isLive && !!scheduleText
 
 	const handleShare = (event: React.MouseEvent) => {
@@ -220,11 +221,7 @@ function RoomCard({
 											)}
 											onClick={handleNotJoining}
 										>
-											<IconCircleMinus
-												size={16}
-												stroke={1.75}
-												color="#0F1729"
-											/>
+											<MinusCircleFill />
 											<span>Not joining</span>
 										</button>
 									) : (
