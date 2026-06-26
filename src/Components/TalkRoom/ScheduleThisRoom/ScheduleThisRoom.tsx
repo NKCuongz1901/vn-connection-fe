@@ -14,7 +14,7 @@ import {
 
 import classes from './ScheduleThisRoom.module.scss'
 
-const SCHEDULE_DAILY_SUMMARY = '50 rooms out of 50'
+const SCHEDULE_DAILY_SUMMARY = '50 rooms out of 100 schedulable per day'
 
 export type ScheduleDayState = {
 	checked: boolean
@@ -94,8 +94,7 @@ function ScheduleThisRoom({
 									<div className={classes.dateTexts}>
 										<span className={classes.dateLabel}>{day.label}</span>
 										<span className={classes.dateHint}>
-											{slots?.availabilityText ??
-												(loading ? 'Loading...' : '')}
+											{slots?.availabilityText ?? (loading ? 'Loading...' : '')}
 										</span>
 									</div>
 								</div>
