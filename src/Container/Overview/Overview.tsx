@@ -44,6 +44,7 @@ import CSwitch from '@/Components/Custom/CSwitch'
 import { LEFT_FLAG } from '@/Variable/countryVariable'
 import classes from './Overview.module.scss'
 import TalkRoomCard from '@/Components/TalkRoom/TalkRoomCard/TalkRoomCard'
+import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
 import ModalTalkRoomWelcome from '@/Components/Modal/ModalTalkRoomWelcome'
 import LiveIcon from '@/svg/Talkroom/LiveIcon'
 import ModalTalkRoomSoundQuality from '@/Components/Modal/ModalTalkRoomSoundQuality'
@@ -100,6 +101,9 @@ const Overview = () => {
 	const [createTalkRoomModal, setCreateTalkRoomModal] = useState<{
 		open: boolean
 	}>({ open: false })
+	const [talkRoomRuleModal, setTalkRoomRuleModal] = useState<{
+		open: boolean
+	}>({ open: false })
 
 	const handleOpenTalkRoomJoinModal = (roomId: string) => {
 		setTalkRoomJoinModal({ open: true, roomId })
@@ -126,9 +130,19 @@ const Overview = () => {
 		setCreateTalkRoomModal({ open: false })
 	}
 
+	const handleConfirmTalkRoomWelcome = () => {
+		setTalkRoomJoinModal((prev) => ({ ...prev, open: false }))
+		setTalkRoomRuleModal({ open: true })
+	}
+
+	const handleCloseTalkRoomRuleModal = () => {
+		setTalkRoomRuleModal({ open: false })
+	}
+
 	const handleConfirmTalkRoomJoin = () => {
 		const { roomId } = talkRoomJoinModal
 		setTalkRoomJoinModal({ open: false })
+		setTalkRoomRuleModal({ open: false })
 		if (roomId) {
 			onChangeRoute(`${mainRoutes.talkroom}?id=${roomId}`)
 		}
@@ -696,8 +710,15 @@ const Overview = () => {
 			<ModalTalkRoomWelcome
 				open={talkRoomJoinModal.open}
 				onClose={handleCloseTalkRoomJoinModal}
-				onConfirm={handleConfirmTalkRoomJoin}
+				onConfirm={handleConfirmTalkRoomWelcome}
 			/>
+			{talkRoomRuleModal.open && (
+				<ModalNotiChatRoom
+					open
+					onClose={handleCloseTalkRoomRuleModal}
+					onSubmit={handleConfirmTalkRoomJoin}
+				/>
+			)}
 			<ModalTalkRoomSoundQuality
 				open={modalSoundQuality.open}
 				onClose={handleCloseModalSoundQuality}

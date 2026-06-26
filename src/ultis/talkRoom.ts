@@ -34,6 +34,7 @@ export const getSpeakerAvatar = (speaker?: TalkRoomSpeaker) => speaker?.avatar
 const getSpeakersForDisplay = (room?: TalkRoomRoom) => {
 	const speakers = room?.speakers ?? []
 	if (speakers.length > 0) return speakers
+	if (isTalkRoomLive(room?.status)) return []
 	if (room?.created_by_user) return [room.created_by_user]
 	return []
 }
