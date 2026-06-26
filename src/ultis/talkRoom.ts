@@ -63,7 +63,7 @@ export const formatTalkRoomSchedule = (date?: string | null) => {
 	if (!date) return ''
 	const d = dayjs(date)
 	if (!d.isValid()) return ''
-	return `${d.format('hh:mmA')} ${d.format('MM/DD')}`
+	return `${d.format('hh:mmA')} ${d.format('DD/MM')}`
 }
 
 export const isTalkRoomLive = (status?: string) => status === 'live'
