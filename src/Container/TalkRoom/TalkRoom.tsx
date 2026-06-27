@@ -5,6 +5,7 @@ import { Flex, Skeleton } from 'antd'
 import { useState } from 'react'
 
 import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
+import ModalEditTalkRoom from '@/Components/Modal/ModalEditTalkRoom'
 import RoomCard from '@/Components/TalkRoom/RoomCard'
 import TalkRoomFilterBar from '@/Components/TalkRoom/TalkRoomFilterBar'
 import TalkRoomProfileInfo from '@/Components/TalkRoom/TalkRoomProfileInfo/TalkRoomProfileInfo'
@@ -13,12 +14,14 @@ import useTalkRoom from '@/hooks/TalkRoom/useTalkRoom'
 import useProfile from '@/hooks/Profile/useProfile'
 import { mainRoutes } from '@/routes/MainRoutes'
 import BookIcon from '@/svg/BookIcon'
+import { TalkRoomRoom } from '@/ultis/talkRoom'
 import { useLocalePath } from '@/ultis/route'
 
 import classes from './TalkRoom.module.scss'
 
 function TalkRoom() {
 	const [ruleModalOpen, setRuleModalOpen] = useState(false)
+	const [editRoom, setEditRoom] = useState<TalkRoomRoom | null>(null)
 	const { onChangeRoute } = useLocalePath()
 
 	const {
@@ -34,6 +37,9 @@ function TalkRoom() {
 		onChangeSearchKeyword,
 		onChangeLanguageFilter,
 		onChangeLevelFilter,
+		onGetDetailTalkRoom,
+		onUpdateTalkRoom,
+		loadingUpdate,
 	} = useTalkRoom()
 	const { userData } = useProfile({})
 
@@ -83,7 +89,12 @@ function TalkRoom() {
 								/>
 							))
 						: displayTalkRooms.map((room) => (
-								<RoomCard key={room.id} room={room} onShare={handleShareRoom} />
+								<RoomCard
+									key={room.id}
+									room={room}
+									onShare={handleShareRoom}
+									onEditRoom={setEditRoom}
+								/>
 							))}
 				</Flex>
 			</div>
@@ -111,6 +122,18 @@ function TalkRoom() {
 				</div>
 				<div className={classes.rightContent}></div>
 			</Flex>
+
+			{editRoom?.id && (
+				<ModalEditTalkRoom
+					open
+					roomId={editRoom.id}
+					onGetDetailTalkRoom={onGetDetailTalkRoom}
+					onUpdateTalkRoom={onUpdateTalkRoom}
+					loadingUpdate={loadingUpdate}
+					onClose={() => setEditRoom(null)}
+					onSuccess={() => setEditRoom(null)}
+				/>
+			)}
 
 			{ruleModalOpen && (
 				<ModalNotiChatRoom

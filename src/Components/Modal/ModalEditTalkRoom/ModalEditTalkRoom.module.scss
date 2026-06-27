@@ -1,0 +1,146 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-height: calc(90vh - 32px);
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-shrink: 0;
+	padding: 16px 24px 8px;
+	border-bottom: 1px solid #d9d9d9;
+}
+
+.title {
+	margin: 0;
+	color: rgba(0, 0, 0, 0.88);
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 28px;
+}
+
+.closeBtn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: none;
+	background: none;
+	color: rgba(0, 0, 0, 0.45);
+	cursor: pointer;
+
+	&:hover {
+		color: rgba(0, 0, 0, 0.88);
+	}
+}
+
+.body {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	padding: 16px;
+}
+
+.description {
+	margin: 0 0 16px;
+	color: #48546b;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+}
+
+.hint {
+	margin: 0 0 16px;
+	color: #e55a0f;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.footer {
+	display: flex;
+	flex-shrink: 0;
+	align-items: stretch;
+	gap: 8px;
+	padding: 16px;
+	background: #fff;
+}
+
+.cancelBtn,
+.saveBtn {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 48px;
+	height: 48px;
+	padding: 12px 16px;
+	border-radius: 999px;
+	border: none;
+	box-shadow: none;
+	cursor: pointer;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	font-family: inherit;
+	transition: none;
+
+	&:disabled {
+		cursor: not-allowed;
+	}
+}
+
+.cancelBtn {
+	color: #cd3031;
+	background: #f0f3f9;
+
+	&:hover:not(:disabled),
+	&:focus-visible:not(:disabled) {
+		color: #cd3031;
+		background: #f0f3f9;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+	}
+}
+
+.saveBtn {
+	color: #fff;
+	background: #e55a0f;
+
+	&:hover:not(:disabled),
+	&:focus-visible:not(:disabled) {
+		color: #fff;
+		background: #e55a0f;
+	}
+}
+
+.saveBtnDisabled,
+.saveBtn:disabled {
+	color: rgba(0, 0, 0, 0.25);
+	background: #eef3f6;
+}
+
+.saveSpinner {
+	:global(.ant-spin-dot-item) {
+		background-color: #fff;
+	}
+}
+
+.saveBtnDisabled .saveSpinner,
+.saveBtn:disabled .saveSpinner {
+	:global(.ant-spin-dot-item) {
+		background-color: rgba(0, 0, 0, 0.25);
+	}
+}

@@ -2,14 +2,17 @@ import {
 	buildTalkRoomListWhere,
 	createTalkRoom,
 	CreateTalkRoomInput,
+	getDetailTalkRoom,
 	getListTalkRoom,
 	getMyTalkRoomAnalysis,
 	getTalkRoomCategories,
 	getTalkRoomLanguages,
 	TalkRoomCategoryItem,
+	TalkRoomDetail,
 	TalkRoomLanguageItem,
 	TalkRoomListFilters,
 	TalkRoomListItem,
+	updateTalkRoom,
 } from '@/apis/talkRoomApis'
 import { useModal } from '@/context/ModalContext'
 import { PaginationType } from '@/interface/common/common.interface'
@@ -25,6 +28,7 @@ export default function useTalkRoom() {
 	const { openError, openSuccess } = useModal()
 	const [loading, setLoading] = useState(false)
 	const [loadingCreate, setLoadingCreate] = useState(false)
+	const [loadingUpdate, setLoadingUpdate] = useState(false)
 	const [loadingLanguages, setLoadingLanguages] = useState(false)
 	const [loadingCategories, setLoadingCategories] = useState(false)
 	const [myTalkRoomAnalysis, setMyTalkRoomAnalysis] = useState<any>(null)
@@ -36,6 +40,10 @@ export default function useTalkRoom() {
 	const [listTalkRoomFilters, setListTalkRoomFilters] =
 		useState<TalkRoomListFilters>({})
 	const [searchKeyword, setSearchKeyword] = useState('')
+	const [talkRoomDetail, setTalkRoomDetail] = useState<TalkRoomDetail | null>(
+		null,
+	)
+	const [loadingTalkRoomDetail, setLoadingTalkRoomDetail] = useState(false)
 
 	const _listTalkRoomPaginationRef = useRef<PaginationType>(
 		cloneDeep({ ...paginationCommon, limit: 30 }),
@@ -87,6 +95,34 @@ export default function useTalkRoom() {
 			} finally {
 				setLoadingListTalkRooms(false)
 			}
+		},
+		[openError],
+	)
+
+	const handleGetDetailTalkRoom = useCallback(
+		async (
+			id: string,
+			params: { [key: string]: any } = { fields: ['$all'] },
+		) => {
+			if (!id) return null
+
+			setLoadingTalkRoomDetail(true)
+			try {
+				const res: any = await getDetailTalkRoom({ id, params })
+				const { code, results } = res || {}
+
+				if (code === 200) {
+					const room: TalkRoomDetail = results?.object ?? null
+					setTalkRoomDetail(room)
+					return room
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingTalkRoomDetail(false)
+			}
+
+			return null
 		},
 		[openError],
 	)
@@ -224,6 +260,48 @@ export default function useTalkRoom() {
 		}
 	}, [openError])
 
+	const handleUpdateTalkRoom = useCallback(
+		async (id: string, input: { name: string }) => {
+			if (!id || !input.name.trim()) return null
+
+			setLoadingUpdate(true)
+			try {
+				const res: any = await updateTalkRoom({
+					id,
+					payload: {
+						name: input.name.trim(),
+					},
+				})
+				const { code, results } = res || {}
+
+				if (code === 200) {
+					const updated: TalkRoomListItem = results?.object
+					const nextName = updated?.name ?? input.name.trim()
+
+					setListTalkRooms((prev) =>
+						prev.map((item) =>
+							item.id === id ? { ...item, ...updated, name: nextName } : item,
+						),
+					)
+					setTalkRoomDetail((prev) =>
+						prev?.id === id
+							? { ...prev, ...updated, name: nextName }
+							: prev,
+					)
+					openSuccess({ message: 'Update talk room successfully' })
+					return updated ?? { id, name: nextName }
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingUpdate(false)
+			}
+
+			return null
+		},
+		[openError, openSuccess],
+	)
+
 	const handleCreateTalkRoom = useCallback(
 		async (input: CreateTalkRoomInput) => {
 			setLoadingCreate(true)
@@ -266,14 +344,17 @@ export default function useTalkRoom() {
 	return {
 		loading,
 		loadingCreate,
+		loadingUpdate,
 		loadingLanguages,
 		loadingCategories,
 		loadingListTalkRooms,
+		loadingTalkRoomDetail,
 		myTalkRoomAnalysis,
 		languages,
 		categories,
 		listTalkRooms,
 		displayTalkRooms,
+		talkRoomDetail,
 		totalTalkRooms,
 		listTalkRoomFilters,
 		searchKeyword,
@@ -285,11 +366,13 @@ export default function useTalkRoom() {
 		onGetCategories: handleGetCategories,
 		onGetMyTalkRoomAnalysis: handleGetMyTalkRoomAnalysis,
 		onGetListTalkRoom: handleGetListTalkRoom,
+		onGetDetailTalkRoom: handleGetDetailTalkRoom,
 		onChangeListTalkRoomFilters: handleChangeListTalkRoomFilters,
 		onChangeLanguageFilter: handleChangeLanguageFilter,
 		onChangeLevelFilter: handleChangeLevelFilter,
 		onChangeSearchKeyword: handleChangeSearchKeyword,
 		onLoadMoreListTalkRooms: handleLoadMoreListTalkRooms,
 		onCreateTalkRoom: handleCreateTalkRoom,
+		onUpdateTalkRoom: handleUpdateTalkRoom,
 	}
 }

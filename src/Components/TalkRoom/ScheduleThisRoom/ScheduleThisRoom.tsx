@@ -24,6 +24,7 @@ export type ScheduleDayState = {
 export type ScheduleThisRoomProps = {
 	enabled: boolean
 	loading?: boolean
+	readOnly?: boolean
 	dayOptions: ScheduleDayOption[]
 	bookingSlotsByDay: Record<string, BookingSlotsData>
 	scheduleByDay: Record<string, ScheduleDayState>
@@ -35,6 +36,7 @@ export type ScheduleThisRoomProps = {
 function ScheduleThisRoom({
 	enabled,
 	loading,
+	readOnly = false,
 	dayOptions,
 	bookingSlotsByDay,
 	scheduleByDay,
@@ -42,8 +44,14 @@ function ScheduleThisRoom({
 	onToggleDay,
 	onChangeFromTime,
 }: ScheduleThisRoomProps) {
+	const showDateList = enabled || readOnly
+
 	return (
-		<div className={classes.scheduleSection}>
+		<div
+			className={clsx(classes.scheduleSection, {
+				[classes.readOnly]: readOnly,
+			})}
+		>
 			<div className={classes.divider} />
 
 			<div className={classes.scheduleHeader}>
@@ -54,11 +62,12 @@ function ScheduleThisRoom({
 				<CSwitch
 					ctype="success"
 					checked={enabled}
+					disabled={readOnly}
 					onChange={(checked) => onToggleEnabled(checked)}
 				/>
 			</div>
 
-			{enabled && (
+			{showDateList && (
 				<div className={classes.dateList}>
 					{dayOptions.map((day) => {
 						const slots = bookingSlotsByDay[day.key]
@@ -66,8 +75,10 @@ function ScheduleThisRoom({
 							checked: false,
 							fromTime: null,
 						}
-						const isFull = slots?.isFull ?? false
-						const isActive = state.checked && !isFull
+						const isFull = readOnly ? false : (slots?.isFull ?? false)
+						const isActive = readOnly
+							? state.checked
+							: state.checked && !isFull
 						const fromTimeValue = isActive ? state.fromTime : null
 						const toTimeValue =
 							isActive && state.fromTime
@@ -83,7 +94,7 @@ function ScheduleThisRoom({
 											className={clsx(classes.checkbox, {
 												[classes.checkboxChecked]: isActive,
 											})}
-											disabled={isFull || loading}
+											disabled={readOnly || isFull || loading}
 											onClick={() => onToggleDay(day.key)}
 										>
 											{isActive && (
@@ -94,7 +105,10 @@ function ScheduleThisRoom({
 									<div className={classes.dateTexts}>
 										<span className={classes.dateLabel}>{day.label}</span>
 										<span className={classes.dateHint}>
-											{slots?.availabilityText ?? (loading ? 'Loading...' : '')}
+											{readOnly && isActive
+												? 'Scheduled'
+												: slots?.availabilityText ??
+													(loading ? 'Loading...' : '')}
 										</span>
 									</div>
 								</div>
@@ -104,7 +118,7 @@ function ScheduleThisRoom({
 										<span className={classes.timeLabel}>From:</span>
 										<CScheduleTimePicker
 											value={fromTimeValue}
-											disabled={!isActive || loading}
+											disabled={readOnly || !isActive || loading}
 											onChange={(value) => onChangeFromTime(day.key, value)}
 										/>
 									</div>
@@ -114,7 +128,7 @@ function ScheduleThisRoom({
 										<CScheduleTimePicker
 											value={toTimeValue}
 											readOnly
-											disabled={!isActive}
+											disabled={readOnly || !isActive}
 										/>
 									</div>
 								</div>

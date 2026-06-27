@@ -255,3 +255,63 @@ export const getListMyFriendTalkRoom = async ({
 		params: convertParams(params || {}),
 	})
 }
+
+export type UpdateTalkRoomPayload = {
+	name: string
+	categories?: CreateTalkRoomCategory[]
+}
+
+export const updateTalkRoom = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: UpdateTalkRoomPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}`
+
+	return await axios.put(url, payload)
+}
+
+export type TalkRoomDetail = TalkRoomListItem & {
+	schedule_at?: string | null
+	started_at?: string | null
+	host_joined?: boolean
+	host_user?: {
+		id?: string
+		name?: string
+		avatar?: string
+		i_am_from?: string
+	}
+	schedules?: {
+		id?: string
+		schedule_at?: string
+		enabled?: boolean
+		status?: string
+		index?: number
+		estimated_end_at?: string | null
+		ended_at?: string | null
+		conversation_id?: string | null
+	}[]
+	categories?: {
+		slug?: string
+		category_details?: {
+			slug?: string
+			name?: string
+		}
+	}[]
+}
+
+export const getDetailTalkRoom = async ({
+	id,
+	params = { fields: ['$all'] },
+}: {
+	id: string
+	params?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/details`
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}

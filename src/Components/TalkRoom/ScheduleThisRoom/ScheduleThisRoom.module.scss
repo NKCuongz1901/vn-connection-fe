@@ -139,3 +139,13 @@
 	line-height: 20px;
 	white-space: nowrap;
 }
+
+.readOnly {
+	.scheduleTitle,
+	.scheduleSubtitle,
+	.dateLabel,
+	.dateHint,
+	.timeLabel {
+		color: #94a3b8;
+	}
+}

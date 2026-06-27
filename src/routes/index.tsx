@@ -157,6 +157,7 @@ export const TALKROOM_ROUTES = {
 	checkCanCreateTalkRoom: 'validation/can-create-room',
 	getListTalkRoom: 'talkroom',
 	getListMyFriendTalkRoom: 'talkroom/friend-rooms',
+	getTalkRoomDetail: 'talkroom',
 }
 export const Menus = [
 	{
