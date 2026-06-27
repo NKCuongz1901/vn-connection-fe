@@ -5,14 +5,14 @@ import clsx from 'clsx'
 import classes from './RoomCard.module.scss'
 
 import TalkRoomAvatarGroup from '@/Components/TalkRoom/TalkRoomAvatarGroup/TalkRoomAvatarGroup'
+import RoomCardHostActions from '@/Components/TalkRoom/RoomCardHostActions'
 
-import { IconCircleMinus, IconCrown, IconDots } from '@tabler/icons-react'
+import { IconCrown } from '@tabler/icons-react'
 import CalenderIcon from '@/svg/CalenderIcon'
 import People from '@/svg/People'
 import ShareIconSvg from '@/svg/ShareIconSvg'
 import StarIcon2 from '@/svg/StarIcon2'
 import BellIcon from '@/svg/BellIcon'
-import MoreIcon from '@/svg/MoreIcon'
 import HostIcon from '@/svg/HostIcon'
 
 import HeadPhoneIcon from '@/svg/Talkroom/HeadPhoneIcon'
@@ -39,7 +39,8 @@ export type RoomCardProps = {
 	onNotifyMe?: (room: TalkRoomRoom) => void
 	onJoin?: (room: TalkRoomRoom) => void
 	onStart?: (room: TalkRoomRoom) => void
-	onMore?: (room: TalkRoomRoom) => void
+	onEditRoom?: (room: TalkRoomRoom) => void
+	onCancelRoom?: (room: TalkRoomRoom) => void
 	onClick?: (room: TalkRoomRoom) => void
 }
 
@@ -51,7 +52,8 @@ function RoomCard({
 	onNotifyMe,
 	onJoin,
 	onStart,
-	onMore,
+	onEditRoom,
+	onCancelRoom,
 	onClick,
 }: RoomCardProps) {
 	const isLive = isTalkRoomLive(room?.status)
@@ -106,11 +108,6 @@ function RoomCard({
 	const handleStart = (event: React.MouseEvent) => {
 		event.stopPropagation()
 		onStart?.(room)
-	}
-
-	const handleMore = (event: React.MouseEvent) => {
-		event.stopPropagation()
-		onMore?.(room)
 	}
 
 	return (
@@ -201,14 +198,11 @@ function RoomCard({
 									<IconCrown size={16} stroke={2} color="#E55A0F" />
 									<span>You&apos;re host</span>
 								</div>
-								<button
-									type="button"
-									className={classes.moreBtn}
-									aria-label="More actions"
-									onClick={handleMore}
-								>
-									<IconDots size={16} color="#0F1729" />
-								</button>
+								<RoomCardHostActions
+									room={room}
+									onEditRoom={onEditRoom}
+									onCancelRoom={onCancelRoom}
+								/>
 							</div>
 						) : (
 							<button
@@ -333,14 +327,11 @@ function RoomCard({
 											<HostIcon fill="#E55A0F" width={16} height={16} />
 											<span>You&apos;re host</span>
 										</div>
-										<button
-											type="button"
-											className={classes.moreBtn}
-											aria-label="More actions"
-											onClick={handleMore}
-										>
-											<MoreIcon fill="#0F1729" width={16} height={16} />
-										</button>
+										<RoomCardHostActions
+											room={room}
+											onEditRoom={onEditRoom}
+											onCancelRoom={onCancelRoom}
+										/>
 									</div>
 								) : (
 									<button
