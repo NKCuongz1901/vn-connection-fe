@@ -15,14 +15,18 @@ import BellIcon from '@/svg/BellIcon'
 import MoreIcon from '@/svg/MoreIcon'
 import HostIcon from '@/svg/HostIcon'
 
+import HeadPhoneIcon from '@/svg/Talkroom/HeadPhoneIcon'
+
 import {
 	formatTalkRoomCategoriesText,
 	formatTalkRoomCmiText,
 	formatTalkRoomLevelLabel,
 	formatTalkRoomLiveParticipantsText,
+	formatTalkRoomWaitingCount,
 	getTalkRoomStartTimeDisplay,
 	isTalkRoomHostCanStart,
 	isTalkRoomLive,
+	isTalkRoomWaitingForHost,
 	TalkRoomRoom,
 } from '@/ultis/talkRoom'
 import MinusCircleFill from '@/svg/Talkroom/MinusCircleFill'
@@ -56,13 +60,23 @@ function RoomCard({
 	const cmiText = formatTalkRoomCmiText(room?.cmi_users, room?.total_cmi)
 	const liveParticipantsText = formatTalkRoomLiveParticipantsText(room)
 	const scheduleText = getTalkRoomStartTimeDisplay(room)
+	const waitingCount = formatTalkRoomWaitingCount(room)
 	const showHostStartFooter = isTalkRoomHostCanStart(room)
-	const showLiveFooter = isLive && !showHostStartFooter
+	const showGuestWaitingFooter = isTalkRoomWaitingForHost(room)
+	const showLiveFooter =
+		isLive && !showHostStartFooter && !showGuestWaitingFooter
 	const hasCmi = (room?.total_cmi ?? 0) > 0 && !!cmiText
 	const showCmiSection =
-		!showLiveFooter && !isLive && (hasCmi || !isYourRoom) && !showHostStartFooter
+		!showLiveFooter &&
+		!showHostStartFooter &&
+		!showGuestWaitingFooter &&
+		!isLive &&
+		(hasCmi || !isYourRoom)
 	const showScheduleSection =
-		!!scheduleText && (!isLive || showHostStartFooter)
+		!!scheduleText &&
+		!isLive &&
+		!showHostStartFooter &&
+		!showGuestWaitingFooter
 
 	const handleShare = (event: React.MouseEvent) => {
 		event.stopPropagation()
@@ -206,6 +220,49 @@ function RoomCard({
 							</button>
 						)}
 					</div>
+				) : showHostStartFooter ? (
+					<div className={classes.footerRow}>
+						<div className={classes.scheduleGroup}>
+							<CalenderIcon fill="#006B35" width={20} height={20} />
+							<span className={classes.scheduleLabel}>Start at</span>
+							<span className={classes.scheduleTime}>{scheduleText}</span>
+						</div>
+						<button
+							type="button"
+							className={clsx(classes.actionBtn, classes.actionBtnStart)}
+							onClick={handleStart}
+						>
+							Start
+						</button>
+					</div>
+				) : showGuestWaitingFooter ? (
+					<div className={classes.footerRow}>
+						<div className={classes.waitingContent}>
+							<div className={classes.scheduleRow}>
+								<div className={classes.scheduleMeta}>
+									<CalenderIcon fill="#006B35" width={20} height={20} />
+									<span className={classes.scheduleLabel}>Start at</span>
+								</div>
+								<span className={classes.scheduleTime}>{scheduleText}</span>
+							</div>
+							<div className={classes.waitingRow}>
+								<div className={classes.waitingMeta}>
+									<span className={classes.waitingIcon}>
+										<HeadPhoneIcon fill="#006B35" />
+									</span>
+									<span className={classes.metaHighlight}>{waitingCount}</span>
+								</div>
+								<span className={classes.waitingText}>people are waiting</span>
+							</div>
+						</div>
+						<button
+							type="button"
+							className={clsx(classes.actionBtn, classes.actionBtnStart)}
+							onClick={handleJoin}
+						>
+							Join now
+						</button>
+					</div>
 				) : (
 					<>
 						{showCmiSection && (
@@ -256,7 +313,7 @@ function RoomCard({
 							<div className={classes.footerRow}>
 								<div className={classes.scheduleGroup}>
 									<CalenderIcon fill="#006B35" width={20} height={20} />
-									{isYourRoom && !showHostStartFooter ? (
+									{isYourRoom ? (
 										<span className={classes.scheduleLabel}>
 											Start at: {scheduleText}
 										</span>
@@ -270,18 +327,7 @@ function RoomCard({
 									)}
 								</div>
 
-								{showHostStartFooter ? (
-									<button
-										type="button"
-										className={clsx(
-											classes.actionBtn,
-											classes.actionBtnStart,
-										)}
-										onClick={handleStart}
-									>
-										Start
-									</button>
-								) : isYourRoom ? (
+								{isYourRoom ? (
 									<div className={classes.hostActions}>
 										<div className={classes.hostBadge}>
 											<HostIcon fill="#E55A0F" width={16} height={16} />

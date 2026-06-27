@@ -110,6 +110,20 @@ export const isTalkRoomHostCanStart = (room?: TalkRoomRoom) => {
 	)
 }
 
+export const isTalkRoomWaitingForHost = (room?: TalkRoomRoom) => {
+	return (
+		room?.is_your_room !== true &&
+		isTalkRoomStartTimeReached(room?.started_at) &&
+		room?.host_joined === false
+	)
+}
+
+export const formatTalkRoomWaitingCount = (room?: TalkRoomRoom) => {
+	const total = room?.total_participants ?? 0
+	const max = room?.max_participants ?? 0
+	return `${total}/${max}`
+}
+
 export const getTalkRoomStartTimeDisplay = (room?: TalkRoomRoom) => {
 	return formatTalkRoomSchedule(room?.started_at ?? room?.next_schedule_at)
 }

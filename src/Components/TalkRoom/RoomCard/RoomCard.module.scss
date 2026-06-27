@@ -171,6 +171,56 @@
 	white-space: nowrap;
 }
 
+.waitingContent {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.scheduleRow,
+.waitingRow {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+}
+
+.waitingRow {
+	gap: 4px;
+}
+
+.scheduleMeta,
+.waitingMeta {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	flex-shrink: 0;
+}
+
+.waitingIcon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	flex-shrink: 0;
+
+	svg {
+		width: 20px;
+		height: 20px;
+	}
+}
+
+.waitingText {
+	color: #0f1729;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+	white-space: nowrap;
+}
+
 .actionBtn {
 	display: inline-flex;
 	align-items: center;
