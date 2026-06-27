@@ -35,6 +35,8 @@ export type TalkRoomRoom = {
 	total_participants?: number
 	max_participants?: number
 	next_schedule_at?: string | null
+	started_at?: string | null
+	host_joined?: boolean
 	language?: TalkRoomLanguage
 	level?: string[]
 	categories?: TalkRoomCategory[]
@@ -92,6 +94,25 @@ export const formatTalkRoomSchedule = (date?: string | null) => {
 }
 
 export const isTalkRoomLive = (status?: string) => status === 'live'
+
+export const isTalkRoomStartTimeReached = (startedAt?: string | null) => {
+	if (!startedAt) return false
+	const started = dayjs(startedAt)
+	if (!started.isValid()) return false
+	return !dayjs().isBefore(started)
+}
+
+export const isTalkRoomHostCanStart = (room?: TalkRoomRoom) => {
+	return (
+		room?.is_your_room === true &&
+		isTalkRoomStartTimeReached(room?.started_at) &&
+		room?.host_joined === false
+	)
+}
+
+export const getTalkRoomStartTimeDisplay = (room?: TalkRoomRoom) => {
+	return formatTalkRoomSchedule(room?.started_at ?? room?.next_schedule_at)
+}
 
 export const formatTalkRoomLevelLabel = (level?: string) => {
 	if (!level) return ''

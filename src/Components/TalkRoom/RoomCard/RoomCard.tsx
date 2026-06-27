@@ -20,7 +20,8 @@ import {
 	formatTalkRoomCmiText,
 	formatTalkRoomLevelLabel,
 	formatTalkRoomLiveParticipantsText,
-	formatTalkRoomSchedule,
+	getTalkRoomStartTimeDisplay,
+	isTalkRoomHostCanStart,
 	isTalkRoomLive,
 	TalkRoomRoom,
 } from '@/ultis/talkRoom'
@@ -33,6 +34,7 @@ export type RoomCardProps = {
 	onNotJoining?: (room: TalkRoomRoom) => void
 	onNotifyMe?: (room: TalkRoomRoom) => void
 	onJoin?: (room: TalkRoomRoom) => void
+	onStart?: (room: TalkRoomRoom) => void
 	onMore?: (room: TalkRoomRoom) => void
 	onClick?: (room: TalkRoomRoom) => void
 }
@@ -44,6 +46,7 @@ function RoomCard({
 	onNotJoining,
 	onNotifyMe,
 	onJoin,
+	onStart,
 	onMore,
 	onClick,
 }: RoomCardProps) {
@@ -52,10 +55,14 @@ function RoomCard({
 	const topic = formatTalkRoomCategoriesText(room?.categories)
 	const cmiText = formatTalkRoomCmiText(room?.cmi_users, room?.total_cmi)
 	const liveParticipantsText = formatTalkRoomLiveParticipantsText(room)
-	const scheduleText = formatTalkRoomSchedule(room?.next_schedule_at)
+	const scheduleText = getTalkRoomStartTimeDisplay(room)
+	const showHostStartFooter = isTalkRoomHostCanStart(room)
+	const showLiveFooter = isLive && !showHostStartFooter
 	const hasCmi = (room?.total_cmi ?? 0) > 0 && !!cmiText
-	const showCmiSection = !isLive && (hasCmi || !isYourRoom)
-	const showScheduleSection = !isLive && !!scheduleText
+	const showCmiSection =
+		!showLiveFooter && !isLive && (hasCmi || !isYourRoom) && !showHostStartFooter
+	const showScheduleSection =
+		!!scheduleText && (!isLive || showHostStartFooter)
 
 	const handleShare = (event: React.MouseEvent) => {
 		event.stopPropagation()
@@ -80,6 +87,11 @@ function RoomCard({
 	const handleJoin = (event: React.MouseEvent) => {
 		event.stopPropagation()
 		onJoin?.(room)
+	}
+
+	const handleStart = (event: React.MouseEvent) => {
+		event.stopPropagation()
+		onStart?.(room)
 	}
 
 	const handleMore = (event: React.MouseEvent) => {
@@ -143,7 +155,7 @@ function RoomCard({
 			<div className={classes.divider} />
 
 			<div className={classes.footer}>
-				{isLive ? (
+				{showLiveFooter ? (
 					<div className={classes.footerRow}>
 						<div className={classes.metaGroup}>
 							<People fill="#006B35" width={20} height={20} />
@@ -244,7 +256,7 @@ function RoomCard({
 							<div className={classes.footerRow}>
 								<div className={classes.scheduleGroup}>
 									<CalenderIcon fill="#006B35" width={20} height={20} />
-									{isYourRoom ? (
+									{isYourRoom && !showHostStartFooter ? (
 										<span className={classes.scheduleLabel}>
 											Start at: {scheduleText}
 										</span>
@@ -258,7 +270,18 @@ function RoomCard({
 									)}
 								</div>
 
-								{isYourRoom ? (
+								{showHostStartFooter ? (
+									<button
+										type="button"
+										className={clsx(
+											classes.actionBtn,
+											classes.actionBtnStart,
+										)}
+										onClick={handleStart}
+									>
+										Start
+									</button>
+								) : isYourRoom ? (
 									<div className={classes.hostActions}>
 										<div className={classes.hostBadge}>
 											<HostIcon fill="#E55A0F" width={16} height={16} />
