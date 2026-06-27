@@ -1,0 +1,91 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.iconSection {
+	display: flex;
+	align-items: flex-start;
+	padding: 24px 16px 0;
+}
+
+.icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 40px;
+	height: 40px;
+	color: #cd3031;
+}
+
+.info {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 24px 16px;
+}
+
+.title {
+	margin: 0;
+	color: #0f1729;
+	font-size: 20px;
+	font-weight: 600;
+	line-height: 28px;
+}
+
+.description {
+	margin: 0;
+	color: #0f1729;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+}
+
+.footer {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 0 16px 16px;
+	background: #fff;
+}
+
+.confirmBtn,
+.dismissBtn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	min-height: 48px;
+	padding: 12px 16px;
+	border: none;
+	border-radius: 999px;
+	cursor: pointer;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	font-family: inherit;
+}
+
+.confirmBtn {
+	color: #fff;
+	background: #cd3031;
+
+	&:hover,
+	&:focus-visible {
+		color: #fff;
+		background: #cd3031;
+	}
+}
+
+.dismissBtn {
+	color: #0f1729;
+	background: transparent;
+
+	&:hover,
+	&:focus-visible {
+		color: #0f1729;
+		background: transparent;
+	}
+}

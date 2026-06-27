@@ -5,6 +5,7 @@ import { Flex, Skeleton } from 'antd'
 import { useState } from 'react'
 
 import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
+import ModalCancelTalkRoom from '@/Components/Modal/ModalCancelTalkRoom'
 import ModalEditTalkRoom from '@/Components/Modal/ModalEditTalkRoom'
 import RoomCard from '@/Components/TalkRoom/RoomCard'
 import TalkRoomFilterBar from '@/Components/TalkRoom/TalkRoomFilterBar'
@@ -22,6 +23,7 @@ import classes from './TalkRoom.module.scss'
 function TalkRoom() {
 	const [ruleModalOpen, setRuleModalOpen] = useState(false)
 	const [editRoom, setEditRoom] = useState<TalkRoomRoom | null>(null)
+	const [cancelRoom, setCancelRoom] = useState<TalkRoomRoom | null>(null)
 	const { onChangeRoute } = useLocalePath()
 
 	const {
@@ -94,6 +96,7 @@ function TalkRoom() {
 									room={room}
 									onShare={handleShareRoom}
 									onEditRoom={setEditRoom}
+									onCancelRoom={setCancelRoom}
 								/>
 							))}
 				</Flex>
@@ -132,6 +135,14 @@ function TalkRoom() {
 					loadingUpdate={loadingUpdate}
 					onClose={() => setEditRoom(null)}
 					onSuccess={() => setEditRoom(null)}
+				/>
+			)}
+
+			{cancelRoom?.id && (
+				<ModalCancelTalkRoom
+					open
+					onClose={() => setCancelRoom(null)}
+					onConfirm={() => setCancelRoom(null)}
 				/>
 			)}
 
