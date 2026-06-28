@@ -21,4 +21,5 @@ export const appLayoutAuth = [
 export const appLayoutPublic = [
 	mainRoutes.publicEvent,
 	mainRoutes.publicDiscussion,
+	mainRoutes.publicCommunity,
 ]

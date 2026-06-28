@@ -54,9 +54,11 @@ const icons = {
 
 interface DetailCommunityProps {
 	id: string
+	isPublic?: boolean
+	onRequireLogin?: () => void
 }
 const DetailCommunity = (props: DetailCommunityProps) => {
-	const { id } = props
+	const { id, isPublic, onRequireLogin } = props
 	const {
 		discussionRef,
 		memberRef,
@@ -86,7 +88,15 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		onGetMenus,
 		onBack,
 		onJoinConv,
-	} = useDetailCommunity(props)
+	} = useDetailCommunity({ id, isPublic, onRequireLogin })
+
+	const handleTabTopClick = (value: string) => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
+		setTabTop(value)
+	}
 
 	const _renderAction = () => {
 		return (
@@ -107,7 +117,9 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 			convInfo || {}
 		const { type: typeJoin } = join || {}
 
-		const isCreateAnnou = getUserInfo('id') === host_id || typeJoin === 'ADMIN'
+		const isCreateAnnou =
+			!isPublic &&
+			(getUserInfo('id') === host_id || typeJoin === 'ADMIN')
 
 		return (
 			<Flex className={classes.infoWrapper}>
@@ -136,7 +148,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 							>
 								<span>Invite friends</span>
 							</CButton>
-							{!join && (
+							{(!join || isPublic) && (
 								<CButton
 									disabled={!!loadingApi.join}
 									ctype="oranger"
@@ -170,7 +182,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 							>
 								<span>Invite friends</span>
 							</CButton>
-							{!join && (
+							{(!join || isPublic) && (
 								<CButton
 									disabled={!!loadingApi.join}
 									ctype="oranger"
@@ -198,7 +210,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 							className={clsx(classes.tab, {
 								[classes.tabActive]: value === tabTop,
 							})}
-							onClick={() => setTabTop(value)}
+							onClick={() => handleTabTopClick(value)}
 						>
 							<Flex className={classes.tabIcon}>
 								<Icon />
@@ -271,6 +283,8 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 					announceList={annouList || []}
 					onGetMenus={onGetMenus}
 					onAction={onAction}
+					isPublic={isPublic}
+					onRequireLogin={onRequireLogin}
 				/>
 			</div>
 		)
@@ -297,7 +311,12 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 					[classes.followAboutHidden]: tabMiddle !== mappingAboutTabsBtn.about,
 				})}
 			>
-				<DetailCommunityAdmin id={id} />
+				<DetailCommunityAdmin
+					id={id}
+					admins={convInfo?.admins}
+					isPublic={isPublic}
+					onRequireLogin={onRequireLogin}
+				/>
 				<Flex className={classes.category} vertical>
 					<div className={classes.title}>Category</div>
 					<div className={classes.categoryInfo}>{category}</div>
@@ -322,6 +341,8 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		)
 	}
 	const _renderModal = () => {
+		if (isPublic) return null
+
 		const { type, data, title } = modal || {}
 		let Content = <></>
 		const propsModal = {

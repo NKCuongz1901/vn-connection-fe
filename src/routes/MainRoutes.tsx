@@ -24,6 +24,7 @@ export const mainRoutes = {
 	peopleCommunity: 'people-community',
 	publicEvent: 'public-event',
 	publicDiscussion: 'public-discussion',
+	publicCommunity: 'public-community',
 	referral: 'referral',
 	referralAddBankCard: 'referral/add-bank-card',
 	referralRedeemHistory: 'referral/redeem-history',

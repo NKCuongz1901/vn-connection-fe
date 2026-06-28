@@ -189,6 +189,7 @@ export interface ConversationProps {
 		created_at: string
 		updated_at: string
 	}
+	admins?: ClubMemberProps[]
 }
 
 export interface ClubMemberProps {

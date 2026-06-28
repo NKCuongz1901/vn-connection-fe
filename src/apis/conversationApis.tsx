@@ -87,6 +87,13 @@ export const getConvInfoById = async (params: {
 		params: convertParams(_params),
 	})
 }
+
+export const getPublicConvInfoById = async (params: { id: string }) => {
+	const { id } = params || {}
+	const url = `${CONVERSATION_ROUTES.publicDetail}/${id}`
+
+	return await axios.get(url)
+}
 export const getConvMembersById = async (params: {
 	id: string
 	[key: string]: any
@@ -247,6 +254,18 @@ export const getAnnouListById = async ({
 	params?: { [key: string]: any }
 }) => {
 	const url = CONVERSATION_ROUTES.anouncement
+	const { keyword, ..._params } = params || {}
+	return await axios.get(url, {
+		params: { ...convertParams(_params), keyword },
+	})
+}
+
+export const getPublicAnnouListById = async ({
+	params = {},
+}: {
+	params?: { [key: string]: any }
+}) => {
+	const url = CONVERSATION_ROUTES.anouncementPublic
 	const { keyword, ..._params } = params || {}
 	return await axios.get(url, {
 		params: { ...convertParams(_params), keyword },

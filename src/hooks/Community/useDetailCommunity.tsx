@@ -5,6 +5,8 @@ import {
 	deleteConvById,
 	getAnnouListById,
 	getConvInfoById,
+	getPublicAnnouListById,
+	getPublicConvInfoById,
 	joinConversation,
 	leaveConversation,
 	likeAnnoun,
@@ -42,6 +44,8 @@ const mappingAboutTabsBtn = {
 
 interface useDetailCommunityProps {
 	id: string
+	isPublic?: boolean
+	onRequireLogin?: () => void
 	[key: string]: any
 }
 
@@ -50,7 +54,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	const { toggleLoadingContext } = useLoading()
 	const { onChangeRoute } = useLocalePath()
 	const { goBackOrPush } = useSafeBack()
-	const { id } = props
+	const { id, isPublic, onRequireLogin } = props
 
 	const _loadmore = useRef(true)
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
@@ -103,10 +107,12 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 			setLoadingConvInfo(true)
 		}
 		try {
-			const res: any = await getConvInfoById({
-				id: id,
-				fields: ['$all'],
-			})
+			const res: any = isPublic
+				? await getPublicConvInfoById({ id })
+				: await getConvInfoById({
+						id,
+						fields: ['$all'],
+					})
 			setConvInfo(res?.results?.object)
 		} catch (error) {
 			openError(error)
@@ -144,7 +150,9 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 				limit,
 			} as any
 
-			const res: any = await getAnnouListById({ params: payload })
+			const res: any = isPublic
+				? await getPublicAnnouListById({ params: payload })
+				: await getAnnouListById({ params: payload })
 			await delay(500)
 			const { code, results } = res || {}
 			if (code === 200) {
@@ -181,16 +189,20 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		handleScrollCallback(e, handleLoadMore)
 	}
 
-	const handleLike = async (id: string) => {
-		if (loadIds.includes(id)) return
+	const handleLike = async (annouId: string) => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
+		if (loadIds.includes(annouId)) return
 		try {
-			setLoadingIds((prev) => [...prev, id])
-			const res: any = await likeAnnoun({ id })
+			setLoadingIds((prev) => [...prev, annouId])
+			const res: any = await likeAnnoun({ id: annouId })
 			if (res) {
 				const { status } = res?.results?.object
 				setAnnouList((prev) =>
 					prev.map((item) => {
-						if (item.id === id) {
+						if (item.id === annouId) {
 							return {
 								...item,
 								is_liked: status === 'like',
@@ -206,12 +218,16 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		} catch (error) {
 			openError(error)
 		} finally {
-			setLoadingIds((prev) => prev.filter((item) => item !== id))
+			setLoadingIds((prev) => prev.filter((item) => item !== annouId))
 		}
 	}
 
-	const handleShareFriend = async (id) => {
-		setLoadingShare((prev: any) => ({ ...prev, [id]: true }))
+	const handleShareFriend = async (friendId) => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
+		setLoadingShare((prev: any) => ({ ...prev, [friendId]: true }))
 
 		try {
 			const { share_link } = modal?.data?.props || {}
@@ -226,13 +242,13 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 			const { code } = res || {}
 
 			if (code === 200) {
-				setShareList((prev: any) => ({ ...prev, [id]: true }))
+				setShareList((prev: any) => ({ ...prev, [friendId]: true }))
 				openSuccess({ message: 'Share link to your friend successfully' })
 			}
 		} catch (error) {
 			openError(error)
 		} finally {
-			setLoadingShare((prev: any) => ({ ...prev, [id]: false }))
+			setLoadingShare((prev: any) => ({ ...prev, [friendId]: false }))
 		}
 	}
 
@@ -253,6 +269,15 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	}
 
 	const handleAction = ({ key, value }) => {
+		if (
+			isPublic &&
+			['like', 'share', 'block', 'report', 'addNewAnnou', 'editAnnou'].includes(
+				key,
+			)
+		) {
+			onRequireLogin?.()
+			return
+		}
 		switch (key) {
 			case 'like':
 				handleLike(value)
@@ -303,6 +328,16 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		id: string
 		user_id: string
 	}) => {
+		if (isPublic) {
+			return [
+				{
+					key: 'share',
+					label: 'Share',
+					onClick: () => onRequireLogin?.(),
+				},
+			] as ItemType[]
+		}
+
 		const isMe = user_id === getUserInfo()?.id
 
 		const menus: ItemType[] = [
@@ -355,6 +390,14 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		return menus
 	}
 	const handleBack = () => {
+		if (isPublic) {
+			if (tabTop) {
+				setTabTop('')
+				return
+			}
+			goBackOrPush(mainRoutes.login)
+			return
+		}
 		if (tabTop) {
 			return setTabTop('')
 		} else {
@@ -362,10 +405,14 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		}
 	}
 
-	const handleJoinConv = async (id) => {
+	const handleJoinConv = async (convId) => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
 		try {
 			setLoadingApi((prev) => ({ ...prev, join: true }))
-			await joinConversation({ id, status: true })
+			await joinConversation({ id: convId, status: true })
 			handleGetInfoConv(true)
 			if (memberRef.current?.onGetMember) {
 				memberRef.current.onGetMember()
@@ -420,6 +467,16 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		})
 	}
 	const menus: ItemType[] = useMemo(() => {
+		if (isPublic) {
+			return [
+				{
+					key: 'share',
+					label: 'Share community',
+					onClick: () => onRequireLogin?.(),
+				},
+			]
+		}
+
 		const { host_id, join } = convInfo || {}
 		const { is_accept_notification } = join || {}
 		const isMe = getUserInfo('id') === host_id
@@ -502,7 +559,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		]
 		return returnData
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [convInfo, loadingApi.noti])
+	}, [convInfo, loadingApi.noti, isPublic])
 
 	useEffect(() => {
 		handleGetInfoConv()

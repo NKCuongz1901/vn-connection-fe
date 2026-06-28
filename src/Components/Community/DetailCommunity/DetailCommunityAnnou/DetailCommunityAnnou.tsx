@@ -25,10 +25,21 @@ interface DetailCommunityAnnouProps {
 	loading?: boolean
 	onAction?: any
 	onGetMenus?: any
+	isPublic?: boolean
+	onRequireLogin?: () => void
 }
 const DetailCommunityAnnou = (props: DetailCommunityAnnouProps) => {
 	const { onChangeRoute } = useLocalePath()
-	const { loading, announceList, onAction, onGetMenus } = props
+	const { loading, announceList, onAction, onGetMenus, isPublic, onRequireLogin } =
+		props
+
+	const handleProfileClick = (userId: string) => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
+		onChangeRoute(mainRoutes.profile + `/${userId}`)
+	}
 	const _renderBody = (item: AnnouncementProps) => {
 		const { description, title, user, created_at, medias } = item || {}
 		const { avatar, id: user_id, name } = user || {}
@@ -39,7 +50,7 @@ const DetailCommunityAnnou = (props: DetailCommunityAnnouProps) => {
 				<Flex className={classes.bodyHeader}>
 					<CAvatar
 						src={avatar}
-						onClick={() => onChangeRoute(mainRoutes.profile + `/${user_id}`)}
+						onClick={() => handleProfileClick(user_id)}
 					/>
 					<span className={classes.title}>{name}</span>
 					<span>
