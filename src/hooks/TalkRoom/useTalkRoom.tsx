@@ -2,6 +2,7 @@ import {
 	buildTalkRoomListWhere,
 	createTalkRoom,
 	CreateTalkRoomInput,
+	deleteTalkRoom,
 	getDetailTalkRoom,
 	getListMyFriendTalkRoom,
 	getListTalkRoom,
@@ -31,6 +32,7 @@ export default function useTalkRoom() {
 	const [loading, setLoading] = useState(false)
 	const [loadingCreate, setLoadingCreate] = useState(false)
 	const [loadingUpdate, setLoadingUpdate] = useState(false)
+	const [loadingDelete, setLoadingDelete] = useState(false)
 	const [loadingLanguages, setLoadingLanguages] = useState(false)
 	const [loadingCategories, setLoadingCategories] = useState(false)
 	const [myTalkRoomAnalysis, setMyTalkRoomAnalysis] = useState<any>(null)
@@ -60,6 +62,38 @@ export default function useTalkRoom() {
 		cloneDeep({ ...paginationCommon, limit: 30 }),
 	)
 	const _listTalkRoomFilterRef = useRef<TalkRoomListFilters>({})
+
+	const handleDeleteTalkRoom = useCallback(
+		async (id: string) => {
+			if (!id) return false
+
+			setLoadingDelete(true)
+			try {
+				const res: any = await deleteTalkRoom(id)
+				const { code } = res || {}
+
+				if (code === 200) {
+					setListTalkRooms((prev) => prev.filter((item) => item.id !== id))
+					setListMyFriendTalkRooms((prev) =>
+						prev.filter((item) => item.id !== id),
+					)
+					setTotalTalkRooms((prev) => Math.max(0, prev - 1))
+					setTotalMyFriendTalkRooms((prev) => Math.max(0, prev - 1))
+					setTalkRoomDetail((prev) => (prev?.id === id ? null : prev))
+					openSuccess({ message: 'Cancel talk room successfully' })
+					handleGetMyTalkRoomAnalysis()
+					return true
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingDelete(false)
+			}
+
+			return false
+		},
+		[openError, openSuccess],
+	)
 
 	const handleGetListMyFriendTalkRoom = useCallback(
 		async (isNotLoading = false) => {
@@ -416,6 +450,7 @@ export default function useTalkRoom() {
 		loading,
 		loadingCreate,
 		loadingUpdate,
+		loadingDelete,
 		loadingLanguages,
 		loadingCategories,
 		loadingListTalkRooms,
@@ -450,5 +485,6 @@ export default function useTalkRoom() {
 		onLoadMoreListMyFriendTalkRooms: handleLoadMoreListMyFriendTalkRooms,
 		onCreateTalkRoom: handleCreateTalkRoom,
 		onUpdateTalkRoom: handleUpdateTalkRoom,
+		onDeleteTalkRoom: handleDeleteTalkRoom,
 	}
 }

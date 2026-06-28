@@ -77,6 +77,11 @@
 		color: #fff;
 		background: #cd3031;
 	}
+
+	&:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
+	}
 }
 
 .dismissBtn {
@@ -87,5 +92,10 @@
 	&:focus-visible {
 		color: #0f1729;
 		background: transparent;
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 }

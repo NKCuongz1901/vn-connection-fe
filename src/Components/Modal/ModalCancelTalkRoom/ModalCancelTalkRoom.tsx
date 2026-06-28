@@ -1,6 +1,7 @@
 'use client'
 
 import { IconCircleXFilled } from '@tabler/icons-react'
+import { Spin } from 'antd'
 import { memo } from 'react'
 
 import CModal from '@/Components/Custom/CModal/CModal'
@@ -9,19 +10,21 @@ import classes from './ModalCancelTalkRoom.module.scss'
 
 export interface ModalCancelTalkRoomProps {
 	open: boolean
+	loading?: boolean
 	onClose: () => void
-	onConfirm?: () => void
+	onConfirm?: () => void | Promise<void | boolean>
 }
 
 function ModalCancelTalkRoom({
 	open,
+	loading = false,
 	onClose,
 	onConfirm,
 }: ModalCancelTalkRoomProps) {
 	if (!open) return null
 
-	const handleConfirm = () => {
-		onConfirm?.()
+	const handleConfirm = async () => {
+		await onConfirm?.()
 	}
 
 	return (
@@ -30,7 +33,7 @@ function ModalCancelTalkRoom({
 			centered
 			closable={false}
 			footer={null}
-			onCancel={onClose}
+			onCancel={loading ? undefined : onClose}
 			styles={{
 				content: {
 					width: 343,
@@ -62,13 +65,19 @@ function ModalCancelTalkRoom({
 					<button
 						type="button"
 						className={classes.confirmBtn}
+						disabled={loading}
 						onClick={handleConfirm}
 					>
-						Cancel room
+						{loading ? (
+							<Spin size="small" />
+						) : (
+							'Cancel room'
+						)}
 					</button>
 					<button
 						type="button"
 						className={classes.dismissBtn}
+						disabled={loading}
 						onClick={onClose}
 					>
 						Keep this room

@@ -41,7 +41,9 @@ function TalkRoom() {
 		onChangeLevelFilter,
 		onGetDetailTalkRoom,
 		onUpdateTalkRoom,
+		onDeleteTalkRoom,
 		loadingUpdate,
+		loadingDelete,
 		loadingListMyFriendTalkRooms,
 		listMyFriendTalkRooms,
 		totalMyFriendTalkRooms,
@@ -184,8 +186,12 @@ function TalkRoom() {
 			{cancelRoom?.id && (
 				<ModalCancelTalkRoom
 					open
+					loading={loadingDelete}
 					onClose={() => setCancelRoom(null)}
-					onConfirm={() => setCancelRoom(null)}
+					onConfirm={async () => {
+						const success = await onDeleteTalkRoom(cancelRoom.id)
+						if (success) setCancelRoom(null)
+					}}
 				/>
 			)}
 

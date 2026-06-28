@@ -29,6 +29,71 @@ export type CreateTalkRoomInput = {
 	idempotency_key?: string
 }
 
+export type TalkRoomDetail = TalkRoomListItem & {
+	schedule_at?: string | null
+	started_at?: string | null
+	host_joined?: boolean
+	host_user?: {
+		id?: string
+		name?: string
+		avatar?: string
+		i_am_from?: string
+	}
+	schedules?: {
+		id?: string
+		schedule_at?: string
+		enabled?: boolean
+		status?: string
+		index?: number
+		estimated_end_at?: string | null
+		ended_at?: string | null
+		conversation_id?: string | null
+	}[]
+	categories?: {
+		slug?: string
+		category_details?: {
+			slug?: string
+			name?: string
+		}
+	}[]
+}
+
+export type TalkRoomListFilters = {
+	levels?: string[]
+	languageIds?: string[]
+}
+
+export type TalkRoomListItem = {
+	id: string
+	name: string
+	language_id?: string
+	level?: string[]
+	status?: string
+	total_participants?: number
+	max_participants?: number
+	next_schedule_at?: string | null
+	speakers?: {
+		id?: string
+		name?: string
+		avatar?: string
+		role?: string
+		talking_time?: number
+		i_am_from?: string
+	}[]
+	created_by_user?: {
+		id?: string
+		name?: string
+		avatar?: string
+	}
+	language?: {
+		id?: string
+		name?: string
+		code?: string
+		flag?: string
+	}
+	[key: string]: any
+}
+
 export const getTalkRoomOverview = async ({
 	params = {},
 }: {
@@ -183,42 +248,6 @@ export const getBookingSlots = async () => {
 	return await axios.get(url)
 }
 
-export type TalkRoomListFilters = {
-	levels?: string[]
-	languageIds?: string[]
-}
-
-export type TalkRoomListItem = {
-	id: string
-	name: string
-	language_id?: string
-	level?: string[]
-	status?: string
-	total_participants?: number
-	max_participants?: number
-	next_schedule_at?: string | null
-	speakers?: {
-		id?: string
-		name?: string
-		avatar?: string
-		role?: string
-		talking_time?: number
-		i_am_from?: string
-	}[]
-	created_by_user?: {
-		id?: string
-		name?: string
-		avatar?: string
-	}
-	language?: {
-		id?: string
-		name?: string
-		code?: string
-		flag?: string
-	}
-	[key: string]: any
-}
-
 export const buildTalkRoomListWhere = (filters?: TalkRoomListFilters) => {
 	const where: Record<string, unknown> = {}
 
@@ -284,35 +313,6 @@ export const updateTalkRoom = async ({
 	return await axios.put(url, payload)
 }
 
-export type TalkRoomDetail = TalkRoomListItem & {
-	schedule_at?: string | null
-	started_at?: string | null
-	host_joined?: boolean
-	host_user?: {
-		id?: string
-		name?: string
-		avatar?: string
-		i_am_from?: string
-	}
-	schedules?: {
-		id?: string
-		schedule_at?: string
-		enabled?: boolean
-		status?: string
-		index?: number
-		estimated_end_at?: string | null
-		ended_at?: string | null
-		conversation_id?: string | null
-	}[]
-	categories?: {
-		slug?: string
-		category_details?: {
-			slug?: string
-			name?: string
-		}
-	}[]
-}
-
 export const getDetailTalkRoom = async ({
 	id,
 	params = { fields: ['$all'] },
@@ -325,4 +325,10 @@ export const getDetailTalkRoom = async ({
 	return await axios.get(url, {
 		params: convertParams(params),
 	})
+}
+
+export const deleteTalkRoom = async (id: string) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}`
+
+	return await axios.delete(url)
 }
