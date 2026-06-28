@@ -11,6 +11,12 @@ export type TalkRoomSpeaker = {
 	i_am_from?: string
 }
 
+export type TalkRoomJoinedFriend = {
+	id?: string
+	name?: string
+	avatar?: string
+}
+
 export type TalkRoomLanguage = {
 	id?: string
 	name?: string
@@ -53,7 +59,71 @@ export type TalkRoomRoom = {
 	is_joined?: boolean
 	is_your_room?: boolean
 	dynamic_link?: string
+	joined_friends?: TalkRoomJoinedFriend[]
+	total_friends_joined?: number
 }
+
+export type TalkRoomFriendBannerDisplay = {
+	names: string[]
+	suffix: string
+}
+
+export const formatTalkRoomFriendBanner = (
+	joinedFriends?: TalkRoomJoinedFriend[],
+	totalFriendsJoined?: number,
+): TalkRoomFriendBannerDisplay | null => {
+	const friends = joinedFriends ?? []
+	const total = totalFriendsJoined ?? friends.length
+
+	if (total <= 0 || !friends.length) return null
+
+	const names = friends.map((friend) => friend?.name).filter(Boolean) as string[]
+
+	if (!names.length) return null
+
+	if (total === 1) {
+		return {
+			names: [names[0]],
+			suffix: ' is here, waiting for you in this room',
+		}
+	}
+
+	const displayNames = names.slice(0, 2)
+	const othersCount = Math.max(total - displayNames.length, 0)
+
+	if (othersCount <= 0) {
+		return {
+			names: displayNames,
+			suffix:
+				displayNames.length === 1
+					? ' is staying in this room!'
+					: ' are staying in this room!',
+		}
+	}
+
+	const othersLabel = othersCount === 1 ? '1 other' : `${othersCount} others`
+
+	return {
+		names: displayNames,
+		suffix: ` and ${othersLabel} is staying in this room!`,
+	}
+}
+
+export const formatTalkRoomInRoomParticipantsText = (
+	room?: TalkRoomRoom,
+): TalkRoomLiveParticipantsDisplay => {
+	const total = room?.total_participants ?? 0
+	const max = room?.max_participants ?? 0
+
+	return {
+		highlight: `${total}/${max}`,
+		regular: ' people in room',
+	}
+}
+
+/** @deprecated Use formatTalkRoomInRoomParticipantsText */
+export const formatTalkRoomFriendParticipantsText =
+	formatTalkRoomInRoomParticipantsText
 
 export const getSpeakerAvatar = (speaker?: TalkRoomSpeaker) => speaker?.avatar
 
@@ -94,6 +164,10 @@ export const formatTalkRoomSchedule = (date?: string | null) => {
 }
 
 export const isTalkRoomLive = (status?: string) => status === 'live'
+
+export const isTalkRoomLiveWithHostJoined = (room?: TalkRoomRoom) => {
+	return isTalkRoomLive(room?.status) && room?.host_joined === true
+}
 
 export const isTalkRoomStartTimeReached = (startedAt?: string | null) => {
 	if (!startedAt) return false

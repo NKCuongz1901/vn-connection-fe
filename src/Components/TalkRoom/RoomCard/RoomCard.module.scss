@@ -304,3 +304,46 @@
 	cursor: pointer;
 	flex-shrink: 0;
 }
+
+.friendBanner {
+	padding: 12px 16px 0;
+}
+
+.friendBannerText {
+	margin: 0;
+	color: #0f1729;
+	font-size: 14px;
+	line-height: 20px;
+}
+
+.friendBannerName {
+	color: #e55a0f;
+	font-weight: 600;
+}
+
+.friendBannerRegular {
+	font-weight: 400;
+}
+
+.bannerDivider {
+	height: 1px;
+	margin: 12px 16px 0;
+	background: #edf0f5;
+}
+
+.liveDot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #e55a0f;
+	flex-shrink: 0;
+}
+
+.liveIconWrap {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	flex-shrink: 0;
+}

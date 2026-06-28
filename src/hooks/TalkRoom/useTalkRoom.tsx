@@ -3,6 +3,7 @@ import {
 	createTalkRoom,
 	CreateTalkRoomInput,
 	getDetailTalkRoom,
+	getListMyFriendTalkRoom,
 	getListTalkRoom,
 	getMyTalkRoomAnalysis,
 	getTalkRoomCategories,
@@ -35,6 +36,12 @@ export default function useTalkRoom() {
 	const [languages, setLanguages] = useState<TalkRoomLanguageItem[]>([])
 	const [categories, setCategories] = useState<TalkRoomCategoryItem[]>([])
 	const [listTalkRooms, setListTalkRooms] = useState<TalkRoomListItem[]>([])
+	const [loadingListMyFriendTalkRooms, setLoadingListMyFriendTalkRooms] =
+		useState(false)
+	const [listMyFriendTalkRooms, setListMyFriendTalkRooms] = useState<
+		TalkRoomListItem[]
+	>([])
+	const [totalMyFriendTalkRooms, setTotalMyFriendTalkRooms] = useState(0)
 	const [totalTalkRooms, setTotalTalkRooms] = useState(0)
 	const [loadingListTalkRooms, setLoadingListTalkRooms] = useState(false)
 	const [listTalkRoomFilters, setListTalkRoomFilters] =
@@ -48,7 +55,56 @@ export default function useTalkRoom() {
 	const _listTalkRoomPaginationRef = useRef<PaginationType>(
 		cloneDeep({ ...paginationCommon, limit: 30 }),
 	)
+	const _listMyFriendTalkRoomPaginationRef = useRef<PaginationType>(
+		cloneDeep({ ...paginationCommon, limit: 30 }),
+	)
 	const _listTalkRoomFilterRef = useRef<TalkRoomListFilters>({})
+
+	const handleGetListMyFriendTalkRoom = useCallback(
+		async (isNotLoading = false) => {
+			setLoadingListMyFriendTalkRooms(true)
+			try {
+				const { page, limit } = _listMyFriendTalkRoomPaginationRef.current
+				const isNew = page === 1
+
+				if (isNew && !isNotLoading) {
+					setListMyFriendTalkRooms([])
+				}
+
+				const res: any = await getListMyFriendTalkRoom({
+					params: {
+						fields: ['$all'],
+						page: !isNotLoading ? page : 1,
+						limit: !isNotLoading ? limit : limit * page,
+					},
+				})
+				const { code, results, pagination } = res || {}
+
+				if (code === 200) {
+					const rows: TalkRoomListItem[] = results?.objects?.rows ?? []
+					const count =
+						results?.objects?.count ?? pagination?.total ?? rows.length
+
+					_listMyFriendTalkRoomPaginationRef.current.totalPage =
+						Math.ceil(count / limit) || 0
+
+					setListMyFriendTalkRooms((prev) => {
+						const contents = isNew && !isNotLoading ? [] : prev
+						return uniqueArray(
+							[...contents, ...rows],
+							'id',
+						) as TalkRoomListItem[]
+					})
+					setTotalMyFriendTalkRooms(count)
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingListMyFriendTalkRooms(false)
+			}
+		},
+		[openError],
+	)
 
 	const handleGetListTalkRoom = useCallback(
 		async (isNotLoading = false) => {
@@ -203,7 +259,13 @@ export default function useTalkRoom() {
 		await handleGetListTalkRoom()
 	}, [handleGetListTalkRoom, loadingListTalkRooms])
 
-	const handleGetListMyFriendTalkRoom = async () => {}
+	const handleLoadMoreListMyFriendTalkRooms = useCallback(async () => {
+		const { page, totalPage } = _listMyFriendTalkRoomPaginationRef.current
+		if (loadingListMyFriendTalkRooms || page >= totalPage) return
+
+		_listMyFriendTalkRoomPaginationRef.current.page += 1
+		await handleGetListMyFriendTalkRoom()
+	}, [handleGetListMyFriendTalkRoom, loadingListMyFriendTalkRooms])
 
 	const handleGetMyTalkRoomAnalysis = async () => {
 		setLoading(true)
@@ -284,9 +346,7 @@ export default function useTalkRoom() {
 						),
 					)
 					setTalkRoomDetail((prev) =>
-						prev?.id === id
-							? { ...prev, ...updated, name: nextName }
-							: prev,
+						prev?.id === id ? { ...prev, ...updated, name: nextName } : prev,
 					)
 					openSuccess({ message: 'Update talk room successfully' })
 					return updated ?? { id, name: nextName }
@@ -338,6 +398,7 @@ export default function useTalkRoom() {
 		handleGetLanguages()
 		handleGetCategories()
 		handleGetListTalkRoom()
+		handleGetListMyFriendTalkRoom()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -348,14 +409,17 @@ export default function useTalkRoom() {
 		loadingLanguages,
 		loadingCategories,
 		loadingListTalkRooms,
+		loadingListMyFriendTalkRooms,
 		loadingTalkRoomDetail,
 		myTalkRoomAnalysis,
 		languages,
 		categories,
 		listTalkRooms,
+		listMyFriendTalkRooms,
 		displayTalkRooms,
 		talkRoomDetail,
 		totalTalkRooms,
+		totalMyFriendTalkRooms,
 		listTalkRoomFilters,
 		searchKeyword,
 		languageFilterOptions,
@@ -366,12 +430,14 @@ export default function useTalkRoom() {
 		onGetCategories: handleGetCategories,
 		onGetMyTalkRoomAnalysis: handleGetMyTalkRoomAnalysis,
 		onGetListTalkRoom: handleGetListTalkRoom,
+		onGetListMyFriendTalkRoom: handleGetListMyFriendTalkRoom,
 		onGetDetailTalkRoom: handleGetDetailTalkRoom,
 		onChangeListTalkRoomFilters: handleChangeListTalkRoomFilters,
 		onChangeLanguageFilter: handleChangeLanguageFilter,
 		onChangeLevelFilter: handleChangeLevelFilter,
 		onChangeSearchKeyword: handleChangeSearchKeyword,
 		onLoadMoreListTalkRooms: handleLoadMoreListTalkRooms,
+		onLoadMoreListMyFriendTalkRooms: handleLoadMoreListMyFriendTalkRooms,
 		onCreateTalkRoom: handleCreateTalkRoom,
 		onUpdateTalkRoom: handleUpdateTalkRoom,
 	}

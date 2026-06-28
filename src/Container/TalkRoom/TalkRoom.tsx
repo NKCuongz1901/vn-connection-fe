@@ -42,6 +42,10 @@ function TalkRoom() {
 		onGetDetailTalkRoom,
 		onUpdateTalkRoom,
 		loadingUpdate,
+		loadingListMyFriendTalkRooms,
+		listMyFriendTalkRooms,
+		totalMyFriendTalkRooms,
+		onLoadMoreListMyFriendTalkRooms,
 	} = useTalkRoom()
 	const { userData } = useProfile({})
 
@@ -103,6 +107,42 @@ function TalkRoom() {
 			</div>
 		)
 	}
+	const _renderLeaderBoard = () => {
+		return <div className={classes.leaderBoardContainer}>Coming soon</div>
+	}
+	const _renderFriendTalkroomList = () => {
+		return (
+			<div className={classes.friendTalkroomListContainer}>
+				<Flex className={classes.listFriendTalkroomHeader}>
+					<div className={classes.listFriendTalkroomHeaderTitle}>
+						Your friends are here
+					</div>
+					<div className={classes.amountFriendRooms}>
+						{totalMyFriendTalkRooms}
+					</div>
+				</Flex>
+				<Flex vertical gap={12} className={classes.listFriendTalkroomInner}>
+					{loadingListMyFriendTalkRooms && !listMyFriendTalkRooms.length
+						? Array.from({ length: 2 }).map((_, index) => (
+								<Skeleton.Input
+									key={index}
+									active
+									block
+									style={{ height: 220, borderRadius: 16 }}
+								/>
+							))
+						: listMyFriendTalkRooms.map((room) => (
+								<RoomCard
+									key={room.id}
+									room={room}
+									variant="friend"
+									onShare={handleShareRoom}
+								/>
+							))}
+				</Flex>
+			</div>
+		)
+	}
 	return (
 		<div className={classes.wrapper}>
 			<Flex className={classes.header}>
@@ -123,7 +163,10 @@ function TalkRoom() {
 					{_renderProfile()}
 					{_renderListTalkRoom()}
 				</div>
-				<div className={classes.rightContent}></div>
+				<div className={classes.rightContent}>
+					{_renderLeaderBoard()}
+					{_renderFriendTalkroomList()}
+				</div>
 			</Flex>
 
 			{editRoom?.id && (

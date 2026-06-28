@@ -14,18 +14,22 @@ import ShareIconSvg from '@/svg/ShareIconSvg'
 import StarIcon2 from '@/svg/StarIcon2'
 import BellIcon from '@/svg/BellIcon'
 import HostIcon from '@/svg/HostIcon'
+import LiveIcon from '@/svg/GroupIcon'
 
 import HeadPhoneIcon from '@/svg/Talkroom/HeadPhoneIcon'
 
 import {
 	formatTalkRoomCategoriesText,
 	formatTalkRoomCmiText,
+	formatTalkRoomFriendBanner,
+	formatTalkRoomInRoomParticipantsText,
 	formatTalkRoomLevelLabel,
 	formatTalkRoomLiveParticipantsText,
 	formatTalkRoomWaitingCount,
 	getTalkRoomStartTimeDisplay,
 	isTalkRoomHostCanStart,
 	isTalkRoomLive,
+	isTalkRoomLiveWithHostJoined,
 	isTalkRoomWaitingForHost,
 	TalkRoomRoom,
 } from '@/ultis/talkRoom'
@@ -33,6 +37,7 @@ import MinusCircleFill from '@/svg/Talkroom/MinusCircleFill'
 
 export type RoomCardProps = {
 	room: TalkRoomRoom
+	variant?: 'default' | 'friend'
 	onShare?: (room: TalkRoomRoom) => void
 	onCountMeIn?: (room: TalkRoomRoom) => void
 	onNotJoining?: (room: TalkRoomRoom) => void
@@ -46,6 +51,7 @@ export type RoomCardProps = {
 
 function RoomCard({
 	room,
+	variant = 'default',
 	onShare,
 	onCountMeIn,
 	onNotJoining,
@@ -56,26 +62,43 @@ function RoomCard({
 	onCancelRoom,
 	onClick,
 }: RoomCardProps) {
+	const isFriendVariant = variant === 'friend'
 	const isLive = isTalkRoomLive(room?.status)
 	const isYourRoom = room?.is_your_room === true
 	const topic = formatTalkRoomCategoriesText(room?.categories)
 	const cmiText = formatTalkRoomCmiText(room?.cmi_users, room?.total_cmi)
+	const inRoomParticipantsText = formatTalkRoomInRoomParticipantsText(room)
 	const liveParticipantsText = formatTalkRoomLiveParticipantsText(room)
+	const friendBanner = isFriendVariant
+		? formatTalkRoomFriendBanner(
+				room?.joined_friends,
+				room?.total_friends_joined,
+			)
+		: null
 	const scheduleText = getTalkRoomStartTimeDisplay(room)
 	const waitingCount = formatTalkRoomWaitingCount(room)
-	const showHostStartFooter = isTalkRoomHostCanStart(room)
-	const showGuestWaitingFooter = isTalkRoomWaitingForHost(room)
-	const showLiveFooter =
-		isLive && !showHostStartFooter && !showGuestWaitingFooter
+	const showActiveLiveFooter = isTalkRoomLiveWithHostJoined(room)
+	const showHostStartFooter =
+		!showActiveLiveFooter && !isFriendVariant && isTalkRoomHostCanStart(room)
+	const showGuestWaitingFooter =
+		!showActiveLiveFooter && !isFriendVariant && isTalkRoomWaitingForHost(room)
+	const showLegacyLiveFooter =
+		!showActiveLiveFooter &&
+		!isFriendVariant &&
+		isLive &&
+		!showHostStartFooter &&
+		!showGuestWaitingFooter
 	const hasCmi = (room?.total_cmi ?? 0) > 0 && !!cmiText
 	const showCmiSection =
-		!showLiveFooter &&
+		!showActiveLiveFooter &&
+		!showLegacyLiveFooter &&
 		!showHostStartFooter &&
 		!showGuestWaitingFooter &&
 		!isLive &&
 		(hasCmi || !isYourRoom)
 	const showScheduleSection =
 		!!scheduleText &&
+		!showActiveLiveFooter &&
 		!isLive &&
 		!showHostStartFooter &&
 		!showGuestWaitingFooter
@@ -117,6 +140,25 @@ function RoomCard({
 			role={onClick ? 'button' : undefined}
 			tabIndex={onClick ? 0 : undefined}
 		>
+			{friendBanner && (
+				<>
+					<div className={classes.friendBanner}>
+						<p className={classes.friendBannerText}>
+							{friendBanner.names.map((name, index) => (
+								<span key={`${name}-${index}`}>
+									<span className={classes.friendBannerName}>{name}</span>
+									{index < friendBanner.names.length - 1 ? ', ' : ''}
+								</span>
+							))}
+							<span className={classes.friendBannerRegular}>
+								{friendBanner.suffix}
+							</span>
+						</p>
+					</div>
+					<div className={classes.bannerDivider} />
+				</>
+			)}
+
 			<div className={classes.header}>
 				<div className={classes.info}>
 					<div className={classes.nameTopic}>
@@ -166,7 +208,57 @@ function RoomCard({
 			<div className={classes.divider} />
 
 			<div className={classes.footer}>
-				{showLiveFooter ? (
+				{showActiveLiveFooter ? (
+					<div className={classes.footerRow}>
+						<div className={classes.metaGroup}>
+							<span className={classes.liveIconWrap}>
+								<LiveIcon fill="#E55A0F" width={20} height={20} />
+							</span>
+							<p className={classes.metaText}>
+								<span className={classes.metaHighlight}>
+									{inRoomParticipantsText.highlight}
+								</span>
+								<span className={classes.metaRegular}>
+									{inRoomParticipantsText.regular}
+								</span>
+							</p>
+						</div>
+
+						{room?.is_joined ? (
+							<button
+								type="button"
+								className={clsx(
+									classes.actionBtn,
+									classes.actionBtnSecondary,
+									classes.actionBtnDisabled,
+								)}
+								disabled
+							>
+								Joined
+							</button>
+						) : isYourRoom ? (
+							<div className={classes.hostActions}>
+								<div className={classes.hostBadge}>
+									<IconCrown size={16} stroke={2} color="#E55A0F" />
+									<span>You&apos;re host</span>
+								</div>
+								<RoomCardHostActions
+									room={room}
+									onEditRoom={onEditRoom}
+									onCancelRoom={onCancelRoom}
+								/>
+							</div>
+						) : (
+							<button
+								type="button"
+								className={clsx(classes.actionBtn, classes.actionBtnStart)}
+								onClick={handleJoin}
+							>
+								Join now
+							</button>
+						)}
+					</div>
+				) : showLegacyLiveFooter ? (
 					<div className={classes.footerRow}>
 						<div className={classes.metaGroup}>
 							<People fill="#006B35" width={20} height={20} />
