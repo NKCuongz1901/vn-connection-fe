@@ -1,5 +1,6 @@
 import {
 	buildTalkRoomListWhere,
+	countMeInTalkRoom,
 	createTalkRoom,
 	CreateTalkRoomInput,
 	deleteTalkRoom,
@@ -9,6 +10,7 @@ import {
 	getMyTalkRoomAnalysis,
 	getTalkRoomCategories,
 	getTalkRoomLanguages,
+	notificationMeInTalkRoom,
 	TalkRoomCategoryItem,
 	TalkRoomDetail,
 	TalkRoomLanguageItem,
@@ -33,6 +35,8 @@ export default function useTalkRoom() {
 	const [loadingCreate, setLoadingCreate] = useState(false)
 	const [loadingUpdate, setLoadingUpdate] = useState(false)
 	const [loadingDelete, setLoadingDelete] = useState(false)
+	const [loadingCountMeIn, setLoadingCountMeIn] = useState(false)
+	const [loadingNotification, setLoadingNotification] = useState(false)
 	const [loadingLanguages, setLoadingLanguages] = useState(false)
 	const [loadingCategories, setLoadingCategories] = useState(false)
 	const [myTalkRoomAnalysis, setMyTalkRoomAnalysis] = useState<any>(null)
@@ -62,6 +66,113 @@ export default function useTalkRoom() {
 		cloneDeep({ ...paginationCommon, limit: 30 }),
 	)
 	const _listTalkRoomFilterRef = useRef<TalkRoomListFilters>({})
+
+	const patchTalkRoomInState = useCallback(
+		(id: string, room: Partial<TalkRoomListItem>) => {
+			setListTalkRooms((prev) =>
+				prev.map((item) => (item.id === id ? { ...item, ...room } : item)),
+			)
+			setListMyFriendTalkRooms((prev) =>
+				prev.map((item) => (item.id === id ? { ...item, ...room } : item)),
+			)
+			setTalkRoomDetail((prev) =>
+				prev?.id === id ? { ...prev, ...room } : prev,
+			)
+		},
+		[],
+	)
+
+	const handleNotificationMeInTalkRoom = useCallback(
+		async (id: string, isEnabled: boolean) => {
+			if (!id) return false
+
+			setLoadingNotification(true)
+			try {
+				const res: any = await notificationMeInTalkRoom({
+					id,
+					payload: { isEnabled },
+				})
+				const { code } = res || {}
+
+				if (code === 200) {
+					const detailRes: any = await getDetailTalkRoom({
+						id,
+						params: { fields: ['$all'] },
+					})
+					const refreshed: TalkRoomDetail | null =
+						detailRes?.code === 200 ? detailRes?.results?.object ?? null : null
+
+					if (refreshed) {
+						patchTalkRoomInState(id, {
+							...refreshed,
+							user_notified: refreshed.user_notified ?? isEnabled,
+						})
+					} else {
+						patchTalkRoomInState(id, { user_notified: isEnabled })
+					}
+
+					openSuccess({
+						message: isEnabled
+							? 'Notification turned on successfully'
+							: 'Notification turned off successfully',
+					})
+					return true
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingNotification(false)
+			}
+
+			return false
+		},
+		[openError, openSuccess, patchTalkRoomInState],
+	)
+
+	const handleCountMeInTalkRoom = useCallback(
+		async (id: string, isEnabled: boolean) => {
+			if (!id) return false
+
+			setLoadingCountMeIn(true)
+			try {
+				const res: any = await countMeInTalkRoom({
+					id,
+					payload: { isEnabled },
+				})
+				const { code } = res || {}
+
+				if (code === 200) {
+					const detailRes: any = await getDetailTalkRoom({
+						id,
+						params: { fields: ['$all'] },
+					})
+					const refreshed: TalkRoomDetail | null =
+						detailRes?.code === 200 ? detailRes?.results?.object ?? null : null
+
+					if (refreshed) {
+						patchTalkRoomInState(id, refreshed)
+					} else {
+						patchTalkRoomInState(id, { is_cmi: isEnabled })
+					}
+
+					openSuccess({
+						message: isEnabled
+							? 'Count me in successfully'
+							: 'You opted out successfully',
+					})
+					handleGetMyTalkRoomAnalysis()
+					return true
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingCountMeIn(false)
+			}
+
+			return false
+		},
+		[openError, openSuccess, patchTalkRoomInState],
+	)
 
 	const handleDeleteTalkRoom = useCallback(
 		async (id: string) => {
@@ -451,6 +562,8 @@ export default function useTalkRoom() {
 		loadingCreate,
 		loadingUpdate,
 		loadingDelete,
+		loadingCountMeIn,
+		loadingNotification,
 		loadingLanguages,
 		loadingCategories,
 		loadingListTalkRooms,
@@ -486,5 +599,7 @@ export default function useTalkRoom() {
 		onCreateTalkRoom: handleCreateTalkRoom,
 		onUpdateTalkRoom: handleUpdateTalkRoom,
 		onDeleteTalkRoom: handleDeleteTalkRoom,
+		onCountMeInTalkRoom: handleCountMeInTalkRoom,
+		onNotificationMeInTalkRoom: handleNotificationMeInTalkRoom,
 	}
 }

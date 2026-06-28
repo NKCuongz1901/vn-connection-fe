@@ -15,7 +15,7 @@ import useTalkRoom from '@/hooks/TalkRoom/useTalkRoom'
 import useProfile from '@/hooks/Profile/useProfile'
 import { mainRoutes } from '@/routes/MainRoutes'
 import BookIcon from '@/svg/BookIcon'
-import { TalkRoomRoom } from '@/ultis/talkRoom'
+import { TalkRoomRoom, isTalkRoomUserNotified } from '@/ultis/talkRoom'
 import { useLocalePath } from '@/ultis/route'
 
 import classes from './TalkRoom.module.scss'
@@ -42,6 +42,8 @@ function TalkRoom() {
 		onGetDetailTalkRoom,
 		onUpdateTalkRoom,
 		onDeleteTalkRoom,
+		onCountMeInTalkRoom,
+		onNotificationMeInTalkRoom,
 		loadingUpdate,
 		loadingDelete,
 		loadingListMyFriendTalkRooms,
@@ -67,6 +69,18 @@ function TalkRoom() {
 			return
 		}
 		navigator.clipboard?.writeText(room.dynamic_link)
+	}
+
+	const handleCountMeIn = (room: TalkRoomRoom) => {
+		onCountMeInTalkRoom(room.id, true)
+	}
+
+	const handleNotJoining = (room: TalkRoomRoom) => {
+		onCountMeInTalkRoom(room.id, false)
+	}
+
+	const handleNotifyMe = (room: TalkRoomRoom) => {
+		onNotificationMeInTalkRoom(room.id, !isTalkRoomUserNotified(room))
 	}
 
 	const _renderListTalkRoom = () => {
@@ -101,6 +115,9 @@ function TalkRoom() {
 									key={room.id}
 									room={room}
 									onShare={handleShareRoom}
+									onCountMeIn={handleCountMeIn}
+									onNotJoining={handleNotJoining}
+									onNotifyMe={handleNotifyMe}
 									onEditRoom={setEditRoom}
 									onCancelRoom={setCancelRoom}
 								/>
@@ -139,6 +156,9 @@ function TalkRoom() {
 									room={room}
 									variant="friend"
 									onShare={handleShareRoom}
+									onCountMeIn={handleCountMeIn}
+									onNotJoining={handleNotJoining}
+									onNotifyMe={handleNotifyMe}
 								/>
 							))}
 				</Flex>

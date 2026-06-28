@@ -94,6 +94,10 @@ export type TalkRoomListItem = {
 	[key: string]: any
 }
 
+export type CountMeInTalkRoomPayload = {
+	isEnabled: boolean
+}
+
 export const getTalkRoomOverview = async ({
 	params = {},
 }: {
@@ -331,4 +335,28 @@ export const deleteTalkRoom = async (id: string) => {
 	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}`
 
 	return await axios.delete(url)
+}
+
+export const countMeInTalkRoom = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: CountMeInTalkRoomPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/count_me_in/toggle`
+
+	return await axios.post(url, payload)
+}
+
+export const notificationMeInTalkRoom = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: CountMeInTalkRoomPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/notifications/toggle`
+
+	return await axios.post(url, payload)
 }

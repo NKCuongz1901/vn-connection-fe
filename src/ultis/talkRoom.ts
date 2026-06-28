@@ -239,6 +239,12 @@ export const formatTalkRoomWaitingCount = (room?: TalkRoomRoom) => {
 	return `${total}/${max}`
 }
 
+export const isTalkRoomUserNotified = (room?: TalkRoomRoom | null) =>
+	room?.user_notified === true
+
+export const getTalkRoomNotifyButtonLabel = (room?: TalkRoomRoom | null) =>
+	isTalkRoomUserNotified(room) ? 'Notify on' : 'Notify me'
+
 export const getTalkRoomStartTimeDisplay = (room?: TalkRoomRoom) => {
 	return formatTalkRoomSchedule(getTalkRoomScheduledStartAt(room))
 }

@@ -27,6 +27,7 @@ import {
 	formatTalkRoomLiveParticipantsText,
 	formatTalkRoomWaitingCount,
 	getTalkRoomStartTimeDisplay,
+	getTalkRoomNotifyButtonLabel,
 	isTalkRoomGuestCanJoinEarly,
 	isTalkRoomHostCanStart,
 	isTalkRoomLive,
@@ -110,6 +111,7 @@ function RoomCard({
 		!showHostStartFooter &&
 		!showGuestEarlyJoinFooter &&
 		!showGuestWaitingFooter
+	const notifyButtonLabel = getTalkRoomNotifyButtonLabel(room)
 
 	const handleShare = (event: React.MouseEvent) => {
 		event.stopPropagation()
@@ -432,9 +434,7 @@ function RoomCard({
 										onClick={handleNotifyMe}
 									>
 										<BellIcon fill="#0F1729" width={16} height={16} />
-										<span>
-											{room?.user_notified ? 'Notify on' : 'Notify me'}
-										</span>
+										<span>{notifyButtonLabel}</span>
 									</button>
 								)}
 							</div>
