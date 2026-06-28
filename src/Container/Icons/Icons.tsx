@@ -120,6 +120,7 @@ import StarIcon2 from '@/svg/StarIcon2'
 import BgIcon1 from '@/svg/Talkroom/BgIcon1'
 import BgIcon2 from '@/svg/Talkroom/BgIcon2'
 import BgIcon3 from '@/svg/Talkroom/BgIcon3'
+import EmptyConnectionIcon from '@/svg/Talkroom/EmptyConnectionIcon'
 
 const Icons = () => {
 	const icons = [
@@ -572,6 +573,11 @@ const Icons = () => {
 		{
 			ICON: BgIcon3,
 			name: '@/svg/Event/BgIcon3',
+			key: randomString(),
+		},
+		{
+			ICON: EmptyConnectionIcon,
+			name: '@/svg/Event/EmptyConnectionIcon',
 			key: randomString(),
 		},
 	]

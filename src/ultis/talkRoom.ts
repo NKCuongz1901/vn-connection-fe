@@ -1,5 +1,7 @@
 import dayjs from 'dayjs'
 
+import { CountriesOptions } from '@/Variable/countryVariable'
+
 export type TalkRoomAvatarLayout = 'single' | 'double' | 'triple'
 
 export type TalkRoomSpeaker = {
@@ -360,4 +362,17 @@ export const formatTalkRoomLiveParticipantsText = (
 		highlight: namesText,
 		regular: ` and ${othersLabel} are in the room`,
 	}
+}
+
+const talkRoomCountryNameByCode = CountriesOptions.reduce<Record<string, string>>(
+	(acc, country) => {
+		acc[country.code] = country.name
+		return acc
+	},
+	{},
+)
+
+export const getTalkRoomCountryName = (code?: string) => {
+	if (!code) return ''
+	return talkRoomCountryNameByCode[code] || code
 }

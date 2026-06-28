@@ -6,7 +6,10 @@ import { useState } from 'react'
 
 import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
 import ModalCancelTalkRoom from '@/Components/Modal/ModalCancelTalkRoom'
+import ModalCreateTalkRoom from '@/Components/Modal/ModalCreateTalkRoom'
 import ModalEditTalkRoom from '@/Components/Modal/ModalEditTalkRoom'
+import TalkRoomConnectedCountryModal from '@/Components/Modal/TalkRoomConnectedCountryModal'
+import TalkRoomConnectedUserModal from '@/Components/Modal/TalkRoomConnectedUserModal'
 import RoomCard from '@/Components/TalkRoom/RoomCard'
 import TalkRoomFilterBar from '@/Components/TalkRoom/TalkRoomFilterBar'
 import TalkRoomProfileInfo from '@/Components/TalkRoom/TalkRoomProfileInfo/TalkRoomProfileInfo'
@@ -24,6 +27,10 @@ function TalkRoom() {
 	const [ruleModalOpen, setRuleModalOpen] = useState(false)
 	const [editRoom, setEditRoom] = useState<TalkRoomRoom | null>(null)
 	const [cancelRoom, setCancelRoom] = useState<TalkRoomRoom | null>(null)
+	const [connectedUsersModalOpen, setConnectedUsersModalOpen] = useState(false)
+	const [connectedCountriesModalOpen, setConnectedCountriesModalOpen] =
+		useState(false)
+	const [createRoomModalOpen, setCreateRoomModalOpen] = useState(false)
 	const { onChangeRoute } = useLocalePath()
 
 	const {
@@ -50,14 +57,51 @@ function TalkRoom() {
 		listMyFriendTalkRooms,
 		totalMyFriendTalkRooms,
 		onLoadMoreListMyFriendTalkRooms,
+		connectedUsers,
+		connectedCountries,
+		totalConnectedUsers,
+		loadingConnectedPeople,
+		loadingConnectedCountry,
+		onGetConnectedUsers,
+		onLoadMoreConnectedUsers,
+		onGetConnectedCountry,
+		onGetMyTalkRoomAnalysis,
+		onGetListTalkRoom,
 	} = useTalkRoom()
 	const { userData } = useProfile({})
+
+	const handleOpenConnectedUsersModal = () => {
+		setConnectedUsersModalOpen(true)
+		onGetConnectedUsers(false, true)
+	}
+
+	const handleOpenConnectedCountriesModal = () => {
+		setConnectedCountriesModalOpen(true)
+		onGetConnectedCountry()
+	}
+
+	const handleCreateRoomFromConnected = () => {
+		setConnectedUsersModalOpen(false)
+		setConnectedCountriesModalOpen(false)
+		setCreateRoomModalOpen(true)
+	}
+
+	const handleCreateRoomSuccess = () => {
+		setCreateRoomModalOpen(false)
+		onGetMyTalkRoomAnalysis()
+		onGetListTalkRoom(true)
+	}
 
 	const _renderProfile = () => {
 		return (
 			<div className={classes.profileContainer}>
 				<TalkRoomProfileInfo user={userData} />
-				<TalkRoomStats data={myTalkRoomAnalysis} loading={loading} />
+				<TalkRoomStats
+					data={myTalkRoomAnalysis}
+					loading={loading}
+					onClickPeople={handleOpenConnectedUsersModal}
+					onClickCountries={handleOpenConnectedCountriesModal}
+				/>
 			</div>
 		)
 	}
@@ -212,6 +256,37 @@ function TalkRoom() {
 						const success = await onDeleteTalkRoom(cancelRoom.id)
 						if (success) setCancelRoom(null)
 					}}
+				/>
+			)}
+
+			{connectedCountriesModalOpen && (
+				<TalkRoomConnectedCountryModal
+					open
+					onClose={() => setConnectedCountriesModalOpen(false)}
+					countries={connectedCountries}
+					loading={loadingConnectedCountry}
+					onCreateRoom={handleCreateRoomFromConnected}
+				/>
+			)}
+
+			{connectedUsersModalOpen && (
+				<TalkRoomConnectedUserModal
+					open
+					onClose={() => setConnectedUsersModalOpen(false)}
+					users={connectedUsers}
+					total={totalConnectedUsers}
+					loading={loadingConnectedPeople}
+					hasMore={connectedUsers.length < totalConnectedUsers}
+					onLoadMore={onLoadMoreConnectedUsers}
+					onCreateRoom={handleCreateRoomFromConnected}
+				/>
+			)}
+
+			{createRoomModalOpen && (
+				<ModalCreateTalkRoom
+					open
+					onClose={() => setCreateRoomModalOpen(false)}
+					onSuccess={handleCreateRoomSuccess}
 				/>
 			)}
 

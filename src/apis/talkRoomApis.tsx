@@ -360,3 +360,37 @@ export const notificationMeInTalkRoom = async ({
 
 	return await axios.post(url, payload)
 }
+
+export type TalkRoomConnectedUser = {
+	id: string
+	name: string
+	avatar?: string
+	country_code?: string
+	gender?: string
+	age?: number | null
+	connected_at?: string
+}
+
+export const getTalkRoomConnectedCountry = async ({
+	params = {},
+}: {
+	params?: { [key: string]: any }
+} = {}) => {
+	const url = TALKROOM_ROUTES.getTalkRoomConnectedCountry
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const getTalkRoomConnectedPeople = async ({
+	params = {},
+}: {
+	params?: { [key: string]: any }
+} = {}) => {
+	const url = TALKROOM_ROUTES.getTalkRoomConnectedPeople
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}

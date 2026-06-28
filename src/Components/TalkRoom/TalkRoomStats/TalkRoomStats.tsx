@@ -1,5 +1,6 @@
 import { IconChevronRight } from '@tabler/icons-react'
 import { Skeleton } from 'antd'
+import clsx from 'clsx'
 import { memo } from 'react'
 
 import ClockIcon from '@/svg/ClockIcon'
@@ -21,9 +22,16 @@ export type TalkRoomAnalysis = {
 type TalkRoomStatsProps = {
 	data?: TalkRoomAnalysis | null
 	loading?: boolean
+	onClickPeople?: () => void
+	onClickCountries?: () => void
 }
 
-function TalkRoomStats({ data, loading }: TalkRoomStatsProps) {
+function TalkRoomStats({
+	data,
+	loading,
+	onClickPeople,
+	onClickCountries,
+}: TalkRoomStatsProps) {
 	if (loading) {
 		return (
 			<div className={classes.stats}>
@@ -52,21 +60,31 @@ function TalkRoomStats({ data, loading }: TalkRoomStatsProps) {
 				</div>
 
 				<div className={classes.connectedContent}>
-					<div className={classes.statColumn}>
+					<button
+						type="button"
+						className={clsx(classes.statColumn, classes.statColumnClickable)}
+						onClick={onClickCountries}
+						disabled={!onClickCountries}
+					>
 						<span className={classes.statColumnLabel}>Countries</span>
 						<div className={classes.statValueRow}>
 							<span className={classes.statValue}>{countriesConnected}</span>
 							<IconChevronRight size={16} color="#0F1729" stroke={1.5} />
 						</div>
-					</div>
+					</button>
 
-					<div className={classes.statColumn}>
+					<button
+						type="button"
+						className={clsx(classes.statColumn, classes.statColumnClickable)}
+						onClick={onClickPeople}
+						disabled={!onClickPeople}
+					>
 						<span className={classes.statColumnLabel}>People</span>
 						<div className={classes.statValueRow}>
 							<span className={classes.statValue}>{peopleTalked}</span>
 							<IconChevronRight size={16} color="#0F1729" stroke={1.5} />
 						</div>
-					</div>
+					</button>
 				</div>
 			</div>
 

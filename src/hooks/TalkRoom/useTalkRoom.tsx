@@ -9,9 +9,12 @@ import {
 	getListTalkRoom,
 	getMyTalkRoomAnalysis,
 	getTalkRoomCategories,
+	getTalkRoomConnectedCountry,
+	getTalkRoomConnectedPeople,
 	getTalkRoomLanguages,
 	notificationMeInTalkRoom,
 	TalkRoomCategoryItem,
+	TalkRoomConnectedUser,
 	TalkRoomDetail,
 	TalkRoomLanguageItem,
 	TalkRoomListFilters,
@@ -39,6 +42,8 @@ export default function useTalkRoom() {
 	const [loadingNotification, setLoadingNotification] = useState(false)
 	const [loadingLanguages, setLoadingLanguages] = useState(false)
 	const [loadingCategories, setLoadingCategories] = useState(false)
+	const [loadingConnectedCountry, setLoadingConnectedCountry] = useState(false)
+	const [loadingConnectedPeople, setLoadingConnectedPeople] = useState(false)
 	const [myTalkRoomAnalysis, setMyTalkRoomAnalysis] = useState<any>(null)
 	const [languages, setLanguages] = useState<TalkRoomLanguageItem[]>([])
 	const [categories, setCategories] = useState<TalkRoomCategoryItem[]>([])
@@ -58,6 +63,11 @@ export default function useTalkRoom() {
 		null,
 	)
 	const [loadingTalkRoomDetail, setLoadingTalkRoomDetail] = useState(false)
+	const [connectedUsers, setConnectedUsers] = useState<TalkRoomConnectedUser[]>(
+		[],
+	)
+	const [totalConnectedUsers, setTotalConnectedUsers] = useState(0)
+	const [connectedCountries, setConnectedCountries] = useState<string[]>([])
 
 	const _listTalkRoomPaginationRef = useRef<PaginationType>(
 		cloneDeep({ ...paginationCommon, limit: 30 }),
@@ -66,6 +76,9 @@ export default function useTalkRoom() {
 		cloneDeep({ ...paginationCommon, limit: 30 }),
 	)
 	const _listTalkRoomFilterRef = useRef<TalkRoomListFilters>({})
+	const _connectedUsersPaginationRef = useRef<PaginationType>(
+		cloneDeep({ ...paginationCommon, limit: 50 }),
+	)
 
 	const patchTalkRoomInState = useCallback(
 		(id: string, room: Partial<TalkRoomListItem>) => {
@@ -81,6 +94,80 @@ export default function useTalkRoom() {
 		},
 		[],
 	)
+
+	const handleGetConnectedUsers = useCallback(
+		async (isNotLoading = false, reset = false) => {
+			if (reset) {
+				_connectedUsersPaginationRef.current.page = 1
+			}
+
+			setLoadingConnectedPeople(true)
+			try {
+				const { page, limit } = _connectedUsersPaginationRef.current
+				const isNew = page === 1
+
+				if (isNew && !isNotLoading) {
+					setConnectedUsers([])
+				}
+
+				const res: any = await getTalkRoomConnectedPeople({
+					params: {
+						fields: ['$all'],
+						page: !isNotLoading ? page : 1,
+						limit: !isNotLoading ? limit : limit * page,
+					},
+				})
+				const { code, results, pagination } = res || {}
+
+				if (code === 200) {
+					const rows: TalkRoomConnectedUser[] = results?.objects?.rows ?? []
+					const count =
+						results?.objects?.count ?? pagination?.total ?? rows.length
+
+					_connectedUsersPaginationRef.current.totalPage =
+						Math.ceil(count / limit) || 0
+
+					setConnectedUsers((prev) => {
+						const contents = isNew && !isNotLoading ? [] : prev
+						return uniqueArray(
+							[...contents, ...rows],
+							'id',
+						) as TalkRoomConnectedUser[]
+					})
+					setTotalConnectedUsers(count)
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingConnectedPeople(false)
+			}
+		},
+		[openError],
+	)
+
+	const handleLoadMoreConnectedUsers = useCallback(async () => {
+		const { page, totalPage } = _connectedUsersPaginationRef.current
+		if (loadingConnectedPeople || page >= totalPage) return
+
+		_connectedUsersPaginationRef.current.page += 1
+		await handleGetConnectedUsers()
+	}, [handleGetConnectedUsers, loadingConnectedPeople])
+
+	const handleGetConnectedCountry = useCallback(async () => {
+		setLoadingConnectedCountry(true)
+		try {
+			const res: any = await getTalkRoomConnectedCountry()
+			const { code, results } = res || {}
+
+			if (code === 200) {
+				setConnectedCountries(results?.object ?? [])
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoadingConnectedCountry(false)
+		}
+	}, [openError])
 
 	const handleNotificationMeInTalkRoom = useCallback(
 		async (id: string, isEnabled: boolean) => {
@@ -100,7 +187,9 @@ export default function useTalkRoom() {
 						params: { fields: ['$all'] },
 					})
 					const refreshed: TalkRoomDetail | null =
-						detailRes?.code === 200 ? detailRes?.results?.object ?? null : null
+						detailRes?.code === 200
+							? (detailRes?.results?.object ?? null)
+							: null
 
 					if (refreshed) {
 						patchTalkRoomInState(id, {
@@ -147,7 +236,9 @@ export default function useTalkRoom() {
 						params: { fields: ['$all'] },
 					})
 					const refreshed: TalkRoomDetail | null =
-						detailRes?.code === 200 ? detailRes?.results?.object ?? null : null
+						detailRes?.code === 200
+							? (detailRes?.results?.object ?? null)
+							: null
 
 					if (refreshed) {
 						patchTalkRoomInState(id, refreshed)
@@ -569,6 +660,8 @@ export default function useTalkRoom() {
 		loadingListTalkRooms,
 		loadingListMyFriendTalkRooms,
 		loadingTalkRoomDetail,
+		loadingConnectedPeople,
+		loadingConnectedCountry,
 		myTalkRoomAnalysis,
 		languages,
 		categories,
@@ -576,6 +669,9 @@ export default function useTalkRoom() {
 		listMyFriendTalkRooms,
 		displayTalkRooms,
 		talkRoomDetail,
+		connectedUsers,
+		connectedCountries,
+		totalConnectedUsers,
 		totalTalkRooms,
 		totalMyFriendTalkRooms,
 		listTalkRoomFilters,
@@ -601,5 +697,8 @@ export default function useTalkRoom() {
 		onDeleteTalkRoom: handleDeleteTalkRoom,
 		onCountMeInTalkRoom: handleCountMeInTalkRoom,
 		onNotificationMeInTalkRoom: handleNotificationMeInTalkRoom,
+		onGetConnectedUsers: handleGetConnectedUsers,
+		onLoadMoreConnectedUsers: handleLoadMoreConnectedUsers,
+		onGetConnectedCountry: handleGetConnectedCountry,
 	}
 }
