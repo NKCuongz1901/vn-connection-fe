@@ -155,6 +155,11 @@ export const TALKROOM_ROUTES = {
 	createTalkRoom: 'talkroom',
 	checkBookingSlots: 'talkroom/booking-slots',
 	checkCanCreateTalkRoom: 'validation/can-create-room',
+	getListTalkRoom: 'talkroom',
+	getListMyFriendTalkRoom: 'talkroom/friend-rooms',
+	getTalkRoomDetail: 'talkroom',
+	getTalkRoomConnectedCountry: 'talkroom/connected-countries',
+	getTalkRoomConnectedPeople: 'talkroom/connected-users',
 }
 export const Menus = [
 	{

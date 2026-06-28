@@ -91,7 +91,11 @@
 	flex-direction: column;
 	max-height: 320px;
 	overflow-y: auto;
-	padding: 8px 0 88px;
+	padding: 8px 0;
+}
+
+.listWithFooter {
+	padding-bottom: 88px;
 }
 
 .footer {
@@ -118,4 +122,24 @@
 .errorText {
 	font-size: 12px;
 	color: #f80024;
+}
+
+.wrapperChip {
+	width: auto;
+}
+
+.triggerChip {
+	width: auto;
+	min-height: auto;
+	padding: 6px 0 6px 16px;
+	border-radius: 999px;
+}
+
+.triggerTextChip {
+	flex: unset;
+	padding: 0;
+}
+
+.triggerIconChip {
+	padding: 4px 12px 4px 0;
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { TimePicker } from 'antd'
+import type { TimePickerProps } from 'antd'
 import clsx from 'clsx'
 import dayjs, { Dayjs } from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -17,7 +18,7 @@ export type CScheduleTimePickerProps = {
 	disabled?: boolean
 	readOnly?: boolean
 	placeholder?: string
-	minuteStep?: number
+	minuteStep?: TimePickerProps['minuteStep']
 	onChange?: (value: string) => void
 }
 
@@ -65,8 +66,8 @@ const CScheduleTimePicker = ({
 			value={timeValue}
 			format="hh:mmA"
 			placeholder={placeholder}
-			minuteStep={1}
-			needConfirm={false}
+			minuteStep={minuteStep}
+			needConfirm={true}
 			variant="borderless"
 			allowClear={false}
 			suffixIcon={null}

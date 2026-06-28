@@ -1,0 +1,47 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	width: 100%;
+}
+
+.searchWrapper {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	padding: 12px 8px;
+	background: var(--background-secondary, #f0f3f9);
+	border-radius: var(--radius-component-input-pill, 999px);
+}
+
+.searchIcon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	padding-left: 8px;
+}
+
+.searchInput {
+	flex: 1;
+	min-width: 0;
+	padding: 0 8px;
+	border: none;
+	outline: none;
+	background: transparent;
+	font-size: var(--body-base-size, 14px);
+	font-weight: 400;
+	line-height: var(--body-base-line-height, 20px);
+	color: var(--text-primary, #0f1729);
+
+	&::placeholder {
+		color: var(--text-placeholder, #7987a4);
+	}
+}
+
+.chipsRow {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+}

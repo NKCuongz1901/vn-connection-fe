@@ -56,6 +56,22 @@
 	min-width: 0;
 }
 
+.statColumnClickable {
+	padding: 0;
+	border: none;
+	background: transparent;
+	text-align: left;
+	cursor: pointer;
+
+	&:disabled {
+		cursor: default;
+	}
+
+	&:not(:disabled):hover .statValue {
+		color: #006b35;
+	}
+}
+
 .statColumnLabel {
 	color: #7987a4;
 	font-size: 12px;

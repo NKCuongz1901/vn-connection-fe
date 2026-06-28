@@ -48,9 +48,7 @@ function TalkRoomAvatarGroup({ room }: TalkRoomAvatarGroupProps) {
 								className={classes.avatar}
 							/>
 						</div>
-						<div
-							className={`${classes.avatarSlot} ${classes.avatarTopRight}`}
-						>
+						<div className={`${classes.avatarSlot} ${classes.avatarTopRight}`}>
 							<CAvatar
 								src={getSpeakerAvatar(visibleSpeakers[1])}
 								size={36}
@@ -90,13 +88,13 @@ function TalkRoomAvatarGroup({ room }: TalkRoomAvatarGroupProps) {
 					</>
 				)
 			default:
+				const speaker = visibleSpeakers[0]
+				const avatarSrc = getSpeakerAvatar(speaker)
 				return (
 					<div className={`${classes.avatarSlot} ${classes.avatarSingle}`}>
-						<CAvatar
-							src={getSpeakerAvatar(visibleSpeakers[0])}
-							size={40}
-							className={classes.avatar}
-						/>
+						{avatarSrc && (
+							<CAvatar src={avatarSrc} size={40} className={classes.avatar} />
+						)}
 					</div>
 				)
 		}
