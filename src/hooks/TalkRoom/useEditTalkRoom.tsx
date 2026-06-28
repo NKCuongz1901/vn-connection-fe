@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { TalkRoomDetail, TalkRoomListItem } from '@/apis/talkRoomApis'
+import { TalkRoomDetail, TalkRoomListItem, UpdateTalkRoomInput } from '@/apis/talkRoomApis'
 import type { ScheduleDayState } from '@/Components/TalkRoom/ScheduleThisRoom'
 import { buildScheduleDayOptions } from '@/ultis/talkRoomSchedule'
 import { levelOptions } from '@/Variable/common.variable'
@@ -78,7 +78,7 @@ export default function useEditTalkRoom({
 	) => Promise<TalkRoomDetail | null>
 	onUpdateTalkRoom: (
 		id: string,
-		input: { name: string },
+		input: UpdateTalkRoomInput,
 	) => Promise<TalkRoomListItem | null>
 	loadingUpdate?: boolean
 	onSuccess?: () => void
@@ -197,7 +197,13 @@ export default function useEditTalkRoom({
 		}
 	}, [onGetDetailTalkRoom, roomId])
 
-	const isFormValid = useMemo(() => !!form.name.trim(), [form.name])
+	const isFormValid = useMemo(
+		() =>
+			!!form.name.trim() &&
+			!!form.language_id &&
+			form.level.length >= 1,
+		[form],
+	)
 
 	const onChangeName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 		setForm((prev) => ({ ...prev, name: e.target.value }))
@@ -211,14 +217,20 @@ export default function useEditTalkRoom({
 			setErrors({ name: 'Topic name is required' })
 			return false
 		}
+		if (!form.language_id || !form.level.length) {
+			return false
+		}
 		return true
-	}, [form.name])
+	}, [form.language_id, form.level.length, form.name])
 
 	const handleSubmit = useCallback(async () => {
 		if (!validate() || !roomId) return
 
 		const room = await onUpdateTalkRoom(roomId, {
 			name: form.name.trim(),
+			language_id: form.language_id,
+			categorySlugs: form.categorySlugs,
+			level: form.level,
 		})
 
 		if (room) {

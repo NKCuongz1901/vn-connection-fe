@@ -14,6 +14,7 @@ import {
 	TalkRoomListFilters,
 	TalkRoomListItem,
 	updateTalkRoom,
+	UpdateTalkRoomInput,
 } from '@/apis/talkRoomApis'
 import { useModal } from '@/context/ModalContext'
 import { PaginationType } from '@/interface/common/common.interface'
@@ -323,33 +324,42 @@ export default function useTalkRoom() {
 	}, [openError])
 
 	const handleUpdateTalkRoom = useCallback(
-		async (id: string, input: { name: string }) => {
-			if (!id || !input.name.trim()) return null
+		async (id: string, input: UpdateTalkRoomInput) => {
+			if (!id || !input.name.trim() || !input.language_id) return null
 
 			setLoadingUpdate(true)
 			try {
+				const { categorySlugs, idempotency_key, level, ...rest } = input
 				const res: any = await updateTalkRoom({
 					id,
 					payload: {
-						name: input.name.trim(),
+						...rest,
+						name: rest.name.trim(),
+						level: level.map((item) => item.toLowerCase()),
+						categories: (categorySlugs || []).map((slug) => ({ slug })),
+						idempotency_key: idempotency_key || generateCustomUuid(),
 					},
 				})
 				const { code, results } = res || {}
 
 				if (code === 200) {
 					const updated: TalkRoomListItem = results?.object
-					const nextName = updated?.name ?? input.name.trim()
 
 					setListTalkRooms((prev) =>
 						prev.map((item) =>
-							item.id === id ? { ...item, ...updated, name: nextName } : item,
+							item.id === id ? { ...item, ...updated } : item,
+						),
+					)
+					setListMyFriendTalkRooms((prev) =>
+						prev.map((item) =>
+							item.id === id ? { ...item, ...updated } : item,
 						),
 					)
 					setTalkRoomDetail((prev) =>
-						prev?.id === id ? { ...prev, ...updated, name: nextName } : prev,
+						prev?.id === id ? { ...prev, ...updated } : prev,
 					)
 					openSuccess({ message: 'Update talk room successfully' })
-					return updated ?? { id, name: nextName }
+					return updated ?? { id, ...input, name: rest.name.trim() }
 				}
 			} catch (error) {
 				openError(error)

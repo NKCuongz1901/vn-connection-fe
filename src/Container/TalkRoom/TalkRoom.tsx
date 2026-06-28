@@ -165,7 +165,7 @@ function TalkRoom() {
 				</div>
 				<div className={classes.rightContent}>
 					{_renderLeaderBoard()}
-					{_renderFriendTalkroomList()}
+					{totalMyFriendTalkRooms > 0 && <>{_renderFriendTalkroomList()}</>}
 				</div>
 			</Flex>
 

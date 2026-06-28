@@ -5,7 +5,7 @@ import { Skeleton, Spin } from 'antd'
 import clsx from 'clsx'
 import { memo, useState } from 'react'
 
-import { TalkRoomDetail, TalkRoomListItem } from '@/apis/talkRoomApis'
+import { TalkRoomDetail, TalkRoomListItem, UpdateTalkRoomInput } from '@/apis/talkRoomApis'
 import useEditTalkRoom from '@/hooks/TalkRoom/useEditTalkRoom'
 
 import CCheckboxSelect from '@/Components/Custom/CCheckboxSelect'
@@ -27,7 +27,7 @@ export interface ModalEditTalkRoomProps {
 	) => Promise<TalkRoomDetail | null>
 	onUpdateTalkRoom: (
 		id: string,
-		input: { name: string },
+		input: UpdateTalkRoomInput,
 	) => Promise<TalkRoomListItem | null>
 	loadingUpdate?: boolean
 	onClose: () => void

@@ -258,7 +258,18 @@ export const getListMyFriendTalkRoom = async ({
 
 export type UpdateTalkRoomPayload = {
 	name: string
-	categories?: CreateTalkRoomCategory[]
+	level: string[]
+	language_id: string
+	categories: CreateTalkRoomCategory[]
+	idempotency_key: string
+}
+
+export type UpdateTalkRoomInput = {
+	name: string
+	level: string[]
+	language_id: string
+	categorySlugs: string[]
+	idempotency_key?: string
 }
 
 export const updateTalkRoom = async ({
