@@ -27,6 +27,7 @@ import {
 	formatTalkRoomLiveParticipantsText,
 	formatTalkRoomWaitingCount,
 	getTalkRoomStartTimeDisplay,
+	isTalkRoomGuestCanJoinEarly,
 	isTalkRoomHostCanStart,
 	isTalkRoomLive,
 	isTalkRoomLiveWithHostJoined,
@@ -80,6 +81,10 @@ function RoomCard({
 	const showActiveLiveFooter = isTalkRoomLiveWithHostJoined(room)
 	const showHostStartFooter =
 		!showActiveLiveFooter && !isFriendVariant && isTalkRoomHostCanStart(room)
+	const showGuestEarlyJoinFooter =
+		!showActiveLiveFooter &&
+		!isFriendVariant &&
+		isTalkRoomGuestCanJoinEarly(room)
 	const showGuestWaitingFooter =
 		!showActiveLiveFooter && !isFriendVariant && isTalkRoomWaitingForHost(room)
 	const showLegacyLiveFooter =
@@ -87,12 +92,14 @@ function RoomCard({
 		!isFriendVariant &&
 		isLive &&
 		!showHostStartFooter &&
+		!showGuestEarlyJoinFooter &&
 		!showGuestWaitingFooter
 	const hasCmi = (room?.total_cmi ?? 0) > 0 && !!cmiText
 	const showCmiSection =
 		!showActiveLiveFooter &&
 		!showLegacyLiveFooter &&
 		!showHostStartFooter &&
+		!showGuestEarlyJoinFooter &&
 		!showGuestWaitingFooter &&
 		!isLive &&
 		(hasCmi || !isYourRoom)
@@ -101,6 +108,7 @@ function RoomCard({
 		!showActiveLiveFooter &&
 		!isLive &&
 		!showHostStartFooter &&
+		!showGuestEarlyJoinFooter &&
 		!showGuestWaitingFooter
 
 	const handleShare = (event: React.MouseEvent) => {
@@ -224,39 +232,13 @@ function RoomCard({
 							</p>
 						</div>
 
-						{room?.is_joined ? (
-							<button
-								type="button"
-								className={clsx(
-									classes.actionBtn,
-									classes.actionBtnSecondary,
-									classes.actionBtnDisabled,
-								)}
-								disabled
-							>
-								Joined
-							</button>
-						) : isYourRoom ? (
-							<div className={classes.hostActions}>
-								<div className={classes.hostBadge}>
-									<IconCrown size={16} stroke={2} color="#E55A0F" />
-									<span>You&apos;re host</span>
-								</div>
-								<RoomCardHostActions
-									room={room}
-									onEditRoom={onEditRoom}
-									onCancelRoom={onCancelRoom}
-								/>
-							</div>
-						) : (
-							<button
-								type="button"
-								className={clsx(classes.actionBtn, classes.actionBtnStart)}
-								onClick={handleJoin}
-							>
-								Join now
-							</button>
-						)}
+						<button
+							type="button"
+							className={clsx(classes.actionBtn, classes.actionBtnStart)}
+							onClick={handleJoin}
+						>
+							Join now
+						</button>
 					</div>
 				) : showLegacyLiveFooter ? (
 					<div className={classes.footerRow}>
@@ -319,6 +301,21 @@ function RoomCard({
 							onClick={handleStart}
 						>
 							Start
+						</button>
+					</div>
+				) : showGuestEarlyJoinFooter ? (
+					<div className={classes.footerRow}>
+						<div className={classes.scheduleGroup}>
+							<CalenderIcon fill="#006B35" width={20} height={20} />
+							<span className={classes.scheduleLabel}>Start at</span>
+							<span className={classes.scheduleTime}>{scheduleText}</span>
+						</div>
+						<button
+							type="button"
+							className={clsx(classes.actionBtn, classes.actionBtnStart)}
+							onClick={handleJoin}
+						>
+							Join now
 						</button>
 					</div>
 				) : showGuestWaitingFooter ? (
