@@ -69,7 +69,9 @@ export default function useEventComment(
 			const isNew = page === 1
 			const res: any = await fetchComments({
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
-				where: { post_id: id, parent_id: null },
+				where: isPublic
+					? { post_id: id }
+					: { post_id: id, parent_id: null },
 				page,
 				limit,
 			})
@@ -78,12 +80,15 @@ export default function useEventComment(
 
 			if (code === 200) {
 				const { rows, count } = results?.objects || {}
+				const rootComments = isPublic
+					? (rows || []).filter((item) => !item?.parent_id)
+					: rows || []
 				const totalPage = Math.ceil((count || 0) / (limit || 1))
 				_paginationRefs.current.totalPage = totalPage
 				setCommentList((prev: any[]) => {
 					const contents = isNew ? [] : prev
 					const dataShow = uniqueArray(
-						[...contents, ...(rows || [])],
+						[...contents, ...rootComments],
 						'id',
 					) as any[]
 					return dataShow

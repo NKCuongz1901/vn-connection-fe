@@ -21,6 +21,7 @@ import { copyToClipboard, randomString } from '@/ultis/string'
 
 import { mainRoutes } from '@/routes/MainRoutes'
 import { repeatOpt } from '@/Variable/select.variable'
+import { participantType } from '@/Variable/event.variable'
 
 interface useDetailEventProps {
 	id: string
@@ -168,7 +169,9 @@ export default function useDetailEvent({
 		try {
 			const params = {
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
-				where: { post_id: id, type: 'ADMIN' },
+				where: isPublic
+					? { post_id: id }
+					: { post_id: id, type: participantType.ADMIN },
 				page: 1,
 				limit: 10,
 			}
@@ -179,7 +182,10 @@ export default function useDetailEvent({
 			await delay(1000)
 			if (code === 200) {
 				const { rows } = results?.objects || {}
-				setParticipantList(rows || [])
+				const adminRows = isPublic
+					? (rows || []).filter((item) => item?.type === participantType.ADMIN)
+					: rows || []
+				setParticipantList(adminRows)
 			}
 		} catch (error) {
 			openError(error)

@@ -48,9 +48,11 @@ export default function useEventCoHost({
 			}
 			const params = {
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
-				where: { post_id: id, type: 'ADMIN' },
+				where: isPublic
+					? { post_id: id }
+					: { post_id: id, type: participantType.ADMIN },
 				page,
-				limit,
+				limit: isPublic ? 100 : limit,
 			}
 			const res: any = await (isPublic
 				? getPublicListParticipant(params)
@@ -59,11 +61,14 @@ export default function useEventCoHost({
 			await delay(1000)
 			if (code === 200) {
 				const { rows, count } = results?.objects || {}
+				const adminRows = isPublic
+					? (rows || []).filter((item) => item?.type === participantType.ADMIN)
+					: rows || []
 				const totalPage = Math.ceil((count || 0) / (limit || 1))
 				_paginationRefs.current.totalPage = totalPage
 				setParticipantList((prev: any[]) => {
 					const contents = isNew ? [] : prev
-					const _rows = (rows || []).map((i) => {
+					const _rows = adminRows.map((i) => {
 						const { type } = i || {}
 						return {
 							...i,
@@ -74,7 +79,7 @@ export default function useEventCoHost({
 					const dataShow = uniqueArray([...contents, ..._rows], 'id') as any[]
 					return dataShow
 				})
-				setTotal(count)
+				setTotal(isPublic ? adminRows.length : count)
 			}
 		} catch (error) {
 			openError(error)
