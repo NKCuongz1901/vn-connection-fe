@@ -107,6 +107,7 @@ export const HANGOUT_ROUTES = {
 }
 export const DISCUSS_ROUTES = {
 	name: 'discuss',
+	publicDetail: 'discuss/public',
 	likeDiscuss: 'discuss/like',
 }
 export const CATEGORY_ROUTES = {

@@ -18,4 +18,7 @@ export const appLayoutAuth = [
 	'open-app',
 ]
 
-export const appLayoutPublic = [mainRoutes.publicEvent]
+export const appLayoutPublic = [
+	mainRoutes.publicEvent,
+	mainRoutes.publicDiscussion,
+]

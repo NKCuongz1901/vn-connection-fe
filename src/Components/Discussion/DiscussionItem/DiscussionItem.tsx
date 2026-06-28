@@ -26,6 +26,9 @@ interface DiscussionItemProps {
 	onAction?: any
 	onChangeUrl?: any
 	noRadius?: boolean
+	isPublic?: boolean
+	isDetailView?: boolean
+	onRequireLogin?: () => void
 	[key: string]: any
 }
 const DiscussionItem = (props: DiscussionItemProps) => {
@@ -36,6 +39,9 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 		onGetMenus,
 		onAction = () => null,
 		onChangeUrl = () => null,
+		isPublic,
+		isDetailView,
+		onRequireLogin,
 	} = props
 	const {
 		user,
@@ -52,6 +58,13 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 	const { avatar, name, id: user_id } = user || {}
 	const { title: titleCategory, image: imageCategory } = category || {}
 	const { value: timeAgo, unit } = getDiffFromNow({ input: created_at })
+	const handleProfileClick = (e: React.MouseEvent) => {
+		if (!isPublic) return
+		e.preventDefault()
+		e.stopPropagation()
+		onRequireLogin?.()
+	}
+
 	const _renderBody = () => {
 		return (
 			<Flex vertical className={classes.body}>
@@ -59,15 +72,21 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 					<CAvatar
 						className={classes.avatar}
 						src={avatar}
-						onClick={() => onChangeRoute(mainRoutes.profile + `/${user_id}`)}
+						onClick={(e) => {
+							if (isPublic) {
+								handleProfileClick(e)
+								return
+							}
+							onChangeRoute(mainRoutes.profile + `/${user_id}`)
+						}}
 					/>
-					<span className={classes.title}>{name}</span>
-					<span>
+					<span className={classes.userName}>{name}</span>
+					<span className={classes.timeAgo}>
 						{timeAgo} {unit ? unit + 's ago' : ''}
 					</span>
 				</Flex>
 				<Flex className={classes.bodyText} vertical>
-					<div className={classes.title}>{title}</div>
+					<div className={classes.postTitle}>{title}</div>
 					<CTextSpecial className={classes.text} data={description} />
 				</Flex>
 				<Flex className={classes.medias}>
@@ -152,13 +171,21 @@ const DiscussionItem = (props: DiscussionItemProps) => {
 	}
 
 	return (
-		<div className={classes.wrapper}>
+		<div
+			className={clsx(classes.wrapper, {
+				[classes.wrapperDetailView]: isDetailView,
+			})}
+		>
 			<Flex
 				className={clsx(classes.container, {
 					[classes.containerNoRadius]: noRadius,
+					[classes.containerDetailView]: isDetailView,
 				})}
 				vertical
-				onClick={() => onChangeUrl({ key: 'id', value: item })}
+				onClick={() => {
+					if (isPublic) return
+					onChangeUrl({ key: 'id', value: item })
+				}}
 			>
 				{titleCategory && (
 					<Flex className={classes.header}>

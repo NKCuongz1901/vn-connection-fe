@@ -219,7 +219,11 @@ const EventComment = (
 	}
 
 	return (
-		<div className={classes.wrapper}>
+		<div
+			className={clsx(classes.wrapper, {
+				[classes.publicView]: isPublic,
+			})}
+		>
 			<Flex className={classes.container} vertical>
 				<Flex className={classes.note}>
 					<span className={classes.title}>Comments</span>

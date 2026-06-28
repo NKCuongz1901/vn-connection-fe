@@ -12,6 +12,9 @@ import ModalMyFriend from '@/Components/Friend/ModalMyFriend'
 import DiscussionItem from '../DiscussionItem'
 import ModalCRUDDiscussion from '../ModalCRUDDiscussion'
 
+import { mainRoutes } from '@/routes/MainRoutes'
+import { useSafeBack } from '@/ultis/route'
+
 import classes from './DiscussionDetail.module.scss'
 import { REPORT_ISSUE_TYPE } from '@/Variable/common.variable'
 interface DiscussionDetailProps {
@@ -20,6 +23,8 @@ interface DiscussionDetailProps {
 	topic?: any
 	onAction?: any
 	title?: string
+	isPublic?: boolean
+	onRequireLogin?: () => void
 }
 const DiscussionDetail = (
 	{
@@ -28,9 +33,12 @@ const DiscussionDetail = (
 		conversation_id,
 		onAction: onActionProps = () => null,
 		title,
+		isPublic,
+		onRequireLogin,
 	}: DiscussionDetailProps,
 	ref,
 ) => {
+	const { goBackOrPush } = useSafeBack()
 	const {
 		eventCommentRef,
 
@@ -52,6 +60,8 @@ const DiscussionDetail = (
 			discussId,
 			onActionProps,
 			conversation_id,
+			isPublic,
+			onRequireLogin,
 		},
 		ref,
 	)
@@ -86,6 +96,9 @@ const DiscussionDetail = (
 				item={discussDetail}
 				onGetMenus={onGetMenus}
 				onAction={onAction}
+				isPublic={isPublic}
+				isDetailView={isPublic}
+				onRequireLogin={onRequireLogin}
 			/>
 		)
 	}
@@ -152,13 +165,22 @@ const DiscussionDetail = (
 		}
 		return Content
 	}
+	const handleBack = () => {
+		if (isPublic) {
+			goBackOrPush(mainRoutes.login)
+			return
+		}
+		onChangeUrl({ key: 'back', value: null })
+	}
+
 	return (
-		<div className={classes.wrapper}>
+		<div
+			className={clsx(classes.wrapper, {
+				[classes.wrapperPublic]: isPublic,
+			})}
+		>
 			<Flex vertical className={classes.container}>
-				<Flex
-					className={classes.back}
-					onClick={() => onChangeUrl({ key: 'back', value: null })}
-				>
+				<Flex className={classes.back} onClick={handleBack}>
 					<IconChevronLeft />
 					<div className={classes.title}>{title || 'Discussion'}</div>
 				</Flex>
@@ -169,13 +191,22 @@ const DiscussionDetail = (
 					})}
 					onScroll={onScroll}
 				>
-					{_renderContent()}
-					<Flex className={classes.comment}>
-						<EventComment id={discussId} ref={eventCommentRef} />
+					<div className={classes.postCard}>{_renderContent()}</div>
+					<Flex
+						className={clsx(classes.comment, {
+							[classes.commentCard]: isPublic,
+						})}
+					>
+						<EventComment
+							id={discussId}
+							ref={eventCommentRef}
+							isPublic={isPublic}
+							onRequireLogin={onRequireLogin}
+						/>
 					</Flex>
 				</Flex>
 			</Flex>
-			{_renderModal()}
+			{!isPublic && _renderModal()}
 		</div>
 	)
 }

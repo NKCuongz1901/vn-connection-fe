@@ -23,6 +23,7 @@ export const mainRoutes = {
 	miniApps: 'mini-apps',
 	peopleCommunity: 'people-community',
 	publicEvent: 'public-event',
+	publicDiscussion: 'public-discussion',
 	referral: 'referral',
 	referralAddBankCard: 'referral/add-bank-card',
 	referralRedeemHistory: 'referral/redeem-history',

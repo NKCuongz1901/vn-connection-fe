@@ -21,6 +21,18 @@ export const getDiscussDetail = async (params: {
 		params: convertParams(_params),
 	})
 }
+
+export const getPublicDiscussDetail = async (params: {
+	id: string
+	[key: string]: any
+}) => {
+	const { id, ..._params } = params || {}
+	const url = `${DISCUSS_ROUTES.publicDetail}/${id}`
+
+	return await axios.get(url, {
+		params: convertParams(_params),
+	})
+}
 export const getMyCategory = async (params) => {
 	const url = CATEGORY_ROUTES.myCategory
 

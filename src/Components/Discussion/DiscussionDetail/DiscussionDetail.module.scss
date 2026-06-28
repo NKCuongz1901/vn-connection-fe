@@ -160,6 +160,66 @@
 	}
 }
 
+.wrapperPublic {
+	min-height: 100%;
+	padding: 24px 32px;
+	background: #edf0f5;
+
+	.container {
+		max-width: 720px;
+		margin: 0 auto;
+		gap: 12px;
+		height: auto;
+	}
+
+	.back {
+		gap: 4px;
+		margin-bottom: 4px;
+
+		svg {
+			width: 20px;
+			height: 20px;
+			color: #48546b;
+		}
+
+		.title {
+			text-align: left;
+			color: #0f1729;
+			font-size: 18px;
+			font-weight: 600;
+		}
+	}
+
+	.body {
+		gap: 12px;
+		overflow: auto;
+	}
+
+	.postCard {
+		width: 100%;
+		flex-shrink: 0;
+	}
+
+	.commentCard {
+		border-radius: 16px;
+		background: #fff;
+		padding: 16px;
+		box-shadow: 0 1px 4px rgba(15, 23, 41, 0.08);
+		width: 100%;
+		white-space: normal;
+	}
+}
+
+@media (min-width: 0px) and (max-width: 769px) {
+	.wrapperPublic {
+		padding: 16px;
+
+		.back .title {
+			font-size: 16px;
+		}
+	}
+}
+
 @media (min-width: 0px) and (max-width: 769px) {
 	.wrapper {
 		.container {

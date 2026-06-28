@@ -14,6 +14,7 @@ import { sendMessageById } from '@/apis/conversationApis'
 import {
 	deleteDiscussion,
 	getDiscussDetail,
+	getPublicDiscussDetail,
 	likeDiscuss,
 } from '@/apis/discussionApis'
 import { blockUser } from '@/apis/userApis'
@@ -26,12 +27,16 @@ interface useDiscussionDetailProps {
 	discussId: string
 	onActionProps?: any
 	conversation_id?: string
+	isPublic?: boolean
+	onRequireLogin?: () => void
 }
 export default function useDiscussionDetail(
 	{
 		discussId,
 		conversation_id,
 		onActionProps = () => null,
+		isPublic,
+		onRequireLogin,
 	}: useDiscussionDetailProps,
 	ref,
 ) {
@@ -53,29 +58,33 @@ export default function useDiscussionDetail(
 		like: false,
 		commentList: true,
 	})
+
+	const discussDetailFields = [
+		'$all',
+		{ user: ['name', 'avatar', 'id'] },
+		{
+			medias: [
+				'thumbnail',
+				'duration',
+				'url',
+				'width',
+				'height',
+				'ratio',
+				'type',
+			],
+		},
+		{
+			category: ['id', 'image', 'title'],
+		},
+	]
+
 	const handleGetDetailDiscuss = async () => {
 		try {
 			setLoading((prev) => ({ ...prev, discuss: true }))
-			const res: any = await getDiscussDetail({
+			const fetchDetail = isPublic ? getPublicDiscussDetail : getDiscussDetail
+			const res: any = await fetchDetail({
 				id: discussId,
-				fields: [
-					'$all',
-					{ user: ['name', 'avatar', 'id'] },
-					{
-						medias: [
-							'thumbnail',
-							'duration',
-							'url',
-							'width',
-							'height',
-							'ratio',
-							'type',
-						],
-					},
-					{
-						category: ['id', 'image', 'title'],
-					},
-				],
+				fields: discussDetailFields,
 			})
 			if (res) {
 				const { object } = res?.results || {}
@@ -108,6 +117,10 @@ export default function useDiscussionDetail(
 	}
 
 	const handleLikeDiscuss = async (id: string) => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
 		if (loading.like) return
 		try {
 			setLoading((prev) => ({ ...prev, like: true }))
@@ -159,6 +172,10 @@ export default function useDiscussionDetail(
 		}
 	}
 	const handleAction = ({ key, value }) => {
+		if (isPublic && ['like', 'share', 'edit'].includes(key)) {
+			onRequireLogin?.()
+			return
+		}
 		switch (key) {
 			case 'like':
 				handleLikeDiscuss(value)
@@ -178,6 +195,14 @@ export default function useDiscussionDetail(
 	}
 
 	const handleMenusClick = ({ key, value }) => {
+		if (isPublic) {
+			if (key === 'share') {
+				onRequireLogin?.()
+				return
+			}
+			onRequireLogin?.()
+			return
+		}
 		switch (key) {
 			case 'share':
 				setModal({ type: key, data: value })
@@ -209,6 +234,17 @@ export default function useDiscussionDetail(
 		id: string
 		user_id: string
 	}) => {
+		if (isPublic) {
+			return [
+				{
+					key: 'share',
+					label: 'Share',
+					onClick: () =>
+						handleMenusClick({ key: 'share', value: { id, user_id, props } }),
+				},
+			] as ItemType[]
+		}
+
 		const isMe = user_id === getUserInfo()?.id
 
 		const menus: ItemType[] = [
@@ -262,6 +298,10 @@ export default function useDiscussionDetail(
 	}
 
 	const handleShareFriend = async (id) => {
+		if (isPublic) {
+			onRequireLogin?.()
+			return
+		}
 		setLoadingShare((prev: any) => ({ ...prev, [id]: true }))
 
 		try {
