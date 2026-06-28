@@ -17,7 +17,10 @@ import { useNewInbox } from '@/context/NewInboxContext'
 import AuthLayout from './Child/AuthLayout'
 import HeaderMainLayout from './Child/HeaderMainLayout'
 
-import { appLayoutAuth, appLayoutPublic } from '@/app/variable/layoutData'
+import {
+	appLayoutAuth,
+	appLayoutGuestAllowed,
+} from '@/app/variable/layoutData'
 import { Menus } from '@/routes'
 import { mainRoutes } from '@/routes/MainRoutes'
 
@@ -35,8 +38,10 @@ const MainLayout = (props: MainLayoutProps) => {
 	const { openConfirm } = useModal()
 	const ref = useRef<HTMLDivElement>(null)
 
-	const isPublicRoute = appLayoutPublic.some((i) => pathname.includes(i))
-	const shouldGuardMenu = isPublicRoute && !isLogin()
+	const isGuestAllowedRoute = appLayoutGuestAllowed.some((i) =>
+		pathname.includes(i),
+	)
+	const shouldGuardMenu = isGuestAllowedRoute && !isLogin()
 
 	const [openMenu, setOpenMenu] = useState(false)
 	const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -180,7 +185,7 @@ const MainLayout = (props: MainLayoutProps) => {
 
 	useEffect(() => {
 		const login = isLogin()
-		if (appLayoutPublic.some((i) => pathname.includes(i))) {
+		if (appLayoutGuestAllowed.some((i) => pathname.includes(i))) {
 			setContent(_renderAppShell())
 			return
 		}

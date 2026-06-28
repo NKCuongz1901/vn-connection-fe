@@ -23,3 +23,8 @@ export const appLayoutPublic = [
 	mainRoutes.publicDiscussion,
 	mainRoutes.publicCommunity,
 ]
+
+export const appLayoutGuestAllowed = [
+	mainRoutes.overview,
+	...appLayoutPublic,
+]

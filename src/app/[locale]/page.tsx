@@ -1,7 +1,9 @@
-import { headers } from 'next/headers'
-export default function Term() {
-	const headersList = headers()
+import { redirect } from '@/i18n/routing'
 
-	const pathname = headersList.get('x-x-pathname') || ''
-	return <div className="p-10">Welcome to https://univini.com/</div>
+export default function LocaleHomePage({
+	params: { locale },
+}: {
+	params: { locale: string }
+}) {
+	redirect({ href: '/overview', locale })
 }
