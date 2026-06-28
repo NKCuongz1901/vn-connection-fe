@@ -8,6 +8,7 @@ import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
 import ModalCancelTalkRoom from '@/Components/Modal/ModalCancelTalkRoom'
 import ModalCreateTalkRoom from '@/Components/Modal/ModalCreateTalkRoom'
 import ModalEditTalkRoom from '@/Components/Modal/ModalEditTalkRoom'
+import ModalTalkRoomWarning from '@/Components/Modal/ModalTalkRoomWarning'
 import TalkRoomConnectedCountryModal from '@/Components/Modal/TalkRoomConnectedCountryModal'
 import TalkRoomConnectedUserModal from '@/Components/Modal/TalkRoomConnectedUserModal'
 import RoomCard from '@/Components/TalkRoom/RoomCard'
@@ -22,6 +23,7 @@ import { TalkRoomRoom, isTalkRoomUserNotified } from '@/ultis/talkRoom'
 import { useLocalePath } from '@/ultis/route'
 
 import classes from './TalkRoom.module.scss'
+import CButtonCreate from '@/Components/Custom/CButtonCreate'
 
 function TalkRoom() {
 	const [ruleModalOpen, setRuleModalOpen] = useState(false)
@@ -31,6 +33,8 @@ function TalkRoom() {
 	const [connectedCountriesModalOpen, setConnectedCountriesModalOpen] =
 		useState(false)
 	const [createRoomModalOpen, setCreateRoomModalOpen] = useState(false)
+	const [createTalkRoomWarningOpen, setCreateTalkRoomWarningOpen] =
+		useState(false)
 	const { onChangeRoute } = useLocalePath()
 
 	const {
@@ -78,6 +82,15 @@ function TalkRoom() {
 	const handleOpenConnectedCountriesModal = () => {
 		setConnectedCountriesModalOpen(true)
 		onGetConnectedCountry()
+	}
+
+	const handleOpenCreateTalkRoomWarning = () => {
+		setCreateTalkRoomWarningOpen(true)
+	}
+
+	const handleConfirmCreateTalkRoomWarning = () => {
+		setCreateTalkRoomWarningOpen(false)
+		setCreateRoomModalOpen(true)
 	}
 
 	const handleCreateRoomFromConnected = () => {
@@ -211,6 +224,11 @@ function TalkRoom() {
 	}
 	return (
 		<div className={classes.wrapper}>
+			<div className={classes.createRoomBtnWrapper}>
+				<CButtonCreate isIcon onClick={handleOpenCreateTalkRoomWarning}>
+					Create talk room
+				</CButtonCreate>
+			</div>
 			<Flex className={classes.header}>
 				<IconChevronLeft
 					className={classes.iconBack}
@@ -279,6 +297,14 @@ function TalkRoom() {
 					hasMore={connectedUsers.length < totalConnectedUsers}
 					onLoadMore={onLoadMoreConnectedUsers}
 					onCreateRoom={handleCreateRoomFromConnected}
+				/>
+			)}
+
+			{createTalkRoomWarningOpen && (
+				<ModalTalkRoomWarning
+					open
+					onClose={() => setCreateTalkRoomWarningOpen(false)}
+					onConfirm={handleConfirmCreateTalkRoomWarning}
 				/>
 			)}
 

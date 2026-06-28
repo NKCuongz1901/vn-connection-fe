@@ -7,6 +7,13 @@
 	flex: 1 0 0;
 	align-self: stretch;
 
+	.createRoomBtnWrapper {
+		position: absolute;
+		right: 200px;
+		bottom: 24px;
+		z-index: 1000;
+	}
+
 	.header {
 		align-items: center;
 		gap: var(--spacing-spacer-12, 12px);
