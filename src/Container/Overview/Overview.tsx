@@ -600,7 +600,7 @@ const Overview = () => {
 							className={classes.talkRoomEmptyWrapper}
 							vertical
 							align="center"
-							onClick={() => onChangeRoute(mainRoutes.talkroom)}
+							onClick={() => handleOpenCreateTalkRoomModal()}
 						>
 							<img
 								src="/images/emptyRoom.png"

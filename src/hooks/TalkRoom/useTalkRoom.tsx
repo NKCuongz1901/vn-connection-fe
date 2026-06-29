@@ -282,7 +282,7 @@ export default function useTalkRoom() {
 					setTotalTalkRooms((prev) => Math.max(0, prev - 1))
 					setTotalMyFriendTalkRooms((prev) => Math.max(0, prev - 1))
 					setTalkRoomDetail((prev) => (prev?.id === id ? null : prev))
-					openSuccess({ message: 'Cancel talk room successfully' })
+					openSuccess({ message: 'Your talk room has been canceled' })
 					handleGetMyTalkRoomAnalysis()
 					return true
 				}
@@ -623,7 +623,9 @@ export default function useTalkRoom() {
 				if (code === 200) {
 					const room = results?.object
 					openSuccess({
-						message: 'Create talk room successfully',
+						titleLabel: 'Create successfully!',
+						message:
+							'Your talk room is ready and will start at the time you set',
 						onAccept: () => {
 							handleGetMyTalkRoomAnalysis()
 						},

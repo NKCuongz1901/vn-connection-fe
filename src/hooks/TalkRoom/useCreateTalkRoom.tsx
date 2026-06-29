@@ -21,6 +21,9 @@ type CreateTalkRoomErrors = Partial<
 const MAX_CATEGORIES = 3
 const MAX_LEVELS = 2
 
+const hasIncompatibleLevels = (levels: string[]) =>
+	levels.includes('BEGINNER') && levels.includes('ADVANCED')
+
 const initialForm: CreateTalkRoomForm = {
 	name: '',
 	language_id: '',
@@ -111,6 +114,14 @@ export default function useCreateTalkRoom({
 	}, [])
 
 	const onChangeLevel = useCallback((values: string[]) => {
+		if (hasIncompatibleLevels(values)) {
+			setErrors((prev) => ({
+				...prev,
+				level: 'Beginner and Advanced cannot be selected at the same time',
+			}))
+			return
+		}
+
 		setForm((prev) => ({ ...prev, level: values }))
 		setErrors((prev) => ({ ...prev, level: undefined }))
 	}, [])

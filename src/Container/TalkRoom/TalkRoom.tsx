@@ -225,7 +225,7 @@ function TalkRoom() {
 	return (
 		<div className={classes.wrapper}>
 			<div className={classes.createRoomBtnWrapper}>
-				<CButtonCreate isIcon onClick={handleOpenCreateTalkRoomWarning}>
+				<CButtonCreate isIcon onClick={() => setCreateRoomModalOpen(true)}>
 					Create talk room
 				</CButtonCreate>
 			</div>

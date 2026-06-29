@@ -16,7 +16,7 @@ import type { ScheduleDayState } from '@/Components/TalkRoom/ScheduleThisRoom'
 
 export default function useTalkRoomSchedule() {
 	const { openError } = useModal()
-	const [scheduleEnabled, setScheduleEnabled] = useState(true)
+	const [scheduleEnabled, setScheduleEnabled] = useState(false)
 	const [loadingSlots, setLoadingSlots] = useState(false)
 	const [bookingSlotsByDay, setBookingSlotsByDay] = useState<
 		Record<string, BookingSlotsData>
