@@ -1,0 +1,172 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.header {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	padding: 8px 16px;
+}
+
+.title {
+	margin: 0;
+	color: #0f1729;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 28px;
+	text-align: center;
+}
+
+.closeBtn {
+	position: absolute;
+	top: 12px;
+	right: 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: none;
+	background: none;
+	color: #7987a4;
+	cursor: pointer;
+
+	&:hover {
+		color: #0f1729;
+	}
+}
+
+.divider {
+	height: 1px;
+	background: #e2e8f0;
+}
+
+.body {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 24px 16px 16px;
+}
+
+.content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+}
+
+.thoughtBubble {
+	position: relative;
+	max-width: 244px;
+	padding: 8px;
+	border-radius: 12px;
+	background: #fff;
+	box-shadow: 0 0 8px rgba(0, 58, 111, 0.08);
+	color: #0f1729;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+	text-align: center;
+	word-break: break-word;
+
+	&::after {
+		content: '';
+		position: absolute;
+		left: 14px;
+		bottom: -9px;
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		background: #fff;
+		box-shadow: 0 0 8px rgba(0, 58, 111, 0.08);
+	}
+
+	&::before {
+		content: '';
+		position: absolute;
+		left: 28px;
+		bottom: -18px;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: #fff;
+		box-shadow: 0 0 8px rgba(0, 58, 111, 0.08);
+	}
+}
+
+.avatarWrap {
+	margin-top: 8px;
+}
+
+.info {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	color: #0f1729;
+	font-size: 14px;
+	line-height: 20px;
+}
+
+.infoName {
+	font-weight: 600;
+}
+
+.infoDivider {
+	width: 1px;
+	height: 12px;
+	background: #edf0f5;
+}
+
+.infoTime {
+	color: #48546b;
+	font-weight: 400;
+}
+
+.footer {
+	display: flex;
+	gap: 12px;
+	flex-shrink: 0;
+	padding: 12px 16px;
+	background: #fff;
+}
+
+.deleteBtn,
+.updateBtn {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 12px 16px;
+	border: none;
+	border-radius: 99px;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.deleteBtn {
+	background: #f0f3f9;
+	color: #0f1729;
+
+	&:hover {
+		background: #e8ecf4;
+	}
+}
+
+.updateBtn {
+	background: #e55a0f;
+	color: #fff;
+
+	&:hover {
+		background: #d4520e;
+	}
+}

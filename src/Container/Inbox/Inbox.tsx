@@ -1,10 +1,15 @@
 'use client'
-import { IconChevronLeft, IconCircleXFilled, IconPlus } from '@tabler/icons-react'
+import {
+	IconChevronLeft,
+	IconCircleXFilled,
+	IconPlus,
+} from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
-import { Fragment, memo, useCallback } from 'react'
+import { Fragment, memo, useCallback, useState } from 'react'
 
 import useInbox from '@/hooks/Inbox/useInbox'
+import useThought from '@/hooks/Inbox/useThought'
 
 import { arrayFrom, isArray } from '@/ultis/array'
 import { toJson } from '@/ultis/common'
@@ -16,6 +21,8 @@ import { randomString } from '@/ultis/string'
 import CAvatar from '@/Components/Custom/CAvatar'
 import CInput from '@/Components/Custom/CInput'
 import InboxChat from '@/Components/Inbox/InboxChat'
+import ModalShareThought from '@/Components/Inbox/ModalShareThought'
+import ModalViewThought from '@/Components/Inbox/ModalViewThought'
 import Message3 from '@/svg/Message3'
 import MessageIcon from '@/svg/MessageIcon'
 import NotFound from '@/svg/NotFound'
@@ -25,6 +32,7 @@ import SearchIcon from '@/svg/SearchIcon'
 import { mappingTypeMessage } from '@/Variable/common.variable'
 
 import classes from './Inbox.module.scss'
+import useProfile from '@/hooks/Profile/useProfile'
 
 const Inbox = () => {
 	const {
@@ -51,6 +59,60 @@ const Inbox = () => {
 		onCreateConv,
 		onUpdateListConv,
 	} = useInbox()
+	const { userData, onGetUserProfile } = useProfile({})
+	const [shareThoughtOpen, setShareThoughtOpen] = useState(false)
+	const [viewThoughtOpen, setViewThoughtOpen] = useState(false)
+	const [friendThought, setFriendThought] = useState<{
+		thought: string
+		avatar?: string
+		name?: string
+		updatedAt?: string | number | null
+	} | null>(null)
+	const { shareThought, deleteThought, loading: thoughtLoading } = useThought({
+		onSuccess: () => onGetUserProfile({ isNotLoading: true }),
+	})
+	const meInfo = getUserInfo()
+	const thought = userData?.thinking || ''
+	const thinkingUpdatedAt = userData?.thinking_updated_at
+	const hasThought = !!thought?.trim()
+
+	const handleOpenThought = () => {
+		if (hasThought) {
+			setViewThoughtOpen(true)
+		} else {
+			setShareThoughtOpen(true)
+		}
+	}
+
+	const handleUpdateThought = () => {
+		setViewThoughtOpen(false)
+		setShareThoughtOpen(true)
+	}
+
+	const handleShareThought = async (value: string) => {
+		const ok = await shareThought(value)
+		if (ok) setShareThoughtOpen(false)
+	}
+
+	const handleDeleteThought = async () => {
+		const ok = await deleteThought()
+		if (ok) setViewThoughtOpen(false)
+	}
+
+	const handleOpenFriendThought = (friend: {
+		thinking?: string | null
+		avatar?: string
+		name?: string
+		thinking_updated_at?: string | number | null
+	}) => {
+		if (!friend?.thinking?.trim()) return
+		setFriendThought({
+			thought: friend.thinking,
+			avatar: friend.avatar,
+			name: friend.name,
+			updatedAt: friend.thinking_updated_at,
+		})
+	}
 
 	const _renderLastMessage = useCallback((item) => {
 		const { last_message, is_read, activeItem } = item || {}
@@ -319,7 +381,23 @@ const Inbox = () => {
 		return (
 			<Flex className={classes.friendStoryList}>
 				<div className={classes.friendStoryMe}>
-					<div className={classes.thoughtBubble}>Drop a thought</div>
+					<div
+						className={clsx(classes.thoughtBubble, {
+							[classes.thoughtBubbleFilled]: !!thought?.trim(),
+							[classes.thoughtBubbleClickable]: true,
+						})}
+						role="button"
+						tabIndex={0}
+						onClick={handleOpenThought}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault()
+								handleOpenThought()
+							}
+						}}
+					>
+						{thought?.trim() ? thought : 'Drop a thought'}
+					</div>
 					<div className={classes.friendStoryMeAvatarWrap}>
 						<CAvatar
 							src={avatar}
@@ -330,6 +408,7 @@ const Inbox = () => {
 							type="button"
 							className={classes.addThoughtBtn}
 							aria-label="Drop a thought"
+							onClick={handleOpenThought}
 						>
 							<IconPlus size={16} color="#006B35" stroke={2} />
 						</button>
@@ -341,15 +420,19 @@ const Inbox = () => {
 					const {
 						id: friendId,
 						avatar: friendAvatar,
+						thinking: friendThinking,
 						visibility,
 						online_time,
 					} = friend || {}
 					const isOnline = visibility === 'ONLINE'
+					const hasFriendThought = !!friendThinking?.trim()
 
 					return (
 						<div
 							key={id}
-							className={classes.friendStoryItem}
+							className={clsx(classes.friendStoryItem, {
+								[classes.friendStoryItemWithThought]: hasFriendThought,
+							})}
 							onClick={() => friendId && onCreateConv(friendId)}
 							role="button"
 							tabIndex={0}
@@ -359,7 +442,35 @@ const Inbox = () => {
 								}
 							}}
 						>
-							<div className={classes.friendStoryAvatarWrap}>
+							{hasFriendThought && (
+								<div
+									className={clsx(
+										classes.thoughtBubble,
+										classes.thoughtBubbleFilled,
+										classes.thoughtBubbleClickable,
+									)}
+									role="button"
+									tabIndex={0}
+									onClick={(e) => {
+										e.stopPropagation()
+										handleOpenFriendThought(friend)
+									}}
+									onKeyDown={(e) => {
+										if (e.key === 'Enter' || e.key === ' ') {
+											e.preventDefault()
+											e.stopPropagation()
+											handleOpenFriendThought(friend)
+										}
+									}}
+								>
+									{friendThinking}
+								</div>
+							)}
+							<div
+								className={clsx(classes.friendStoryAvatarWrap, {
+									[classes.friendStoryFriendAvatarWrap]: hasFriendThought,
+								})}
+							>
 								<CAvatar src={friendAvatar} size={64} />
 								{isOnline ? (
 									<span className={classes.onlineDot} aria-label="Online" />
@@ -444,6 +555,32 @@ const Inbox = () => {
 					)}
 				</Flex>
 			</Flex>
+			<ModalShareThought
+				open={shareThoughtOpen}
+				onClose={() => setShareThoughtOpen(false)}
+				initialThought={thought}
+				loading={thoughtLoading}
+				onShare={handleShareThought}
+			/>
+			<ModalViewThought
+				open={viewThoughtOpen}
+				onClose={() => setViewThoughtOpen(false)}
+				thought={thought}
+				avatar={meInfo?.avatar}
+				updatedAt={thinkingUpdatedAt}
+				loading={thoughtLoading}
+				onUpdate={handleUpdateThought}
+				onDelete={handleDeleteThought}
+			/>
+			<ModalViewThought
+				open={!!friendThought}
+				onClose={() => setFriendThought(null)}
+				thought={friendThought?.thought || ''}
+				avatar={friendThought?.avatar}
+				name={friendThought?.name}
+				updatedAt={friendThought?.updatedAt}
+				showFooter={false}
+			/>
 		</div>
 	)
 }
