@@ -63,7 +63,7 @@ function FeedbackSupport() {
 			setLoadingReportType(true)
 			try {
 				const res: any = await getReportIssueTypes({
-					type: REPORT_ISSUE_TYPE.GET_HELP,
+					type: REPORT_ISSUE_TYPE.TALKROOM,
 				})
 				const rows = res?.results?.objects ?? []
 				setReportTypeList(rows)
@@ -311,7 +311,7 @@ function FeedbackSupport() {
 					<Flex className={classes.chooseImg} vertical>
 						<Flex className={classes.upload}>
 							<CUploadMuti
-								maxCount={1}
+								maxCount={5}
 								onChange={({ fileList: newList }) => {
 									handleImportImg(newList)
 								}}
@@ -321,7 +321,7 @@ function FeedbackSupport() {
 							</CUploadMuti>
 						</Flex>
 						<p className={classes.uploadText}>
-							* Upload maximum 1 image or video (max 1 min).
+							* Upload maximum 5 image or video (max 1 min).
 						</p>
 						{fileList.length > 0 && (
 							<Flex className={classes.medias}>
