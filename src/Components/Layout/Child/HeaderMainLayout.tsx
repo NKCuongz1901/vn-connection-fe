@@ -172,7 +172,6 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 			handleStorageUserInfo()
 			// Sửa lỗi TS1252: Chuyển Function Declaration thành Arrow Function Expression.
 			const setupFCM = async () => {
-				// Bọc logic bất đồng bộ trong try...catch để bắt lỗi mạng hoặc lỗi Firebase.
 				try {
 					// Tắt console.log() sau khi debug
 					const token = await initFCM()
