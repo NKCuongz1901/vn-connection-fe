@@ -106,6 +106,11 @@ const Overview = () => {
 	}>({ open: false })
 
 	const handleOpenTalkRoomJoinModal = (roomId: string) => {
+		if (userData.keyIntroTalkRoom === true) {
+			onChangeRoute(`${mainRoutes.talkroom}`)
+			return
+		}
+
 		setTalkRoomJoinModal({ open: true, roomId })
 	}
 
@@ -130,7 +135,13 @@ const Overview = () => {
 		setCreateTalkRoomModal({ open: false })
 	}
 
-	const handleConfirmTalkRoomWelcome = () => {
+	const handleConfirmTalkRoomWelcome = async () => {
+		await onUpdateUserInfo({
+			status_of_tutorial: {
+				_keyIntroTalkRoom: true,
+			},
+		})
+
 		setTalkRoomJoinModal((prev) => ({ ...prev, open: false }))
 		setTalkRoomRuleModal({ open: true })
 	}

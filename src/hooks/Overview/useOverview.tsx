@@ -27,6 +27,7 @@ type userDataProps = {
 	title_open_hangout: string
 	latitude: null | number
 	longitude: null | number
+	keyIntroTalkRoom: null | boolean
 }
 type filterProps = {
 	radius: number | string | null
@@ -59,6 +60,7 @@ export default function useOverview() {
 		title_open_hangout: '',
 		latitude: null,
 		longitude: null,
+		keyIntroTalkRoom: null,
 	})
 	const [defaultTitleHangout, setDefaultTitleHangout] =
 		useState('I want to hang out')
@@ -290,13 +292,19 @@ export default function useOverview() {
 			})
 			const { code, results } = res || {}
 			if (code === 200) {
-				const { is_open_hangout, title_open_hangout, latitude, longitude } =
-					results?.object || {}
+				const {
+					is_open_hangout,
+					title_open_hangout,
+					latitude,
+					longitude,
+					status_of_tutorial,
+				} = results?.object || {}
 				setUserData({
 					is_open_hangout,
 					title_open_hangout,
 					latitude,
 					longitude,
+					keyIntroTalkRoom: status_of_tutorial?._keyIntroTalkRoom,
 				})
 				await handleGetOpenHangout(!!is_open_hangout)
 			}
@@ -311,8 +319,9 @@ export default function useOverview() {
 
 		try {
 			setDefaultTitleHangout('')
+			const { keyIntroTalkRoom: _keyIntroTalkRoom, ...apiUserData } = userData
 			const payload = {
-				...userData,
+				...apiUserData,
 				...otherData,
 			}
 			const res = (await updateUserProfile(payload)) as any
@@ -331,6 +340,10 @@ export default function useOverview() {
 						obj.title_open_hangout ?? payload.title_open_hangout,
 					latitude: obj.latitude ?? payload.latitude,
 					longitude: obj.longitude ?? payload.longitude,
+					keyIntroTalkRoom:
+						obj.status_of_tutorial?._keyIntroTalkRoom ??
+						otherData.status_of_tutorial?._keyIntroTalkRoom ??
+						userData.keyIntroTalkRoom,
 				})
 				await handleGetOpenHangout(isOpenHangout)
 			}
