@@ -26,6 +26,8 @@ import { handleRemoveAllCookie, isLogin } from '@/ultis/storage'
 interface openSuccessProps {
 	message: string
 	titleLabel?: string
+	autoCloseMs?: number
+	hideFooter?: boolean
 	onAccept?: any
 	[key: string]: any
 }
@@ -134,7 +136,7 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 				content = (
 					<CModalSuccess
 						onCancel={(e) => {
-							e.stopPropagation()
+							e?.stopPropagation?.()
 							closeModal()
 							onAccept?.()
 						}}

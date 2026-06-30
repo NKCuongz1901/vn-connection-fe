@@ -282,7 +282,11 @@ export default function useTalkRoom() {
 					setTotalTalkRooms((prev) => Math.max(0, prev - 1))
 					setTotalMyFriendTalkRooms((prev) => Math.max(0, prev - 1))
 					setTalkRoomDetail((prev) => (prev?.id === id ? null : prev))
-					openSuccess({ message: 'Your talk room has been canceled' })
+					openSuccess({
+						message: 'Your talk room has been canceled',
+						autoCloseMs: 2000,
+						hideFooter: true,
+					})
 					handleGetMyTalkRoomAnalysis()
 					return true
 				}
@@ -594,7 +598,11 @@ export default function useTalkRoom() {
 					setTalkRoomDetail((prev) =>
 						prev?.id === id ? { ...prev, ...updated } : prev,
 					)
-					openSuccess({ message: 'Update talk room successfully' })
+					openSuccess({
+						message: 'Update talk room successfully',
+						autoCloseMs: 2000,
+						hideFooter: true,
+					})
 					return updated ?? { id, ...input, name: rest.name.trim() }
 				}
 			} catch (error) {
@@ -626,6 +634,8 @@ export default function useTalkRoom() {
 						titleLabel: 'Create successfully!',
 						message:
 							'Your talk room is ready and will start at the time you set',
+						autoCloseMs: 2000,
+						hideFooter: true,
 						onAccept: () => {
 							handleGetMyTalkRoomAnalysis()
 						},
