@@ -149,7 +149,7 @@ function TalkRoom() {
 				</Flex>
 				<TalkRoomFilterBar
 					searchKeyword={searchKeyword}
-					languageId={listTalkRoomFilters.languageIds?.[0] || ''}
+					languageIds={listTalkRoomFilters.languageIds || []}
 					levelValues={selectedLevelFilters}
 					languageOptions={languageFilterOptions}
 					loadingLanguages={loadingLanguages}

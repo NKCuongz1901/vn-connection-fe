@@ -435,13 +435,13 @@ export default function useTalkRoom() {
 	)
 
 	const handleChangeLanguageFilter = useCallback(
-		(languageId: string) => {
+		(languageIds: string[]) => {
 			const next: TalkRoomListFilters = {
 				..._listTalkRoomFilterRef.current,
 			}
 
-			if (languageId) {
-				next.languageIds = [languageId]
+			if (isArray(languageIds, 1)) {
+				next.languageIds = languageIds
 			} else {
 				delete next.languageIds
 			}
@@ -478,6 +478,7 @@ export default function useTalkRoom() {
 			languages.map((item) => ({
 				label: item.name,
 				value: item.id,
+				flag: item.flag,
 			})),
 		[languages],
 	)

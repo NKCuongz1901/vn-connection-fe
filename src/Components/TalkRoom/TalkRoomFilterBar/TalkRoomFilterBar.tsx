@@ -1,9 +1,7 @@
 'use client'
 
-import { useMemo } from 'react'
-
 import CCheckboxSelect from '@/Components/Custom/CCheckboxSelect'
-import CRadioSelect from '@/Components/Custom/CRadioSelect'
+import SelectLanguage from '@/Components/TalkRoom/SelectLanguage'
 import SearchIcon from '@/svg/SearchIcon'
 import { levelOptions } from '@/Variable/common.variable'
 
@@ -11,18 +9,18 @@ import classes from './TalkRoomFilterBar.module.scss'
 
 type TalkRoomFilterBarProps = {
 	searchKeyword: string
-	languageId?: string
+	languageIds?: string[]
 	levelValues?: string[]
-	languageOptions?: { label: string; value: string }[]
+	languageOptions?: { label: string; value: string; flag?: string }[]
 	loadingLanguages?: boolean
 	onChangeSearchKeyword: (value: string) => void
-	onChangeLanguage: (languageId: string) => void
+	onChangeLanguage: (languageIds: string[]) => void
 	onChangeLevel: (levels: string[]) => void
 }
 
 function TalkRoomFilterBar({
 	searchKeyword,
-	languageId = '',
+	languageIds = [],
 	levelValues = [],
 	languageOptions = [],
 	loadingLanguages,
@@ -30,14 +28,6 @@ function TalkRoomFilterBar({
 	onChangeLanguage,
 	onChangeLevel,
 }: TalkRoomFilterBarProps) {
-	const filterLanguageOptions = useMemo(
-		() =>
-			languageOptions.length
-				? [{ label: 'All languages', value: '' }, ...languageOptions]
-				: [],
-		[languageOptions],
-	)
-
 	return (
 		<div className={classes.wrapper}>
 			<div className={classes.searchWrapper}>
@@ -54,11 +44,10 @@ function TalkRoomFilterBar({
 			</div>
 
 			<div className={classes.chipsRow}>
-				<CRadioSelect
-					variant="chip"
+				<SelectLanguage
 					placeholder="Language"
-					options={filterLanguageOptions}
-					value={languageId}
+					options={languageOptions}
+					value={languageIds}
 					onChange={onChangeLanguage}
 					disabled={loadingLanguages}
 				/>
