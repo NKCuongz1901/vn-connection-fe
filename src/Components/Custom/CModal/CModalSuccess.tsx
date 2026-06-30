@@ -32,7 +32,9 @@ const CModalSuccess = (_props: CModalSuccessProps) => {
 		if (!autoCloseMs || !onCancel) return
 
 		const timer = setTimeout(() => {
-			onCancel({ stopPropagation: () => {} } as React.MouseEvent)
+			onCancel({
+				stopPropagation: () => {},
+			} as React.MouseEvent<HTMLButtonElement>)
 		}, autoCloseMs)
 
 		return () => clearTimeout(timer)
