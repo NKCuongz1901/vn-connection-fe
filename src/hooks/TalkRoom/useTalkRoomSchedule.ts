@@ -62,13 +62,16 @@ export default function useTalkRoomSchedule() {
 				const isCurrentlyChecked = current?.checked ?? false
 
 				if (isCurrentlyChecked) {
-					return {}
+					const next = { ...prev }
+					delete next[key]
+					return next
 				}
 
 				return {
+					...prev,
 					[key]: {
 						checked: true,
-						fromTime: null,
+						fromTime: current?.fromTime ?? null,
 					},
 				}
 			})
@@ -77,12 +80,13 @@ export default function useTalkRoomSchedule() {
 	)
 
 	const onChangeFromTime = useCallback((key: string, fromTime: string) => {
-		setScheduleByDay({
+		setScheduleByDay((prev) => ({
+			...prev,
 			[key]: {
 				checked: true,
 				fromTime,
 			},
-		})
+		}))
 	}, [])
 
 	const buildSchedules = useCallback(
