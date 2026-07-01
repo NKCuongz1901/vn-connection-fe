@@ -4,7 +4,7 @@ import { POST_ROUTES } from '@/routes'
 import { convertParams } from '@/ultis/object'
 import { getDateInfo } from '@/ultis/date'
 
-const SITE_URL = 'https://univini.com'
+const SITE_URL = 'https://dev.univini.com'
 
 export type PublicEventDetail = {
 	title?: string
@@ -40,7 +40,9 @@ const buildEventDescription = (event: PublicEventDetail) => {
 	}
 	if (address) parts.push(address)
 
-	return parts.length ? truncate(parts.join(' · ')) : 'Join this event on UniVini'
+	return parts.length
+		? truncate(parts.join(' · '))
+		: 'Join this event on UniVini'
 }
 
 export const fetchPublicEventDetail = async (
@@ -92,8 +94,7 @@ export const generateEventMetadata = async ({
 	const { title, thumbnails, share_link } = event
 	const description = buildEventDescription(event)
 	const image = thumbnails?.[0]
-	const pageUrl =
-		share_link || `${SITE_URL}/${locale}/${routeSegment}/${id}`
+	const pageUrl = share_link || `${SITE_URL}/${locale}/${routeSegment}/${id}`
 
 	return {
 		title: title ? `${title} | UniVini` : fallback.title,
