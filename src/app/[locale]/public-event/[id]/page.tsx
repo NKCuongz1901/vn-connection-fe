@@ -1,12 +1,14 @@
-'use client'
-
 import DetailEvent from '@/Container/Event/DetailEvent'
-import { useQuery } from '@/ultis/route'
 
-const PublicEventDetailPage = () => {
-	const { onGetParams } = useQuery()
-	const id = onGetParams('id') as string
-	return <DetailEvent id={id} isPublic />
+type Props = {
+	params: Promise<{
+		locale: string
+		id: string
+	}>
 }
 
-export default PublicEventDetailPage
+export default async function PublicEventDetailPage({ params }: Props) {
+	const { id } = await params
+
+	return <DetailEvent id={id} isPublic />
+}

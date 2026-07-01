@@ -30,6 +30,7 @@ export const handleStorageCookie = ({
 }
 
 export const getStorageCookie = (key: string) => {
+	if (typeof document === 'undefined') return null
 	const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'))
 	if (!match) return null
 
