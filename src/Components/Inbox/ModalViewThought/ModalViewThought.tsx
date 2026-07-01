@@ -86,17 +86,19 @@ function ModalViewThought({
 			}}
 		>
 			<div className={classes.wrapper}>
-				<div className={classes.header}>
-					<h2 className={classes.title}>Share your thought</h2>
-					<button
-						type="button"
-						className={classes.closeBtn}
-						aria-label="Close"
-						onClick={onClose}
-					>
-						<IconX size={20} stroke={1.5} />
-					</button>
-				</div>
+				{showFooter && (
+					<div className={classes.header}>
+						<h2 className={classes.title}>Share your thought</h2>
+						<button
+							type="button"
+							className={classes.closeBtn}
+							aria-label="Close"
+							onClick={onClose}
+						>
+							<IconX size={20} stroke={1.5} />
+						</button>
+					</div>
+				)}
 
 				<div className={classes.divider} />
 

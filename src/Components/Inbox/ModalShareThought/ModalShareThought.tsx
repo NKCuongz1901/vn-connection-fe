@@ -1,12 +1,13 @@
 'use client'
 
-import { IconCloud, IconX } from '@tabler/icons-react'
+import { IconX } from '@tabler/icons-react'
 import { memo, useEffect, useState } from 'react'
 
 import CButton from '@/Components/Custom/CButton'
 import CModal from '@/Components/Custom/CModal/CModal'
 
 import classes from './ModalShareThought.module.scss'
+import CloundIcon from '@/svg/CloundIcon'
 
 const THOUGHT_MAX_LENGTH = 40
 
@@ -88,11 +89,7 @@ function ModalShareThought({
 							{thought.length}/{THOUGHT_MAX_LENGTH}
 						</span>
 						<div className={classes.inputWrap}>
-							<IconCloud
-								size={20}
-								stroke={1.5}
-								className={classes.cloudIcon}
-							/>
+							<CloundIcon size={20} />
 							<input
 								type="text"
 								className={classes.input}

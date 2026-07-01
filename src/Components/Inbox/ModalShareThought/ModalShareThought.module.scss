@@ -48,8 +48,10 @@
 .body {
 	display: flex;
 	flex-direction: column;
+	justify-content: space-between;
 	gap: 16px;
 	padding: 16px;
+	min-height: 200px;
 }
 
 .inputGroup {
