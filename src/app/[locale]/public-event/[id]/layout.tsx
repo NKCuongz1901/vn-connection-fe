@@ -4,13 +4,18 @@ import { generateEventMetadata } from '@/ultis/eventMetadata'
 
 type Props = {
 	children: React.ReactNode
-	params: { locale: string; id: string }
+	params: Promise<{
+		locale: string
+		id: string
+	}>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+	const { locale, id } = await params
+
 	return generateEventMetadata({
-		id: params.id,
-		locale: params.locale,
+		id,
+		locale,
 		routeSegment: 'public-event',
 	})
 }
