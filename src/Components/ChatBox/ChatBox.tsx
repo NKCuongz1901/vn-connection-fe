@@ -606,7 +606,10 @@ const ChatBox = ({
 			</Flex>
 		)
 	}
-	const _renderMessageAiIcons = (item, { isMe, isTemp, isMemberAction, type }) => {
+	const _renderMessageAiIcons = (
+		item,
+		{ isMe, isTemp, isMemberAction, type },
+	) => {
 		const { id } = item || {}
 		if (isTemp || isMemberAction || isMe || type === 'MEDIAS') return null
 
@@ -722,7 +725,10 @@ const ChatBox = ({
 						[classes.isTemp]: isTemp,
 					})}
 				>
-					<Flex className={classes.contentItem}>
+					<Flex
+						className={classes.contentItem}
+						justify={isMe ? 'flex-end' : undefined}
+					>
 						{!isNot && (
 							<Flex className={classes.avatar}>
 								{isFirst && (
@@ -739,7 +745,11 @@ const ChatBox = ({
 								)}
 							</Flex>
 						)}
-						<Flex className={classes.contentInfo} vertical>
+						<Flex
+							className={classes.contentInfo}
+							vertical
+							align={isMe ? 'end' : undefined}
+						>
 							{isFirst && !isNot && (
 								<Flex className={classes.name}>{user?.name}</Flex>
 							)}
@@ -748,12 +758,6 @@ const ChatBox = ({
 									[classes.isReaction]: isArray(reactions, 1),
 								})}
 							>
-								{_renderMessageAiIcons(item, {
-									isMe,
-									isTemp,
-									isMemberAction,
-									type,
-								})}
 								<div
 									className={clsx(classes.messageBubbleHitArea, {
 										[classes.messageBubbleInteractive]: canOpenMessageMenu,
@@ -772,6 +776,12 @@ const ChatBox = ({
 								>
 									{_renderContentChat(item)}
 								</div>
+								{_renderMessageAiIcons(item, {
+									isMe,
+									isTemp,
+									isMemberAction,
+									type,
+								})}
 							</Flex>
 						</Flex>
 					</Flex>

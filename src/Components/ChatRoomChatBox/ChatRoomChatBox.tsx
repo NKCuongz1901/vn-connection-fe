@@ -562,7 +562,10 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 				return <Flex className={classes.memberAccept}>{type}</Flex>
 		}
 	}
-	const _renderMessageAiIcons = (item, { isMe, isTemp, isMemberAction, type }) => {
+	const _renderMessageAiIcons = (
+		item,
+		{ isMe, isTemp, isMemberAction, type },
+	) => {
 		const { id } = item || {}
 		if (isTemp || isMemberAction || isMe || type === 'MEDIAS') return null
 
@@ -681,7 +684,10 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 						[classes.isTemp]: isTemp,
 					})}
 				>
-					<Flex className={classes.contentItem}>
+					<Flex
+						className={classes.contentItem}
+						justify={isMe ? 'flex-end' : undefined}
+					>
 						{!isNot && (
 							<Flex className={classes.avatar}>
 								{isFirst && (
@@ -696,7 +702,11 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 								)}
 							</Flex>
 						)}
-						<Flex className={classes.contentInfo} vertical>
+						<Flex
+							className={classes.contentInfo}
+							vertical
+							align={isMe ? 'end' : undefined}
+						>
 							{isFirst && (
 								<Flex className={classes.infoNameTime}>
 									{!isNot && <Flex className={classes.name}>{user?.name}</Flex>}
@@ -708,12 +718,6 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 									[classes.isReaction]: isArray(reactions, 1),
 								})}
 							>
-								{_renderMessageAiIcons(item, {
-									isMe,
-									isTemp,
-									isMemberAction,
-									type,
-								})}
 								<div
 									className={clsx(classes.messageBubbleHitArea, {
 										[classes.messageBubbleInteractive]: canOpenMessageMenu,
@@ -732,6 +736,12 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 								>
 									{_renderContentChat(item)}
 								</div>
+								{_renderMessageAiIcons(item, {
+									isMe,
+									isTemp,
+									isMemberAction,
+									type,
+								})}
 							</Flex>
 						</Flex>
 					</Flex>
@@ -739,14 +749,11 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 			</Flex>
 		)
 	}
-	const handleActionMenuClick = useCallback(
-		(key: string) => {
-			if (key !== 'quick') return
-			setShowActionMenu(false)
-			setOpenQuickMessage(true)
-		},
-		[],
-	)
+	const handleActionMenuClick = useCallback((key: string) => {
+		if (key !== 'quick') return
+		setShowActionMenu(false)
+		setOpenQuickMessage(true)
+	}, [])
 
 	const handleSendQuickMessage = useCallback(
 		(item: QuickMessageItem) => {

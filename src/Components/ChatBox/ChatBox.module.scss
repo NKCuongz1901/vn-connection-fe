@@ -72,9 +72,14 @@
 						font-weight: 600;
 					}
 					.content {
+						width: fit-content;
 						max-width: 100%;
+						align-self: flex-start;
+						align-items: flex-end;
+						gap: 8px;
 						.messageBubbleHitArea {
 							max-width: 100%;
+							flex: 0 1 auto;
 						}
 						.messageBubbleInteractive {
 							cursor: pointer;
@@ -85,7 +90,7 @@
 							padding: 6px;
 							gap: 8px;
 							position: relative;
-							order: 1;
+							flex-shrink: 0;
 							.moreIcon {
 								cursor: pointer;
 								border-radius: 50%;
@@ -426,15 +431,24 @@
 			margin-top: 8px;
 		}
 		.isMe {
+			width: 100%;
 			justify-content: flex-end;
 			.contentItem {
-				// justify-content: flex-end;
+				width: fit-content;
+				max-width: 80%;
+				margin-left: auto;
+				margin-right: 0;
 				position: relative;
 
 				.contentInfo {
-					// justify-content: flex-end;
+					width: fit-content;
+					max-width: 100%;
+					align-items: flex-end;
 
 					.content {
+						width: fit-content;
+						max-width: 100%;
+						align-self: auto;
 						justify-content: flex-end;
 						.moreIconWrapper {
 							position: relative;
@@ -447,6 +461,7 @@
 							word-break: break-word;
 							position: relative;
 							min-width: 100px;
+							max-width: 100%;
 							div {
 								display: flex;
 								justify-content: flex-end;
@@ -463,6 +478,8 @@
 							}
 						}
 						.stickerWrapper {
+							width: fit-content;
+							max-width: 100%;
 							align-items: flex-end;
 						}
 						.time {
