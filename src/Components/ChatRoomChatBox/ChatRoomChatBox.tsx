@@ -449,7 +449,6 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 				)
 			case 'MEDIAS': {
 				const totalMedia = (medias || []).length
-				const isMulti = totalMedia > 1
 				const gridCount = Math.min(totalMedia, 5)
 				const firstMediaType = medias?.[0]?.type
 				const isAudioMedia = firstMediaType === 'AUDIO'
@@ -509,8 +508,10 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 								{_renderParentItem(parent)}
 								<div
 									className={clsx(
-										isMulti ? classes.multiMediaContent : classes.mediaContent,
-										!isAudioMedia && isMulti && classes[`grid${gridCount}`],
+										isAudioMedia
+											? classes.mediaContent
+											: classes.multiMediaContent,
+										!isAudioMedia && classes[`grid${gridCount}`],
 									)}
 								>
 									{Content}
