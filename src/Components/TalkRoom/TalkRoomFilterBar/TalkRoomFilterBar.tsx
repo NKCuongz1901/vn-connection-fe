@@ -58,7 +58,7 @@ function TalkRoomFilterBar({
 					options={levelOptions}
 					value={levelValues}
 					onChange={onChangeLevel}
-					maxSelected={2}
+					maxSelected={3}
 				/>
 			</div>
 		</div>
