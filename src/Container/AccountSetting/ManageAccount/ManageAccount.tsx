@@ -191,7 +191,7 @@ function ManageAccount() {
 
 			<Divider />
 			<Flex className={classes.section}>
-				<div className={classes.sectionTitle}>Account Infomations</div>
+				<div className={classes.sectionTitle}>Manage Account</div>
 				<Flex vertical className={classes.actions} gap={12}>
 					{ACCOUNT_ACTIONS.map((action) => (
 						<button

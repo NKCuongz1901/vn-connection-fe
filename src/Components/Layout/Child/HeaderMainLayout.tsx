@@ -79,6 +79,7 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 			{
 				key: 'fns',
 				label: 'Feedback & Support',
+				onClick: () => handleMenusClick('feedback'),
 			},
 			{
 				key: 'signout',
@@ -290,6 +291,9 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 				break
 			case 'peopleCommunity':
 				onChangeRoute(mainRoutes.peopleCommunity)
+				break
+			case 'feedback':
+				onChangeRoute(mainRoutes.feedback)
 				break
 			default:
 				break

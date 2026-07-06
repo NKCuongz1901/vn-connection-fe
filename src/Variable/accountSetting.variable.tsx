@@ -37,12 +37,12 @@ export const ACCOUNT_SETTING_MENUS = [
 	// 	path: 'profile/account-setting/members-network',
 	// 	Icon: UserSearchIcon,
 	// },
-	{
-		key: 'feedback-support',
-		label: 'Feedback & Support',
-		path: 'profile/account-setting/feedback-support',
-		Icon: IconMailFilled,
-	},
+	// {
+	// 	key: 'feedback-support',
+	// 	label: 'Feedback & Support',
+	// 	path: 'profile/account-setting/feedback-support',
+	// 	Icon: IconMailFilled,
+	// },
 	{
 		key: 'request-feature',
 		label: 'Request a feature',
