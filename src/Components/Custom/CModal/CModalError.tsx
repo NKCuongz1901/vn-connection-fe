@@ -42,6 +42,7 @@ const CModalError = (_props: CModalProps) => {
 	return (
 		<CModal
 			className="wrapperCModalError"
+			zIndex={2100}
 			onCancel={onClose}
 			footer={[
 				<Flex key="back" justify="center">

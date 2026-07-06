@@ -25,6 +25,7 @@ export type CCheckboxSelectProps = {
 	value?: string[]
 	onChange?: (values: string[]) => void
 	maxSelected?: number
+	onMaxSelectedExceeded?: () => void
 	isRequired?: boolean
 	error?: string
 	disabled?: boolean
@@ -44,6 +45,7 @@ const CCheckboxSelect = ({
 	value = [],
 	onChange,
 	maxSelected,
+	onMaxSelectedExceeded,
 	isRequired,
 	error,
 	disabled,
@@ -83,22 +85,27 @@ const CCheckboxSelect = ({
 
 	const handleToggle = useCallback(
 		(optionValue: string) => {
+			const isDeselecting = draft.includes(optionValue)
+			const isAtMax =
+				!isDeselecting && !!maxSelected && draft.length >= maxSelected
+
+			if (isAtMax) {
+				setOpen(false)
+				onMaxSelectedExceeded?.()
+				return
+			}
+
 			setDraft((prev) => {
-				let next: string[]
-				if (prev.includes(optionValue)) {
-					next = prev.filter((item) => item !== optionValue)
-				} else if (maxSelected && prev.length >= maxSelected) {
-					next = prev
-				} else {
-					next = [...prev, optionValue]
-				}
+				const next = isDeselecting
+					? prev.filter((item) => item !== optionValue)
+					: [...prev, optionValue]
 				if (immediateSelect) {
 					onChange?.(next)
 				}
 				return next
 			})
 		},
-		[maxSelected, immediateSelect, onChange],
+		[draft, maxSelected, onMaxSelectedExceeded, immediateSelect, onChange],
 	)
 
 	const handleCancel = useCallback(() => {

@@ -40,6 +40,7 @@ function ModalCreateTalkRoom({
 		onChangeName,
 		onChangeLanguage,
 		onChangeCategories,
+		onCategoryMaxExceeded,
 		onChangeLevel,
 		onToggleScheduleEnabled,
 		onToggleDay,
@@ -118,6 +119,7 @@ function ModalCreateTalkRoom({
 							options={categoryOptions}
 							value={form.categorySlugs}
 							onChange={onChangeCategories}
+							onMaxSelectedExceeded={onCategoryMaxExceeded}
 							error={errors.categorySlugs}
 							maxSelected={3}
 							disabled={loadingCategories}

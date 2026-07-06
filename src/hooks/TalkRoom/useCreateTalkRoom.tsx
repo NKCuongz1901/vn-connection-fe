@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 
+import { useModal } from '@/context/ModalContext'
+
 import { isArray } from '@/ultis/array'
 
 import { levelOptions } from '@/Variable/common.variable'
@@ -60,6 +62,7 @@ export default function useCreateTalkRoom({
 		resetSchedule,
 	} = useTalkRoomSchedule()
 
+	const { openError } = useModal()
 	const [form, setForm] = useState<CreateTalkRoomForm>(initialForm)
 	const [errors, setErrors] = useState<CreateTalkRoomErrors>({})
 
@@ -112,6 +115,10 @@ export default function useCreateTalkRoom({
 		setForm((prev) => ({ ...prev, categorySlugs: values }))
 		setErrors((prev) => ({ ...prev, categorySlugs: undefined }))
 	}, [])
+
+	const onCategoryMaxExceeded = useCallback(() => {
+		openError('You can only select up to 3 categories')
+	}, [openError])
 
 	const onChangeLevel = useCallback((values: string[]) => {
 		if (hasIncompatibleLevels(values)) {
@@ -200,6 +207,7 @@ export default function useCreateTalkRoom({
 		onChangeName,
 		onChangeLanguage,
 		onChangeCategories,
+		onCategoryMaxExceeded,
 		onChangeLevel,
 		onToggleScheduleEnabled,
 		onToggleDay,
