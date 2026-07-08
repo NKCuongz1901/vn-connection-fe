@@ -201,6 +201,20 @@ export default function useTalkRoom() {
 					}
 
 					openSuccess({
+						autoCloseMs: 2000,
+						hideFooter: true,
+						styles: {
+							content: {
+								width: '360px',
+								maxWidth: 'calc(100vw - 32px)',
+								minHeight: 'unset',
+								padding: '20px 24px',
+							},
+							body: {
+								flex: 'unset',
+								padding: 0,
+							},
+						},
 						message: isEnabled
 							? 'Notification turned on successfully'
 							: 'Notification turned off successfully',
