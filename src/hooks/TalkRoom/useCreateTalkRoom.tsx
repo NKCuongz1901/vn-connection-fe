@@ -26,6 +26,9 @@ const MAX_LEVELS = 2
 const hasIncompatibleLevels = (levels: string[]) =>
 	levels.includes('BEGINNER') && levels.includes('ADVANCED')
 
+const LEVEL_INCOMPATIBLE_MSG =
+	'Beginner and Advanced cannot be selected at the same time'
+
 const initialForm: CreateTalkRoomForm = {
 	name: '',
 	language_id: '',
@@ -90,6 +93,7 @@ export default function useCreateTalkRoom({
 			!!form.language_id &&
 			form.level.length >= 1 &&
 			form.level.length <= MAX_LEVELS &&
+			!hasIncompatibleLevels(form.level) &&
 			form.categorySlugs.length <= MAX_CATEGORIES
 		)
 	}, [form])
@@ -121,15 +125,13 @@ export default function useCreateTalkRoom({
 	}, [openError])
 
 	const onChangeLevel = useCallback((values: string[]) => {
+		setForm((prev) => ({ ...prev, level: values }))
+
 		if (hasIncompatibleLevels(values)) {
-			setErrors((prev) => ({
-				...prev,
-				level: 'Beginner and Advanced cannot be selected at the same time',
-			}))
+			setErrors((prev) => ({ ...prev, level: LEVEL_INCOMPATIBLE_MSG }))
 			return
 		}
 
-		setForm((prev) => ({ ...prev, level: values }))
 		setErrors((prev) => ({ ...prev, level: undefined }))
 	}, [])
 
@@ -146,6 +148,8 @@ export default function useCreateTalkRoom({
 			nextErrors.level = 'Level is required'
 		} else if (form.level.length > MAX_LEVELS) {
 			nextErrors.level = `You can only select up to ${MAX_LEVELS} levels`
+		} else if (hasIncompatibleLevels(form.level)) {
+			nextErrors.level = LEVEL_INCOMPATIBLE_MSG
 		}
 		if (form.categorySlugs.length > MAX_CATEGORIES) {
 			nextErrors.categorySlugs = `You can only select up to ${MAX_CATEGORIES} categories`

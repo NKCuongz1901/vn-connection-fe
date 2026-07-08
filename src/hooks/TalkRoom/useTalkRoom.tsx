@@ -286,6 +286,18 @@ export default function useTalkRoom() {
 						message: 'Your talk room has been canceled',
 						autoCloseMs: 2000,
 						hideFooter: true,
+						styles: {
+							content: {
+								width: '360px',
+								maxWidth: 'calc(100vw - 32px)',
+								minHeight: 'unset',
+								padding: '20px 24px',
+							},
+							body: {
+								flex: 'unset',
+								padding: 0,
+							},
+						},
 					})
 					handleGetMyTalkRoomAnalysis()
 					return true
