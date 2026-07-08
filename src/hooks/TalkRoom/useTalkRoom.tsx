@@ -247,9 +247,23 @@ export default function useTalkRoom() {
 					}
 
 					openSuccess({
+						autoCloseMs: 2000,
+						hideFooter: true,
 						message: isEnabled
 							? 'Count me in successfully'
 							: 'You opted out successfully',
+						styles: {
+							content: {
+								width: '360px',
+								maxWidth: 'calc(100vw - 32px)',
+								minHeight: 'unset',
+								padding: '20px 24px',
+							},
+							body: {
+								flex: 'unset',
+								padding: 0,
+							},
+						},
 					})
 					handleGetMyTalkRoomAnalysis()
 					return true
