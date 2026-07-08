@@ -168,6 +168,8 @@ const Profile = (props: ProfileProps) => {
 			i_am_from,
 			mode,
 			amount_of_friend,
+			wallet,
+			amount_of_feedback,
 		} = userData || {}
 		const isMe = id === getUserInfo('id')
 		const completedScore = userData?.complete_profile?.point || 0
@@ -231,7 +233,7 @@ const Profile = (props: ProfileProps) => {
 								<Flex gap={4} align="center">
 									<IconStarFilled size={14} color="#006B35" />
 									<span className={classes.amountOfFeferences}>
-										10 feferences
+										{wallet} references
 									</span>
 								</Flex>
 							</Flex>
@@ -274,7 +276,7 @@ const Profile = (props: ProfileProps) => {
 										<span className={classes.communityBuilderText}>
 											Community builder:{' '}
 											<span className={classes.communityBuilderTextBold}>
-												5
+												{amount_of_feedback}
 											</span>{' '}
 											friends invited
 										</span>

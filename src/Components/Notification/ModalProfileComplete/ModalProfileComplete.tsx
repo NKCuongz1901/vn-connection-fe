@@ -76,13 +76,15 @@ function ModalProfileComplete(_props: ModalProfileCompleteProps) {
 							</Flex>
 						)
 					})}
-					<CButton
-						ctype="oranger"
-						style={{ width: '100%', height: 44, marginTop: 12 }}
-						onClick={onCompleteProfile}
-					>
-						Complete Profile
-					</CButton>
+					{completeData?.point < 100 && (
+						<CButton
+							ctype="oranger"
+							style={{ width: '100%', height: 44, marginTop: 12 }}
+							onClick={onCompleteProfile}
+						>
+							Complete Profile
+						</CButton>
+					)}
 				</Flex>
 			</CModal>
 		</div>
