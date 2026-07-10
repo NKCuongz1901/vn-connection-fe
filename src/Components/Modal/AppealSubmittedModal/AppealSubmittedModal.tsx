@@ -1,6 +1,5 @@
 'use client'
 
-import { IconX } from '@tabler/icons-react'
 import { memo } from 'react'
 
 import CModal from '@/Components/Custom/CModal/CModal'
@@ -10,10 +9,10 @@ import classes from './AppealSubmittedModal.module.scss'
 
 export interface AppealSubmittedModalProps {
 	open: boolean
-	onClose: () => void
+	onSignOut: () => void
 }
 
-function AppealSubmittedModal({ open, onClose }: AppealSubmittedModalProps) {
+function AppealSubmittedModal({ open, onSignOut }: AppealSubmittedModalProps) {
 	if (!open) return null
 
 	return (
@@ -21,8 +20,9 @@ function AppealSubmittedModal({ open, onClose }: AppealSubmittedModalProps) {
 			open
 			centered
 			closable={false}
+			maskClosable={false}
+			keyboard={false}
 			footer={null}
-			onCancel={onClose}
 			styles={{
 				content: {
 					width: 352,
@@ -37,15 +37,6 @@ function AppealSubmittedModal({ open, onClose }: AppealSubmittedModalProps) {
 			}}
 		>
 			<div className={classes.wrapper}>
-				<button
-					type="button"
-					className={classes.closeBtn}
-					aria-label="Close"
-					onClick={onClose}
-				>
-					<IconX size={20} />
-				</button>
-
 				<div className={classes.content}>
 					<div className={classes.icon}>
 						<AppealIcon />
@@ -63,6 +54,16 @@ function AppealSubmittedModal({ open, onClose }: AppealSubmittedModalProps) {
 							days)
 						</p>
 					</div>
+				</div>
+
+				<div className={classes.footer}>
+					<button
+						type="button"
+						className={classes.signOutBtn}
+						onClick={onSignOut}
+					>
+						Sign out
+					</button>
 				</div>
 			</div>
 		</CModal>

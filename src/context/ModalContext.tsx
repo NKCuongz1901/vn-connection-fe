@@ -165,7 +165,7 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 						open
 						payload={open.payload || {}}
 						appealLoading={appealLoading}
-						onClose={handleCloseAccountSuspended}
+						onLogout={handleCloseAccountSuspended}
 						onAppeal={handleAppeal}
 					/>
 				)
@@ -174,7 +174,7 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 				content = (
 					<AppealSubmittedModal
 						open
-						onClose={handleCloseAccountSuspended}
+						onSignOut={handleCloseAccountSuspended}
 					/>
 				)
 				break

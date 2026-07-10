@@ -81,19 +81,59 @@
 
 .footer {
 	position: relative;
+	display: flex;
+	align-items: stretch;
+	gap: 12px;
 	padding: 12px 16px;
-	border-top: 1px solid #edf0f5;
+	background: #fff;
+
+	&::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 1px;
+		background: #edf0f5;
+	}
+}
+
+.footerBtn {
+	flex: 1 0 0;
+	min-width: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 12px 16px;
+	border: none;
+	border-radius: 99px;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	white-space: nowrap;
+	cursor: pointer;
+	transition: opacity 0.2s ease;
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}
+
+.logoutBtn {
+	color: #0f1729;
+	background: #eef3f6;
+
+	&:hover:not(:disabled) {
+		background: #e4eaef;
+	}
 }
 
 .appealBtn {
-	width: 100%;
+	color: #fff;
+	background: #e55a0f;
 
-	:global(button) {
-		width: 100%;
-		min-height: 48px;
-		border-radius: 99px !important;
-		font-size: 16px;
-		font-weight: 600;
-		line-height: 24px;
+	&:hover:not(:disabled) {
+		background: #cf4f0d;
 	}
 }

@@ -1,13 +1,9 @@
 'use client'
 
-import {
-	IconAlertCircleFilled,
-	IconInfoCircle,
-	IconX,
-} from '@tabler/icons-react'
+import { IconAlertCircleFilled } from '@tabler/icons-react'
+import clsx from 'clsx'
 import { memo } from 'react'
 
-import CButton from '@/Components/Custom/CButton'
 import CModal from '@/Components/Custom/CModal/CModal'
 
 import {
@@ -18,11 +14,13 @@ import {
 } from '@/ultis/string'
 
 import classes from './AccountSuspendedModal.module.scss'
+import { getSessionStorage, getUserInfo } from '@/ultis/storage'
+import { STORAGE_KEY } from '@/Variable/storage.variable'
 
 export interface AccountSuspendedModalProps {
 	open: boolean
 	payload: AccountSuspendedPayload
-	onClose: () => void
+	onLogout: () => void
 	onAppeal?: () => void
 	appealLoading?: boolean
 }
@@ -30,17 +28,29 @@ export interface AccountSuspendedModalProps {
 function AccountSuspendedModal({
 	open,
 	payload,
-	onClose,
+	onLogout,
 	onAppeal,
 	appealLoading,
 }: AccountSuspendedModalProps) {
 	const suspensionType = getSuspensionType(payload.unblocked_at)
 	const duration = getSuspensionDurationText(payload)
 	const showAppeal = canShowAppealButton(payload.amount_of_appeal)
-	const displayName = payload.name?.trim() || 'your account'
+	// const displayName = payload.name?.trim() || 'your account'
 	const reason = payload.reason?.trim() || 'Violation of community standards'
 
 	const isTemporary = suspensionType === 'temporary' && !!duration
+
+	const resolveDisplayName = (payload: AccountSuspendedPayload) => {
+		const fromPayload = payload.name?.trim()
+		if (fromPayload) return fromPayload
+		const fromCookie = getUserInfo('name')?.trim()
+		if (fromCookie) return fromCookie
+		const fromSession = getSessionStorage(STORAGE_KEY.USER)?.name?.trim()
+		if (fromSession) return fromSession
+		return 'your account'
+	}
+
+	const displayName = resolveDisplayName(payload)
 
 	if (!open) return null
 
@@ -49,8 +59,9 @@ function AccountSuspendedModal({
 			open
 			centered
 			closable={false}
+			maskClosable={false}
+			keyboard={false}
 			footer={null}
-			onCancel={onClose}
 			styles={{
 				content: {
 					width: 520,
@@ -74,14 +85,14 @@ function AccountSuspendedModal({
 								: 'Account Permanently Suspended'}
 						</div>
 					</div>
-					<button
+					{/* <button
 						type="button"
 						className={classes.closeBtn}
 						aria-label="Close"
 						onClick={onClose}
 					>
 						<IconX size={16} />
-					</button>
+					</button> */}
 				</div>
 
 				<div className={classes.body}>
@@ -135,20 +146,25 @@ function AccountSuspendedModal({
 					</p>
 				</div>
 
-				{showAppeal && (
-					<div className={classes.footer}>
-						<div className={classes.appealBtn}>
-							<CButton
-								ctype="oranger"
-								loading={appealLoading}
-								disabled={appealLoading}
-								onClick={onAppeal || onClose}
-							>
-								Appeal now
-							</CButton>
-						</div>
-					</div>
-				)}
+				<div className={classes.footer}>
+					<button
+						type="button"
+						className={clsx(classes.footerBtn, classes.logoutBtn)}
+						onClick={onLogout}
+					>
+						Log out
+					</button>
+					{showAppeal && (
+						<button
+							type="button"
+							className={clsx(classes.footerBtn, classes.appealBtn)}
+							disabled={appealLoading}
+							onClick={onAppeal}
+						>
+							Appeal now
+						</button>
+					)}
+				</div>
 			</div>
 		</CModal>
 	)
