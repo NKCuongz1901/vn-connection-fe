@@ -3,10 +3,7 @@
 import { useEffect } from 'react'
 
 import { showMessageDeleteToast } from '@/Components/Toast/SocketToastContent'
-import {
-	TOAST_SOURCE_TYPE,
-	type ToastModel,
-} from '@/interface/Toast/Toast.interface'
+import { parseToastSocketPayload } from '@/interface/Toast/Toast.interface'
 import { getUserInfo } from '@/ultis/storage'
 
 import { useSocket } from './SocketContext'
@@ -21,15 +18,12 @@ export const SocketToastProvider = ({
 	useEffect(() => {
 		if (!socket) return
 
-		const onToast = (data: ToastModel) => {
+		const onToast = (payload: unknown) => {
 			const myId = getUserInfo()?.id
-			const { user_id, source_type = TOAST_SOURCE_TYPE.MESSAGE_DELETE_REASON } =
-				data || {}
+			const toastData = parseToastSocketPayload(payload, myId)
+			if (!toastData) return
 
-			if (!myId || user_id !== myId) return
-			if (source_type !== TOAST_SOURCE_TYPE.MESSAGE_DELETE_REASON) return
-
-			showMessageDeleteToast(data)
+			showMessageDeleteToast(toastData)
 		}
 
 		socket.on('toast', onToast)
