@@ -7,10 +7,12 @@ import { routing } from '@/i18n/routing'
 import { LoadingProvider } from '@/context/LoadingContext'
 import { ModalProvider } from '@/context/ModalContext'
 import { SocketProvider } from '@/context/SocketContext'
+import { SocketToastProvider } from '@/context/SocketToastContext'
 import { NewInboxProvider } from '@/context/NewInboxContext'
 import { SearchLocationProvider } from '@/context/SearchLocationContext'
 
 import MainLayout from '@/Components/Layout/MainLayout'
+import ToastProvider from '@/Components/Toast/ToastProvider'
 import 'country-flag-icons/3x2/flags.css'
 
 export default async function LocaleLayout({
@@ -35,13 +37,17 @@ export default async function LocaleLayout({
 		<NextIntlClientProvider messages={messages}>
 			<LoadingProvider>
 				<ModalProvider>
-					<SocketProvider>
-						<NewInboxProvider>
-							<SearchLocationProvider>
-								<MainLayout>{children}</MainLayout>
-							</SearchLocationProvider>
-						</NewInboxProvider>
-					</SocketProvider>
+					<ToastProvider>
+						<SocketProvider>
+							<SocketToastProvider>
+								<NewInboxProvider>
+									<SearchLocationProvider>
+										<MainLayout>{children}</MainLayout>
+									</SearchLocationProvider>
+								</NewInboxProvider>
+							</SocketToastProvider>
+						</SocketProvider>
+					</ToastProvider>
 				</ModalProvider>
 			</LoadingProvider>
 		</NextIntlClientProvider>
