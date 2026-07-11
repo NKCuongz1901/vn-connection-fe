@@ -34,16 +34,29 @@ export type TalkRoomCategory = {
 	}
 }
 
+export type TalkRoomSchedule = {
+	id?: string
+	schedule_at?: string
+	enabled?: boolean
+	status?: string
+	index?: number
+	estimated_end_at?: string | null
+	ended_at?: string | null
+	conversation_id?: string | null
+}
+
 export type TalkRoomRoom = {
 	id?: string
 	name?: string
 	status?: string
+	type?: string
 	speakers?: TalkRoomSpeaker[]
 	created_by_user?: TalkRoomSpeaker
 	total_participants?: number
 	max_participants?: number
 	next_schedule_at?: string | null
 	started_at?: string | null
+	schedules?: TalkRoomSchedule[]
 	host_joined?: boolean
 	language?: TalkRoomLanguage
 	level?: string[]
@@ -133,8 +146,10 @@ const getSpeakersForDisplay = (room?: TalkRoomRoom) => {
 	const speakers = room?.speakers ?? []
 	if (speakers.length > 0) return speakers
 	if (isTalkRoomLive(room?.status)) return []
-	if (room?.created_by_user) return [room.created_by_user]
-	return []
+	if (!shouldShowHostAvatarWhenEmpty(room)) return []
+
+	const host = room?.host_user ?? room?.created_by_user
+	return host ? [host] : []
 }
 
 export const getSpeakerCount = (room?: TalkRoomRoom) => {
@@ -167,8 +182,53 @@ export const formatTalkRoomSchedule = (date?: string | null) => {
 
 export const TALK_ROOM_EARLY_ACCESS_MINUTES = 10
 
+const TALK_ROOM_EARLY_ACCESS_SECONDS = TALK_ROOM_EARLY_ACCESS_MINUTES * 60
+
+/** Returns the next pending schedule time (matches mobile pendingNextSchedule). */
+export const getTalkRoomPendingNextSchedule = (
+	room?: TalkRoomRoom,
+): string | null => {
+	if (!room) return null
+
+	const pendingScheduleTimes = (room.schedules || [])
+		.filter(
+			(schedule) =>
+				schedule.enabled !== false &&
+				schedule.status === 'pending' &&
+				!!schedule.schedule_at,
+		)
+		.map((schedule) => schedule.schedule_at as string)
+		.filter((scheduleAt) => dayjs(scheduleAt).isValid())
+		.sort((a, b) => dayjs(a).valueOf() - dayjs(b).valueOf())
+
+	if (pendingScheduleTimes.length > 0) {
+		const nextFuture = pendingScheduleTimes.find((scheduleAt) =>
+			dayjs(scheduleAt).isAfter(dayjs()),
+		)
+		return nextFuture ?? pendingScheduleTimes[0]
+	}
+
+	if (room.next_schedule_at && dayjs(room.next_schedule_at).isValid()) {
+		return room.next_schedule_at
+	}
+
+	return null
+}
+
 export const getTalkRoomScheduledStartAt = (room?: TalkRoomRoom) => {
+	const pendingNext = getTalkRoomPendingNextSchedule(room)
+	if (pendingNext) return pendingNext
+
 	return room?.started_at ?? room?.next_schedule_at ?? null
+}
+
+export const getTalkRoomScheduleRemainSeconds = (
+	scheduledAt?: string | null,
+) => {
+	if (!scheduledAt) return null
+	const scheduled = dayjs(scheduledAt)
+	if (!scheduled.isValid()) return null
+	return scheduled.diff(dayjs(), 'second')
 }
 
 export const isTalkRoomScheduledStartTimePassed = (
@@ -199,39 +259,93 @@ export const isTalkRoomLiveWithHostJoined = (room?: TalkRoomRoom) => {
 	return isTalkRoomLive(room?.status) && room?.host_joined === true
 }
 
+/** Live room created but host has not entered yet (matches mobile _buildJoinStatus). */
+export const isTalkRoomLiveWaitingForHostToJoin = (room?: TalkRoomRoom) => {
+	return isTalkRoomLive(room?.status) && room?.host_joined === false
+}
+
+export const isTalkRoomNoScheduleRoom = (room?: TalkRoomRoom) =>
+	room?.type === 'NO_SCHEDULE'
+
+/** Scheduled room within 10 minutes before start (mobile isRoomScheduleJoinBeforeLive). */
+export const isTalkRoomScheduleJoinBeforeLive = (room?: TalkRoomRoom) => {
+	if (isTalkRoomLive(room?.status)) return false
+
+	const scheduledAt =
+		getTalkRoomPendingNextSchedule(room) ?? getTalkRoomScheduledStartAt(room)
+	const remainSeconds = getTalkRoomScheduleRemainSeconds(scheduledAt)
+	if (remainSeconds === null) return false
+
+	return (
+		remainSeconds >= 0 && remainSeconds <= TALK_ROOM_EARLY_ACCESS_SECONDS
+	)
+}
+
+/** Show host avatar fallback when speakers list is empty (mobile isShowHostWhenEmpty). */
+export const shouldShowHostAvatarWhenEmpty = (room?: TalkRoomRoom) => {
+	return (
+		!isTalkRoomLive(room?.status) && !isTalkRoomScheduleJoinBeforeLive(room)
+	)
+}
+
 /** @deprecated Use isTalkRoomScheduledStartTimePassed */
 export const isTalkRoomStartTimeReached = isTalkRoomScheduledStartTimePassed
 
 export const isTalkRoomHostCanStart = (room?: TalkRoomRoom) => {
 	const scheduledAt = getTalkRoomScheduledStartAt(room)
+	const remainSeconds = getTalkRoomScheduleRemainSeconds(scheduledAt)
+
+	if (
+		room?.is_your_room !== true ||
+		room?.host_joined === true ||
+		remainSeconds === null ||
+		isTalkRoomLive(room?.status)
+	) {
+		return false
+	}
+
+	if (remainSeconds < 0) return true
+
+	return (
+		remainSeconds >= 0 && remainSeconds <= TALK_ROOM_EARLY_ACCESS_SECONDS
+	)
+}
+
+export const isTalkRoomHostWaiting = (room?: TalkRoomRoom) => {
+	const scheduledAt = getTalkRoomScheduledStartAt(room)
+	const remainSeconds = getTalkRoomScheduleRemainSeconds(scheduledAt)
 
 	return (
 		room?.is_your_room === true &&
 		room?.host_joined === false &&
-		!!scheduledAt &&
-		isTalkRoomWithinEarlyAccessWindow(scheduledAt)
+		!isTalkRoomLive(room?.status) &&
+		remainSeconds !== null &&
+		remainSeconds > TALK_ROOM_EARLY_ACCESS_SECONDS
 	)
 }
 
 export const isTalkRoomGuestCanJoinEarly = (room?: TalkRoomRoom) => {
 	const scheduledAt = getTalkRoomScheduledStartAt(room)
+	const remainSeconds = getTalkRoomScheduleRemainSeconds(scheduledAt)
 
 	return (
 		room?.is_your_room !== true &&
 		room?.host_joined === false &&
-		!!scheduledAt &&
-		isTalkRoomWithinEarlyAccessWindow(scheduledAt) &&
-		!isTalkRoomScheduledStartTimePassed(scheduledAt)
+		remainSeconds !== null &&
+		remainSeconds > 0 &&
+		remainSeconds <= TALK_ROOM_EARLY_ACCESS_SECONDS
 	)
 }
 
 export const isTalkRoomWaitingForHost = (room?: TalkRoomRoom) => {
 	const scheduledAt = getTalkRoomScheduledStartAt(room)
+	const remainSeconds = getTalkRoomScheduleRemainSeconds(scheduledAt)
 
 	return (
 		room?.is_your_room !== true &&
 		room?.host_joined === false &&
-		isTalkRoomScheduledStartTimePassed(scheduledAt)
+		remainSeconds !== null &&
+		remainSeconds <= 0
 	)
 }
 

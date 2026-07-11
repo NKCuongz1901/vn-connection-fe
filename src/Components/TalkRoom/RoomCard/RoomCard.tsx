@@ -31,6 +31,7 @@ import {
 	isTalkRoomGuestCanJoinEarly,
 	isTalkRoomHostCanStart,
 	isTalkRoomLive,
+	isTalkRoomLiveWaitingForHostToJoin,
 	isTalkRoomLiveWithHostJoined,
 	isTalkRoomWaitingForHost,
 	TalkRoomRoom,
@@ -80,16 +81,28 @@ function RoomCard({
 	const scheduleText = getTalkRoomStartTimeDisplay(room)
 	const waitingCount = formatTalkRoomWaitingCount(room)
 	const showActiveLiveFooter = isTalkRoomLiveWithHostJoined(room)
+	const showLiveWaitingFooter =
+		!showActiveLiveFooter &&
+		!isFriendVariant &&
+		isTalkRoomLiveWaitingForHostToJoin(room)
 	const showHostStartFooter =
-		!showActiveLiveFooter && !isFriendVariant && isTalkRoomHostCanStart(room)
+		!showActiveLiveFooter &&
+		!showLiveWaitingFooter &&
+		!isFriendVariant &&
+		isTalkRoomHostCanStart(room)
 	const showGuestEarlyJoinFooter =
 		!showActiveLiveFooter &&
+		!showLiveWaitingFooter &&
 		!isFriendVariant &&
 		isTalkRoomGuestCanJoinEarly(room)
 	const showGuestWaitingFooter =
-		!showActiveLiveFooter && !isFriendVariant && isTalkRoomWaitingForHost(room)
+		!showActiveLiveFooter &&
+		!showLiveWaitingFooter &&
+		!isFriendVariant &&
+		isTalkRoomWaitingForHost(room)
 	const showLegacyLiveFooter =
 		!showActiveLiveFooter &&
+		!showLiveWaitingFooter &&
 		!isFriendVariant &&
 		isLive &&
 		!showHostStartFooter &&
@@ -98,6 +111,7 @@ function RoomCard({
 	const hasCmi = (room?.total_cmi ?? 0) > 0 && !!cmiText
 	const showCmiSection =
 		!showActiveLiveFooter &&
+		!showLiveWaitingFooter &&
 		!showLegacyLiveFooter &&
 		!showHostStartFooter &&
 		!showGuestEarlyJoinFooter &&
@@ -242,6 +256,36 @@ function RoomCard({
 							Join now
 						</button>
 					</div>
+				) : showLiveWaitingFooter ? (
+					<div className={classes.footerRow}>
+						<div className={classes.metaGroup}>
+							<span className={classes.waitingIcon}>
+								<HeadPhoneIcon fill="#006B35" />
+							</span>
+							<p className={classes.metaText}>
+								<span className={classes.metaHighlight}>{waitingCount}</span>
+								<span className={classes.metaRegular}> people are waiting</span>
+							</p>
+						</div>
+
+						{isYourRoom ? (
+							<button
+								type="button"
+								className={clsx(classes.actionBtn, classes.actionBtnStart)}
+								onClick={handleStart}
+							>
+								Start
+							</button>
+						) : (
+							<button
+								type="button"
+								className={clsx(classes.actionBtn, classes.actionBtnStart)}
+								onClick={handleJoin}
+							>
+								Join now
+							</button>
+						)}
+					</div>
 				) : showLegacyLiveFooter ? (
 					<div className={classes.footerRow}>
 						<div className={classes.metaGroup}>
@@ -256,19 +300,7 @@ function RoomCard({
 							</p>
 						</div>
 
-						{room?.is_joined ? (
-							<button
-								type="button"
-								className={clsx(
-									classes.actionBtn,
-									classes.actionBtnSecondary,
-									classes.actionBtnDisabled,
-								)}
-								disabled
-							>
-								Joined
-							</button>
-						) : isYourRoom ? (
+						{isYourRoom ? (
 							<div className={classes.hostActions}>
 								<div className={classes.hostBadge}>
 									<IconCrown size={16} stroke={2} color="#E55A0F" />
@@ -283,10 +315,10 @@ function RoomCard({
 						) : (
 							<button
 								type="button"
-								className={clsx(classes.actionBtn, classes.actionBtnPrimary)}
+								className={clsx(classes.actionBtn, classes.actionBtnStart)}
 								onClick={handleJoin}
 							>
-								Join
+								Join now
 							</button>
 						)}
 					</div>
@@ -297,13 +329,20 @@ function RoomCard({
 							<span className={classes.scheduleLabel}>Start at</span>
 							<span className={classes.scheduleTime}>{scheduleText}</span>
 						</div>
-						<button
-							type="button"
-							className={clsx(classes.actionBtn, classes.actionBtnStart)}
-							onClick={handleStart}
-						>
-							Start
-						</button>
+						<div className={classes.hostActions}>
+							<button
+								type="button"
+								className={clsx(classes.actionBtn, classes.actionBtnStart)}
+								onClick={handleStart}
+							>
+								Start
+							</button>
+							<RoomCardHostActions
+								room={room}
+								onEditRoom={onEditRoom}
+								onCancelRoom={onCancelRoom}
+							/>
+						</div>
 					</div>
 				) : showGuestEarlyJoinFooter ? (
 					<div className={classes.footerRow}>
