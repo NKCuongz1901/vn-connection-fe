@@ -276,7 +276,7 @@ const Profile = (props: ProfileProps) => {
 										<span className={classes.communityBuilderText}>
 											Community builder:{' '}
 											<span className={classes.communityBuilderTextBold}>
-												{amount_of_feedback}
+												{wallet}
 											</span>{' '}
 											friends invited
 										</span>
