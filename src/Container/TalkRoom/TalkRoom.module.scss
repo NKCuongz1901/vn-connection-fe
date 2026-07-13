@@ -137,6 +137,23 @@
 				align-self: stretch;
 				border-radius: var(--radius-2, 8px);
 				background: var(--background-primary, #fff);
+
+				.leaderBoardTitle {
+					color: var(--text-primary, #0f1729);
+
+					font-size: var(--title-small-size, 16px);
+					font-style: normal;
+					font-weight: 600;
+					line-height: var(--title-small-line-height, 24px); /* 150% */
+				}
+				.leaderBoardIcon {
+					color: #94a3b8;
+					cursor: pointer;
+				}
+
+				.topLeaderBoardContainer {
+					width: 100%;
+				}
 			}
 			.friendTalkroomListContainer {
 				padding: 16px;

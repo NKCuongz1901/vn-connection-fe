@@ -1,6 +1,6 @@
 'use client'
 
-import { IconChevronLeft } from '@tabler/icons-react'
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
 import { useMemo, useState } from 'react'
 
@@ -11,6 +11,7 @@ import ModalEditTalkRoom from '@/Components/Modal/ModalEditTalkRoom'
 import ModalTalkRoomWarning from '@/Components/Modal/ModalTalkRoomWarning'
 import TalkRoomConnectedCountryModal from '@/Components/Modal/TalkRoomConnectedCountryModal'
 import TalkRoomConnectedUserModal from '@/Components/Modal/TalkRoomConnectedUserModal'
+import ReferralLeaderboardPodium from '@/Components/Referral/ReferralLeaderboardPodium/ReferralLeaderboardPodium'
 import RoomCard from '@/Components/TalkRoom/RoomCard'
 import TalkRoomFilterBar from '@/Components/TalkRoom/TalkRoomFilterBar'
 import TalkRoomListEmpty from '@/Components/TalkRoom/TalkRoomListEmpty'
@@ -20,7 +21,7 @@ import useTalkRoom from '@/hooks/TalkRoom/useTalkRoom'
 import useProfile from '@/hooks/Profile/useProfile'
 import { mainRoutes } from '@/routes/MainRoutes'
 import BookIcon from '@/svg/BookIcon'
-import { TalkRoomRoom, isTalkRoomUserNotified } from '@/ultis/talkRoom'
+import { TalkRoomRoom, formatHostMinutes, isTalkRoomUserNotified } from '@/ultis/talkRoom'
 import { useLocalePath } from '@/ultis/route'
 
 import classes from './TalkRoom.module.scss'
@@ -62,6 +63,8 @@ function TalkRoom() {
 		loadingListMyFriendTalkRooms,
 		listMyFriendTalkRooms,
 		totalMyFriendTalkRooms,
+		loadingLeaderBoard,
+		topLeaderBoard,
 		onLoadMoreListMyFriendTalkRooms,
 		connectedUsers,
 		connectedCountries,
@@ -82,6 +85,17 @@ function TalkRoom() {
 			listTalkRoomFilters.levels?.length,
 	)
 
+	const topHosts = useMemo(
+		() =>
+			topLeaderBoard.map((item) => ({
+				id: item.user_id,
+				name: item.user?.name,
+				avatar: item.user?.avatar,
+				scoreLabel: formatHostMinutes(item.total_hosting_seconds),
+			})),
+		[topLeaderBoard],
+	)
+
 	const isTrulyEmpty = useMemo(
 		() =>
 			!loadingListTalkRooms &&
@@ -98,9 +112,7 @@ function TalkRoom() {
 
 	const isNoResults = useMemo(
 		() =>
-			!loadingListTalkRooms &&
-			displayTalkRooms.length === 0 &&
-			!isTrulyEmpty,
+			!loadingListTalkRooms && displayTalkRooms.length === 0 && !isTrulyEmpty,
 		[displayTalkRooms.length, isTrulyEmpty, loadingListTalkRooms],
 	)
 
@@ -188,42 +200,55 @@ function TalkRoom() {
 					onChangeLevel={onChangeLevelFilter}
 				/>
 				<Flex vertical gap={12} className={classes.listTalkroomInner}>
-					{loadingListTalkRooms && !displayTalkRooms.length
-						? Array.from({ length: 3 }).map((_, index) => (
-								<Skeleton.Input
-									key={index}
-									active
-									block
-									style={{ height: 180, borderRadius: 16 }}
-								/>
-							))
-						: isTrulyEmpty
-							? (
-									<TalkRoomListEmpty
-										variant="empty"
-										onCreateRoom={() => setCreateRoomModalOpen(true)}
-									/>
-								)
-							: isNoResults
-								? <TalkRoomListEmpty variant="search" />
-								: displayTalkRooms.map((room) => (
-										<RoomCard
-											key={room.id}
-											room={room}
-											onShare={handleShareRoom}
-											onCountMeIn={handleCountMeIn}
-											onNotJoining={handleNotJoining}
-											onNotifyMe={handleNotifyMe}
-											onEditRoom={setEditRoom}
-											onCancelRoom={setCancelRoom}
-										/>
-									))}
+					{loadingListTalkRooms && !displayTalkRooms.length ? (
+						Array.from({ length: 3 }).map((_, index) => (
+							<Skeleton.Input
+								key={index}
+								active
+								block
+								style={{ height: 180, borderRadius: 16 }}
+							/>
+						))
+					) : isTrulyEmpty ? (
+						<TalkRoomListEmpty
+							variant="empty"
+							onCreateRoom={() => setCreateRoomModalOpen(true)}
+						/>
+					) : isNoResults ? (
+						<TalkRoomListEmpty variant="search" />
+					) : (
+						displayTalkRooms.map((room) => (
+							<RoomCard
+								key={room.id}
+								room={room}
+								onShare={handleShareRoom}
+								onCountMeIn={handleCountMeIn}
+								onNotJoining={handleNotJoining}
+								onNotifyMe={handleNotifyMe}
+								onEditRoom={setEditRoom}
+								onCancelRoom={setCancelRoom}
+							/>
+						))
+					)}
 				</Flex>
 			</div>
 		)
 	}
 	const _renderLeaderBoard = () => {
-		return <div className={classes.leaderBoardContainer}>Coming soon</div>
+		return (
+			<div className={classes.leaderBoardContainer}>
+				<Flex align="center" gap={4}>
+					<div className={classes.leaderBoardTitle}>Top 3 hosts</div>
+					<IconChevronRight size={16} className={classes.leaderBoardIcon} />
+				</Flex>
+				<div className={classes.topLeaderBoardContainer}>
+					<ReferralLeaderboardPodium
+						topInvitees={topHosts}
+						loading={loadingLeaderBoard}
+					/>
+				</div>
+			</div>
+		)
 	}
 	const _renderFriendTalkroomList = () => {
 		return (

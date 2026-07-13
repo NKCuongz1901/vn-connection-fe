@@ -386,6 +386,16 @@ export const formatTalkRoomCategoriesText = (
 	return getTalkRoomCategoryLabels(categories).join(', ')
 }
 
+/** Format hosting seconds for leaderboard display (e.g. 98K min). */
+export const formatHostMinutes = (seconds?: number) => {
+	if (!seconds || seconds <= 0) return '0 min'
+
+	const mins = Math.floor(seconds / 60)
+	if (mins >= 1000) return `${Math.round(mins / 1000)}K min`
+
+	return `${mins} min`
+}
+
 export const filterTalkRoomsByKeyword = (
 	rooms: TalkRoomRoom[],
 	keyword?: string,

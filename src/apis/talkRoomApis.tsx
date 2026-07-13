@@ -371,6 +371,20 @@ export type TalkRoomConnectedUser = {
 	connected_at?: string
 }
 
+export type TalkRoomLeaderBoardUser = {
+	id: string
+	name: string
+	avatar?: string
+	i_am_from?: string
+}
+
+export type TalkRoomLeaderBoardItem = {
+	user_id: string
+	total_speaking_seconds: number
+	total_hosting_seconds: number
+	user: TalkRoomLeaderBoardUser
+}
+
 export const getTalkRoomConnectedCountry = async ({
 	params = {},
 }: {
@@ -389,6 +403,30 @@ export const getTalkRoomConnectedPeople = async ({
 	params?: { [key: string]: any }
 } = {}) => {
 	const url = TALKROOM_ROUTES.getTalkRoomConnectedPeople
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const getTalkRoomLeaderBoard = async ({
+	params = {},
+}: {
+	params?: { [key: string]: any }
+} = {}) => {
+	const url = TALKROOM_ROUTES.getTalkRoomLeaderBoard
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const getTalkRoomLeaderBoardMy = async ({
+	params = {},
+}: {
+	params?: { [key: string]: any }
+} = {}) => {
+	const url = TALKROOM_ROUTES.getTalkRoomLeaderBoardMy
 
 	return await axios.get(url, {
 		params: convertParams(params),

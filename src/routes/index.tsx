@@ -163,6 +163,8 @@ export const TALKROOM_ROUTES = {
 	getTalkRoomDetail: 'talkroom',
 	getTalkRoomConnectedCountry: 'talkroom/connected-countries',
 	getTalkRoomConnectedPeople: 'talkroom/connected-users',
+	getTalkRoomLeaderBoard: 'talkroom/leaderboard',
+	getTalkRoomLeaderBoardMy: 'talkroom/leaderboard/position',
 }
 export const Menus = [
 	{

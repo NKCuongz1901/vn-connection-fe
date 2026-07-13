@@ -18,6 +18,7 @@ export type LeaderboardUser = {
 	avatar?: string
 	total_points?: number
 	user_rank?: string
+	scoreLabel?: string
 }
 
 export interface ReferralPodiumItemProps {
@@ -58,9 +59,23 @@ function ReferralPodiumItem({ rank, user }: ReferralPodiumItemProps) {
 
 			<div className={classes.info}>
 				<div className={classes.name}>{user?.name || '—'}</div>
-				<div className={classes.points}>
-					<span className={classes.pointsValue}>{user?.total_points ?? 0}</span>
-					<CoinIcon />
+				<div
+					className={clsx(classes.points, {
+						[classes.pointsDuration]: Boolean(user?.scoreLabel),
+					})}
+				>
+					{user?.scoreLabel ? (
+						<span className={classes.pointsDurationValue}>
+							{user.scoreLabel}
+						</span>
+					) : (
+						<>
+							<span className={classes.pointsValue}>
+								{user?.total_points ?? 0}
+							</span>
+							<CoinIcon />
+						</>
+					)}
 				</div>
 			</div>
 		</div>

@@ -12,11 +12,13 @@ import {
 	getTalkRoomConnectedCountry,
 	getTalkRoomConnectedPeople,
 	getTalkRoomLanguages,
+	getTalkRoomLeaderBoard,
 	notificationMeInTalkRoom,
 	TalkRoomCategoryItem,
 	TalkRoomConnectedUser,
 	TalkRoomDetail,
 	TalkRoomLanguageItem,
+	TalkRoomLeaderBoardItem,
 	TalkRoomListFilters,
 	TalkRoomListItem,
 	updateTalkRoom,
@@ -44,6 +46,14 @@ export default function useTalkRoom() {
 	const [loadingCategories, setLoadingCategories] = useState(false)
 	const [loadingConnectedCountry, setLoadingConnectedCountry] = useState(false)
 	const [loadingConnectedPeople, setLoadingConnectedPeople] = useState(false)
+	const [loadingLeaderBoard, setLoadingLeaderBoard] = useState(false)
+	const [topLeaderBoard, setTopLeaderBoard] = useState<TalkRoomLeaderBoardItem[]>(
+		[],
+	)
+	const [myLeaderBoardPosition, setMyLeaderBoardPosition] = useState<any>(null)
+	const [leaderBoardList, setLeaderBoardList] = useState<TalkRoomLeaderBoardItem[]>(
+		[],
+	)
 	const [myTalkRoomAnalysis, setMyTalkRoomAnalysis] = useState<any>(null)
 	const [languages, setLanguages] = useState<TalkRoomLanguageItem[]>([])
 	const [categories, setCategories] = useState<TalkRoomCategoryItem[]>([])
@@ -94,6 +104,30 @@ export default function useTalkRoom() {
 		},
 		[],
 	)
+
+	const handleGetTopLeaderBoard = useCallback(async () => {
+		setLoadingLeaderBoard(true)
+		try {
+			const res: any = await getTalkRoomLeaderBoard({
+				params: {
+					fields: ['$all'],
+					page: 1,
+					limit: 3,
+					period: 'all_time',
+					metric: 'host_time',
+				},
+			})
+			const { code, results } = res || {}
+
+			if (code === 200) {
+				setTopLeaderBoard(results?.objects?.rows ?? [])
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoadingLeaderBoard(false)
+		}
+	}, [openError])
 
 	const handleGetConnectedUsers = useCallback(
 		async (isNotLoading = false, reset = false) => {
@@ -698,6 +732,7 @@ export default function useTalkRoom() {
 		handleGetCategories()
 		handleGetListTalkRoom()
 		handleGetListMyFriendTalkRoom()
+		handleGetTopLeaderBoard()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -715,6 +750,8 @@ export default function useTalkRoom() {
 		loadingTalkRoomDetail,
 		loadingConnectedPeople,
 		loadingConnectedCountry,
+		loadingLeaderBoard,
+		topLeaderBoard,
 		myTalkRoomAnalysis,
 		languages,
 		categories,
@@ -753,5 +790,6 @@ export default function useTalkRoom() {
 		onGetConnectedUsers: handleGetConnectedUsers,
 		onLoadMoreConnectedUsers: handleLoadMoreConnectedUsers,
 		onGetConnectedCountry: handleGetConnectedCountry,
+		onGetTopLeaderBoard: handleGetTopLeaderBoard,
 	}
 }

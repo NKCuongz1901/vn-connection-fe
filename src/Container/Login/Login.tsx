@@ -209,7 +209,7 @@ const Login = () => {
 				open={openModalNotFoundAccount}
 				onClose={() => setOpenModalNotFoundAccount(false)}
 				icon={<NotFound />}
-				title="We couldn't find your account."
+				title="This phone number is not registered yet."
 				description={notFoundPhone}
 				onGetHelp={() => {
 					setOpenModalNotFoundAccount(false)
