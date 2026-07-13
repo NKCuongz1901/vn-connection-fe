@@ -2,7 +2,7 @@
 
 import { IconChevronLeft } from '@tabler/icons-react'
 import { Flex, Skeleton } from 'antd'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
 import ModalCancelTalkRoom from '@/Components/Modal/ModalCancelTalkRoom'
@@ -13,6 +13,7 @@ import TalkRoomConnectedCountryModal from '@/Components/Modal/TalkRoomConnectedC
 import TalkRoomConnectedUserModal from '@/Components/Modal/TalkRoomConnectedUserModal'
 import RoomCard from '@/Components/TalkRoom/RoomCard'
 import TalkRoomFilterBar from '@/Components/TalkRoom/TalkRoomFilterBar'
+import TalkRoomListEmpty from '@/Components/TalkRoom/TalkRoomListEmpty'
 import TalkRoomProfileInfo from '@/Components/TalkRoom/TalkRoomProfileInfo/TalkRoomProfileInfo'
 import TalkRoomStats from '@/Components/TalkRoom/TalkRoomStats/TalkRoomStats'
 import useTalkRoom from '@/hooks/TalkRoom/useTalkRoom'
@@ -41,6 +42,7 @@ function TalkRoom() {
 		loading,
 		myTalkRoomAnalysis,
 		displayTalkRooms,
+		listTalkRooms,
 		loadingListTalkRooms,
 		loadingLanguages,
 		searchKeyword,
@@ -73,6 +75,34 @@ function TalkRoom() {
 		onGetListTalkRoom,
 	} = useTalkRoom()
 	const { userData } = useProfile({})
+
+	const hasActiveSearch = Boolean(searchKeyword?.trim())
+	const hasActiveFilters = Boolean(
+		listTalkRoomFilters.languageIds?.length ||
+			listTalkRoomFilters.levels?.length,
+	)
+
+	const isTrulyEmpty = useMemo(
+		() =>
+			!loadingListTalkRooms &&
+			listTalkRooms.length === 0 &&
+			!hasActiveSearch &&
+			!hasActiveFilters,
+		[
+			hasActiveFilters,
+			hasActiveSearch,
+			listTalkRooms.length,
+			loadingListTalkRooms,
+		],
+	)
+
+	const isNoResults = useMemo(
+		() =>
+			!loadingListTalkRooms &&
+			displayTalkRooms.length === 0 &&
+			!isTrulyEmpty,
+		[displayTalkRooms.length, isTrulyEmpty, loadingListTalkRooms],
+	)
 
 	const handleOpenConnectedUsersModal = () => {
 		setConnectedUsersModalOpen(true)
@@ -167,18 +197,27 @@ function TalkRoom() {
 									style={{ height: 180, borderRadius: 16 }}
 								/>
 							))
-						: displayTalkRooms.map((room) => (
-								<RoomCard
-									key={room.id}
-									room={room}
-									onShare={handleShareRoom}
-									onCountMeIn={handleCountMeIn}
-									onNotJoining={handleNotJoining}
-									onNotifyMe={handleNotifyMe}
-									onEditRoom={setEditRoom}
-									onCancelRoom={setCancelRoom}
-								/>
-							))}
+						: isTrulyEmpty
+							? (
+									<TalkRoomListEmpty
+										variant="empty"
+										onCreateRoom={() => setCreateRoomModalOpen(true)}
+									/>
+								)
+							: isNoResults
+								? <TalkRoomListEmpty variant="search" />
+								: displayTalkRooms.map((room) => (
+										<RoomCard
+											key={room.id}
+											room={room}
+											onShare={handleShareRoom}
+											onCountMeIn={handleCountMeIn}
+											onNotJoining={handleNotJoining}
+											onNotifyMe={handleNotifyMe}
+											onEditRoom={setEditRoom}
+											onCancelRoom={setCancelRoom}
+										/>
+									))}
 				</Flex>
 			</div>
 		)

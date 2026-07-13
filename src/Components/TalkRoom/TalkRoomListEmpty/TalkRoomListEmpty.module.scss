@@ -1,0 +1,65 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	padding: 40px 0;
+	gap: 8px;
+	text-align: center;
+}
+
+.searchIllustration {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 120px;
+	height: 120px;
+
+	svg {
+		width: 100%;
+		height: auto;
+	}
+}
+
+.searchTitle {
+	width: 100%;
+	color: #7987a4;
+	font-size: 24px;
+	font-weight: 600;
+	line-height: 28px;
+}
+
+.searchSubtitle {
+	width: 100%;
+	color: #7987a4;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+}
+
+.emptyWrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	width: 100%;
+	max-width: 311px;
+	cursor: pointer;
+}
+
+.emptyImage {
+	width: 80px;
+	height: 80px;
+	object-fit: contain;
+}
+
+.emptyLabel {
+	width: 100%;
+	color: #48546b;
+	text-align: center;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+}
