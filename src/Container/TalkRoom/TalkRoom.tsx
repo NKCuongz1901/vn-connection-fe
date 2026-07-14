@@ -18,12 +18,15 @@ import TalkRoomFilterBar from '@/Components/TalkRoom/TalkRoomFilterBar'
 import TalkRoomListEmpty from '@/Components/TalkRoom/TalkRoomListEmpty'
 import TalkRoomProfileInfo from '@/Components/TalkRoom/TalkRoomProfileInfo/TalkRoomProfileInfo'
 import TalkRoomStats from '@/Components/TalkRoom/TalkRoomStats/TalkRoomStats'
+import { createConversation } from '@/apis/conversationApis'
 import useTalkRoom from '@/hooks/TalkRoom/useTalkRoom'
 import useProfile from '@/hooks/Profile/useProfile'
+import { useModal } from '@/context/ModalContext'
 import { mainRoutes } from '@/routes/MainRoutes'
 import BookIcon from '@/svg/BookIcon'
 import { TalkRoomRoom, formatHostMinutes, isTalkRoomUserNotified } from '@/ultis/talkRoom'
 import { useLocalePath } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
 
 import classes from './TalkRoom.module.scss'
 import CButtonCreate from '@/Components/Custom/CButtonCreate'
@@ -40,6 +43,9 @@ function TalkRoom() {
 		useState(false)
 	const [cmiPeopleModalOpen, setCmiPeopleModalOpen] = useState(false)
 	const { onChangeRoute } = useLocalePath()
+	const { openError } = useModal()
+	const { userData } = useProfile({})
+	const currentUserId = userData?.id || getUserInfo('id')
 
 	const {
 		loading,
@@ -84,7 +90,6 @@ function TalkRoom() {
 		onGetMyTalkRoomAnalysis,
 		onGetListTalkRoom,
 	} = useTalkRoom()
-	const { userData } = useProfile({})
 
 	const hasActiveSearch = Boolean(searchKeyword?.trim())
 	const hasActiveFilters = Boolean(
@@ -193,6 +198,25 @@ function TalkRoom() {
 		if (!room?.id) return
 		setCmiPeopleModalOpen(true)
 		onGetCountMeInList(room.id, false, true)
+	}
+
+	const handleMessageCmiUser = async (userId: string) => {
+		if (!userId || userId === currentUserId) return
+
+		try {
+			const { name } = getUserInfo() || {}
+			const res: any = await createConversation({
+				title: name || '',
+				member_ids: [userId],
+			})
+			const conversationId = res?.results?.object?.id
+			if (!conversationId) return
+
+			setCmiPeopleModalOpen(false)
+			onChangeRoute(`${mainRoutes.inbox}?id=${conversationId}`)
+		} catch (error) {
+			openError(error)
+		}
 	}
 
 	const _renderListTalkRoom = () => {
@@ -386,7 +410,9 @@ function TalkRoom() {
 					users={countMeInUsers}
 					loading={loadingCountMeInList}
 					hasMore={countMeInUsers.length < totalCountMeInUsers}
+					currentUserId={currentUserId}
 					onLoadMore={onLoadMoreCountMeInList}
+					onMessage={handleMessageCmiUser}
 				/>
 			)}
 

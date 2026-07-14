@@ -36,6 +36,7 @@ export interface TalkRoomPeoplePlanJoinModalProps {
 	users: TalkRoomCountMeInListItem[]
 	loading?: boolean
 	hasMore?: boolean
+	currentUserId?: string
 	onLoadMore?: () => void
 	onMessage?: (userId: string) => void
 }
@@ -47,6 +48,7 @@ function TalkRoomPeoplePlanJoinModal({
 	users,
 	loading = false,
 	hasMore = false,
+	currentUserId,
 	onLoadMore,
 	onMessage,
 }: TalkRoomPeoplePlanJoinModalProps) {
@@ -63,6 +65,7 @@ function TalkRoomPeoplePlanJoinModal({
 	const renderUser = (item: TalkRoomCountMeInListItem) => {
 		const user = item.user
 		const userId = user?.id || item.user_id
+		const isMe = Boolean(userId && currentUserId && userId === currentUserId)
 		const IconGender =
 			genderIcon[user?.gender as keyof typeof genderIcon] ?? genderIcon.OTHER
 		const genderColor =
@@ -111,14 +114,16 @@ function TalkRoomPeoplePlanJoinModal({
 				</div>
 
 				<div className={classes.actionCol}>
-					<button
-						type="button"
-						className={classes.messageBtn}
-						aria-label={`Message ${user?.name || 'user'}`}
-						onClick={() => userId && onMessage?.(userId)}
-					>
-						<Messenger fill="#fff" />
-					</button>
+					{!isMe && (
+						<button
+							type="button"
+							className={classes.messageBtn}
+							aria-label={`Message ${user?.name || 'user'}`}
+							onClick={() => userId && onMessage?.(userId)}
+						>
+							<Messenger fill="#fff" />
+						</button>
+					)}
 				</div>
 			</div>
 		)
