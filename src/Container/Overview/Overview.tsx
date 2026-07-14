@@ -114,7 +114,16 @@ const Overview = () => {
 		setTalkRoomJoinModal({ open: true, roomId })
 	}
 
+	const canShowSoundQualityModal = () => {
+		if (userData.keyIntroTalkRoom !== true) return false
+
+		const viewCount = Number(userData.keyAudioRemind) || 0
+		return viewCount < 2
+	}
+
 	const handleOpenModalSoundQuality = () => {
+		if (!canShowSoundQualityModal()) return
+
 		setModalSoundQuality({ open: true })
 	}
 
@@ -123,6 +132,17 @@ const Overview = () => {
 	}
 
 	const handleCloseModalSoundQuality = () => {
+		setModalSoundQuality({ open: false })
+	}
+
+	const handleConfirmSoundQuality = async () => {
+		const nextCount = (Number(userData.keyAudioRemind) || 0) + 1
+		await onUpdateUserInfo({
+			status_of_tutorial: {
+				_keyIntroTalkRoom: true,
+				_keyAudioRemind: nextCount,
+			},
+		})
 		setModalSoundQuality({ open: false })
 	}
 
@@ -733,7 +753,7 @@ const Overview = () => {
 			<ModalTalkRoomSoundQuality
 				open={modalSoundQuality.open}
 				onClose={handleCloseModalSoundQuality}
-				onConfirm={handleConfirmTalkRoomJoin}
+				onConfirm={handleConfirmSoundQuality}
 			/>
 			{createTalkRoomModal.open && (
 				<ModalCreateTalkRoom

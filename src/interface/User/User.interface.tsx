@@ -33,6 +33,7 @@ export interface UserProps {
 	status_of_tutorial: {
 		_keyTutorialHome: boolean
 		_keyIntroTalkRoom: boolean
+		_keyAudioRemind?: number
 		_keyTutorialDating: boolean
 		_keyTutorialHangout: boolean
 		_keyTutorialChatRoom: boolean
