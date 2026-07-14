@@ -1,0 +1,234 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-height: min(70vh, 560px);
+}
+
+.header {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 16px;
+	border-radius: 24px 24px 0 0;
+	background: #fff;
+}
+
+.headerTitleRow {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	min-height: 28px;
+}
+
+.title {
+	margin: 0;
+	color: #0f1729;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 28px;
+	text-align: center;
+}
+
+.closeBtn {
+	position: absolute;
+	top: 4px;
+	right: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	border: none;
+	background: transparent;
+	color: #94a3b8;
+	cursor: pointer;
+}
+
+.divider {
+	width: 100%;
+	height: 1px;
+	background: #edf0f5;
+}
+
+.body {
+	flex: 1;
+	min-height: 0;
+	padding: 8px 0 12px;
+	overflow-y: auto;
+}
+
+.list {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.item {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	min-width: 0;
+}
+
+.avatarCol {
+	display: flex;
+	align-items: center;
+	padding: 8px 12px 8px 16px;
+}
+
+.avatarWrap {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 48px;
+	height: 48px;
+}
+
+.avatar {
+	border: 1px solid #edf0f5 !important;
+}
+
+.flagWrapper {
+	position: absolute;
+	right: -4px;
+	bottom: -2px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	overflow: hidden;
+	border: 1px solid #fff;
+	border-radius: 999px;
+	background: #fff;
+}
+
+.flag {
+	transform: translateX(-3px);
+	min-width: 24px;
+	min-height: 20px;
+}
+
+.info {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 4px;
+	min-width: 0;
+	padding: 8px 0;
+}
+
+.name {
+	max-width: 100%;
+	margin: 0;
+	color: #0f1729;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.meta {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.age {
+	color: #48546b;
+	font-size: 10px;
+	font-weight: 400;
+	line-height: 14px;
+	white-space: nowrap;
+}
+
+.genderIcon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 12px;
+	height: 12px;
+}
+
+.languages {
+	max-width: 100%;
+	margin: 0;
+	color: #48546b;
+	font-size: 10px;
+	font-weight: 400;
+	line-height: 14px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.actionCol {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	padding: 8px 16px;
+}
+
+.messageBtn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	padding: 0 8px;
+	border: none;
+	border-radius: 999px;
+	background: #e55a0f;
+	cursor: pointer;
+
+	&:hover,
+	&:focus-visible {
+		background: #cf500c;
+	}
+}
+
+.skeletonList {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 8px 16px;
+}
+
+.skeletonItem {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.skeletonLines {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.loadingMore {
+	display: flex;
+	justify-content: center;
+	padding: 12px 0 4px;
+}
+
+.emptyState {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 40px 16px;
+	color: #7987a4;
+	font-size: 14px;
+	line-height: 20px;
+	text-align: center;
+}

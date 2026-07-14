@@ -165,6 +165,7 @@ export const TALKROOM_ROUTES = {
 	getTalkRoomConnectedPeople: 'talkroom/connected-users',
 	getTalkRoomLeaderBoard: 'talkroom/leaderboard',
 	getTalkRoomLeaderBoardMy: 'talkroom/leaderboard/position',
+	getTalkRoomCountMeInList: 'talkroom',
 }
 export const Menus = [
 	{

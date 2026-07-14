@@ -11,6 +11,7 @@ import ModalEditTalkRoom from '@/Components/Modal/ModalEditTalkRoom'
 import ModalTalkRoomWarning from '@/Components/Modal/ModalTalkRoomWarning'
 import TalkRoomConnectedCountryModal from '@/Components/Modal/TalkRoomConnectedCountryModal'
 import TalkRoomConnectedUserModal from '@/Components/Modal/TalkRoomConnectedUserModal'
+import TalkRoomPeoplePlanJoinModal from '@/Components/Modal/TalkRoomPeoplePlanJoinModal'
 import ReferralLeaderboardPodium from '@/Components/Referral/ReferralLeaderboardPodium/ReferralLeaderboardPodium'
 import RoomCard from '@/Components/TalkRoom/RoomCard'
 import TalkRoomFilterBar from '@/Components/TalkRoom/TalkRoomFilterBar'
@@ -37,6 +38,7 @@ function TalkRoom() {
 	const [createRoomModalOpen, setCreateRoomModalOpen] = useState(false)
 	const [createTalkRoomWarningOpen, setCreateTalkRoomWarningOpen] =
 		useState(false)
+	const [cmiPeopleModalOpen, setCmiPeopleModalOpen] = useState(false)
 	const { onChangeRoute } = useLocalePath()
 
 	const {
@@ -71,9 +73,14 @@ function TalkRoom() {
 		totalConnectedUsers,
 		loadingConnectedPeople,
 		loadingConnectedCountry,
+		countMeInUsers,
+		totalCountMeInUsers,
+		loadingCountMeInList,
 		onGetConnectedUsers,
 		onLoadMoreConnectedUsers,
 		onGetConnectedCountry,
+		onGetCountMeInList,
+		onLoadMoreCountMeInList,
 		onGetMyTalkRoomAnalysis,
 		onGetListTalkRoom,
 	} = useTalkRoom()
@@ -182,6 +189,12 @@ function TalkRoom() {
 		onNotificationMeInTalkRoom(room.id, !isTalkRoomUserNotified(room))
 	}
 
+	const handleViewCmiPeople = (room: TalkRoomRoom) => {
+		if (!room?.id) return
+		setCmiPeopleModalOpen(true)
+		onGetCountMeInList(room.id, false, true)
+	}
+
 	const _renderListTalkRoom = () => {
 		return (
 			<div className={classes.listTalkroomContainer}>
@@ -218,16 +231,17 @@ function TalkRoom() {
 						<TalkRoomListEmpty variant="search" />
 					) : (
 						displayTalkRooms.map((room) => (
-							<RoomCard
-								key={room.id}
-								room={room}
-								onShare={handleShareRoom}
-								onCountMeIn={handleCountMeIn}
-								onNotJoining={handleNotJoining}
-								onNotifyMe={handleNotifyMe}
-								onEditRoom={setEditRoom}
-								onCancelRoom={setCancelRoom}
-							/>
+								<RoomCard
+									key={room.id}
+									room={room}
+									onShare={handleShareRoom}
+									onCountMeIn={handleCountMeIn}
+									onNotJoining={handleNotJoining}
+									onNotifyMe={handleNotifyMe}
+									onViewCmiPeople={handleViewCmiPeople}
+									onEditRoom={setEditRoom}
+									onCancelRoom={setCancelRoom}
+								/>
 						))
 					)}
 				</Flex>
@@ -280,6 +294,7 @@ function TalkRoom() {
 									onCountMeIn={handleCountMeIn}
 									onNotJoining={handleNotJoining}
 									onNotifyMe={handleNotifyMe}
+									onViewCmiPeople={handleViewCmiPeople}
 								/>
 							))}
 				</Flex>
@@ -361,6 +376,17 @@ function TalkRoom() {
 					hasMore={connectedUsers.length < totalConnectedUsers}
 					onLoadMore={onLoadMoreConnectedUsers}
 					onCreateRoom={handleCreateRoomFromConnected}
+				/>
+			)}
+
+			{cmiPeopleModalOpen && (
+				<TalkRoomPeoplePlanJoinModal
+					open
+					onClose={() => setCmiPeopleModalOpen(false)}
+					users={countMeInUsers}
+					loading={loadingCountMeInList}
+					hasMore={countMeInUsers.length < totalCountMeInUsers}
+					onLoadMore={onLoadMoreCountMeInList}
 				/>
 			)}
 

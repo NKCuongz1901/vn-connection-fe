@@ -11,11 +11,13 @@ import {
 	getTalkRoomCategories,
 	getTalkRoomConnectedCountry,
 	getTalkRoomConnectedPeople,
+	getTalkRoomCountMeInList,
 	getTalkRoomLanguages,
 	getTalkRoomLeaderBoard,
 	notificationMeInTalkRoom,
 	TalkRoomCategoryItem,
 	TalkRoomConnectedUser,
+	TalkRoomCountMeInListItem,
 	TalkRoomDetail,
 	TalkRoomLanguageItem,
 	TalkRoomLeaderBoardItem,
@@ -78,6 +80,11 @@ export default function useTalkRoom() {
 	)
 	const [totalConnectedUsers, setTotalConnectedUsers] = useState(0)
 	const [connectedCountries, setConnectedCountries] = useState<string[]>([])
+	const [loadingCountMeInList, setLoadingCountMeInList] = useState(false)
+	const [countMeInUsers, setCountMeInUsers] = useState<
+		TalkRoomCountMeInListItem[]
+	>([])
+	const [totalCountMeInUsers, setTotalCountMeInUsers] = useState(0)
 
 	const _listTalkRoomPaginationRef = useRef<PaginationType>(
 		cloneDeep({ ...paginationCommon, limit: 30 }),
@@ -89,6 +96,10 @@ export default function useTalkRoom() {
 	const _connectedUsersPaginationRef = useRef<PaginationType>(
 		cloneDeep({ ...paginationCommon, limit: 50 }),
 	)
+	const _countMeInListPaginationRef = useRef<PaginationType>(
+		cloneDeep({ ...paginationCommon, limit: 10 }),
+	)
+	const _countMeInRoomIdRef = useRef<string | null>(null)
 
 	const patchTalkRoomInState = useCallback(
 		(id: string, room: Partial<TalkRoomListItem>) => {
@@ -186,6 +197,74 @@ export default function useTalkRoom() {
 		_connectedUsersPaginationRef.current.page += 1
 		await handleGetConnectedUsers()
 	}, [handleGetConnectedUsers, loadingConnectedPeople])
+
+	const handleGetCountMeInList = useCallback(
+		async (roomId: string, isNotLoading = false, reset = false) => {
+			if (!roomId) return
+
+			if (reset || _countMeInRoomIdRef.current !== roomId) {
+				_countMeInListPaginationRef.current.page = 1
+				_countMeInRoomIdRef.current = roomId
+				if (!isNotLoading) {
+					setCountMeInUsers([])
+					setTotalCountMeInUsers(0)
+				}
+			}
+
+			setLoadingCountMeInList(true)
+			try {
+				const { page, limit } = _countMeInListPaginationRef.current
+				const isNew = page === 1
+
+				if (isNew && !isNotLoading) {
+					setCountMeInUsers([])
+				}
+
+				const res: any = await getTalkRoomCountMeInList({
+					id: roomId,
+					params: {
+						fields: ['$all'],
+						page: !isNotLoading ? page : 1,
+						limit: !isNotLoading ? limit : limit * page,
+					},
+				})
+				const { code, results, pagination } = res || {}
+
+				if (code === 200) {
+					const rows: TalkRoomCountMeInListItem[] =
+						results?.objects?.rows ?? []
+					const count =
+						results?.objects?.count ?? pagination?.total ?? rows.length
+
+					_countMeInListPaginationRef.current.totalPage =
+						Math.ceil(count / limit) || 0
+
+					setCountMeInUsers((prev) => {
+						const contents = isNew && !isNotLoading ? [] : prev
+						return uniqueArray(
+							[...contents, ...rows],
+							'user_id',
+						) as TalkRoomCountMeInListItem[]
+					})
+					setTotalCountMeInUsers(count)
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingCountMeInList(false)
+			}
+		},
+		[openError],
+	)
+
+	const handleLoadMoreCountMeInList = useCallback(async () => {
+		const roomId = _countMeInRoomIdRef.current
+		const { page, totalPage } = _countMeInListPaginationRef.current
+		if (!roomId || loadingCountMeInList || page >= totalPage) return
+
+		_countMeInListPaginationRef.current.page += 1
+		await handleGetCountMeInList(roomId)
+	}, [handleGetCountMeInList, loadingCountMeInList])
 
 	const handleGetConnectedCountry = useCallback(async () => {
 		setLoadingConnectedCountry(true)
@@ -763,6 +842,7 @@ export default function useTalkRoom() {
 		loadingConnectedPeople,
 		loadingConnectedCountry,
 		loadingLeaderBoard,
+		loadingCountMeInList,
 		topLeaderBoard,
 		myTalkRoomAnalysis,
 		languages,
@@ -774,6 +854,8 @@ export default function useTalkRoom() {
 		connectedUsers,
 		connectedCountries,
 		totalConnectedUsers,
+		countMeInUsers,
+		totalCountMeInUsers,
 		totalTalkRooms,
 		totalMyFriendTalkRooms,
 		listTalkRoomFilters,
@@ -802,6 +884,8 @@ export default function useTalkRoom() {
 		onGetConnectedUsers: handleGetConnectedUsers,
 		onLoadMoreConnectedUsers: handleLoadMoreConnectedUsers,
 		onGetConnectedCountry: handleGetConnectedCountry,
+		onGetCountMeInList: handleGetCountMeInList,
+		onLoadMoreCountMeInList: handleLoadMoreCountMeInList,
 		onGetTopLeaderBoard: handleGetTopLeaderBoard,
 	}
 }

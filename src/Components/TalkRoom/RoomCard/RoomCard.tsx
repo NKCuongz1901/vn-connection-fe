@@ -50,6 +50,7 @@ export type RoomCardProps = {
 	onEditRoom?: (room: TalkRoomRoom) => void
 	onCancelRoom?: (room: TalkRoomRoom) => void
 	onClick?: (room: TalkRoomRoom) => void
+	onViewCmiPeople?: (room: TalkRoomRoom) => void
 }
 
 function RoomCard({
@@ -64,6 +65,7 @@ function RoomCard({
 	onEditRoom,
 	onCancelRoom,
 	onClick,
+	onViewCmiPeople,
 }: RoomCardProps) {
 	const isFriendVariant = variant === 'friend'
 	const isLive = isTalkRoomLive(room?.status)
@@ -155,6 +157,12 @@ function RoomCard({
 	const handleStart = (event: React.MouseEvent) => {
 		event.stopPropagation()
 		onStart?.(room)
+	}
+
+	const handleViewCmiPeople = (event: React.MouseEvent) => {
+		event.stopPropagation()
+		if (!hasCmi) return
+		onViewCmiPeople?.(room)
 	}
 
 	return (
@@ -391,7 +399,23 @@ function RoomCard({
 					<>
 						{showCmiSection && (
 							<div className={classes.footerRow}>
-								<div className={classes.metaGroup}>
+								<div
+									className={clsx(classes.metaGroup, {
+										[classes.metaGroupClickable]: hasCmi && !!onViewCmiPeople,
+									})}
+									role={hasCmi && onViewCmiPeople ? 'button' : undefined}
+									tabIndex={hasCmi && onViewCmiPeople ? 0 : undefined}
+									onClick={hasCmi ? handleViewCmiPeople : undefined}
+									onKeyDown={(event) => {
+										if (!hasCmi || !onViewCmiPeople) return
+										if (event.key === 'Enter' || event.key === ' ') {
+											event.preventDefault()
+											handleViewCmiPeople(
+												event as unknown as React.MouseEvent,
+											)
+										}
+									}}
+								>
 									<People fill="#006B35" width={20} height={20} />
 									<p className={classes.metaText}>
 										{hasCmi ? (

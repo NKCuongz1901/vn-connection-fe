@@ -349,6 +349,38 @@ export const countMeInTalkRoom = async ({
 	return await axios.post(url, payload)
 }
 
+export type TalkRoomCountMeInUser = {
+	id: string
+	name: string
+	avatar?: string
+	i_am_from?: string | null
+	country_code?: string | null
+	gender?: string | null
+	languages_can_speak?: string | null
+	languages_can_speak_array?: string[]
+	age?: number | null
+}
+
+export type TalkRoomCountMeInListItem = {
+	user_id: string
+	created_at?: string
+	user: TalkRoomCountMeInUser
+}
+
+export const getTalkRoomCountMeInList = async ({
+	id,
+	params = {},
+}: {
+	id: string
+	params?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/count_me_in/list`
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
 export const notificationMeInTalkRoom = async ({
 	id,
 	payload,
