@@ -47,13 +47,13 @@ export default function useTalkRoom() {
 	const [loadingConnectedCountry, setLoadingConnectedCountry] = useState(false)
 	const [loadingConnectedPeople, setLoadingConnectedPeople] = useState(false)
 	const [loadingLeaderBoard, setLoadingLeaderBoard] = useState(false)
-	const [topLeaderBoard, setTopLeaderBoard] = useState<TalkRoomLeaderBoardItem[]>(
-		[],
-	)
+	const [topLeaderBoard, setTopLeaderBoard] = useState<
+		TalkRoomLeaderBoardItem[]
+	>([])
 	const [myLeaderBoardPosition, setMyLeaderBoardPosition] = useState<any>(null)
-	const [leaderBoardList, setLeaderBoardList] = useState<TalkRoomLeaderBoardItem[]>(
-		[],
-	)
+	const [leaderBoardList, setLeaderBoardList] = useState<
+		TalkRoomLeaderBoardItem[]
+	>([])
 	const [myTalkRoomAnalysis, setMyTalkRoomAnalysis] = useState<any>(null)
 	const [languages, setLanguages] = useState<TalkRoomLanguageItem[]>([])
 	const [categories, setCategories] = useState<TalkRoomCategoryItem[]>([])
@@ -710,6 +710,18 @@ export default function useTalkRoom() {
 						message:
 							'Your talk room is ready and will start at the time you set',
 						autoCloseMs: 2000,
+						styles: {
+							content: {
+								width: '380px',
+								maxWidth: 'calc(100vw - 32px)',
+								minHeight: 'unset',
+								padding: '20px 24px',
+							},
+							body: {
+								flex: 'unset',
+								padding: 0,
+							},
+						},
 						hideFooter: true,
 						onAccept: () => {
 							handleGetMyTalkRoomAnalysis()
