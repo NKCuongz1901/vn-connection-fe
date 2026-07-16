@@ -27,12 +27,13 @@ const TermPolicy = () => {
 					Privacy Policy
 				</Link>
 			</Flex>
-			<span>
-				© 2026 VN CONNECTIONS COMPANY LIMITED. All rights reserved.
-			</span>
+			<span>VN CONNECTIONS COMPANY LIMITED</span>
 			<span style={{ textAlign: 'center', maxWidth: 360 }}>
 				Address: 2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh
-				City, Viet Nam.
+				City, Viet Nam, 700000
+			</span>
+			<span>
+				© 2026 VN CONNECTIONS COMPANY LIMITED. All rights reserved.
 			</span>
 			<span>Version: {buildVersion}</span>
 		</Flex>

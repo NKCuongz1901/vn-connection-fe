@@ -225,11 +225,12 @@ export default function OpenApp() {
 			</div>
 
 			<footer className={styles.footer}>
-				<p>© 2026 VN CONNECTIONS COMPANY LIMITED. All rights reserved.</p>
+				<p>VN CONNECTIONS COMPANY LIMITED</p>
 				<p>
 					Address: 2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh
-					City, Viet Nam.
+					City, Viet Nam, 700000
 				</p>
+				<p>© 2026 VN CONNECTIONS COMPANY LIMITED. All rights reserved.</p>
 			</footer>
 		</main>
 	)

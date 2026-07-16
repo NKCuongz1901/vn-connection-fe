@@ -1,13 +1,15 @@
 # Bước 2: Thông tin pháp lý trên Website
 
-Hệ thống kiểm duyệt sẽ truy cập website để đối chiếu thông tin sở hữu pháp lý. Footer website phải hiển thị rõ bản quyền và địa chỉ công ty.
+Hệ thống kiểm duyệt sẽ truy cập website để đối chiếu thông tin sở hữu pháp lý. Footer website phải hiển thị rõ tên pháp lý, bản quyền và địa chỉ công ty.
 
 ## Nội dung hiển thị trên Footer
 
 ```text
-© 2026 VN CONNECTIONS COMPANY LIMITED. All rights reserved.
+VN CONNECTIONS COMPANY LIMITED
 
-Address: 2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh City, Viet Nam.
+Address: 2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh City, Viet Nam, 700000
+
+© 2026 VN CONNECTIONS COMPANY LIMITED. All rights reserved.
 ```
 
 ## Vị trí trong codebase
@@ -20,7 +22,8 @@ Address: 2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh City, Viet Nam.
 ## Checklist kiểm tra
 
 - [ ] Cuộn xuống Footer trên trang Login và trang Open App
+- [ ] Thấy tên pháp lý `VN CONNECTIONS COMPANY LIMITED`
 - [ ] Thấy dòng bản quyền `© 2026 VN CONNECTIONS COMPANY LIMITED. All rights reserved.`
-- [ ] Thấy địa chỉ `2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh City, Viet Nam.`
+- [ ] Thấy địa chỉ `2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh City, Viet Nam, 700000`
 - [ ] Website load bình thường, không phải trang trống
 - [ ] Deploy bản mới lên môi trường production trước khi gửi kiểm duyệt
