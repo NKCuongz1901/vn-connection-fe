@@ -27,7 +27,13 @@ const TermPolicy = () => {
 					Privacy Policy
 				</Link>
 			</Flex>
-			<span>Copyrightⓒ(Inc)UniVini. All rights reserved.</span>
+			<span>
+				© 2026 VN CONNECTIONS COMPANY LIMITED. All rights reserved.
+			</span>
+			<span style={{ textAlign: 'center', maxWidth: 360 }}>
+				Address: 2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh
+				City, Viet Nam.
+			</span>
 			<span>Version: {buildVersion}</span>
 		</Flex>
 	)

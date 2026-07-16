@@ -499,3 +499,23 @@ $gradient-hero: linear-gradient(145deg, #7ed957 0%, #006b35 55%, #004d28 100%);
 	font-weight: 700;
 	color: $brand-green-deep;
 }
+
+.footer {
+	position: relative;
+	z-index: 20;
+	max-width: 1280px;
+	margin: 0 auto;
+	padding: 32px 24px 40px;
+	text-align: center;
+	font-size: 12px;
+	line-height: 1.5;
+	color: $text-muted;
+
+	p {
+		margin: 0;
+	}
+
+	p + p {
+		margin-top: 4px;
+	}
+}

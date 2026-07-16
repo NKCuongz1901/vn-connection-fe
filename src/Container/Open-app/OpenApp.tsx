@@ -223,6 +223,14 @@ export default function OpenApp() {
 					</div>
 				</div>
 			</div>
+
+			<footer className={styles.footer}>
+				<p>© 2026 VN CONNECTIONS COMPANY LIMITED. All rights reserved.</p>
+				<p>
+					Address: 2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh
+					City, Viet Nam.
+				</p>
+			</footer>
 		</main>
 	)
 }
