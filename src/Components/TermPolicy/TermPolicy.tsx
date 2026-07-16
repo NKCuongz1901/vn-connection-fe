@@ -33,6 +33,12 @@ const TermPolicy = () => {
 				City, Viet Nam, 700000
 			</span>
 			<span>
+				Contact:{' '}
+				<a href="mailto:support@univini.com" style={{ color: 'inherit' }}>
+					support@univini.com
+				</a>
+			</span>
+			<span>
 				© 2026 VN CONNECTIONS COMPANY LIMITED. All rights reserved.
 			</span>
 			<span>Version: {buildVersion}</span>

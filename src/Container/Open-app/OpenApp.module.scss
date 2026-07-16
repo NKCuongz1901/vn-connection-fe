@@ -518,4 +518,8 @@ $gradient-hero: linear-gradient(145deg, #7ed957 0%, #006b35 55%, #004d28 100%);
 	p + p {
 		margin-top: 4px;
 	}
+
+	a {
+		color: inherit;
+	}
 }

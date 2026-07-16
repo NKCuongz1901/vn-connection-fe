@@ -230,6 +230,10 @@ export default function OpenApp() {
 					Address: 2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh
 					City, Viet Nam, 700000
 				</p>
+				<p>
+					Contact:{' '}
+					<a href="mailto:support@univini.com">support@univini.com</a>
+				</p>
 				<p>© 2026 VN CONNECTIONS COMPANY LIMITED. All rights reserved.</p>
 			</footer>
 		</main>

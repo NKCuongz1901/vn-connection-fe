@@ -1,5 +1,6 @@
 'use client'
 import { getSystemSettings } from '@/apis/authApis'
+import TermPolicy from '@/Components/TermPolicy'
 import { Flex } from 'antd'
 import React, { useEffect, useState } from 'react'
 
@@ -42,6 +43,9 @@ const PolicyTerm = ({ type }: { type: string }) => {
 					className={classes.content}
 					dangerouslySetInnerHTML={{ __html: data?.value }}
 				/>
+				<div className={classes.footer}>
+					<TermPolicy />
+				</div>
 			</Flex>
 		</div>
 	)
