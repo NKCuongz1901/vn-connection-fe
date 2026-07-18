@@ -21,10 +21,11 @@ Contact: support@univini.com
 | Login / Forget Password | `src/Components/TermPolicy/TermPolicy.tsx` |
 | Open App (download landing) | `src/Container/Open-app/OpenApp.tsx` |
 | Terms / Privacy Policy | `src/Container/PolicyTerm/PolicyTerm.tsx` (dùng lại `TermPolicy`) |
+| Overview & các trang app chính | `src/Components/Layout/MainLayout.tsx` (sidebar + footer nội dung) |
 
 ## Checklist kiểm tra
 
-- [ ] Cuộn xuống Footer trên trang Login, Open App, Terms và Privacy Policy
+- [ ] Cuộn xuống Footer trên trang Login, Open App, Terms, Privacy Policy và Overview (`/overview`)
 - [ ] Thấy tên pháp lý `VN CONNECTIONS COMPANY LIMITED`
 - [ ] Thấy dòng bản quyền `© 2026 VN CONNECTIONS COMPANY LIMITED. All rights reserved.`
 - [ ] Thấy địa chỉ `2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh City, Viet Nam, 700000`
