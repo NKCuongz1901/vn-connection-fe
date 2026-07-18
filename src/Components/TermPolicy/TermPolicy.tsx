@@ -5,14 +5,21 @@ import Link from 'next/link'
 import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
 
-const TermPolicy = () => {
+const TermPolicy = ({
+	align = 'center',
+	className,
+}: {
+	align?: 'center' | 'start'
+	className?: string
+}) => {
 	const { onGetPath } = useLocalePath()
 	return (
 		<Flex
 			vertical
 			justify="center"
-			align="center"
+			align={align === 'start' ? 'flex-start' : 'center'}
 			gap={4}
+			className={className}
 			style={{
 				color: '#48546b',
 				fontSize: 12,
@@ -28,7 +35,7 @@ const TermPolicy = () => {
 				</Link>
 			</Flex>
 			<span>VN CONNECTIONS COMPANY LIMITED</span>
-			<span style={{ textAlign: 'center', maxWidth: 360 }}>
+			<span style={{ textAlign: align === 'start' ? 'left' : 'center', maxWidth: 360 }}>
 				Address: 2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh
 				City, Viet Nam, 700000
 			</span>

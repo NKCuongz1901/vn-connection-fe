@@ -16,6 +16,7 @@ import { useNewInbox } from '@/context/NewInboxContext'
 
 import AuthLayout from './Child/AuthLayout'
 import HeaderMainLayout from './Child/HeaderMainLayout'
+import TermPolicy from '@/Components/TermPolicy'
 
 import {
 	appLayoutAuth,
@@ -156,7 +157,9 @@ const MainLayout = (props: MainLayoutProps) => {
 						})}
 					</Flex>
 					<Flex
-						className="sidebarVersion justify-end items-end item"
+						vertical
+						className="sidebarLegalFooter"
+						gap={4}
 						style={{
 							marginTop: 'auto',
 							padding: '12px',
@@ -164,7 +167,8 @@ const MainLayout = (props: MainLayoutProps) => {
 							color: '#64748B',
 						}}
 					>
-						Version: {buildVersion}
+						<span>VN CONNECTIONS COMPANY LIMITED</span>
+						<span>Version: {buildVersion}</span>
 					</Flex>
 				</Flex>
 			</Flex>
@@ -177,7 +181,10 @@ const MainLayout = (props: MainLayoutProps) => {
 			<Flex className="bodyMainLayout">
 				{_renderSideBar()}
 				<Flex vertical className="contentMainLayout">
-					{children}
+					<div className="contentMainLayoutBody">{children}</div>
+					<footer className="mainLayoutLegalFooter">
+						<TermPolicy />
+					</footer>
 				</Flex>
 			</Flex>
 		</Flex>
