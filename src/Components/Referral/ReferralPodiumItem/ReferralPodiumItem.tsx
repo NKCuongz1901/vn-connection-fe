@@ -17,7 +17,7 @@ export type LeaderboardUser = {
 	name?: string
 	avatar?: string
 	total_points?: number
-	user_rank?: string
+	user_rank?: string | number
 	scoreLabel?: string
 }
 

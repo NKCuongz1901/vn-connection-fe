@@ -29,5 +29,6 @@ export const mainRoutes = {
 	referralAddBankCard: 'referral/add-bank-card',
 	referralRedeemHistory: 'referral/redeem-history',
 	talkroom: 'talkroom',
+	talkroomLeaderBoard: 'talkroom/leaderBoard',
 	feedback: 'profile/account-setting/feedback-support',
 }

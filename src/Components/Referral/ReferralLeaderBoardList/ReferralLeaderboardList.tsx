@@ -29,6 +29,7 @@ function ReferralLeaderboardList({
 	)
 
 	const myPoints = myBoardItem?.total_points ?? userData?.wallet ?? 0
+	const myScoreLabel = myBoardItem?.scoreLabel
 
 	return (
 		<div className={classes.wrapper}>
@@ -47,6 +48,7 @@ function ReferralLeaderboardList({
 							name={item.name}
 							avatar={item.avatar}
 							points={item.total_points}
+							scoreLabel={item.scoreLabel}
 						/>
 					))
 				) : (
@@ -59,10 +61,11 @@ function ReferralLeaderboardList({
 			<div className={classes.myPositionSection}>
 				<div className={classes.myPositionTitle}>Your position</div>
 				<ReferralLeaderboardRow
-					rank={myPosition}
+					rank={myPosition || myBoardItem?.user_rank}
 					name={userData?.name}
 					avatar={userData?.avatar}
 					points={myPoints}
+					scoreLabel={myScoreLabel}
 					variant="myPosition"
 				/>
 			</div>

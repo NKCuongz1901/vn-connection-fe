@@ -24,7 +24,11 @@ import useProfile from '@/hooks/Profile/useProfile'
 import { useModal } from '@/context/ModalContext'
 import { mainRoutes } from '@/routes/MainRoutes'
 import BookIcon from '@/svg/BookIcon'
-import { TalkRoomRoom, formatHostMinutes, isTalkRoomUserNotified } from '@/ultis/talkRoom'
+import {
+	TalkRoomRoom,
+	formatHostMinutes,
+	isTalkRoomUserNotified,
+} from '@/ultis/talkRoom'
 import { useLocalePath } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
 
@@ -94,7 +98,7 @@ function TalkRoom() {
 	const hasActiveSearch = Boolean(searchKeyword?.trim())
 	const hasActiveFilters = Boolean(
 		listTalkRoomFilters.languageIds?.length ||
-			listTalkRoomFilters.levels?.length,
+		listTalkRoomFilters.levels?.length,
 	)
 
 	const topHosts = useMemo(
@@ -255,17 +259,17 @@ function TalkRoom() {
 						<TalkRoomListEmpty variant="search" />
 					) : (
 						displayTalkRooms.map((room) => (
-								<RoomCard
-									key={room.id}
-									room={room}
-									onShare={handleShareRoom}
-									onCountMeIn={handleCountMeIn}
-									onNotJoining={handleNotJoining}
-									onNotifyMe={handleNotifyMe}
-									onViewCmiPeople={handleViewCmiPeople}
-									onEditRoom={setEditRoom}
-									onCancelRoom={setCancelRoom}
-								/>
+							<RoomCard
+								key={room.id}
+								room={room}
+								onShare={handleShareRoom}
+								onCountMeIn={handleCountMeIn}
+								onNotJoining={handleNotJoining}
+								onNotifyMe={handleNotifyMe}
+								onViewCmiPeople={handleViewCmiPeople}
+								onEditRoom={setEditRoom}
+								onCancelRoom={setCancelRoom}
+							/>
 						))
 					)}
 				</Flex>
@@ -277,7 +281,11 @@ function TalkRoom() {
 			<div className={classes.leaderBoardContainer}>
 				<Flex align="center" gap={4}>
 					<div className={classes.leaderBoardTitle}>Top 3 hosts</div>
-					<IconChevronRight size={16} className={classes.leaderBoardIcon} />
+					<IconChevronRight
+						size={16}
+						className={classes.leaderBoardIcon}
+						onClick={() => onChangeRoute(mainRoutes.talkroomLeaderBoard)}
+					/>
 				</Flex>
 				<div className={classes.topLeaderBoardContainer}>
 					<ReferralLeaderboardPodium
