@@ -43,12 +43,14 @@ function TalkRoomConnectedCountryModal({
 
 	const renderCountry = (code: string) => (
 		<div key={code} className={classes.countryItem}>
-			<div
-				className={clsx(
-					classes.flagCircle,
-					`flag:${mappingFlag[code] || code}`,
-				)}
-			/>
+			<div className={classes.flagCircle}>
+				<div
+					className={clsx(
+						`flag:${mappingFlag[code] || code}`,
+						classes.flag,
+					)}
+				/>
+			</div>
 			<span className={classes.countryName}>
 				{getTalkRoomCountryName(code)}
 			</span>

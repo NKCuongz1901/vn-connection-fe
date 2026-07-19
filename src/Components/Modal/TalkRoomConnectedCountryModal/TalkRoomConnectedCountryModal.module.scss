@@ -193,12 +193,20 @@
 }
 
 .flagCircle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	width: 64px;
 	height: 64px;
 	border: 1px solid #cbd5e1;
 	border-radius: 999px;
 	overflow: hidden;
 	flex-shrink: 0;
+}
+
+.flag {
+	min-width: 96px;
+	min-height: 64px;
 }
 
 .countryName {
