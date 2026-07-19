@@ -689,7 +689,7 @@ const Overview = () => {
 			>
 				{_renderHangout()}
 				{_renderChatRoom()}
-				{/* {_renderTalRoomOverview()} */}
+				{_renderTalRoomOverview()}
 				{_renderMyCommunity()}
 				{_renderMyEvent()}
 				<Flex className={classes.wrapperUp} vertical>
