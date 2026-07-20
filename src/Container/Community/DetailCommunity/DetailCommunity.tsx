@@ -22,7 +22,7 @@ import People from '@/svg/People'
 import TopicIcon from '@/svg/TopicIcon'
 
 import classes from './DetailCommunity.module.scss'
-import { getUserInfo } from '@/ultis/storage'
+import { getUserInfo, isLogin } from '@/ultis/storage'
 import { REPORT_ISSUE_TYPE } from '@/Variable/common.variable'
 
 const mappingTabsBtnTop = {
@@ -91,7 +91,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 	} = useDetailCommunity({ id, isPublic, onRequireLogin })
 
 	const handleTabTopClick = (value: string) => {
-		if (isPublic) {
+		if (isPublic && !isLogin()) {
 			onRequireLogin?.()
 			return
 		}
@@ -341,7 +341,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		)
 	}
 	const _renderModal = () => {
-		if (isPublic) return null
+		if (isPublic && !isLogin()) return null
 
 		const { type, data, title } = modal || {}
 		let Content = <></>
