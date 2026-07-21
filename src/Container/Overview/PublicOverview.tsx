@@ -12,6 +12,7 @@ import CInput from '@/Components/Custom/CInput'
 import CSelect from '@/Components/Custom/CSelect'
 import EventTitle from '@/Components/Event/EventTitle'
 import ItemEvent from '@/Components/Event/ItemEvent'
+import TalkRoomCard from '@/Components/TalkRoom/TalkRoomCard/TalkRoomCard'
 import usePublicOverview from '@/hooks/Overview/usePublicOverview'
 import useRequireLogin from '@/hooks/useRequireLogin'
 import EventIcon from '@/svg/Event'
@@ -23,6 +24,8 @@ import Party from '@/svg/Party'
 import People from '@/svg/People'
 import SearchIcon from '@/svg/SearchIcon'
 import UpcomingEvent from '@/svg/UpcomingEvent'
+import CalendarIcon from '@/svg/CalenderIcon'
+import LiveIcon from '@/svg/Talkroom/LiveIcon'
 
 import { arrayFrom, isArray } from '@/ultis/array'
 
@@ -47,6 +50,10 @@ function PublicOverview() {
 		loading,
 		total,
 		filters,
+		listTalkroom,
+		totalTalkroom,
+		statsTalkroom,
+		loadingTalkroom,
 		onChangeFilter,
 		onChangeKeyword,
 		onScrollList,
@@ -114,6 +121,7 @@ function PublicOverview() {
 			<Flex className={classes.title} onClick={requireLogin}>
 				<EventTitle
 					label="Talk room"
+					number={totalTalkroom}
 					labelCreateBtn="Create talk room"
 					icon={<MicroPhoneIcon />}
 					onAddNew={(e) => {
@@ -122,10 +130,76 @@ function PublicOverview() {
 					}}
 				/>
 			</Flex>
-			<OverviewLockedSection
-				description="Join a talk room to practice speaking"
-				onLogin={requireLogin}
-			/>
+			<Flex className={classes.statsTalkroom}>
+				<div className={classes.statsItem}>
+					<LiveIcon />
+					<div className={classes.statsItemLabel}>
+						Live: {statsTalkroom?.live_rooms_count}
+					</div>
+				</div>
+				<div className={classes.statsItem}>
+					<CalendarIcon fill="#1B8024" width={16} height={16} />
+					<div className={classes.statsItemLabel}>
+						Scheduled: {statsTalkroom?.scheduled_rooms_count}
+					</div>
+				</div>
+				<div className={classes.statsItemJoining} onClick={requireLogin}>
+					<div className={classes.statsJoiningItemLabel}>
+						Joining: {statsTalkroom?.total_count_me_in_in_scheduled_rooms}
+					</div>
+				</div>
+			</Flex>
+			<Flex vertical className={classes.talkRoom}>
+				{!loadingTalkroom && totalTalkroom === 0 ? (
+					<Flex
+						className={classes.talkRoomEmptyWrapper}
+						vertical
+						align="center"
+						onClick={requireLogin}
+					>
+						<img
+							src="/images/emptyRoom.png"
+							alt=""
+							className={classes.talkRoomEmptyImage}
+						/>
+						<span className={classes.talkRoomEmptyLabel}>
+							Start a Talk Room
+						</span>
+					</Flex>
+				) : (
+					<Flex className={classes.talkRoomListWrapper}>
+						{loadingTalkroom
+							? arrayFrom(5).map((_, index) => (
+									<Flex
+										key={index}
+										vertical
+										className={classes.talkRoomItemSkeleton}
+									>
+										<Skeleton.Avatar
+											active
+											className={classes.talkRoomSkeletonAvatar}
+										/>
+										<Skeleton.Input
+											active
+											className={classes.talkRoomSkeletonTag}
+										/>
+										<Skeleton.Input
+											active
+											className={classes.talkRoomSkeletonStatus}
+										/>
+									</Flex>
+								))
+							: isArray(listTalkroom, 1) &&
+								listTalkroom.map((room) => (
+									<TalkRoomCard
+										key={room.id}
+										room={room}
+										onClick={requireLogin}
+									/>
+								))}
+					</Flex>
+				)}
+			</Flex>
 		</Flex>
 	)
 

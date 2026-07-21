@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useModal } from '@/context/ModalContext'
 import { getPublicListPost } from '@/apis/postApis'
+import { getTalkRoomOverview } from '@/apis/talkRoomApis'
 
 import { isArray, uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay } from '@/ultis/common'
@@ -35,6 +36,10 @@ export default function usePublicOverview() {
 	const [loading, setLoading] = useState(false)
 	const [total, setTotal] = useState(0)
 	const [loadmore, setLoadMore] = useState(true)
+	const [loadingTalkroom, setLoadingTalkroom] = useState(false)
+	const [listTalkroom, setListTalkroom] = useState<any[]>([])
+	const [totalTalkroom, setTotalTalkroom] = useState(0)
+	const [statsTalkroom, setStatsTalkroom] = useState<any>({})
 	const [filters, setFilters] = useState<filterProps>({
 		radius: 50,
 		date: null,
@@ -87,6 +92,31 @@ export default function usePublicOverview() {
 			openError(error)
 		} finally {
 			setLoading(false)
+		}
+	}
+
+	const handleGetTalkroomOverview = async () => {
+		setLoadingTalkroom(true)
+		try {
+			const res: any = await getTalkRoomOverview({
+				params: {
+					fields: ['$all'],
+				},
+			})
+			const { code, results } = res || {}
+			if (code === 200) {
+				const { rooms, stats } = results?.object || {}
+				setListTalkroom(rooms?.rows || [])
+				setStatsTalkroom(stats || {})
+				setTotalTalkroom(
+					(stats?.live_rooms_count || 0) +
+						(stats?.scheduled_rooms_count || 0),
+				)
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoadingTalkroom(false)
 		}
 	}
 
@@ -151,6 +181,7 @@ export default function usePublicOverview() {
 
 	useEffect(() => {
 		handleGetListPost()
+		handleGetTalkroomOverview()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -160,6 +191,10 @@ export default function usePublicOverview() {
 		loading,
 		total,
 		filters,
+		listTalkroom,
+		totalTalkroom,
+		statsTalkroom,
+		loadingTalkroom,
 		onChangeFilter: handleChangeFilter,
 		onChangeKeyword: handleChangeKeyword,
 		onScrollList: handleScrollList,
