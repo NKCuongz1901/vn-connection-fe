@@ -166,6 +166,10 @@ export const TALKROOM_ROUTES = {
 	getTalkRoomLeaderBoard: 'talkroom/leaderboard',
 	getTalkRoomLeaderBoardMy: 'talkroom/leaderboard/position',
 	getTalkRoomCountMeInList: 'talkroom',
+
+	// Detail talkroom
+	validatePreTalkroom: 'talkroom/validation/can-join',
+	baseTalkroomRoute: 'talkroom',
 }
 export const Menus = [
 	{

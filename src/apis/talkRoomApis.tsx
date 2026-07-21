@@ -464,3 +464,30 @@ export const getTalkRoomLeaderBoardMy = async ({
 		params: convertParams(params),
 	})
 }
+
+// Detail talkroom
+export const validatePreTalkroom = async () => {}
+
+export const getDetailTalkroom = async () => {}
+
+export const getListenerInRoom = async () => {}
+
+export const joinTalkroom = async () => {}
+
+export const leaveTalkroom = async () => {}
+
+// Action in room
+
+export const getRaiseHandUser = async () => {}
+
+export const toogleMic = async () => {}
+
+export const hostApproveRaiseHand = async () => {}
+
+export const stepDownToListener = async () => {}
+
+export const hostKickListener = async () => {}
+
+export const transitionRole = async () => {}
+
+export const stopHosting = async () => {}
