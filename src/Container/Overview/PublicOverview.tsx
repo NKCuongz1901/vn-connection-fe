@@ -316,11 +316,7 @@ function PublicOverview() {
 			{_renderFilter()}
 			<Flex className={classes.wrapperItemUp} onScroll={onScrollList}>
 				{listPost.map((data) => (
-					<ItemEvent
-						key={data.id}
-						data={data}
-						type={mainRoutes.publicEvent}
-					/>
+					<ItemEvent key={data.id} data={data} type={mainRoutes.publicEvent} />
 				))}
 				{loading &&
 					arrayFrom(3).map((_, index) => (
@@ -351,8 +347,6 @@ function PublicOverview() {
 				{_renderHangout()}
 				{_renderChatRoom()}
 				{_renderTalkRoom()}
-				{_renderMyCommunity()}
-				{_renderMyEvent()}
 				{_renderUpcomingEvent()}
 			</Flex>
 		</div>
