@@ -465,22 +465,95 @@ export const getTalkRoomLeaderBoardMy = async ({
 	})
 }
 
-// Detail talkroom
-export const validatePreTalkroom = async () => {}
+export type ValidatePreTalkroomModel = {
+	canJoin: boolean
+	reason: string
+	message?: string
+}
 
-export const getDetailTalkroom = async () => {}
+export const validatePreTalkroom = async ({
+	id,
+	params = { fields: ['$all'] },
+}: {
+	id: string
+	params?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.validatePreTalkroom}/${id}`
 
-export const getListenerInRoom = async () => {}
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
 
-export const joinTalkroom = async () => {}
+export const getListenerInRoom = async ({
+	id,
+	params = { fields: ['$all'] },
+}: {
+	id: string
+	params?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/details/listeners`
 
-export const leaveTalkroom = async () => {}
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const joinTalkroom = async ({
+	id,
+	payload = { fields: ['$all'] },
+}: {
+	id: string
+	payload?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/join`
+
+	return await axios.post(url, convertParams(payload))
+}
+
+export const leaveTalkroom = async ({
+	id,
+	payload = { fields: ['$all'] },
+}: {
+	id: string
+	payload?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/leave`
+
+	return await axios.post(url, convertParams(payload))
+}
 
 // Action in room
 
-export const getRaiseHandUser = async () => {}
+export const getRaiseHandUser = async ({
+	id,
+	params = { fields: ['$all'] },
+}: {
+	id: string
+	params?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/raised-hands`
 
-export const toogleMic = async () => {}
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export type ToggleMicPayload = {
+	is_on: boolean
+}
+
+export const toogleMic = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: ToggleMicPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.baseTalkroomRoute}/socket/${id}/toggle_mic`
+
+	return await axios.post(url, payload)
+}
 
 export const hostApproveRaiseHand = async () => {}
 
