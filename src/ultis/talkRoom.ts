@@ -534,28 +534,68 @@ export const getTalkRoomCountryName = (code?: string) => {
 
 export type TalkRoomSpeakerSlotType = 'empty' | 'filled'
 
+export type TalkRoomFilledSpeaker = {
+	id?: string
+	name?: string
+	avatar?: string
+	i_am_from?: string
+	is_open_mic?: boolean
+	role?: string
+}
+
 export type TalkRoomSpeakerSlot = {
 	key: string
 	type: TalkRoomSpeakerSlotType
 	isHost: boolean
 	label: string
+	speaker?: TalkRoomFilledSpeaker
 }
 
-export const buildEmptyTalkRoomSpeakerSlots = (
+/** Builds speaker stage slots with host always first, then guest speaker slots. */
+export const buildTalkRoomSpeakerSlots = (
+	room?: TalkRoomRoom,
 	maxSpeakers = 2,
 ): TalkRoomSpeakerSlot[] => {
+	const speakers = room?.speakers ?? []
+	const hostSpeaker =
+		speakers.find((speaker) => speaker?.role === 'host') ??
+		(room?.host_user
+			? {
+					id: room.host_user.id,
+					name: room.host_user.name,
+					avatar: room.host_user.avatar,
+					i_am_from: room.host_user.i_am_from,
+					role: 'host',
+					is_open_mic: false,
+				}
+			: undefined)
+	const guestSpeakers = speakers.filter((speaker) => speaker?.role === 'speaker')
+
 	const slots: TalkRoomSpeakerSlot[] = [
-		{ key: 'host', type: 'empty', isHost: true, label: 'Host' },
+		{
+			key: 'host',
+			type: hostSpeaker ? 'filled' : 'empty',
+			isHost: true,
+			label: 'Host',
+			speaker: hostSpeaker,
+		},
 	]
 
 	for (let i = 0; i < maxSpeakers; i++) {
+		const speaker = guestSpeakers[i]
+
 		slots.push({
 			key: `speaker-${i + 1}`,
-			type: 'empty',
+			type: speaker ? 'filled' : 'empty',
 			isHost: false,
 			label: `Speaker ${i + 1}`,
+			speaker,
 		})
 	}
 
 	return slots
 }
+
+export const buildEmptyTalkRoomSpeakerSlots = (
+	maxSpeakers = 2,
+): TalkRoomSpeakerSlot[] => buildTalkRoomSpeakerSlots(undefined, maxSpeakers)

@@ -42,9 +42,7 @@ function DetailTalkroom({ id }: { id: string }) {
 						</div>
 					</div>
 				</div>
-				<DetailTalkroomSpeakerStage
-					maxSpeakers={talkRoomDetail?.max_speakers ?? 2}
-				/>
+				<DetailTalkroomSpeakerStage talkRoomDetail={talkRoomDetail} />
 			</div>
 		)
 	}

@@ -123,10 +123,34 @@ export default function useDetailTalkroom(id: string) {
 		[id, openError],
 	)
 
+	const handleEnterRoom = useCallback(async () => {
+		if (!id) return
+
+		const validation = await handleValidatePreJoinRoom(id)
+		if (!validation) return
+
+		const canProceed =
+			validation.canJoin === true ||
+			validation.isRejoin === true ||
+			validation.reason === TALK_ROOM_JOIN_REASON.HOST_NOT_JOINED
+
+		if (!canProceed) return
+
+		const joinResult = await handleJoinTalkRoom(id)
+		if (!joinResult?.success) return
+
+		await handleGetDetailTalkRoom(id)
+	}, [
+		id,
+		handleValidatePreJoinRoom,
+		handleJoinTalkRoom,
+		handleGetDetailTalkRoom,
+	])
+
 	useEffect(() => {
 		if (!id) return
-		handleGetDetailTalkRoom(id)
-	}, [id, handleGetDetailTalkRoom])
+		handleEnterRoom()
+	}, [id, handleEnterRoom])
 
 	return {
 		talkRoomDetail,

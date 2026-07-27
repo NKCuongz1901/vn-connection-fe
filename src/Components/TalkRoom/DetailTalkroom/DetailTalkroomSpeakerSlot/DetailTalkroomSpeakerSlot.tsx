@@ -1,9 +1,13 @@
 'use client'
 
-import { IconPlus } from '@tabler/icons-react'
+import { IconCrown, IconPlus } from '@tabler/icons-react'
+import clsx from 'clsx'
 import { memo } from 'react'
 
+import CAvatar from '@/Components/Custom/CAvatar'
+import UserMicOffIcon from '@/svg/Talkroom/UserMicOffIcon'
 import { TalkRoomSpeakerSlot } from '@/ultis/talkRoom'
+import { mappingFlag } from '@/Variable/countryVariable'
 
 import classes from './DetailTalkroomSpeakerSlot.module.scss'
 
@@ -12,14 +16,54 @@ type DetailTalkroomSpeakerSlotProps = {
 }
 
 function DetailTalkroomSpeakerSlot({ slot }: DetailTalkroomSpeakerSlotProps) {
-	if (slot.type !== 'empty') return null
+	if (slot.type === 'empty') {
+		return (
+			<div className={classes.slot}>
+				<div className={classes.emptyAvatar}>
+					<IconPlus size={24} stroke={1.5} color="#fff" />
+				</div>
+				<span className={classes.label}>{slot.label}</span>
+			</div>
+		)
+	}
+
+	const { speaker, isHost, label } = slot
+	const displayName = speaker?.name || label
+	const countryCode = speaker?.i_am_from
+	const isMicOff = speaker?.is_open_mic === false
 
 	return (
 		<div className={classes.slot}>
-			<div className={classes.emptyAvatar}>
-				<IconPlus size={24} stroke={1.5} color="#fff" />
+			<div className={classes.avatarWrap}>
+				<CAvatar
+					src={speaker?.avatar}
+					size={80}
+					className={classes.filledAvatar}
+				/>
+				{countryCode && (
+					<div className={classes.flagWrapper}>
+						<div
+							className={clsx(
+								`flag:${mappingFlag[countryCode] || countryCode}`,
+								classes.flag,
+							)}
+						/>
+					</div>
+				)}
+				{isHost && (
+					<div className={classes.crownBadge}>
+						<IconCrown size={12} stroke={2} color="#fff" fill="#fff" />
+					</div>
+				)}
 			</div>
-			<span className={classes.label}>{slot.label}</span>
+			<div className={classes.userInfo}>
+				{isMicOff && (
+					<div className={classes.micPill}>
+						<UserMicOffIcon width={16} height={16} />
+					</div>
+				)}
+				<span className={classes.userName}>{displayName}</span>
+			</div>
 		</div>
 	)
 }

@@ -2,21 +2,28 @@
 
 import { memo, useMemo } from 'react'
 
-import { buildEmptyTalkRoomSpeakerSlots } from '@/ultis/talkRoom'
+import { TalkRoomDetail } from '@/apis/talkRoomApis'
+import { buildTalkRoomSpeakerSlots } from '@/ultis/talkRoom'
 
 import DetailTalkroomSpeakerSlot from '../DetailTalkroomSpeakerSlot'
 import classes from './DetailTalkroomSpeakerStage.module.scss'
 
 type DetailTalkroomSpeakerStageProps = {
+	talkRoomDetail?: TalkRoomDetail | null
 	maxSpeakers?: number
 }
 
 function DetailTalkroomSpeakerStage({
+	talkRoomDetail,
 	maxSpeakers = 2,
 }: DetailTalkroomSpeakerStageProps) {
 	const slots = useMemo(
-		() => buildEmptyTalkRoomSpeakerSlots(maxSpeakers),
-		[maxSpeakers],
+		() =>
+			buildTalkRoomSpeakerSlots(
+				talkRoomDetail ?? undefined,
+				talkRoomDetail?.max_speakers ?? maxSpeakers,
+			),
+		[talkRoomDetail, maxSpeakers],
 	)
 
 	return (

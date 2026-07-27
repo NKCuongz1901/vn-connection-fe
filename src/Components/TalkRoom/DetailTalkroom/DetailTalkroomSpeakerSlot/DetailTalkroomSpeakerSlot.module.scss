@@ -18,8 +18,89 @@
 	justify-content: center;
 }
 
+.avatarWrap {
+	position: relative;
+	width: 80px;
+	height: 80px;
+	flex-shrink: 0;
+}
+
+.filledAvatar {
+	width: 80px;
+	height: 80px;
+	border: none;
+}
+
+.flagWrapper {
+	position: absolute;
+	right: 0;
+	bottom: -4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	overflow: hidden;
+	border: 1px solid #fff;
+	border-radius: 999px;
+	background: #fff;
+	z-index: 2;
+
+	.flag {
+		transform: translateX(-4px);
+		min-width: 28px;
+		min-height: 24px;
+	}
+}
+
+.crownBadge {
+	position: absolute;
+	top: 60px;
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.48);
+	z-index: 2;
+}
+
+.userInfo {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	width: 100%;
+	min-width: 0;
+}
+
+.micPill {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	padding: 4px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.16);
+}
+
+.userName {
+	overflow: hidden;
+	color: var(--text-primary-inverse, #fff);
+	font-size: var(--body-large-size, 16px);
+	font-style: normal;
+	font-weight: 400;
+	line-height: var(--body-large-line-height, 24px);
+	letter-spacing: var(--body-large-tracking, 0);
+	text-align: center;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .label {
-	max-width: 80px;
+	max-width: 100%;
 	overflow: hidden;
 	color: #fff;
 	font-size: 16px;
