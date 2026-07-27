@@ -70,6 +70,7 @@ function TalkRoom() {
 		onDeleteTalkRoom,
 		onCountMeInTalkRoom,
 		onNotificationMeInTalkRoom,
+		talkRoomDetail,
 		loadingUpdate,
 		loadingDelete,
 		loadingListMyFriendTalkRooms,
@@ -204,6 +205,12 @@ function TalkRoom() {
 		onGetCountMeInList(room.id, false, true)
 	}
 
+	const handleStartTalkroom = (room: TalkRoomRoom) => {
+		if (!room?.id) return
+		onGetDetailTalkRoom(room.id)
+		onChangeRoute(`${mainRoutes.talkroom}/${room.id}`)
+	}
+
 	const handleMessageCmiUser = async (userId: string) => {
 		if (!userId || userId === currentUserId) return
 
@@ -269,6 +276,7 @@ function TalkRoom() {
 								onViewCmiPeople={handleViewCmiPeople}
 								onEditRoom={setEditRoom}
 								onCancelRoom={setCancelRoom}
+								onStart={handleStartTalkroom}
 							/>
 						))
 					)}
@@ -327,6 +335,7 @@ function TalkRoom() {
 									onNotJoining={handleNotJoining}
 									onNotifyMe={handleNotifyMe}
 									onViewCmiPeople={handleViewCmiPeople}
+									onStart={handleStartTalkroom}
 								/>
 							))}
 				</Flex>

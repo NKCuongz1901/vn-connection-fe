@@ -231,8 +231,7 @@ export default function useTalkRoom() {
 				const { code, results, pagination } = res || {}
 
 				if (code === 200) {
-					const rows: TalkRoomCountMeInListItem[] =
-						results?.objects?.rows ?? []
+					const rows: TalkRoomCountMeInListItem[] = results?.objects?.rows ?? []
 					const count =
 						results?.objects?.count ?? pagination?.total ?? rows.length
 
