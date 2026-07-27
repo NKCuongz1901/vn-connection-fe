@@ -1,0 +1,63 @@
+.card {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	width: 100%;
+	padding: 12px 16px;
+	border-radius: 8px;
+	border: 1px solid var(--border-info, #0067b8);
+	background: var(--background-info-subtle, #e1f5fe);
+}
+
+.top {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	width: 100%;
+}
+
+.label {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	gap: 4px;
+	min-width: 0;
+}
+
+.clockIcon {
+	flex-shrink: 0;
+	color: var(--text-info, #0067b8);
+}
+
+.labelText {
+	color: var(--text-info, #0067b8);
+	font-size: var(--body-xlarge-size, 18px);
+	font-style: normal;
+	font-weight: 600;
+	line-height: var(--body-xlarge-line-height, 24px);
+	letter-spacing: var(--body-xlarge-tracking, 0);
+	white-space: nowrap;
+}
+
+.timeValue {
+	flex-shrink: 0;
+	color: var(--text-info, #0067b8);
+	font-size: var(--display-medium-size, 32px);
+	font-style: normal;
+	font-weight: 600;
+	line-height: var(--display-medium-line-height, 40px);
+	letter-spacing: var(--display-medium-tracking, 0);
+	white-space: nowrap;
+}
+
+.description {
+	margin: 0;
+	width: 100%;
+	color: var(--text-secondary, #48546b);
+	font-size: var(--body-small-size, 12px);
+	font-style: normal;
+	font-weight: 400;
+	line-height: var(--body-small-line-height, 16px);
+	letter-spacing: var(--body-small-tracking, 0);
+	word-break: break-word;
+}

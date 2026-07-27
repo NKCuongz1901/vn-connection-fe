@@ -499,6 +499,55 @@ export const getListenerInRoom = async ({
 	})
 }
 
+export type JoinTalkroomRoomate = {
+	id: string
+	talkroom_id: string
+	user_id: string
+	status: string
+	role: string
+	talking_time?: number
+	joined_at?: string
+	left_at?: string | null
+}
+
+export type JoinTalkroomAgora = {
+	session_id?: string
+	connection_type?: string
+	user_role?: string
+	role?: string
+	is_rejoin?: boolean
+	agora_token?: string
+	channel_name?: string
+	agora_uid?: number
+	expires_at?: number
+	stream_wss_url?: string
+	stream_hls_url?: string
+}
+
+export type JoinTalkroomData = {
+	roomate: JoinTalkroomRoomate
+	role: string
+	isRejoining: boolean
+	room_info?: {
+		id: string
+		name: string
+		status: string
+	}
+	socket_integration?: {
+		room_subscribed?: boolean
+		event_broadcasted?: boolean
+		participants_notified?: number
+		socket_event_details?: string
+	}
+	agora?: JoinTalkroomAgora
+}
+
+export type JoinTalkroomModel = {
+	success: boolean
+	message?: string
+	data?: JoinTalkroomData
+}
+
 export const joinTalkroom = async ({
 	id,
 	payload = { fields: ['$all'] },

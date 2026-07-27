@@ -180,6 +180,37 @@ export const formatTalkRoomSchedule = (date?: string | null) => {
 	return `${d.format('hh:mmA')} ${d.format('DD/MM')}`
 }
 
+/** Scheduled start time for in-room timing banner (e.g. "07:15 PM"). */
+export const formatTalkRoomStartTime = (date?: string | null) => {
+	if (!date) return ''
+	const d = dayjs(date)
+	if (!d.isValid()) return ''
+	return d.format('hh:mm A')
+}
+
+/** In-room pre-start timing: within 10 min early window, before scheduled start. */
+export const isTalkRoomPreStartTimingVisible = (room?: TalkRoomRoom) => {
+	if (!room || isTalkRoomLive(room.status)) return false
+
+	const scheduledAt = getTalkRoomScheduledStartAt(room)
+	const remainSeconds = getTalkRoomScheduleRemainSeconds(scheduledAt)
+	if (remainSeconds === null) return false
+
+	return (
+		remainSeconds > 0 &&
+		remainSeconds <= TALK_ROOM_EARLY_ACCESS_MINUTES * 60
+	)
+}
+
+export const getTalkRoomPreStartTimingDescription = (
+	scheduledAt?: string | null,
+) => {
+	const startTime = formatTalkRoomStartTime(scheduledAt)
+	if (!startTime) return ''
+
+	return `The Talk Room opens at ${startTime} and starts when both a host and a listener join`
+}
+
 export const TALK_ROOM_EARLY_ACCESS_MINUTES = 10
 
 const TALK_ROOM_EARLY_ACCESS_SECONDS = TALK_ROOM_EARLY_ACCESS_MINUTES * 60

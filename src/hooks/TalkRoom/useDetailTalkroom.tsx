@@ -2,8 +2,20 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import { getDetailTalkRoom, TalkRoomDetail } from '@/apis/talkRoomApis'
+import {
+	getDetailTalkRoom,
+	joinTalkroom,
+	JoinTalkroomModel,
+	TalkRoomDetail,
+	validatePreTalkroom,
+	ValidatePreTalkroomModel,
+} from '@/apis/talkRoomApis'
 import { useModal } from '@/context/ModalContext'
+import { TALK_ROOM_JOIN_REASON } from '@/Variable/talkRoom.variable'
+
+export type ValidatePreJoinRoomResult = ValidatePreTalkroomModel & {
+	isRejoin: boolean
+}
 
 export default function useDetailTalkroom(id: string) {
 	const { openError } = useModal()
@@ -11,6 +23,12 @@ export default function useDetailTalkroom(id: string) {
 		null,
 	)
 	const [loadingTalkRoomDetail, setLoadingTalkRoomDetail] = useState(false)
+	const [validatePreJoin, setValidatePreJoin] =
+		useState<ValidatePreTalkroomModel | null>(null)
+	const [loadingValidatePreJoin, setLoadingValidatePreJoin] = useState(false)
+	const [joinTalkRoomResult, setJoinTalkRoomResult] =
+		useState<JoinTalkroomModel | null>(null)
+	const [loadingJoinTalkRoom, setLoadingJoinTalkRoom] = useState(false)
 
 	const handleGetDetailTalkRoom = useCallback(
 		async (
@@ -40,6 +58,71 @@ export default function useDetailTalkroom(id: string) {
 		[id, openError],
 	)
 
+	const handleValidatePreJoinRoom = useCallback(
+		async (
+			roomId: string = id,
+			params: { [key: string]: any } = { fields: ['$all'] },
+		): Promise<ValidatePreJoinRoomResult | null> => {
+			if (!roomId) return null
+
+			setLoadingValidatePreJoin(true)
+			try {
+				const res: any = await validatePreTalkroom({ id: roomId, params })
+				const { code, results } = res || {}
+
+				if (code === 200) {
+					const data: ValidatePreTalkroomModel = results?.object ?? null
+					setValidatePreJoin(data)
+
+					if (!data) return null
+
+					return {
+						...data,
+						isRejoin: data.reason === TALK_ROOM_JOIN_REASON.USER_ALREADY_JOINED,
+					}
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingValidatePreJoin(false)
+			}
+
+			return null
+		},
+		[id, openError],
+	)
+
+	const handleJoinTalkRoom = useCallback(
+		async (
+			roomId: string = id,
+			payload: { [key: string]: any } = { fields: ['$all'] },
+		): Promise<JoinTalkroomModel | null> => {
+			if (!roomId) return null
+
+			setLoadingJoinTalkRoom(true)
+			try {
+				const res: any = await joinTalkroom({ id: roomId, payload })
+				const { code, results } = res || {}
+
+				if (code === 200) {
+					const data: JoinTalkroomModel = results?.object ?? null
+
+					if (data?.success) {
+						setJoinTalkRoomResult(data)
+						return data
+					}
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingJoinTalkRoom(false)
+			}
+
+			return null
+		},
+		[id, openError],
+	)
+
 	useEffect(() => {
 		if (!id) return
 		handleGetDetailTalkRoom(id)
@@ -48,8 +131,13 @@ export default function useDetailTalkroom(id: string) {
 	return {
 		talkRoomDetail,
 		loadingTalkRoomDetail,
+		validatePreJoin,
+		loadingValidatePreJoin,
+		joinTalkRoomResult,
+		loadingJoinTalkRoom,
 
-		// Actión
 		onGetDetailTalkRoom: handleGetDetailTalkRoom,
+		onValidatePreJoinRoom: handleValidatePreJoinRoom,
+		onJoinTalkRoom: handleJoinTalkRoom,
 	}
 }

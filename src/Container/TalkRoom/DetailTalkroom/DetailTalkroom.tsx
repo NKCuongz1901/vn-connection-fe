@@ -4,6 +4,7 @@ import { Flex } from 'antd'
 import { IconChevronLeft } from '@tabler/icons-react'
 
 import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomSpeakerStage'
+import DetailTalkroomTiming from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomTiming'
 import useDetailTalkroom from '@/hooks/TalkRoom/useDetailTalkroom'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { useLocalePath } from '@/ultis/route'
@@ -53,7 +54,11 @@ function DetailTalkroom({ id }: { id: string }) {
 	}
 
 	const _renderTimerContent = () => {
-		return <div className={classes.timerContent}></div>
+		return (
+			<div className={classes.timerContent}>
+				<DetailTalkroomTiming talkRoomDetail={talkRoomDetail} />
+			</div>
+		)
 	}
 
 	const _renderChatContent = () => {
