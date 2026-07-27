@@ -500,3 +500,31 @@ export const getTalkRoomCountryName = (code?: string) => {
 	if (!code) return ''
 	return talkRoomCountryNameByCode[code] || code
 }
+
+export type TalkRoomSpeakerSlotType = 'empty' | 'filled'
+
+export type TalkRoomSpeakerSlot = {
+	key: string
+	type: TalkRoomSpeakerSlotType
+	isHost: boolean
+	label: string
+}
+
+export const buildEmptyTalkRoomSpeakerSlots = (
+	maxSpeakers = 2,
+): TalkRoomSpeakerSlot[] => {
+	const slots: TalkRoomSpeakerSlot[] = [
+		{ key: 'host', type: 'empty', isHost: true, label: 'Host' },
+	]
+
+	for (let i = 0; i < maxSpeakers; i++) {
+		slots.push({
+			key: `speaker-${i + 1}`,
+			type: 'empty',
+			isHost: false,
+			label: `Speaker ${i + 1}`,
+		})
+	}
+
+	return slots
+}
