@@ -51,8 +51,9 @@ export default function useTalkRoomSocket(props: TalkroomSocketType) {
 			subcribe.on('publication', (ctx) => {
 				console.log('publication', ctx)
 				const message = ctx.data
-				const event = message?.event
-				const payload = message?.payload
+				console.log('message', message)
+				const event = message?.data?.event_type
+				const payload = message?.data
 
 				if (!event) return
 				onRoomEventRef.current?.(event, payload)
