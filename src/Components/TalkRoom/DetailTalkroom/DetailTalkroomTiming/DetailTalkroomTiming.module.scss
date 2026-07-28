@@ -61,3 +61,14 @@
 	letter-spacing: var(--body-small-tracking, 0);
 	word-break: break-word;
 }
+
+.cardWarning {
+	border-color: var(--border-warning, #ce5b05);
+	background: var(--background-warning-subtle, #fff5eb);
+}
+
+.clockIconWarning,
+.labelTextWarning,
+.timeValueWarning {
+	color: var(--text-warning, #ce5b05);
+}

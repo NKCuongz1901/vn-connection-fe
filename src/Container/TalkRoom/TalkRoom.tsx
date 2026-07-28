@@ -277,6 +277,7 @@ function TalkRoom() {
 								onEditRoom={setEditRoom}
 								onCancelRoom={setCancelRoom}
 								onStart={handleStartTalkroom}
+								onJoin={handleStartTalkroom}
 							/>
 						))
 					)}

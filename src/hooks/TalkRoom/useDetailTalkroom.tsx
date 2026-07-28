@@ -6,12 +6,16 @@ import {
 	getDetailTalkRoom,
 	joinTalkroom,
 	JoinTalkroomModel,
+	leaveTalkroom,
 	TalkRoomDetail,
 	validatePreTalkroom,
 	ValidatePreTalkroomModel,
 } from '@/apis/talkRoomApis'
 import { useModal } from '@/context/ModalContext'
 import { TALK_ROOM_JOIN_REASON } from '@/Variable/talkRoom.variable'
+import { useLocalePath } from '@/ultis/route'
+import { mainRoutes } from '@/routes/MainRoutes'
+import useTalkRoomSocket from './useTalkRoomSocket'
 
 export type ValidatePreJoinRoomResult = ValidatePreTalkroomModel & {
 	isRejoin: boolean
@@ -19,6 +23,7 @@ export type ValidatePreJoinRoomResult = ValidatePreTalkroomModel & {
 
 export default function useDetailTalkroom(id: string) {
 	const { openError } = useModal()
+	const { onChangeRoute } = useLocalePath()
 	const [talkRoomDetail, setTalkRoomDetail] = useState<TalkRoomDetail | null>(
 		null,
 	)
@@ -28,6 +33,7 @@ export default function useDetailTalkroom(id: string) {
 	const [loadingValidatePreJoin, setLoadingValidatePreJoin] = useState(false)
 	const [joinTalkRoomResult, setJoinTalkRoomResult] =
 		useState<JoinTalkroomModel | null>(null)
+	const isJoined = joinTalkRoomResult?.success === true
 	const [loadingJoinTalkRoom, setLoadingJoinTalkRoom] = useState(false)
 
 	const handleGetDetailTalkRoom = useCallback(
@@ -122,6 +128,50 @@ export default function useDetailTalkroom(id: string) {
 		},
 		[id, openError],
 	)
+
+	const handleLeaveRoom = useCallback(async () => {
+		if (!id) return
+		try {
+			await leaveTalkroom({ id })
+		} catch (error) {
+			openError(error)
+		}
+	}, [id, openError])
+
+	const handleRoomSocketEvent = useCallback(
+		(event: string, _data?: any) => {
+			switch (event) {
+				case 'user_joined_room':
+				case 'user_left_room':
+				case 'room_went_live':
+					handleGetDetailTalkRoom(id)
+					break
+				case 'room_start_countdown':
+				case 'speaker_on_mic':
+				case 'speaker_off_mic':
+					handleGetDetailTalkRoom(id)
+					break
+				case 'room_inactive_warning':
+					// openSuccess({ message: '...' }) hoặc toast sau
+					break
+				case 'room_force_closed':
+				case 'room_inactive_force_closed':
+					handleLeaveRoom().finally(() => {
+						onChangeRoute(mainRoutes.talkroom)
+					})
+					break
+				default:
+					break
+			}
+		},
+		[id, handleGetDetailTalkRoom, handleLeaveRoom, onChangeRoute],
+	)
+
+	const { isConnected } = useTalkRoomSocket({
+		roomId: id,
+		enabled: isJoined,
+		onRoomEvent: handleRoomSocketEvent,
+	})
 
 	const handleEnterRoom = useCallback(async () => {
 		if (!id) return

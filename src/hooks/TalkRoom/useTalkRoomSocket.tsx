@@ -52,7 +52,7 @@ export default function useTalkRoomSocket(props: TalkroomSocketType) {
 				console.log('publication', ctx)
 				const message = ctx.data
 				console.log('message', message)
-				const event = message?.data?.event_type
+				const event = message?.data?.event_type ?? message?.event
 				const payload = message?.data
 
 				if (!event) return

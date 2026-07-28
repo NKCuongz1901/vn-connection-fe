@@ -32,6 +32,10 @@ export type CreateTalkRoomInput = {
 export type TalkRoomDetail = TalkRoomListItem & {
 	schedule_at?: string | null
 	started_at?: string | null
+	time_left_in_seconds?: number
+	max_duration_seconds?: number
+	count_down_at?: string | null
+	created_at?: string
 	host_joined?: boolean
 	host_user?: {
 		id?: string

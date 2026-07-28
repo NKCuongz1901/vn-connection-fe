@@ -71,6 +71,10 @@ export type TalkRoomRoom = {
 		avatar?: string
 		i_am_from?: string
 	}
+	time_left_in_seconds?: number
+	max_duration_seconds?: number
+	count_down_at?: string | null
+	created_at?: string
 	is_joined?: boolean
 	is_your_room?: boolean
 	dynamic_link?: string
@@ -92,7 +96,9 @@ export const formatTalkRoomFriendBanner = (
 
 	if (total <= 0 || !friends.length) return null
 
-	const names = friends.map((friend) => friend?.name).filter(Boolean) as string[]
+	const names = friends
+		.map((friend) => friend?.name)
+		.filter(Boolean) as string[]
 
 	if (!names.length) return null
 
@@ -197,8 +203,7 @@ export const isTalkRoomPreStartTimingVisible = (room?: TalkRoomRoom) => {
 	if (remainSeconds === null) return false
 
 	return (
-		remainSeconds > 0 &&
-		remainSeconds <= TALK_ROOM_EARLY_ACCESS_MINUTES * 60
+		remainSeconds > 0 && remainSeconds <= TALK_ROOM_EARLY_ACCESS_MINUTES * 60
 	)
 }
 
@@ -210,6 +215,18 @@ export const getTalkRoomPreStartTimingDescription = (
 
 	return `The Talk Room opens at ${startTime} and starts when both a host and a listener join`
 }
+
+/** Formats countdown seconds as MM:SS for the in-room waiting banner. */
+export const formatTalkRoomCountdownMmSs = (totalSeconds: number) => {
+	const safeSeconds = Math.max(0, Math.floor(totalSeconds))
+	const minutes = Math.floor(safeSeconds / 60)
+	const seconds = safeSeconds % 60
+
+	return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
+export const TALK_ROOM_DEFAULT_MAX_DURATION_SECONDS = 300
+export const TALK_ROOM_COUNT_WAITING_MIN_SECONDS = 10
 
 export const TALK_ROOM_EARLY_ACCESS_MINUTES = 10
 
@@ -251,6 +268,58 @@ export const getTalkRoomScheduledStartAt = (room?: TalkRoomRoom) => {
 	if (pendingNext) return pendingNext
 
 	return room?.started_at ?? room?.next_schedule_at ?? null
+}
+
+/** schedule_at from the live schedule entry (when room status is already live). */
+const getTalkRoomLiveScheduleAt = (room?: TalkRoomRoom) => {
+	const liveSchedule = (room?.schedules || []).find(
+		(schedule) =>
+			schedule.status === 'live' &&
+			!!schedule.schedule_at &&
+			dayjs(schedule.schedule_at).isValid(),
+	)
+
+	return liveSchedule?.schedule_at ?? null
+}
+
+/** Anchor time for countWaiting (pendingNextSchedule ?? live schedule ?? startedAt ?? createdAt). */
+export const getTalkRoomCountWaitingAnchorAt = (room?: TalkRoomRoom) => {
+	return (
+		getTalkRoomLiveScheduleAt(room) ??
+		getTalkRoomPendingNextSchedule(room) ??
+		room?.started_at ??
+		room?.created_at ??
+		null
+	)
+}
+
+/**
+ * countWaiting: after room_went_live, before room_start_countdown.
+ * remainTime = maxDuration - |anchor - now|; if < 0 → fallback 10s.
+ */
+export const getTalkRoomCountWaitingSecondsLeft = (room?: TalkRoomRoom) => {
+	const maxDuration =
+		room?.max_duration_seconds ?? TALK_ROOM_DEFAULT_MAX_DURATION_SECONDS
+	const anchorAt = getTalkRoomCountWaitingAnchorAt(room)
+
+	if (!anchorAt) return maxDuration
+
+	const elapsed = Math.abs(dayjs(anchorAt).diff(dayjs(), 'second'))
+	let remainTime = maxDuration - elapsed
+
+	if (remainTime < 0) {
+		remainTime = TALK_ROOM_COUNT_WAITING_MIN_SECONDS
+	}
+
+	return Math.max(0, Math.floor(remainTime))
+}
+
+/** countWaiting phase: live room waiting for session countdown to start. */
+export const isTalkRoomCountWaitingVisible = (room?: TalkRoomRoom) => {
+	if (!room || !isTalkRoomLive(room.status)) return false
+	if (room.count_down_at) return false
+
+	return getTalkRoomCountWaitingSecondsLeft(room) > 0
 }
 
 export const getTalkRoomScheduleRemainSeconds = (
@@ -307,9 +376,7 @@ export const isTalkRoomScheduleJoinBeforeLive = (room?: TalkRoomRoom) => {
 	const remainSeconds = getTalkRoomScheduleRemainSeconds(scheduledAt)
 	if (remainSeconds === null) return false
 
-	return (
-		remainSeconds >= 0 && remainSeconds <= TALK_ROOM_EARLY_ACCESS_SECONDS
-	)
+	return remainSeconds >= 0 && remainSeconds <= TALK_ROOM_EARLY_ACCESS_SECONDS
 }
 
 /** Show host avatar fallback when speakers list is empty (mobile isShowHostWhenEmpty). */
@@ -337,9 +404,7 @@ export const isTalkRoomHostCanStart = (room?: TalkRoomRoom) => {
 
 	if (remainSeconds < 0) return true
 
-	return (
-		remainSeconds >= 0 && remainSeconds <= TALK_ROOM_EARLY_ACCESS_SECONDS
-	)
+	return remainSeconds >= 0 && remainSeconds <= TALK_ROOM_EARLY_ACCESS_SECONDS
 }
 
 export const isTalkRoomHostWaiting = (room?: TalkRoomRoom) => {
@@ -519,13 +584,12 @@ export const formatTalkRoomLiveParticipantsText = (
 	}
 }
 
-const talkRoomCountryNameByCode = CountriesOptions.reduce<Record<string, string>>(
-	(acc, country) => {
-		acc[country.code] = country.name
-		return acc
-	},
-	{},
-)
+const talkRoomCountryNameByCode = CountriesOptions.reduce<
+	Record<string, string>
+>((acc, country) => {
+	acc[country.code] = country.name
+	return acc
+}, {})
 
 export const getTalkRoomCountryName = (code?: string) => {
 	if (!code) return ''
@@ -569,7 +633,9 @@ export const buildTalkRoomSpeakerSlots = (
 					is_open_mic: false,
 				}
 			: undefined)
-	const guestSpeakers = speakers.filter((speaker) => speaker?.role === 'speaker')
+	const guestSpeakers = speakers.filter(
+		(speaker) => speaker?.role === 'speaker',
+	)
 
 	const slots: TalkRoomSpeakerSlot[] = [
 		{

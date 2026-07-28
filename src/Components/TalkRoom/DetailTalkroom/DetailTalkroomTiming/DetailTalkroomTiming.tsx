@@ -5,12 +5,15 @@ import { memo, useMemo } from 'react'
 import { TalkRoomDetail } from '@/apis/talkRoomApis'
 import {
 	formatTalkRoomStartTime,
+	getTalkRoomCountWaitingSecondsLeft,
 	getTalkRoomPreStartTimingDescription,
 	getTalkRoomScheduledStartAt,
+	isTalkRoomCountWaitingVisible,
 	isTalkRoomPreStartTimingVisible,
 } from '@/ultis/talkRoom'
 
 import PreStartTiming from './PreStartTiming'
+import WaitingTiming from './WaitingTiming'
 
 type DetailTalkroomTimingProps = {
 	talkRoomDetail?: TalkRoomDetail | null
@@ -26,20 +29,33 @@ function DetailTalkroomTiming({ talkRoomDetail }: DetailTalkroomTimingProps) {
 	const showPreStart = isTalkRoomPreStartTimingVisible(
 		talkRoomDetail ?? undefined,
 	)
-
-	if (!showPreStart) return null
-
-	const startTimeLabel = formatTalkRoomStartTime(scheduledAt)
-	const description = getTalkRoomPreStartTimingDescription(scheduledAt)
-
-	if (!startTimeLabel) return null
-
-	return (
-		<PreStartTiming
-			startTimeLabel={startTimeLabel}
-			description={description}
-		/>
+	const showCountWaiting = isTalkRoomCountWaitingVisible(
+		talkRoomDetail ?? undefined,
 	)
+
+	if (showPreStart) {
+		const startTimeLabel = formatTalkRoomStartTime(scheduledAt)
+		const description = getTalkRoomPreStartTimingDescription(scheduledAt)
+
+		if (!startTimeLabel) return null
+
+		return (
+			<PreStartTiming
+				startTimeLabel={startTimeLabel}
+				description={description}
+			/>
+		)
+	}
+
+	if (showCountWaiting) {
+		const waitingSeconds = getTalkRoomCountWaitingSecondsLeft(
+			talkRoomDetail ?? undefined,
+		)
+
+		return <WaitingTiming secondsLeft={waitingSeconds} />
+	}
+
+	return null
 }
 
 export default memo(DetailTalkroomTiming)
