@@ -170,6 +170,8 @@ export const TALKROOM_ROUTES = {
 	// Detail talkroom
 	validatePreTalkroom: 'talkroom/validation/can-join',
 	baseTalkroomRoute: 'talkroom',
+	// Get token socket
+	getTokenSocket: 'auth/socket_token',
 }
 export const Menus = [
 	{

@@ -613,3 +613,8 @@ export const hostKickListener = async () => {}
 export const transitionRole = async () => {}
 
 export const stopHosting = async () => {}
+
+export const getTokenSocket = async () => {
+	const url = TALKROOM_ROUTES.getTokenSocket
+	return await axios.post(url, {})
+}
