@@ -11,6 +11,7 @@ export type TalkRoomSpeaker = {
 	role?: string
 	talking_time?: number
 	i_am_from?: string
+	is_open_mic?: boolean
 }
 
 export type TalkRoomJoinedFriend = {
@@ -320,6 +321,50 @@ export const isTalkRoomCountWaitingVisible = (room?: TalkRoomRoom) => {
 	if (room.count_down_at) return false
 
 	return getTalkRoomCountWaitingSecondsLeft(room) > 0
+}
+
+export type HostMicState = 'disabled' | 'off' | 'on'
+
+export const getTalkRoomListenerCount = (room?: TalkRoomRoom) => {
+	const total = room?.total_participants ?? 0
+	const speakerCount = room?.speakers?.length ?? 0
+
+	return Math.max(0, total - speakerCount)
+}
+
+export const isTalkRoomListenerEmpty = (room?: TalkRoomRoom) => {
+	return getTalkRoomListenerCount(room) === 0
+}
+
+export const getHostSpeaker = (room?: TalkRoomRoom) => {
+	return (
+		room?.speakers?.find((speaker) => speaker?.role === 'host') ??
+		(room?.host_user
+			? {
+					id: room.host_user.id,
+					name: room.host_user.name,
+					avatar: room.host_user.avatar,
+					i_am_from: room.host_user.i_am_from,
+					role: 'host',
+				}
+			: undefined)
+	)
+}
+
+export const getHostMicState = (
+	room?: TalkRoomRoom,
+	options?: { isHost?: boolean },
+): HostMicState => {
+	if (!options?.isHost) return 'disabled'
+
+	if (!isTalkRoomLive(room?.status)) return 'disabled'
+
+	if ((room?.total_participants ?? 0) < 2) return 'disabled'
+
+	const hostSpeaker = getHostSpeaker(room)
+	if (hostSpeaker?.is_open_mic === true) return 'on'
+
+	return 'off'
 }
 
 export const getTalkRoomScheduleRemainSeconds = (
