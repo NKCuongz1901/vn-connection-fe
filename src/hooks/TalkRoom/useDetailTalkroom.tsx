@@ -4,10 +4,12 @@ import { useCallback, useEffect, useState } from 'react'
 
 import {
 	getDetailTalkRoom,
+	getListenerInRoom,
 	joinTalkroom,
 	JoinTalkroomModel,
 	leaveTalkroom,
 	TalkRoomDetail,
+	TalkRoomListenerInRoom,
 	validatePreTalkroom,
 	ValidatePreTalkroomModel,
 } from '@/apis/talkRoomApis'
@@ -35,6 +37,11 @@ export default function useDetailTalkroom(id: string) {
 		useState<JoinTalkroomModel | null>(null)
 	const isJoined = joinTalkRoomResult?.success === true
 	const [loadingJoinTalkRoom, setLoadingJoinTalkRoom] = useState(false)
+	const [listenersInRoom, setListenersInRoom] = useState<
+		TalkRoomListenerInRoom[]
+	>([])
+	const [totalListenersInRoom, setTotalListenersInRoom] = useState(0)
+	const [loadingListenersInRoom, setLoadingListenersInRoom] = useState(false)
 
 	const handleGetDetailTalkRoom = useCallback(
 		async (
@@ -128,6 +135,42 @@ export default function useDetailTalkroom(id: string) {
 		},
 		[id, openError],
 	)
+	const handleGetListenerInRoom = useCallback(
+		async (
+			roomId: string = id,
+			params: { [key: string]: any } = {
+				fields: ['$all'],
+				page: 1,
+				limit: 30,
+			},
+		) => {
+			if (!roomId) return null
+
+			setLoadingListenersInRoom(true)
+			try {
+				const res: any = await getListenerInRoom({ id: roomId, params })
+				const { code, results, pagination } = res || {}
+
+				if (code === 200) {
+					const rows: TalkRoomListenerInRoom[] = results?.objects?.rows ?? []
+					const count =
+						results?.objects?.count ?? pagination?.total ?? rows.length
+
+					setListenersInRoom(rows)
+					setTotalListenersInRoom(count)
+
+					return { rows, count, pagination }
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingListenersInRoom(false)
+			}
+
+			return null
+		},
+		[id, openError],
+	)
 
 	const handleLeaveRoom = useCallback(async () => {
 		if (!id) return
@@ -143,6 +186,9 @@ export default function useDetailTalkroom(id: string) {
 			switch (event) {
 				case 'user_joined_room':
 				case 'user_left_room':
+					handleGetDetailTalkRoom(id)
+					handleGetListenerInRoom(id)
+					break
 				case 'room_went_live':
 					handleGetDetailTalkRoom(id)
 					break
@@ -164,7 +210,13 @@ export default function useDetailTalkroom(id: string) {
 					break
 			}
 		},
-		[id, handleGetDetailTalkRoom, handleLeaveRoom, onChangeRoute],
+		[
+			id,
+			handleGetDetailTalkRoom,
+			handleGetListenerInRoom,
+			handleLeaveRoom,
+			onChangeRoute,
+		],
 	)
 
 	const { isConnected } = useTalkRoomSocket({
@@ -189,12 +241,16 @@ export default function useDetailTalkroom(id: string) {
 		const joinResult = await handleJoinTalkRoom(id)
 		if (!joinResult?.success) return
 
-		await handleGetDetailTalkRoom(id)
+		await Promise.all([
+			handleGetDetailTalkRoom(id),
+			handleGetListenerInRoom(id),
+		])
 	}, [
 		id,
 		handleValidatePreJoinRoom,
 		handleJoinTalkRoom,
 		handleGetDetailTalkRoom,
+		handleGetListenerInRoom,
 	])
 
 	useEffect(() => {
@@ -209,9 +265,14 @@ export default function useDetailTalkroom(id: string) {
 		loadingValidatePreJoin,
 		joinTalkRoomResult,
 		loadingJoinTalkRoom,
+		listenersInRoom,
+		totalListenersInRoom,
+		loadingListenersInRoom,
 
 		onGetDetailTalkRoom: handleGetDetailTalkRoom,
+		onGetListenerInRoom: handleGetListenerInRoom,
 		onValidatePreJoinRoom: handleValidatePreJoinRoom,
 		onJoinTalkRoom: handleJoinTalkRoom,
+		onLeaveRoom: handleLeaveRoom,
 	}
 }

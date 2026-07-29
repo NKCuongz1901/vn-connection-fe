@@ -489,6 +489,30 @@ export const validatePreTalkroom = async ({
 	})
 }
 
+export type TalkRoomListenerInRoomUser = {
+	id: string
+	name: string
+	avatar?: string
+	i_am_from?: string
+	country_code?: string
+	gender?: string
+	age?: number | null
+}
+
+export type TalkRoomListenerInRoom = {
+	id: string
+	talkroom_id: string
+	user_id: string
+	status: string
+	role: string
+	talking_time?: number
+	joined_at?: string
+	left_at?: string | null
+	created_at?: string
+	updated_at?: string
+	user: TalkRoomListenerInRoomUser
+}
+
 export const getListenerInRoom = async ({
 	id,
 	params = { fields: ['$all'] },

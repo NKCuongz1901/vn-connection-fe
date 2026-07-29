@@ -3,20 +3,50 @@
 import { Flex } from 'antd'
 import { IconChevronLeft } from '@tabler/icons-react'
 
+import DetailTalkroomListenerPanel from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomListenerPanel'
+import HostMicButton from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomListenerPanel/HostMicButton'
 import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomSpeakerStage'
 import DetailTalkroomTiming from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomTiming'
 import useDetailTalkroom from '@/hooks/TalkRoom/useDetailTalkroom'
+import useHostMicToggle from '@/hooks/TalkRoom/useHostMicToggle'
 import { mainRoutes } from '@/routes/MainRoutes'
-import { useLocalePath } from '@/ultis/route'
-import MicOffIcon from '@/svg/Talkroom/MicOffIcon'
 import ShareIcon from '@/svg/FriendSvg/ShareIcon'
+import { useLocalePath } from '@/ultis/route'
+import {
+	formatTalkRoomLevelLabel,
+	getTalkRoomListenerCount,
+} from '@/ultis/talkRoom'
 
 import classes from './DetailTalkroom.module.scss'
-import { formatTalkRoomLevelLabel } from '@/ultis/talkRoom'
 
 function DetailTalkroom({ id }: { id: string }) {
-	const { talkRoomDetail, loadingTalkRoomDetail } = useDetailTalkroom(id)
+	const {
+		talkRoomDetail,
+		listenersInRoom,
+		totalListenersInRoom,
+		loadingListenersInRoom,
+		onGetDetailTalkRoom,
+		onLeaveRoom,
+	} = useDetailTalkroom(id)
 	const { onChangeRoute } = useLocalePath()
+
+	const isHost =
+		talkRoomDetail?.is_your_room === true ||
+		(talkRoomDetail as any)?.yourAreHost === true
+
+	const { micState, onToggleMic, onInvite, onLeave } = useHostMicToggle({
+		roomId: id,
+		talkRoomDetail,
+		isHost,
+		onGetDetailTalkRoom,
+		onLeaveRoom,
+		onChangeRoute,
+	})
+
+	const listenerCount =
+		totalListenersInRoom > 0
+			? totalListenersInRoom
+			: getTalkRoomListenerCount(talkRoomDetail ?? undefined)
 
 	const _renderHostContent = () => {
 		return (
@@ -34,9 +64,9 @@ function DetailTalkroom({ id }: { id: string }) {
 						<div className={classes.talkroomTitle}>{talkRoomDetail?.name}</div>
 					</div>
 					<div className={classes.ctaButtons}>
-						<div className={classes.ctaButtonWrapper}>
-							<MicOffIcon />
-						</div>
+						{isHost ? (
+							<HostMicButton state={micState} size="sm" onClick={onToggleMic} />
+						) : null}
 						<div className={classes.ctaButtonWrapper}>
 							<ShareIcon />
 						</div>
@@ -48,7 +78,19 @@ function DetailTalkroom({ id }: { id: string }) {
 	}
 
 	const _renderListenerContent = () => {
-		return <div className={classes.listenerContent}></div>
+		return (
+			<div className={classes.listenerContent}>
+				<DetailTalkroomListenerPanel
+					listenerCount={listenerCount}
+					listeners={listenersInRoom}
+					loadingListeners={loadingListenersInRoom}
+					micState={micState}
+					onToggleMic={onToggleMic}
+					onLeaveRoom={onLeave}
+					onInvite={onInvite}
+				/>
+			</div>
+		)
 	}
 
 	const _renderTimerContent = () => {
@@ -62,6 +104,7 @@ function DetailTalkroom({ id }: { id: string }) {
 	const _renderChatContent = () => {
 		return <div className={classes.chatContent}></div>
 	}
+
 	return (
 		<div className={classes.wrapper}>
 			<Flex className={classes.header}>

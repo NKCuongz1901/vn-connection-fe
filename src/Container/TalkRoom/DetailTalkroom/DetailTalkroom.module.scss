@@ -104,7 +104,9 @@
 
 			.listenerContent {
 				flex: 1;
-				background-color: yellow;
+				display: flex;
+				flex-direction: column;
+				min-height: 0;
 			}
 		}
 		.rightContent {
