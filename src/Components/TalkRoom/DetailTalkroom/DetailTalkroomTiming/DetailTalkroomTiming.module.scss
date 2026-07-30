@@ -72,3 +72,14 @@
 .timeValueWarning {
 	color: var(--text-warning, #ce5b05);
 }
+
+.cardSuccess {
+	border-color: var(--color-brand-brand-green, #006b35);
+	background: var(--background-brand-brand-secondary-subtle, #e7f5e9);
+}
+
+.clockIconSuccess,
+.labelTextSuccess,
+.timeValueSuccess {
+	color: var(--color-brand-brand-green, #006b35);
+}

@@ -253,8 +253,8 @@
 
 .footerActions {
 	display: flex;
-	align-items: center;
-	justify-content: center;
+	align-items: flex-start;
+	justify-content: flex-start;
 	gap: 24px;
 	width: 100%;
 }

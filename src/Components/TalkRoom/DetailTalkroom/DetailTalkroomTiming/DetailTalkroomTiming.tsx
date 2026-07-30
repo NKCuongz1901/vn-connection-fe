@@ -5,13 +5,16 @@ import { memo, useMemo } from 'react'
 import { TalkRoomDetail } from '@/apis/talkRoomApis'
 import {
 	formatTalkRoomStartTime,
+	getTalkRoomCountRoomLiveSecondsLeft,
 	getTalkRoomCountWaitingSecondsLeft,
 	getTalkRoomPreStartTimingDescription,
 	getTalkRoomScheduledStartAt,
+	isTalkRoomCountRoomLiveVisible,
 	isTalkRoomCountWaitingVisible,
 	isTalkRoomPreStartTimingVisible,
 } from '@/ultis/talkRoom'
 
+import LiveTiming from './LiveTiming'
 import PreStartTiming from './PreStartTiming'
 import WaitingTiming from './WaitingTiming'
 
@@ -30,6 +33,9 @@ function DetailTalkroomTiming({ talkRoomDetail }: DetailTalkroomTimingProps) {
 		talkRoomDetail ?? undefined,
 	)
 	const showCountWaiting = isTalkRoomCountWaitingVisible(
+		talkRoomDetail ?? undefined,
+	)
+	const showCountRoomLive = isTalkRoomCountRoomLiveVisible(
 		talkRoomDetail ?? undefined,
 	)
 
@@ -53,6 +59,14 @@ function DetailTalkroomTiming({ talkRoomDetail }: DetailTalkroomTimingProps) {
 		)
 
 		return <WaitingTiming secondsLeft={waitingSeconds} />
+	}
+
+	if (showCountRoomLive) {
+		const liveSeconds = getTalkRoomCountRoomLiveSecondsLeft(
+			talkRoomDetail ?? undefined,
+		)
+
+		return <LiveTiming secondsLeft={liveSeconds} />
 	}
 
 	return null

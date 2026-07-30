@@ -323,6 +323,32 @@ export const isTalkRoomCountWaitingVisible = (room?: TalkRoomRoom) => {
 	return getTalkRoomCountWaitingSecondsLeft(room) > 0
 }
 
+/**
+ * countRoomLive: after room_start_countdown (host toggles mic on).
+ * Prefer server time_left_in_seconds; fallback to count_down_at + max_duration.
+ */
+export const getTalkRoomCountRoomLiveSecondsLeft = (room?: TalkRoomRoom) => {
+	if (!room?.count_down_at) return 0
+
+	if (room.time_left_in_seconds != null && room.time_left_in_seconds >= 0) {
+		return Math.floor(room.time_left_in_seconds)
+	}
+
+	const maxDuration =
+		room.max_duration_seconds ?? TALK_ROOM_DEFAULT_MAX_DURATION_SECONDS
+	const elapsed = Math.max(0, dayjs().diff(dayjs(room.count_down_at), 'second'))
+
+	return Math.max(0, Math.floor(maxDuration - elapsed))
+}
+
+/** countRoomLive phase: live session countdown after host starts mic. */
+export const isTalkRoomCountRoomLiveVisible = (room?: TalkRoomRoom) => {
+	if (!room || !isTalkRoomLive(room.status)) return false
+	if (!room.count_down_at) return false
+
+	return getTalkRoomCountRoomLiveSecondsLeft(room) > 0
+}
+
 export type HostMicState = 'disabled' | 'off' | 'on'
 
 export const getTalkRoomListenerCount = (room?: TalkRoomRoom) => {

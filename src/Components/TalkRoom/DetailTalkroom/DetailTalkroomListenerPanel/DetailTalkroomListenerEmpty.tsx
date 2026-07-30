@@ -5,6 +5,8 @@ import { memo } from 'react'
 
 import classes from './DetailTalkroomListenerPanel.module.scss'
 
+import EmptyConnectionIcon from '@/svg/Talkroom/EmptyConnectionIcon'
+
 type DetailTalkroomListenerEmptyProps = {
 	onInvite?: () => void
 }
@@ -17,13 +19,7 @@ function DetailTalkroomListenerEmpty({
 		<div className={classes.emptyState}>
 			<div className={classes.emptyInfo}>
 				<div className={classes.emptyIllustration}>
-					<Image
-						src="/images/talkroom.png"
-						alt=""
-						width={120}
-						height={120}
-						className={classes.emptyImage}
-					/>
+					<EmptyConnectionIcon />
 				</div>
 				<div className={classes.emptyContent}>
 					<p className={classes.emptyTitle}>
