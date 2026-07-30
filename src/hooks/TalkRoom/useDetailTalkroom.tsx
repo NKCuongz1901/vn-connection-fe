@@ -23,7 +23,14 @@ export type ValidatePreJoinRoomResult = ValidatePreTalkroomModel & {
 	isRejoin: boolean
 }
 
-export default function useDetailTalkroom(id: string) {
+type UseDetailTalkroomOptions = {
+	onRoomSocketEvent?: (event: string, data?: unknown) => void
+}
+
+export default function useDetailTalkroom(
+	id: string,
+	options?: UseDetailTalkroomOptions,
+) {
 	const { openError } = useModal()
 	const { onChangeRoute } = useLocalePath()
 	const [talkRoomDetail, setTalkRoomDetail] = useState<TalkRoomDetail | null>(
@@ -182,7 +189,7 @@ export default function useDetailTalkroom(id: string) {
 	}, [id, openError])
 
 	const handleRoomSocketEvent = useCallback(
-		(event: string, _data?: any) => {
+		(event: string, data?: unknown) => {
 			switch (event) {
 				case 'user_joined_room':
 				case 'user_left_room':
@@ -209,6 +216,8 @@ export default function useDetailTalkroom(id: string) {
 				default:
 					break
 			}
+
+			options?.onRoomSocketEvent?.(event, data)
 		},
 		[
 			id,
@@ -216,6 +225,7 @@ export default function useDetailTalkroom(id: string) {
 			handleGetListenerInRoom,
 			handleLeaveRoom,
 			onChangeRoute,
+			options?.onRoomSocketEvent,
 		],
 	)
 

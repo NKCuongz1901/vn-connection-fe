@@ -1,5 +1,6 @@
 'use client'
 
+import { useCallback, useEffect, useRef } from 'react'
 import { Flex } from 'antd'
 import { IconChevronLeft } from '@tabler/icons-react'
 
@@ -9,7 +10,6 @@ import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/Det
 import DetailTalkroomTiming from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomTiming'
 import useDetailTalkroom from '@/hooks/TalkRoom/useDetailTalkroom'
 import useHostMicToggle from '@/hooks/TalkRoom/useHostMicToggle'
-import { mainRoutes } from '@/routes/MainRoutes'
 import ShareIcon from '@/svg/FriendSvg/ShareIcon'
 import { useLocalePath } from '@/ultis/route'
 import {
@@ -21,6 +21,10 @@ import classes from './DetailTalkroom.module.scss'
 import useTalkRoomAgora from '@/hooks/TalkRoom/useTalkRoomAgora'
 
 function DetailTalkroom({ id }: { id: string }) {
+	const onRoomSocketEventRef = useRef<
+		((event: string, data?: unknown) => void) | undefined
+	>()
+
 	const {
 		talkRoomDetail,
 		listenersInRoom,
@@ -29,7 +33,10 @@ function DetailTalkroom({ id }: { id: string }) {
 		loadingListenersInRoom,
 		onGetDetailTalkRoom,
 		onLeaveRoom,
-	} = useDetailTalkroom(id)
+	} = useDetailTalkroom(id, {
+		onRoomSocketEvent: (event, data) =>
+			onRoomSocketEventRef.current?.(event, data),
+	})
 	const { onChangeRoute } = useLocalePath()
 	const agoraIntegration = joinTalkRoomResult?.data?.agora
 	const isHost =
@@ -40,13 +47,53 @@ function DetailTalkroom({ id }: { id: string }) {
 		enabled: isHost,
 	})
 
+	const isAgoraJoinedRef = useRef(isAgoraJoined)
+	useEffect(() => {
+		isAgoraJoinedRef.current = isAgoraJoined
+	}, [isAgoraJoined])
+
+	const handleConnectAgora = useCallback(
+		() => connect({ micOn: true }),
+		[connect],
+	)
+
+	const handleRoomSocketEvent = useCallback(
+		(event: string) => {
+			if (
+				event === 'room_start_countdown' &&
+				isHost &&
+				!isAgoraJoinedRef.current
+			) {
+				handleConnectAgora()
+			}
+		},
+		[isHost, handleConnectAgora],
+	)
+
+	useEffect(() => {
+		onRoomSocketEventRef.current = handleRoomSocketEvent
+	}, [handleRoomSocketEvent])
+
+	const handleLeaveRoomWithAgora = useCallback(async () => {
+		await disconnect()
+		await onLeaveRoom()
+	}, [disconnect, onLeaveRoom])
+
+	// useEffect(() => {
+	// 	return () => {
+	// 		disconnect()
+	// 	}
+	// }, [disconnect])
+
 	const { micState, onToggleMic, onInvite, onLeave } = useHostMicToggle({
 		roomId: id,
 		talkRoomDetail,
 		isHost,
 		onGetDetailTalkRoom,
-		onLeaveRoom,
+		onLeaveRoom: handleLeaveRoomWithAgora,
 		onChangeRoute,
+		onMicOn: handleConnectAgora,
+		onMicOff: () => setMic(false),
 	})
 
 	const listenerCount =
@@ -114,10 +161,7 @@ function DetailTalkroom({ id }: { id: string }) {
 	return (
 		<div className={classes.wrapper}>
 			<Flex className={classes.header}>
-				<IconChevronLeft
-					className={classes.iconBack}
-					onClick={() => onChangeRoute(mainRoutes.talkroom)}
-				/>
+				<IconChevronLeft className={classes.iconBack} onClick={onLeave} />
 				<div className={classes.title}>Live room</div>
 			</Flex>
 			<Flex className={classes.content}>
