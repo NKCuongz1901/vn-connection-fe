@@ -13,6 +13,8 @@ type UseHostMicToggleProps = {
 	onGetDetailTalkRoom: (roomId?: string) => Promise<TalkRoomDetail | null>
 	onLeaveRoom: () => Promise<void>
 	onChangeRoute: (path: string) => void
+	onMicOn?: () => void | Promise<void>
+	onMicOff?: () => void
 }
 
 /** Host mic toggle, invite share, and leave room actions for in-room detail. */
@@ -23,6 +25,8 @@ export default function useHostMicToggle({
 	onGetDetailTalkRoom,
 	onLeaveRoom,
 	onChangeRoute,
+	onMicOn,
+	onMicOff,
 }: UseHostMicToggleProps) {
 	const micState = useMemo(
 		() => getHostMicState(talkRoomDetail ?? undefined, { isHost }),
@@ -39,13 +43,17 @@ export default function useHostMicToggle({
 				id: roomId,
 				payload: { is_on: nextIsOn },
 			})
+			if (nextIsOn) {
+				await onMicOn?.()
+			} else {
+				onMicOff?.()
+			}
 
-			// TODO: connect Agora on first mic on during countWaiting
 			await onGetDetailTalkRoom(roomId)
 		} catch (error) {
 			console.error('Failed to toggle mic', error)
 		}
-	}, [roomId, micState, onGetDetailTalkRoom])
+	}, [roomId, micState, onGetDetailTalkRoom, onMicOn, onMicOff])
 
 	const handleInvite = useCallback(() => {
 		const dynamicLink = talkRoomDetail?.dynamic_link

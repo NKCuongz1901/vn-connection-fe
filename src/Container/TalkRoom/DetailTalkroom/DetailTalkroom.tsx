@@ -18,21 +18,27 @@ import {
 } from '@/ultis/talkRoom'
 
 import classes from './DetailTalkroom.module.scss'
+import useTalkRoomAgora from '@/hooks/TalkRoom/useTalkRoomAgora'
 
 function DetailTalkroom({ id }: { id: string }) {
 	const {
 		talkRoomDetail,
 		listenersInRoom,
+		joinTalkRoomResult,
 		totalListenersInRoom,
 		loadingListenersInRoom,
 		onGetDetailTalkRoom,
 		onLeaveRoom,
 	} = useDetailTalkroom(id)
 	const { onChangeRoute } = useLocalePath()
-
+	const agoraIntegration = joinTalkRoomResult?.data?.agora
 	const isHost =
 		talkRoomDetail?.is_your_room === true ||
 		(talkRoomDetail as any)?.yourAreHost === true
+	const { connect, setMic, disconnect, isAgoraJoined } = useTalkRoomAgora({
+		agoraIntegration,
+		enabled: isHost,
+	})
 
 	const { micState, onToggleMic, onInvite, onLeave } = useHostMicToggle({
 		roomId: id,
