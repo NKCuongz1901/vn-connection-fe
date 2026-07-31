@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Flex } from 'antd'
 import { IconChevronLeft } from '@tabler/icons-react'
 
@@ -16,6 +16,7 @@ import ShareIcon from '@/svg/FriendSvg/ShareIcon'
 import { useLocalePath } from '@/ultis/route'
 import {
 	formatTalkRoomLevelLabel,
+	getListenerBeSpeakerState,
 	getTalkRoomListenerCount,
 	isTalkRoomLive,
 } from '@/ultis/talkRoom'
@@ -140,6 +141,19 @@ function DetailTalkroom({ id }: { id: string }) {
 		onMicOff: () => setMic(false),
 	})
 
+	const beSpeakerState = useMemo(
+		() =>
+			getListenerBeSpeakerState(talkRoomDetail ?? undefined, {
+				isListener,
+			}),
+		[talkRoomDetail, isListener],
+	)
+
+	const handleBeSpeaker = useCallback(() => {
+		if (beSpeakerState === 'disabled') return
+		// TODO: POST /talkroom/{id}/action/raise_hand
+	}, [beSpeakerState])
+
 	const listenerCount =
 		totalListenersInRoom > 0
 			? totalListenersInRoom
@@ -179,11 +193,14 @@ function DetailTalkroom({ id }: { id: string }) {
 			<div className={classes.listenerContent}>
 				<DetailTalkroomListenerPanel
 					isHost={isHost}
+					isListener={isListener}
 					listenerCount={listenerCount}
 					listeners={listenersInRoom}
 					loadingListeners={loadingListenersInRoom}
 					micState={micState}
+					beSpeakerState={beSpeakerState}
 					onToggleMic={onToggleMic}
+					onBeSpeaker={handleBeSpeaker}
 					onLeaveRoom={onLeave}
 					onInvite={onInvite}
 				/>

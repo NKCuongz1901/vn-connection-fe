@@ -253,10 +253,39 @@
 
 .footerActions {
 	display: flex;
-	align-items: flex-start;
+	align-items: center;
 	justify-content: flex-start;
-	gap: 24px;
+	gap: 12px;
 	width: 100%;
+}
+
+.beSpeakerButton {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0;
+	min-height: 48px;
+	padding: 0 16px;
+	border: none;
+	border-radius: var(--radius-component-button, 999px);
+	background: var(--component-button-primary-bg-default, #e55a0f);
+	color: var(--component-button-primary-fg-default, #fff);
+	cursor: pointer;
+	flex-shrink: 0;
+}
+
+.beSpeakerButtonDisabled {
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
+.beSpeakerButtonLabel {
+	padding: 0 8px;
+	font-size: var(--body-large-size, 16px);
+	font-style: normal;
+	font-weight: 600;
+	line-height: var(--body-large-line-height, 24px);
+	white-space: nowrap;
 }
 
 .micButton {
@@ -301,7 +330,7 @@
 	align-items: center;
 	justify-content: center;
 	min-height: 48px;
-	padding: 0 24px;
+	padding: 0 16px;
 	border: none;
 	border-radius: var(--radius-component-button, 999px);
 	background: var(--component-button-danger-light-bg-default, #f0f3f9);

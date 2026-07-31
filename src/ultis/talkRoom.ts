@@ -393,6 +393,20 @@ export const getHostMicState = (
 	return 'off'
 }
 
+/** Be speaker button state for listeners — same enable rules as host mic. */
+export const getListenerBeSpeakerState = (
+	room?: TalkRoomRoom,
+	options?: { isListener?: boolean },
+): HostMicState => {
+	if (!options?.isListener) return 'disabled'
+
+	if (!isTalkRoomLive(room?.status)) return 'disabled'
+
+	if ((room?.total_participants ?? 0) < 2) return 'disabled'
+
+	return 'off'
+}
+
 export const getTalkRoomScheduleRemainSeconds = (
 	scheduledAt?: string | null,
 ) => {
