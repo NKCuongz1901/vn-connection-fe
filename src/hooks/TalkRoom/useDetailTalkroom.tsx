@@ -3,18 +3,23 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import {
+	ChangeRoleResponse,
 	getDetailTalkRoom,
 	getListenerInRoom,
 	joinTalkroom,
+	JoinTalkroomAgora,
 	JoinTalkroomModel,
 	leaveTalkroom,
+	postRaiseHand,
+	RaiseHandPayload,
 	TalkRoomDetail,
 	TalkRoomListenerInRoom,
+	transitionRole,
 	validatePreTalkroom,
 	ValidatePreTalkroomModel,
 } from '@/apis/talkRoomApis'
 import { useModal } from '@/context/ModalContext'
-import { TALK_ROOM_JOIN_REASON } from '@/Variable/talkRoom.variable'
+import { TALK_ROOM_JOIN_REASON, TALK_ROOM_ROLE } from '@/Variable/talkRoom.variable'
 import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
 import useTalkRoomSocket from './useTalkRoomSocket'
@@ -49,6 +54,9 @@ export default function useDetailTalkroom(
 	>([])
 	const [totalListenersInRoom, setTotalListenersInRoom] = useState(0)
 	const [loadingListenersInRoom, setLoadingListenersInRoom] = useState(false)
+	const [roomUserRole, setRoomUserRole] = useState<string | null>(null)
+	const [roleIntegration, setRoleIntegration] =
+		useState<JoinTalkroomAgora | null>(null)
 
 	const handleGetDetailTalkRoom = useCallback(
 		async (
@@ -112,6 +120,39 @@ export default function useDetailTalkroom(
 		[id, openError],
 	)
 
+	const handlePostRaiseHand = useCallback(
+		async ({
+			roomId = id,
+			isRaiseHand,
+			slotId,
+		}: {
+			roomId?: string
+			isRaiseHand: boolean
+			slotId?: number
+		}) => {
+			if (!roomId) return null
+
+			const payload: RaiseHandPayload = { isRaiseHand }
+			if (isRaiseHand && slotId != null) {
+				payload.slotId = slotId
+			}
+
+			try {
+				const res: any = await postRaiseHand({ id: roomId, payload })
+				const { code } = res || {}
+
+				if (code === 200) {
+					return res
+				}
+			} catch (error) {
+				openError(error)
+			}
+
+			return null
+		},
+		[id, openError],
+	)
+
 	const handleJoinTalkRoom = useCallback(
 		async (
 			roomId: string = id,
@@ -129,6 +170,8 @@ export default function useDetailTalkroom(
 
 					if (data?.success) {
 						setJoinTalkRoomResult(data)
+						setRoomUserRole(data.data?.role ?? null)
+						setRoleIntegration(data.data?.agora ?? null)
 						return data
 					}
 				}
@@ -142,6 +185,60 @@ export default function useDetailTalkroom(
 		},
 		[id, openError],
 	)
+
+	const applySpeakerRole = useCallback(
+		(newConnection?: JoinTalkroomAgora | null) => {
+			if (!newConnection) return
+
+			setRoomUserRole(TALK_ROOM_ROLE.SPEAKER)
+			setRoleIntegration(newConnection)
+			setJoinTalkRoomResult((prev) => {
+				if (!prev?.data) return prev
+
+				return {
+					...prev,
+					data: {
+						...prev.data,
+						role: TALK_ROOM_ROLE.SPEAKER,
+						agora: newConnection,
+					},
+				}
+			})
+		},
+		[],
+	)
+
+	const handleTransitionToSpeaker = useCallback(async () => {
+		if (!id) return null
+
+		try {
+			const res: any = await transitionRole({
+				id,
+				payload: {
+					from_role: TALK_ROOM_ROLE.LISTENER,
+					to_role: TALK_ROOM_ROLE.SPEAKER,
+					fields: ['$all'],
+				},
+			})
+			const { code, results } = res || {}
+
+			if (code !== 200) return null
+
+			const data: ChangeRoleResponse = results?.object ?? results ?? null
+			const newConnection = data?.new_connection ?? data?.agora ?? null
+
+			if (!newConnection) return null
+
+			applySpeakerRole(newConnection)
+
+			return { newConnection }
+		} catch (error) {
+			openError(error)
+		}
+
+		return null
+	}, [id, applySpeakerRole, openError])
+
 	const handleGetListenerInRoom = useCallback(
 		async (
 			roomId: string = id,
@@ -202,7 +299,17 @@ export default function useDetailTalkroom(
 				case 'room_start_countdown':
 				case 'speaker_on_mic':
 				case 'speaker_off_mic':
+				case 'raise_hand_accepted':
+				case 'promote_to_speaker':
+				case 'listener_accept_to_speaker_success':
 					handleGetDetailTalkRoom(id)
+					if (
+						event === 'raise_hand_accepted' ||
+						event === 'promote_to_speaker' ||
+						event === 'listener_accept_to_speaker_success'
+					) {
+						handleGetListenerInRoom(id)
+					}
 					break
 				case 'room_inactive_warning':
 					// openSuccess({ message: '...' }) hoặc toast sau
@@ -275,6 +382,8 @@ export default function useDetailTalkroom(
 		loadingValidatePreJoin,
 		joinTalkRoomResult,
 		loadingJoinTalkRoom,
+		roomUserRole,
+		roleIntegration,
 		listenersInRoom,
 		totalListenersInRoom,
 		loadingListenersInRoom,
@@ -284,5 +393,7 @@ export default function useDetailTalkroom(
 		onValidatePreJoinRoom: handleValidatePreJoinRoom,
 		onJoinTalkRoom: handleJoinTalkRoom,
 		onLeaveRoom: handleLeaveRoom,
+		onPostRaiseHand: handlePostRaiseHand,
+		onTransitionToSpeaker: handleTransitionToSpeaker,
 	}
 }

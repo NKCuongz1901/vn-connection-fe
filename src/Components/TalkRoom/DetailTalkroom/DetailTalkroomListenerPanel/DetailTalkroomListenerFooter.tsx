@@ -11,6 +11,7 @@ import classes from './DetailTalkroomListenerPanel.module.scss'
 type DetailTalkroomListenerFooterProps = {
 	isHost?: boolean
 	isListener?: boolean
+	isSpeaker?: boolean
 	micState: HostMicState
 	beSpeakerState: HostMicState
 	onToggleMic?: () => void
@@ -18,10 +19,11 @@ type DetailTalkroomListenerFooterProps = {
 	onLeaveRoom?: () => void
 }
 
-/** Footer actions: host mic or listener be speaker, plus leave room. */
+/** Footer actions: host/speaker mic or listener be speaker, plus leave room. */
 function DetailTalkroomListenerFooter({
 	isHost = false,
 	isListener = false,
+	isSpeaker = false,
 	micState,
 	beSpeakerState,
 	onToggleMic,
@@ -31,10 +33,10 @@ function DetailTalkroomListenerFooter({
 	return (
 		<div className={classes.footer}>
 			<div className={classes.footerActions}>
-				{isHost ? (
+				{isHost || isSpeaker ? (
 					<HostMicButton state={micState} size="md" onClick={onToggleMic} />
 				) : null}
-				{isListener ? (
+				{isListener && !isSpeaker ? (
 					<BeSpeakerButton state={beSpeakerState} onClick={onBeSpeaker} />
 				) : null}
 				<button

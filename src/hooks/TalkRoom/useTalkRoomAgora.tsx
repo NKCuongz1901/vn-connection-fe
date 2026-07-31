@@ -6,6 +6,11 @@ import { useJoin, useLocalMicrophoneTrack, usePublish } from 'agora-rtc-react'
 import { JoinTalkroomAgora } from '@/apis/talkRoomApis'
 import { TALK_ROOM_CONNECTION_TYPE } from '@/Variable/talkRoom.variable'
 
+type ConnectOptions = {
+	micOn?: boolean
+	integration?: JoinTalkroomAgora | null
+}
+
 type UseTalkRoomAgoraProps = {
 	agoraIntegration?: JoinTalkroomAgora | null
 	enabled?: boolean
@@ -17,19 +22,28 @@ export default function useTalkRoomAgora({
 }: UseTalkRoomAgoraProps) {
 	const [isJoined, setIsJoined] = useState(false)
 	const [micEnabled, setMicEnabled] = useState(false)
+	const [activeIntegration, setActiveIntegration] =
+		useState<JoinTalkroomAgora | null>(agoraIntegration ?? null)
+
+	useEffect(() => {
+		if (isJoined) return
+		if (agoraIntegration) {
+			setActiveIntegration(agoraIntegration)
+		}
+	}, [agoraIntegration, isJoined])
 
 	const canUseAgora =
 		enabled &&
-		agoraIntegration?.connection_type === TALK_ROOM_CONNECTION_TYPE.AGORA_RTC &&
-		!!agoraIntegration?.channel_name &&
-		!!agoraIntegration?.agora_token
+		activeIntegration?.connection_type === TALK_ROOM_CONNECTION_TYPE.AGORA_RTC &&
+		!!activeIntegration?.channel_name &&
+		!!activeIntegration?.agora_token
 
 	useJoin(
 		{
 			appid: process.env.NEXT_PUBLIC_AGORA_APP_ID!,
-			channel: agoraIntegration?.channel_name ?? '',
-			token: agoraIntegration?.agora_token ?? '',
-			uid: agoraIntegration?.agora_uid,
+			channel: activeIntegration?.channel_name ?? '',
+			token: activeIntegration?.agora_token ?? '',
+			uid: activeIntegration?.agora_uid,
 		},
 		canUseAgora && isJoined,
 	)
@@ -50,7 +64,7 @@ export default function useTalkRoomAgora({
 			isJoined,
 			micEnabled,
 			ready: canUseAgora && isJoined && micEnabled,
-			agoraIntegration,
+			activeIntegration,
 			hasTrack: !!localMicrophoneTrack,
 			error,
 		})
@@ -59,13 +73,18 @@ export default function useTalkRoomAgora({
 		canUseAgora,
 		isJoined,
 		micEnabled,
-		agoraIntegration,
+		activeIntegration,
 		localMicrophoneTrack,
 		error,
 	])
-	usePublish(canUseAgora && isJoined ? [localMicrophoneTrack] : [])
 
-	const connect = useCallback(async ({ micOn = true } = {}) => {
+	usePublish(canUseAgora && isJoined && micEnabled ? [localMicrophoneTrack] : [])
+
+	const connect = useCallback(async ({ micOn = true, integration }: ConnectOptions = {}) => {
+		if (integration) {
+			setActiveIntegration(integration)
+		}
+
 		setIsJoined(true)
 		setMicEnabled(micOn)
 	}, [])

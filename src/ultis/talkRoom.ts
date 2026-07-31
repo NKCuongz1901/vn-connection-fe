@@ -55,6 +55,7 @@ export type TalkRoomRoom = {
 	created_by_user?: TalkRoomSpeaker
 	total_participants?: number
 	max_participants?: number
+	max_speakers?: number
 	next_schedule_at?: string | null
 	started_at?: string | null
 	schedules?: TalkRoomSchedule[]
@@ -405,6 +406,81 @@ export const getListenerBeSpeakerState = (
 	if ((room?.total_participants ?? 0) < 2) return 'disabled'
 
 	return 'off'
+}
+
+/** Mic state for guest speaker — same enable rules as host mic. */
+export const getSpeakerMicState = (
+	room?: TalkRoomRoom,
+	options?: { isSpeaker?: boolean; userId?: string },
+): HostMicState => {
+	if (!options?.isSpeaker) return 'disabled'
+
+	if (!isTalkRoomLive(room?.status)) return 'disabled'
+
+	if ((room?.total_participants ?? 0) < 2) return 'disabled'
+
+	const mySpeaker = room?.speakers?.find(
+		(speaker) =>
+			speaker?.id === options.userId ||
+			(speaker as { user_id?: string })?.user_id === options.userId,
+	)
+	if (mySpeaker?.is_open_mic === true) return 'on'
+
+	return 'off'
+}
+
+/**
+ * Resolves guest speaker slot for raise_hand — mirrors mobile Be speaker logic.
+ * Default slot 1; if taken and another slot is free, use slot 2 (or vice versa).
+ */
+export const resolveRaiseHandSlotId = (
+	room?: TalkRoomRoom,
+	preferredSlot = 1,
+): number => {
+	const maxSpeakers = room?.max_speakers ?? 2
+	const slots = buildTalkRoomSpeakerSlots(room, maxSpeakers)
+	const guestSlots = slots.filter((slot) => !slot.isHost)
+
+	const hasEmptySlot = guestSlots.some((slot) => slot.type === 'empty')
+	if (!hasEmptySlot) return preferredSlot
+
+	const preferredGuestSlot = guestSlots[preferredSlot - 1]
+	if (preferredGuestSlot?.type === 'filled') {
+		return preferredSlot === 2 ? 1 : 2
+	}
+
+	return preferredSlot
+}
+
+export const getTalkRoomSocketTargetUserId = (
+	data?: unknown,
+): string | undefined => {
+	if (!data || typeof data !== 'object') return undefined
+
+	const payload = data as Record<string, unknown>
+	const actionDetails = payload.action_details as
+		| Record<string, unknown>
+		| undefined
+	const userInfo = payload.user_info as Record<string, unknown> | undefined
+
+	return (
+		(payload.user_id as string | undefined) ??
+		(payload.target_id as string | undefined) ??
+		(actionDetails?.user_id as string | undefined) ??
+		(userInfo?.id as string | undefined)
+	)
+}
+
+export const isTalkRoomSocketEventForCurrentUser = (
+	data?: unknown,
+	currentUserId?: string,
+): boolean => {
+	if (!currentUserId) return true
+
+	const targetUserId = getTalkRoomSocketTargetUserId(data)
+	if (!targetUserId) return true
+
+	return targetUserId === currentUserId
 }
 
 export const getTalkRoomScheduleRemainSeconds = (

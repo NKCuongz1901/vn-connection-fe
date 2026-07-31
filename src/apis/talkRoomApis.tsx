@@ -616,6 +616,46 @@ export const getRaiseHandUser = async ({
 	})
 }
 
+export type RaiseHandPayload = {
+	isRaiseHand: boolean
+	slotId?: number
+}
+
+export const postRaiseHand = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: RaiseHandPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/raise_hand`
+
+	return await axios.post(url, payload)
+}
+
+export type TransitionRolePayload = {
+	from_role: string
+	to_role: string
+}
+
+export type ChangeRoleResponse = {
+	new_connection?: JoinTalkroomAgora
+	agora?: JoinTalkroomAgora
+	role?: string
+}
+
+export const transitionRole = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: TransitionRolePayload & { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/transition_role`
+
+	return await axios.post(url, convertParams(payload))
+}
+
 export type ToggleMicPayload = {
 	is_on: boolean
 }
@@ -637,8 +677,6 @@ export const hostApproveRaiseHand = async () => {}
 export const stepDownToListener = async () => {}
 
 export const hostKickListener = async () => {}
-
-export const transitionRole = async () => {}
 
 export const stopHosting = async () => {}
 

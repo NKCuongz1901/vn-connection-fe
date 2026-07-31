@@ -4,12 +4,18 @@ import { useCallback, useMemo } from 'react'
 
 import { TalkRoomDetail, toogleMic } from '@/apis/talkRoomApis'
 import { mainRoutes } from '@/routes/MainRoutes'
-import { getHostMicState, HostMicState } from '@/ultis/talkRoom'
+import {
+	getHostMicState,
+	getSpeakerMicState,
+	HostMicState,
+} from '@/ultis/talkRoom'
 
 type UseHostMicToggleProps = {
 	roomId: string
 	talkRoomDetail?: TalkRoomDetail | null
 	isHost?: boolean
+	isSpeaker?: boolean
+	userId?: string
 	onGetDetailTalkRoom: (roomId?: string) => Promise<TalkRoomDetail | null>
 	onLeaveRoom: () => Promise<void>
 	onChangeRoute: (path: string) => void
@@ -17,21 +23,33 @@ type UseHostMicToggleProps = {
 	onMicOff?: () => void
 }
 
-/** Host mic toggle, invite share, and leave room actions for in-room detail. */
+/** Host/speaker mic toggle, invite share, and leave room actions for in-room detail. */
 export default function useHostMicToggle({
 	roomId,
 	talkRoomDetail,
 	isHost = false,
+	isSpeaker = false,
+	userId,
 	onGetDetailTalkRoom,
 	onLeaveRoom,
 	onChangeRoute,
 	onMicOn,
 	onMicOff,
 }: UseHostMicToggleProps) {
-	const micState = useMemo(
-		() => getHostMicState(talkRoomDetail ?? undefined, { isHost }),
-		[talkRoomDetail, isHost],
-	)
+	const micState = useMemo(() => {
+		if (isHost) {
+			return getHostMicState(talkRoomDetail ?? undefined, { isHost })
+		}
+
+		if (isSpeaker) {
+			return getSpeakerMicState(talkRoomDetail ?? undefined, {
+				isSpeaker,
+				userId,
+			})
+		}
+
+		return 'disabled' as HostMicState
+	}, [talkRoomDetail, isHost, isSpeaker, userId])
 
 	const handleToggleMic = useCallback(async () => {
 		if (!roomId || micState === 'disabled') return

@@ -14,6 +14,7 @@ import classes from './DetailTalkroomListenerPanel.module.scss'
 type DetailTalkroomListenerPanelProps = {
 	isHost?: boolean
 	isListener?: boolean
+	isSpeaker?: boolean
 	listenerCount: number
 	listeners?: TalkRoomListenerInRoom[]
 	loadingListeners?: boolean
@@ -29,6 +30,7 @@ type DetailTalkroomListenerPanelProps = {
 function DetailTalkroomListenerPanel({
 	isHost = false,
 	isListener = false,
+	isSpeaker = false,
 	listenerCount,
 	listeners = [],
 	loadingListeners = false,
@@ -57,6 +59,7 @@ function DetailTalkroomListenerPanel({
 			<DetailTalkroomListenerFooter
 				isHost={isHost}
 				isListener={isListener}
+				isSpeaker={isSpeaker}
 				micState={micState}
 				beSpeakerState={beSpeakerState}
 				onToggleMic={onToggleMic}

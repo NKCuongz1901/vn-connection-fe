@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Flex } from 'antd'
 import { IconChevronLeft } from '@tabler/icons-react'
 
+import { toogleMic } from '@/apis/talkRoomApis'
 import DetailTalkroomListenerPanel from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomListenerPanel'
 import HostMicButton from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomListenerPanel/HostMicButton'
 import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomSpeakerStage'
@@ -12,43 +13,65 @@ import useDetailTalkroom from '@/hooks/TalkRoom/useDetailTalkroom'
 import useHostMicToggle from '@/hooks/TalkRoom/useHostMicToggle'
 import useTalkRoomAgora from '@/hooks/TalkRoom/useTalkRoomAgora'
 import useTalkRoomWhep from '@/hooks/TalkRoom/useTalkRoomWhep'
+import { TALK_ROOM_ROLE } from '@/Variable/talkRoom.variable'
 import ShareIcon from '@/svg/FriendSvg/ShareIcon'
 import { useLocalePath } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
 import {
 	formatTalkRoomLevelLabel,
 	getListenerBeSpeakerState,
 	getTalkRoomListenerCount,
 	isTalkRoomLive,
+	isTalkRoomSocketEventForCurrentUser,
+	resolveRaiseHandSlotId,
 } from '@/ultis/talkRoom'
 
 import classes from './DetailTalkroom.module.scss'
+
+const SPEAKER_PROMOTE_EVENTS = [
+	'raise_hand_accepted',
+	'promote_to_speaker',
+	'listener_accept_to_speaker_success',
+] as const
 
 function DetailTalkroom({ id }: { id: string }) {
 	const onRoomSocketEventRef = useRef<
 		((event: string, data?: unknown) => void) | undefined
 	>()
+	const isPromotingRef = useRef(false)
+	const currentUserId = getUserInfo('id') as string | undefined
 
 	const {
 		talkRoomDetail,
 		listenersInRoom,
 		joinTalkRoomResult,
+		roomUserRole,
+		roleIntegration,
 		totalListenersInRoom,
 		loadingListenersInRoom,
 		onGetDetailTalkRoom,
 		onLeaveRoom,
+		onPostRaiseHand,
+		onTransitionToSpeaker,
 	} = useDetailTalkroom(id, {
 		onRoomSocketEvent: (event, data) =>
 			onRoomSocketEventRef.current?.(event, data),
 	})
 	const { onChangeRoute } = useLocalePath()
-	const agoraIntegration = joinTalkRoomResult?.data?.agora
+	const agoraIntegration =
+		roleIntegration ?? joinTalkRoomResult?.data?.agora ?? null
 	const isHost =
 		talkRoomDetail?.is_your_room === true ||
 		(talkRoomDetail as any)?.yourAreHost === true
+	const isSpeaker =
+		roomUserRole === TALK_ROOM_ROLE.SPEAKER ||
+		joinTalkRoomResult?.data?.role === TALK_ROOM_ROLE.SPEAKER
 	const isListener =
-		joinTalkRoomResult?.data?.role === 'listener' ||
-		agoraIntegration?.connection_type === 'media_server' ||
-		agoraIntegration?.user_role === 'listener'
+		!isSpeaker &&
+		(roomUserRole === TALK_ROOM_ROLE.LISTENER ||
+			joinTalkRoomResult?.data?.role === TALK_ROOM_ROLE.LISTENER ||
+			agoraIntegration?.connection_type === 'media_server' ||
+			agoraIntegration?.user_role === 'listener')
 	const streamUrl =
 		agoraIntegration?.stream_wss_url ||
 		(talkRoomDetail as { stream_wss_url?: string } | null)?.stream_wss_url
@@ -58,7 +81,7 @@ function DetailTalkroom({ id }: { id: string }) {
 
 	const { connect, setMic, disconnect, isAgoraJoined } = useTalkRoomAgora({
 		agoraIntegration,
-		enabled: isHost && !isListener,
+		enabled: isHost || isSpeaker || isListener,
 	})
 
 	const {
@@ -86,8 +109,51 @@ function DetailTalkroom({ id }: { id: string }) {
 		await connectWhep()
 	}, [connectWhep, disconnectWhep])
 
+	const handlePromoteToSpeaker = useCallback(async () => {
+		if (isPromotingRef.current || isSpeaker || isHost) return
+
+		isPromotingRef.current = true
+
+		try {
+			await disconnectWhep()
+
+			const result = await onTransitionToSpeaker()
+			const newConnection = result?.newConnection
+
+			if (!newConnection) return
+
+			await connect({ micOn: true, integration: newConnection })
+
+			await toogleMic({
+				id,
+				payload: { is_on: true },
+			})
+
+			await onGetDetailTalkRoom(id)
+		} catch (error) {
+			console.error('Failed to promote to speaker', error)
+		} finally {
+			isPromotingRef.current = false
+		}
+	}, [
+		disconnectWhep,
+		onTransitionToSpeaker,
+		connect,
+		id,
+		onGetDetailTalkRoom,
+		isSpeaker,
+		isHost,
+	])
+
 	const handleRoomSocketEvent = useCallback(
-		(event: string) => {
+		(event: string, data?: unknown) => {
+			if (SPEAKER_PROMOTE_EVENTS.includes(event as (typeof SPEAKER_PROMOTE_EVENTS)[number])) {
+				if (!isTalkRoomSocketEventForCurrentUser(data, currentUserId)) return
+
+				handlePromoteToSpeaker()
+				return
+			}
+
 			if (
 				event === 'room_start_countdown' &&
 				isHost &&
@@ -100,7 +166,15 @@ function DetailTalkroom({ id }: { id: string }) {
 				handleReconnectWhep()
 			}
 		},
-		[isHost, isListener, canUseWhep, handleConnectAgora, handleReconnectWhep],
+		[
+			currentUserId,
+			handlePromoteToSpeaker,
+			isHost,
+			isListener,
+			canUseWhep,
+			handleConnectAgora,
+			handleReconnectWhep,
+		],
 	)
 
 	useEffect(() => {
@@ -125,15 +199,17 @@ function DetailTalkroom({ id }: { id: string }) {
 	])
 
 	const handleLeaveRoomWithMedia = useCallback(async () => {
-		if (isHost) await disconnect()
+		if (isHost || isSpeaker) await disconnect()
 		if (isListener) await disconnectWhep()
 		await onLeaveRoom()
-	}, [disconnect, disconnectWhep, isHost, isListener, onLeaveRoom])
+	}, [disconnect, disconnectWhep, isHost, isSpeaker, isListener, onLeaveRoom])
 
 	const { micState, onToggleMic, onInvite, onLeave } = useHostMicToggle({
 		roomId: id,
 		talkRoomDetail,
 		isHost,
+		isSpeaker,
+		userId: currentUserId,
 		onGetDetailTalkRoom,
 		onLeaveRoom: handleLeaveRoomWithMedia,
 		onChangeRoute,
@@ -149,10 +225,16 @@ function DetailTalkroom({ id }: { id: string }) {
 		[talkRoomDetail, isListener],
 	)
 
-	const handleBeSpeaker = useCallback(() => {
+	const handleBeSpeaker = useCallback(async () => {
 		if (beSpeakerState === 'disabled') return
-		// TODO: POST /talkroom/{id}/action/raise_hand
-	}, [beSpeakerState])
+
+		const slotId = resolveRaiseHandSlotId(talkRoomDetail ?? undefined, 1)
+
+		await onPostRaiseHand({
+			isRaiseHand: true,
+			slotId,
+		})
+	}, [beSpeakerState, talkRoomDetail, onPostRaiseHand])
 
 	const listenerCount =
 		totalListenersInRoom > 0
@@ -175,7 +257,7 @@ function DetailTalkroom({ id }: { id: string }) {
 						<div className={classes.talkroomTitle}>{talkRoomDetail?.name}</div>
 					</div>
 					<div className={classes.ctaButtons}>
-						{isHost ? (
+						{isHost || isSpeaker ? (
 							<HostMicButton state={micState} size="sm" onClick={onToggleMic} />
 						) : null}
 						<div className={classes.ctaButtonWrapper}>
@@ -194,6 +276,7 @@ function DetailTalkroom({ id }: { id: string }) {
 				<DetailTalkroomListenerPanel
 					isHost={isHost}
 					isListener={isListener}
+					isSpeaker={isSpeaker}
 					listenerCount={listenerCount}
 					listeners={listenersInRoom}
 					loadingListeners={loadingListenersInRoom}
