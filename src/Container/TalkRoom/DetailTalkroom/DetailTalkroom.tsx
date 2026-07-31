@@ -10,15 +10,17 @@ import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/Det
 import DetailTalkroomTiming from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomTiming'
 import useDetailTalkroom from '@/hooks/TalkRoom/useDetailTalkroom'
 import useHostMicToggle from '@/hooks/TalkRoom/useHostMicToggle'
+import useTalkRoomAgora from '@/hooks/TalkRoom/useTalkRoomAgora'
+import useTalkRoomWhep from '@/hooks/TalkRoom/useTalkRoomWhep'
 import ShareIcon from '@/svg/FriendSvg/ShareIcon'
 import { useLocalePath } from '@/ultis/route'
 import {
 	formatTalkRoomLevelLabel,
 	getTalkRoomListenerCount,
+	isTalkRoomLive,
 } from '@/ultis/talkRoom'
 
 import classes from './DetailTalkroom.module.scss'
-import useTalkRoomAgora from '@/hooks/TalkRoom/useTalkRoomAgora'
 
 function DetailTalkroom({ id }: { id: string }) {
 	const onRoomSocketEventRef = useRef<
@@ -42,9 +44,30 @@ function DetailTalkroom({ id }: { id: string }) {
 	const isHost =
 		talkRoomDetail?.is_your_room === true ||
 		(talkRoomDetail as any)?.yourAreHost === true
+	const isListener =
+		joinTalkRoomResult?.data?.role === 'listener' ||
+		agoraIntegration?.connection_type === 'media_server' ||
+		agoraIntegration?.user_role === 'listener'
+	const streamUrl =
+		agoraIntegration?.stream_wss_url ||
+		(talkRoomDetail as { stream_wss_url?: string } | null)?.stream_wss_url
+	const isRoomLive =
+		isTalkRoomLive(talkRoomDetail?.status) ||
+		joinTalkRoomResult?.data?.room_info?.status === 'live'
+
 	const { connect, setMic, disconnect, isAgoraJoined } = useTalkRoomAgora({
 		agoraIntegration,
-		enabled: isHost,
+		enabled: isHost && !isListener,
+	})
+
+	const {
+		audioRef: whepAudioRef,
+		connect: connectWhep,
+		disconnect: disconnectWhep,
+		canUseWhep,
+	} = useTalkRoomWhep({
+		streamWssUrl: streamUrl,
+		enabled: isListener,
 	})
 
 	const isAgoraJoinedRef = useRef(isAgoraJoined)
@@ -57,6 +80,11 @@ function DetailTalkroom({ id }: { id: string }) {
 		[connect],
 	)
 
+	const handleReconnectWhep = useCallback(async () => {
+		await disconnectWhep()
+		await connectWhep()
+	}, [connectWhep, disconnectWhep])
+
 	const handleRoomSocketEvent = useCallback(
 		(event: string) => {
 			if (
@@ -66,31 +94,47 @@ function DetailTalkroom({ id }: { id: string }) {
 			) {
 				handleConnectAgora()
 			}
+
+			if (event === 'room_start_countdown' && isListener && canUseWhep) {
+				handleReconnectWhep()
+			}
 		},
-		[isHost, handleConnectAgora],
+		[isHost, isListener, canUseWhep, handleConnectAgora, handleReconnectWhep],
 	)
 
 	useEffect(() => {
 		onRoomSocketEventRef.current = handleRoomSocketEvent
 	}, [handleRoomSocketEvent])
 
-	const handleLeaveRoomWithAgora = useCallback(async () => {
-		await disconnect()
-		await onLeaveRoom()
-	}, [disconnect, onLeaveRoom])
+	useEffect(() => {
+		if (!isListener || !canUseWhep) return
+		if (!isRoomLive) return
 
-	// useEffect(() => {
-	// 	return () => {
-	// 		disconnect()
-	// 	}
-	// }, [disconnect])
+		connectWhep()
+
+		return () => {
+			disconnectWhep()
+		}
+	}, [
+		isListener,
+		canUseWhep,
+		isRoomLive,
+		connectWhep,
+		disconnectWhep,
+	])
+
+	const handleLeaveRoomWithMedia = useCallback(async () => {
+		if (isHost) await disconnect()
+		if (isListener) await disconnectWhep()
+		await onLeaveRoom()
+	}, [disconnect, disconnectWhep, isHost, isListener, onLeaveRoom])
 
 	const { micState, onToggleMic, onInvite, onLeave } = useHostMicToggle({
 		roomId: id,
 		talkRoomDetail,
 		isHost,
 		onGetDetailTalkRoom,
-		onLeaveRoom: handleLeaveRoomWithAgora,
+		onLeaveRoom: handleLeaveRoomWithMedia,
 		onChangeRoute,
 		onMicOn: handleConnectAgora,
 		onMicOff: () => setMic(false),
@@ -134,6 +178,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		return (
 			<div className={classes.listenerContent}>
 				<DetailTalkroomListenerPanel
+					isHost={isHost}
 					listenerCount={listenerCount}
 					listeners={listenersInRoom}
 					loadingListeners={loadingListenersInRoom}
@@ -160,6 +205,14 @@ function DetailTalkroom({ id }: { id: string }) {
 
 	return (
 		<div className={classes.wrapper}>
+			{isListener ? (
+				<audio
+					ref={whepAudioRef}
+					autoPlay
+					playsInline
+					style={{ display: 'none' }}
+				/>
+			) : null}
 			<Flex className={classes.header}>
 				<IconChevronLeft className={classes.iconBack} onClick={onLeave} />
 				<div className={classes.title}>Live room</div>
