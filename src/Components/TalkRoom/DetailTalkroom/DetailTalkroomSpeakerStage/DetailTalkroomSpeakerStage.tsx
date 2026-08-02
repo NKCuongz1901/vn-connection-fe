@@ -3,7 +3,7 @@
 import { memo, useMemo } from 'react'
 
 import { TalkRoomDetail } from '@/apis/talkRoomApis'
-import { buildTalkRoomSpeakerSlots } from '@/ultis/talkRoom'
+import { buildTalkRoomSpeakerSlots, TalkRoomSpeakerStatusMap } from '@/ultis/talkRoom'
 
 import DetailTalkroomSpeakerSlot from '../DetailTalkroomSpeakerSlot'
 import classes from './DetailTalkroomSpeakerStage.module.scss'
@@ -11,19 +11,22 @@ import classes from './DetailTalkroomSpeakerStage.module.scss'
 type DetailTalkroomSpeakerStageProps = {
 	talkRoomDetail?: TalkRoomDetail | null
 	maxSpeakers?: number
+	speakerStatusMap?: TalkRoomSpeakerStatusMap
 }
 
 function DetailTalkroomSpeakerStage({
 	talkRoomDetail,
 	maxSpeakers = 2,
+	speakerStatusMap,
 }: DetailTalkroomSpeakerStageProps) {
 	const slots = useMemo(
 		() =>
 			buildTalkRoomSpeakerSlots(
 				talkRoomDetail ?? undefined,
 				talkRoomDetail?.max_speakers ?? maxSpeakers,
+				speakerStatusMap,
 			),
-		[talkRoomDetail, maxSpeakers],
+		[talkRoomDetail, maxSpeakers, speakerStatusMap],
 	)
 
 	return (

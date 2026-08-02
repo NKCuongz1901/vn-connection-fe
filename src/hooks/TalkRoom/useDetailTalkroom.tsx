@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import {
-	ChangeRoleResponse,
 	getDetailTalkRoom,
 	getListenerInRoom,
 	joinTalkroom,
@@ -22,6 +21,11 @@ import { useModal } from '@/context/ModalContext'
 import { TALK_ROOM_JOIN_REASON, TALK_ROOM_ROLE } from '@/Variable/talkRoom.variable'
 import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
+import {
+	getTalkRoomSocketTalkingStatus,
+	getTalkRoomSocketTargetUserId,
+	TalkRoomSpeakerStatusMap,
+} from '@/ultis/talkRoom'
 import useTalkRoomSocket from './useTalkRoomSocket'
 
 export type ValidatePreJoinRoomResult = ValidatePreTalkroomModel & {
@@ -57,6 +61,26 @@ export default function useDetailTalkroom(
 	const [roomUserRole, setRoomUserRole] = useState<string | null>(null)
 	const [roleIntegration, setRoleIntegration] =
 		useState<JoinTalkroomAgora | null>(null)
+	const [speakerStatusMap, setSpeakerStatusMap] =
+		useState<TalkRoomSpeakerStatusMap>({})
+
+	const handleUpdateSpeakerLiveStatus = useCallback(
+		(
+			userId: string,
+			patch: { is_open_mic?: boolean; is_talking?: boolean },
+		) => {
+			if (!userId) return
+
+			setSpeakerStatusMap((prev) => ({
+				...prev,
+				[userId]: {
+					...prev[userId],
+					...patch,
+				},
+			}))
+		},
+		[],
+	)
 
 	const handleGetDetailTalkRoom = useCallback(
 		async (
@@ -223,8 +247,9 @@ export default function useDetailTalkroom(
 
 			if (code !== 200) return null
 
-			const data: ChangeRoleResponse = results?.object ?? results ?? null
-			const newConnection = data?.new_connection ?? null
+			const transitionData =
+				results?.object?.data ?? results?.object ?? results ?? null
+			const newConnection = transitionData?.new_connection ?? null
 
 			if (!newConnection) return null
 
@@ -295,9 +320,39 @@ export default function useDetailTalkroom(
 				case 'room_went_live':
 					handleGetDetailTalkRoom(id)
 					break
+				case 'speaker_on_mic': {
+					const userId = getTalkRoomSocketTargetUserId(data)
+					if (userId) {
+						handleUpdateSpeakerLiveStatus(userId, {
+							is_open_mic: true,
+							is_talking: false,
+						})
+					} else {
+						handleGetDetailTalkRoom(id)
+					}
+					break
+				}
+				case 'speaker_off_mic': {
+					const userId = getTalkRoomSocketTargetUserId(data)
+					if (userId) {
+						handleUpdateSpeakerLiveStatus(userId, {
+							is_open_mic: false,
+							is_talking: false,
+						})
+					} else {
+						handleGetDetailTalkRoom(id)
+					}
+					break
+				}
+				case 'on_talking': {
+					const userId = getTalkRoomSocketTargetUserId(data)
+					const isTalking = getTalkRoomSocketTalkingStatus(data)
+					if (userId && typeof isTalking === 'boolean') {
+						handleUpdateSpeakerLiveStatus(userId, { is_talking: isTalking })
+					}
+					break
+				}
 				case 'room_start_countdown':
-				case 'speaker_on_mic':
-				case 'speaker_off_mic':
 				case 'raise_hand_accepted':
 				case 'promote_to_speaker':
 				case 'listener_accept_to_speaker_success':
@@ -330,6 +385,7 @@ export default function useDetailTalkroom(
 			handleGetDetailTalkRoom,
 			handleGetListenerInRoom,
 			handleLeaveRoom,
+			handleUpdateSpeakerLiveStatus,
 			onChangeRoute,
 			options?.onRoomSocketEvent,
 		],
@@ -386,6 +442,7 @@ export default function useDetailTalkroom(
 		listenersInRoom,
 		totalListenersInRoom,
 		loadingListenersInRoom,
+		speakerStatusMap,
 
 		onGetDetailTalkRoom: handleGetDetailTalkRoom,
 		onGetListenerInRoom: handleGetListenerInRoom,
@@ -394,5 +451,6 @@ export default function useDetailTalkroom(
 		onLeaveRoom: handleLeaveRoom,
 		onPostRaiseHand: handlePostRaiseHand,
 		onTransitionToSpeaker: handleTransitionToSpeaker,
+		onUpdateSpeakerLiveStatus: handleUpdateSpeakerLiveStatus,
 	}
 }

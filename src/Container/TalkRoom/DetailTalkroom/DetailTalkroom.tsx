@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Flex } from 'antd'
 import { IconChevronLeft } from '@tabler/icons-react'
 
-import { toogleMic } from '@/apis/talkRoomApis'
+import { toogleMic, emitTalkingStatus } from '@/apis/talkRoomApis'
 import DetailTalkroomListenerPanel from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomListenerPanel'
 import HostMicButton from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomListenerPanel/HostMicButton'
 import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomSpeakerStage'
@@ -13,6 +13,7 @@ import TalkRoomTransferHostRoleModal from '@/Components/Modal/TalkRoomTransferHo
 import useDetailTalkroom from '@/hooks/TalkRoom/useDetailTalkroom'
 import useHostMicToggle from '@/hooks/TalkRoom/useHostMicToggle'
 import useTalkRoomAgora from '@/hooks/TalkRoom/useTalkRoomAgora'
+import useTalkRoomLocalTalking from '@/hooks/TalkRoom/useTalkRoomLocalTalking'
 import useTalkRoomWhep from '@/hooks/TalkRoom/useTalkRoomWhep'
 import { TALK_ROOM_ROLE } from '@/Variable/talkRoom.variable'
 import ShareIcon from '@/svg/FriendSvg/ShareIcon'
@@ -44,6 +45,7 @@ function DetailTalkroom({ id }: { id: string }) {
 	>()
 	const isPromotingRef = useRef(false)
 	const autoPromoteAttemptedRef = useRef(false)
+	const lastEmittedTalkingRef = useRef<boolean | null>(null)
 	const [speakerMicOptimisticOn, setSpeakerMicOptimisticOn] = useState(false)
 	const [transferHostModalOpen, setTransferHostModalOpen] = useState(false)
 	const [leavingRoom, setLeavingRoom] = useState(false)
@@ -61,6 +63,8 @@ function DetailTalkroom({ id }: { id: string }) {
 		onLeaveRoom,
 		onPostRaiseHand,
 		onTransitionToSpeaker,
+		speakerStatusMap,
+		onUpdateSpeakerLiveStatus,
 	} = useDetailTalkroom(id, {
 		onRoomSocketEvent: (event, data) =>
 			onRoomSocketEventRef.current?.(event, data),
@@ -92,9 +96,15 @@ function DetailTalkroom({ id }: { id: string }) {
 		isTalkRoomLive(talkRoomDetail?.status) ||
 		joinTalkRoomResult?.data?.room_info?.status === 'live'
 
-	const { connect, setMic, disconnect, isAgoraJoined } = useTalkRoomAgora({
+	const { connect, setMic, disconnect, isAgoraJoined, micEnabled } = useTalkRoomAgora({
 		agoraIntegration,
 		enabled: isHost || isSpeaker || isListener,
+	})
+
+	const isLocalTalking = useTalkRoomLocalTalking({
+		enabled: (isHost || isSpeaker) && isAgoraJoined,
+		micEnabled,
+		agoraUid: agoraIntegration?.agora_uid,
 	})
 
 	const {
@@ -144,6 +154,12 @@ function DetailTalkroom({ id }: { id: string }) {
 			})
 
 			setSpeakerMicOptimisticOn(true)
+			if (currentUserId) {
+				onUpdateSpeakerLiveStatus(currentUserId, {
+					is_open_mic: true,
+					is_talking: false,
+				})
+			}
 			await onGetDetailTalkRoom(id)
 		} catch (error) {
 			console.error('Failed to promote to speaker', error)
@@ -158,6 +174,8 @@ function DetailTalkroom({ id }: { id: string }) {
 		onGetDetailTalkRoom,
 		hasSpeakerRole,
 		isHost,
+		currentUserId,
+		onUpdateSpeakerLiveStatus,
 	])
 
 	const handleRoomSocketEvent = useCallback(
@@ -171,7 +189,7 @@ function DetailTalkroom({ id }: { id: string }) {
 
 			if (
 				event === 'room_start_countdown' &&
-				isHost &&
+				(isHost || isSpeaker) &&
 				!isAgoraJoinedRef.current
 			) {
 				handleConnectAgora()
@@ -185,6 +203,7 @@ function DetailTalkroom({ id }: { id: string }) {
 			currentUserId,
 			handlePromoteToSpeaker,
 			isHost,
+			isSpeaker,
 			isListener,
 			canUseWhep,
 			handleConnectAgora,
@@ -228,6 +247,34 @@ function DetailTalkroom({ id }: { id: string }) {
 			setSpeakerMicOptimisticOn(false)
 		}
 	}, [talkRoomDetail, isSpeaker, currentUserId])
+
+	useEffect(() => {
+		if (!currentUserId || !(isHost || isSpeaker)) return
+
+		if (!micEnabled) {
+			onUpdateSpeakerLiveStatus(currentUserId, { is_talking: false })
+			lastEmittedTalkingRef.current = false
+			return
+		}
+
+		onUpdateSpeakerLiveStatus(currentUserId, { is_talking: isLocalTalking })
+
+		if (lastEmittedTalkingRef.current === isLocalTalking) return
+
+		lastEmittedTalkingRef.current = isLocalTalking
+		emitTalkingStatus({
+			id,
+			payload: { is_talking: isLocalTalking },
+		}).catch(() => undefined)
+	}, [
+		currentUserId,
+		isHost,
+		isSpeaker,
+		micEnabled,
+		isLocalTalking,
+		id,
+		onUpdateSpeakerLiveStatus,
+	])
 
 	useEffect(() => {
 		if (!isListener || !canUseWhep) return
@@ -292,8 +339,24 @@ function DetailTalkroom({ id }: { id: string }) {
 		onLeaveRoom: handleLeaveRoomWithMedia,
 		onChangeRoute,
 		onLeaveClick: isHost ? handleHostLeaveClick : undefined,
-		onMicOn: handleConnectAgora,
-		onMicOff: () => setMic(false),
+		onMicOn: () => {
+			handleConnectAgora()
+			if (currentUserId) {
+				onUpdateSpeakerLiveStatus(currentUserId, {
+					is_open_mic: true,
+					is_talking: false,
+				})
+			}
+		},
+		onMicOff: () => {
+			setMic(false)
+			if (currentUserId) {
+				onUpdateSpeakerLiveStatus(currentUserId, {
+					is_open_mic: false,
+					is_talking: false,
+				})
+			}
+		},
 	})
 
 	const beSpeakerState = useMemo(
@@ -344,7 +407,10 @@ function DetailTalkroom({ id }: { id: string }) {
 						</div>
 					</div>
 				</div>
-				<DetailTalkroomSpeakerStage talkRoomDetail={talkRoomDetail} />
+				<DetailTalkroomSpeakerStage
+					talkRoomDetail={talkRoomDetail}
+					speakerStatusMap={speakerStatusMap}
+				/>
 			</div>
 		)
 	}

@@ -6,7 +6,9 @@ import { memo } from 'react'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import UserMicOffIcon from '@/svg/Talkroom/UserMicOffIcon'
-import { TalkRoomSpeakerSlot } from '@/ultis/talkRoom'
+import UserMicOnIcon from '@/svg/Talkroom/UserMicOnIcon'
+import WaveSoundIcon from '@/svg/Talkroom/WaveSoundIcon'
+import { getSpeakerMicStatusIcon, TalkRoomSpeakerSlot } from '@/ultis/talkRoom'
 import { mappingFlag } from '@/Variable/countryVariable'
 
 import classes from './DetailTalkroomSpeakerSlot.module.scss'
@@ -30,7 +32,7 @@ function DetailTalkroomSpeakerSlot({ slot }: DetailTalkroomSpeakerSlotProps) {
 	const { speaker, isHost, label } = slot
 	const displayName = speaker?.name || label
 	const countryCode = speaker?.i_am_from
-	const isMicOff = speaker?.is_open_mic === false
+	const statusIcon = getSpeakerMicStatusIcon(speaker)
 
 	return (
 		<div className={classes.slot}>
@@ -57,9 +59,21 @@ function DetailTalkroomSpeakerSlot({ slot }: DetailTalkroomSpeakerSlotProps) {
 				)}
 			</div>
 			<div className={classes.userInfo}>
-				{isMicOff && (
-					<div className={classes.micPill}>
-						<UserMicOffIcon width={16} height={16} />
+				{statusIcon && (
+					<div
+						className={clsx(classes.micPill, {
+							[classes.micPillTalking]: statusIcon === 'talking',
+						})}
+					>
+						{statusIcon === 'mic-off' ? (
+							<UserMicOffIcon width={16} height={16} />
+						) : null}
+						{statusIcon === 'mic-on' ? (
+							<UserMicOnIcon width={16} height={16} />
+						) : null}
+						{statusIcon === 'talking' ? (
+							<WaveSoundIcon width={16} height={16} />
+						) : null}
 					</div>
 				)}
 				<span className={classes.userName}>{displayName}</span>

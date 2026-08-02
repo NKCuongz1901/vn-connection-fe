@@ -1,7 +1,13 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { useJoin, useLocalMicrophoneTrack, usePublish } from 'agora-rtc-react'
+import {
+	useJoin,
+	useLocalMicrophoneTrack,
+	usePublish,
+	useRemoteAudioTracks,
+	useRemoteUsers,
+} from 'agora-rtc-react'
 
 import { JoinTalkroomAgora } from '@/apis/talkRoomApis'
 import { TALK_ROOM_CONNECTION_TYPE } from '@/Variable/talkRoom.variable'
@@ -38,6 +44,8 @@ export default function useTalkRoomAgora({
 		!!activeIntegration?.channel_name &&
 		!!activeIntegration?.agora_token
 
+	const isAgoraActive = canUseAgora && isJoined
+
 	useJoin(
 		{
 			appid: process.env.NEXT_PUBLIC_AGORA_APP_ID!,
@@ -45,40 +53,42 @@ export default function useTalkRoomAgora({
 			token: activeIntegration?.agora_token ?? '',
 			uid: activeIntegration?.agora_uid,
 		},
-		canUseAgora && isJoined,
+		isAgoraActive,
 	)
 
 	const { localMicrophoneTrack, error } = useLocalMicrophoneTrack(
-		canUseAgora && isJoined && micEnabled,
+		isAgoraActive && micEnabled,
 	)
-	useEffect(() => {
-		if (localMicrophoneTrack)
-			console.log('Mic track ready', localMicrophoneTrack)
-		if (error) console.error('Mic error', error)
-	}, [localMicrophoneTrack, error])
+
+	const remoteUsers = useRemoteUsers()
+	const { audioTracks, error: remoteAudioError } = useRemoteAudioTracks(
+		isAgoraActive ? remoteUsers : [],
+	)
 
 	useEffect(() => {
-		console.log('[Agora debug]', {
-			enabled,
-			canUseAgora,
-			isJoined,
-			micEnabled,
-			ready: canUseAgora && isJoined && micEnabled,
-			activeIntegration,
-			hasTrack: !!localMicrophoneTrack,
-			error,
+		if (!isAgoraActive) return
+
+		audioTracks.forEach((track) => {
+			try {
+				track.play()
+			} catch (playError) {
+				console.error('Failed to play remote audio track', playError)
+			}
 		})
-	}, [
-		enabled,
-		canUseAgora,
-		isJoined,
-		micEnabled,
-		activeIntegration,
-		localMicrophoneTrack,
-		error,
-	])
 
-	usePublish(canUseAgora && isJoined && micEnabled ? [localMicrophoneTrack] : [])
+		return () => {
+			audioTracks.forEach((track) => {
+				track.stop()
+			})
+		}
+	}, [audioTracks, isAgoraActive])
+
+	useEffect(() => {
+		if (error) console.error('Local mic error', error)
+		if (remoteAudioError) console.error('Remote audio error', remoteAudioError)
+	}, [error, remoteAudioError])
+
+	usePublish(isAgoraActive && micEnabled ? [localMicrophoneTrack] : [])
 
 	const connect = useCallback(async ({ micOn = true, integration }: ConnectOptions = {}) => {
 		if (integration) {
@@ -99,5 +109,5 @@ export default function useTalkRoomAgora({
 		localMicrophoneTrack?.close()
 	}, [localMicrophoneTrack])
 
-	return { connect, setMic, disconnect, isAgoraJoined: isJoined }
+	return { connect, setMic, disconnect, isAgoraJoined: isJoined, micEnabled }
 }

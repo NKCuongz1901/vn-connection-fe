@@ -12,7 +12,17 @@ export type TalkRoomSpeaker = {
 	talking_time?: number
 	i_am_from?: string
 	is_open_mic?: boolean
+	is_talking?: boolean
 }
+
+export type TalkRoomSpeakerLiveStatus = {
+	is_open_mic?: boolean
+	is_talking?: boolean
+}
+
+export type TalkRoomSpeakerStatusMap = Record<string, TalkRoomSpeakerLiveStatus>
+
+export type TalkRoomSpeakerMicStatusIcon = 'mic-off' | 'mic-on' | 'talking'
 
 export type TalkRoomJoinedFriend = {
 	id?: string
@@ -780,7 +790,62 @@ export type TalkRoomFilledSpeaker = {
 	avatar?: string
 	i_am_from?: string
 	is_open_mic?: boolean
+	is_talking?: boolean
 	role?: string
+}
+
+/** Resolves speaker user id from room detail speaker entry. */
+export const resolveSpeakerUserId = (
+	speaker?: { id?: string; user_id?: string } | null,
+): string | undefined => speaker?.id ?? speaker?.user_id
+
+/** Merges realtime socket overrides into a speaker slot model. */
+export const mergeSpeakerLiveStatus = (
+	speaker?: TalkRoomFilledSpeaker,
+	overrides?: TalkRoomSpeakerLiveStatus,
+): TalkRoomFilledSpeaker | undefined => {
+	if (!speaker) return speaker
+
+	return {
+		...speaker,
+		...(overrides?.is_open_mic !== undefined
+			? { is_open_mic: overrides.is_open_mic }
+			: {}),
+		...(overrides?.is_talking !== undefined
+			? { is_talking: overrides.is_talking }
+			: {}),
+	}
+}
+
+/** Maps speaker mic/talking state to the status icon shown beside the name. */
+export const getSpeakerMicStatusIcon = (
+	speaker?: TalkRoomFilledSpeaker,
+): TalkRoomSpeakerMicStatusIcon | null => {
+	if (!speaker) return null
+
+	if (speaker.is_open_mic !== true) return 'mic-off'
+	if (speaker.is_talking) return 'talking'
+
+	return 'mic-on'
+}
+
+/** Reads is_talking from a talk room socket payload. */
+export const getTalkRoomSocketTalkingStatus = (
+	data?: unknown,
+): boolean | undefined => {
+	if (!data || typeof data !== 'object') return undefined
+
+	const payload = data as Record<string, unknown>
+	const actionDetails = payload.action_details as
+		| Record<string, unknown>
+		| undefined
+
+	if (typeof payload.is_talking === 'boolean') return payload.is_talking
+
+	const nestedTalking = actionDetails?.is_talking
+	if (typeof nestedTalking === 'boolean') return nestedTalking
+
+	return undefined
 }
 
 export type TalkRoomSpeakerSlot = {
@@ -795,6 +860,7 @@ export type TalkRoomSpeakerSlot = {
 export const buildTalkRoomSpeakerSlots = (
 	room?: TalkRoomRoom,
 	maxSpeakers = 2,
+	speakerStatusMap?: TalkRoomSpeakerStatusMap,
 ): TalkRoomSpeakerSlot[] => {
 	const speakers = room?.speakers ?? []
 	const hostSpeaker =
@@ -812,6 +878,12 @@ export const buildTalkRoomSpeakerSlots = (
 	const guestSpeakers = speakers.filter(
 		(speaker) => speaker?.role === 'speaker',
 	)
+	const withLiveStatus = (speaker?: TalkRoomFilledSpeaker) => {
+		const userId = resolveSpeakerUserId(speaker)
+		if (!speaker || !userId) return speaker
+
+		return mergeSpeakerLiveStatus(speaker, speakerStatusMap?.[userId])
+	}
 
 	const slots: TalkRoomSpeakerSlot[] = [
 		{
@@ -819,7 +891,7 @@ export const buildTalkRoomSpeakerSlots = (
 			type: hostSpeaker ? 'filled' : 'empty',
 			isHost: true,
 			label: 'Host',
-			speaker: hostSpeaker,
+			speaker: withLiveStatus(hostSpeaker),
 		},
 	]
 
@@ -831,7 +903,7 @@ export const buildTalkRoomSpeakerSlots = (
 			type: speaker ? 'filled' : 'empty',
 			isHost: false,
 			label: `Speaker ${i + 1}`,
-			speaker,
+			speaker: withLiveStatus(speaker),
 		})
 	}
 
