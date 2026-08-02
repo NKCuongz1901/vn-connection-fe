@@ -408,6 +408,21 @@ export const getListenerBeSpeakerState = (
 	return 'off'
 }
 
+/** Whether current user is a guest speaker on the stage (from room detail). */
+export const isCurrentUserGuestSpeaker = (
+	room?: TalkRoomRoom,
+	userId?: string,
+): boolean => {
+	if (!userId) return false
+
+	return (room?.speakers ?? []).some(
+		(speaker) =>
+			speaker?.role === 'speaker' &&
+			(speaker?.id === userId ||
+				(speaker as { user_id?: string })?.user_id === userId),
+	)
+}
+
 /** Mic state for guest speaker — same enable rules as host mic. */
 export const getSpeakerMicState = (
 	room?: TalkRoomRoom,

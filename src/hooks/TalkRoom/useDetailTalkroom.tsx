@@ -217,7 +217,6 @@ export default function useDetailTalkroom(
 				payload: {
 					from_role: TALK_ROOM_ROLE.LISTENER,
 					to_role: TALK_ROOM_ROLE.SPEAKER,
-					fields: ['$all'],
 				},
 			})
 			const { code, results } = res || {}
@@ -225,7 +224,7 @@ export default function useDetailTalkroom(
 			if (code !== 200) return null
 
 			const data: ChangeRoleResponse = results?.object ?? results ?? null
-			const newConnection = data?.new_connection ?? data?.agora ?? null
+			const newConnection = data?.new_connection ?? null
 
 			if (!newConnection) return null
 

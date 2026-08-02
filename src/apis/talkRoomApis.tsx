@@ -83,6 +83,7 @@ export type TalkRoomListItem = {
 		role?: string
 		talking_time?: number
 		i_am_from?: string
+		is_open_mic?: boolean
 	}[]
 	created_by_user?: {
 		id?: string
@@ -639,9 +640,14 @@ export type TransitionRolePayload = {
 }
 
 export type ChangeRoleResponse = {
+	previous_session_id?: string
+	new_session_id?: string
+	previous_role?: string
+	new_role?: string
+	previous_connection_type?: string
+	new_connection_type?: string
+	transition_completed_at?: string
 	new_connection?: JoinTalkroomAgora
-	agora?: JoinTalkroomAgora
-	role?: string
 }
 
 export const transitionRole = async ({
@@ -649,11 +655,11 @@ export const transitionRole = async ({
 	payload,
 }: {
 	id: string
-	payload: TransitionRolePayload & { [key: string]: any }
+	payload: TransitionRolePayload
 }) => {
 	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/transition_role`
 
-	return await axios.post(url, convertParams(payload))
+	return await axios.post(url, payload)
 }
 
 export type ToggleMicPayload = {

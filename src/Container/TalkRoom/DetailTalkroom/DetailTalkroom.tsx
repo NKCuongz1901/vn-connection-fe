@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Flex } from 'antd'
 import { IconChevronLeft } from '@tabler/icons-react'
 
@@ -21,6 +21,7 @@ import {
 	formatTalkRoomLevelLabel,
 	getListenerBeSpeakerState,
 	getTalkRoomListenerCount,
+	isCurrentUserGuestSpeaker,
 	isTalkRoomLive,
 	isTalkRoomSocketEventForCurrentUser,
 	resolveRaiseHandSlotId,
@@ -39,6 +40,8 @@ function DetailTalkroom({ id }: { id: string }) {
 		((event: string, data?: unknown) => void) | undefined
 	>()
 	const isPromotingRef = useRef(false)
+	const autoPromoteAttemptedRef = useRef(false)
+	const [speakerMicOptimisticOn, setSpeakerMicOptimisticOn] = useState(false)
 	const currentUserId = getUserInfo('id') as string | undefined
 
 	const {
@@ -63,9 +66,14 @@ function DetailTalkroom({ id }: { id: string }) {
 	const isHost =
 		talkRoomDetail?.is_your_room === true ||
 		(talkRoomDetail as any)?.yourAreHost === true
-	const isSpeaker =
+	const hasSpeakerRole =
 		roomUserRole === TALK_ROOM_ROLE.SPEAKER ||
 		joinTalkRoomResult?.data?.role === TALK_ROOM_ROLE.SPEAKER
+	const isGuestSpeakerOnStage = useMemo(
+		() => isCurrentUserGuestSpeaker(talkRoomDetail ?? undefined, currentUserId),
+		[talkRoomDetail, currentUserId],
+	)
+	const isSpeaker = hasSpeakerRole || isGuestSpeakerOnStage
 	const isListener =
 		!isSpeaker &&
 		(roomUserRole === TALK_ROOM_ROLE.LISTENER ||
@@ -110,7 +118,8 @@ function DetailTalkroom({ id }: { id: string }) {
 	}, [connectWhep, disconnectWhep])
 
 	const handlePromoteToSpeaker = useCallback(async () => {
-		if (isPromotingRef.current || isSpeaker || isHost) return
+		if (isPromotingRef.current || isHost) return
+		if (hasSpeakerRole && isAgoraJoinedRef.current) return
 
 		isPromotingRef.current = true
 
@@ -129,6 +138,7 @@ function DetailTalkroom({ id }: { id: string }) {
 				payload: { is_on: true },
 			})
 
+			setSpeakerMicOptimisticOn(true)
 			await onGetDetailTalkRoom(id)
 		} catch (error) {
 			console.error('Failed to promote to speaker', error)
@@ -141,7 +151,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		connect,
 		id,
 		onGetDetailTalkRoom,
-		isSpeaker,
+		hasSpeakerRole,
 		isHost,
 	])
 
@@ -182,6 +192,39 @@ function DetailTalkroom({ id }: { id: string }) {
 	}, [handleRoomSocketEvent])
 
 	useEffect(() => {
+		if (!isGuestSpeakerOnStage) {
+			autoPromoteAttemptedRef.current = false
+			return
+		}
+
+		if (isHost || (hasSpeakerRole && isAgoraJoined)) return
+		if (autoPromoteAttemptedRef.current || isPromotingRef.current) return
+
+		autoPromoteAttemptedRef.current = true
+		handlePromoteToSpeaker()
+	}, [
+		isHost,
+		isGuestSpeakerOnStage,
+		hasSpeakerRole,
+		isAgoraJoined,
+		handlePromoteToSpeaker,
+	])
+
+	useEffect(() => {
+		if (!isSpeaker || !currentUserId) return
+
+		const mySpeaker = talkRoomDetail?.speakers?.find(
+			(speaker) =>
+				speaker?.id === currentUserId ||
+				(speaker as { user_id?: string })?.user_id === currentUserId,
+		)
+
+		if (mySpeaker?.is_open_mic === true) {
+			setSpeakerMicOptimisticOn(false)
+		}
+	}, [talkRoomDetail, isSpeaker, currentUserId])
+
+	useEffect(() => {
 		if (!isListener || !canUseWhep) return
 		if (!isRoomLive) return
 
@@ -210,6 +253,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		isHost,
 		isSpeaker,
 		userId: currentUserId,
+		speakerMicOptimisticOn,
 		onGetDetailTalkRoom,
 		onLeaveRoom: handleLeaveRoomWithMedia,
 		onChangeRoute,

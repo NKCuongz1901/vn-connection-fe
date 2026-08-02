@@ -16,6 +16,7 @@ type UseHostMicToggleProps = {
 	isHost?: boolean
 	isSpeaker?: boolean
 	userId?: string
+	speakerMicOptimisticOn?: boolean
 	onGetDetailTalkRoom: (roomId?: string) => Promise<TalkRoomDetail | null>
 	onLeaveRoom: () => Promise<void>
 	onChangeRoute: (path: string) => void
@@ -30,6 +31,7 @@ export default function useHostMicToggle({
 	isHost = false,
 	isSpeaker = false,
 	userId,
+	speakerMicOptimisticOn = false,
 	onGetDetailTalkRoom,
 	onLeaveRoom,
 	onChangeRoute,
@@ -42,6 +44,8 @@ export default function useHostMicToggle({
 		}
 
 		if (isSpeaker) {
+			if (speakerMicOptimisticOn) return 'on'
+
 			return getSpeakerMicState(talkRoomDetail ?? undefined, {
 				isSpeaker,
 				userId,
@@ -49,7 +53,7 @@ export default function useHostMicToggle({
 		}
 
 		return 'disabled' as HostMicState
-	}, [talkRoomDetail, isHost, isSpeaker, userId])
+	}, [talkRoomDetail, isHost, isSpeaker, userId, speakerMicOptimisticOn])
 
 	const handleToggleMic = useCallback(async () => {
 		if (!roomId || micState === 'disabled') return
