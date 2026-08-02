@@ -1,0 +1,12 @@
+.button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 40px;
+	min-height: 40px;
+	padding: 10px;
+	border: none;
+	border-radius: var(--radius-component-button, 999px);
+	background: var(--component-button-alpha-bg-default, rgba(255, 255, 255, 0.16));
+	cursor: pointer;
+}

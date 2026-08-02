@@ -6,8 +6,8 @@ import { IconChevronLeft } from '@tabler/icons-react'
 
 import { toogleMic, emitTalkingStatus } from '@/apis/talkRoomApis'
 import DetailTalkroomListenerPanel from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomListenerPanel'
-import HostMicButton from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomListenerPanel/HostMicButton'
 import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomSpeakerStage'
+import TalkRoomHeaderActionButton from '@/Components/TalkRoom/DetailTalkroom/TalkRoomHeaderActionButton'
 import DetailTalkroomTiming from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomTiming'
 import TalkRoomTransferHostRoleModal from '@/Components/Modal/TalkRoomTransferHostRoleModal'
 import useDetailTalkroom from '@/hooks/TalkRoom/useDetailTalkroom'
@@ -17,6 +17,8 @@ import useTalkRoomLocalTalking from '@/hooks/TalkRoom/useTalkRoomLocalTalking'
 import useTalkRoomWhep from '@/hooks/TalkRoom/useTalkRoomWhep'
 import { TALK_ROOM_ROLE } from '@/Variable/talkRoom.variable'
 import ShareIcon from '@/svg/FriendSvg/ShareIcon'
+import VolumeHighIcon from '@/svg/Talkroom/VolumeHighIcon'
+import VolumeMuteIcon from '@/svg/Talkroom/VolumeMuteIcon'
 import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { getUserInfo } from '@/ultis/storage'
@@ -47,6 +49,7 @@ function DetailTalkroom({ id }: { id: string }) {
 	const autoPromoteAttemptedRef = useRef(false)
 	const lastEmittedTalkingRef = useRef<boolean | null>(null)
 	const [speakerMicOptimisticOn, setSpeakerMicOptimisticOn] = useState(false)
+	const [isMuteRoom, setIsMuteRoom] = useState(false)
 	const [transferHostModalOpen, setTransferHostModalOpen] = useState(false)
 	const [leavingRoom, setLeavingRoom] = useState(false)
 	const currentUserId = getUserInfo('id') as string | undefined
@@ -96,6 +99,8 @@ function DetailTalkroom({ id }: { id: string }) {
 		isTalkRoomLive(talkRoomDetail?.status) ||
 		joinTalkRoomResult?.data?.room_info?.status === 'live'
 
+	const showVolumeButton = isListener && isRoomLive
+
 	const { connect, setMic, disconnect, isAgoraJoined, micEnabled } = useTalkRoomAgora({
 		agoraIntegration,
 		enabled: isHost || isSpeaker || isListener,
@@ -112,10 +117,31 @@ function DetailTalkroom({ id }: { id: string }) {
 		connect: connectWhep,
 		disconnect: disconnectWhep,
 		canUseWhep,
+		isConnected: isWhepConnected,
 	} = useTalkRoomWhep({
 		streamWssUrl: streamUrl,
 		enabled: isListener,
 	})
+
+	const handleToggleRoomVolume = useCallback(() => {
+		if (!showVolumeButton) return
+
+		setIsMuteRoom((prev) => !prev)
+	}, [showVolumeButton])
+
+	useEffect(() => {
+		if (!isListener) return
+
+		const audio = whepAudioRef.current
+		if (!audio) return
+
+		const stream = audio.srcObject
+		if (stream instanceof MediaStream) {
+			stream.getAudioTracks().forEach((track) => {
+				track.enabled = !isMuteRoom
+			})
+		}
+	}, [isListener, isMuteRoom, whepAudioRef, isWhepConnected])
 
 	const isAgoraJoinedRef = useRef(isAgoraJoined)
 	useEffect(() => {
@@ -399,12 +425,23 @@ function DetailTalkroom({ id }: { id: string }) {
 						<div className={classes.talkroomTitle}>{talkRoomDetail?.name}</div>
 					</div>
 					<div className={classes.ctaButtons}>
-						{isHost || isSpeaker ? (
-							<HostMicButton state={micState} size="sm" onClick={onToggleMic} />
+						{showVolumeButton ? (
+							<TalkRoomHeaderActionButton
+								ariaLabel={
+									isMuteRoom ? 'Unmute room audio' : 'Mute room audio'
+								}
+								onClick={handleToggleRoomVolume}
+							>
+								{isMuteRoom ? (
+									<VolumeMuteIcon width={20} height={20} />
+								) : (
+									<VolumeHighIcon width={20} height={20} />
+								)}
+							</TalkRoomHeaderActionButton>
 						) : null}
-						<div className={classes.ctaButtonWrapper}>
-							<ShareIcon />
-						</div>
+						<TalkRoomHeaderActionButton ariaLabel="Share room" onClick={onInvite}>
+							<ShareIcon fill="#FFFFFF" />
+						</TalkRoomHeaderActionButton>
 					</div>
 				</div>
 				<DetailTalkroomSpeakerStage
