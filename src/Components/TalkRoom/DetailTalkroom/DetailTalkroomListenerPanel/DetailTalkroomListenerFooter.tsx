@@ -12,6 +12,7 @@ type DetailTalkroomListenerFooterProps = {
 	isHost?: boolean
 	isListener?: boolean
 	isSpeaker?: boolean
+	isRoomLiving?: boolean
 	micState: HostMicState
 	beSpeakerState: HostMicState
 	onToggleMic?: () => void
@@ -24,19 +25,22 @@ function DetailTalkroomListenerFooter({
 	isHost = false,
 	isListener = false,
 	isSpeaker = false,
+	isRoomLiving = true,
 	micState,
 	beSpeakerState,
 	onToggleMic,
 	onBeSpeaker,
 	onLeaveRoom,
 }: DetailTalkroomListenerFooterProps) {
+	const showVoiceActions = isRoomLiving && (isHost || isSpeaker || isListener)
+
 	return (
 		<div className={classes.footer}>
 			<div className={classes.footerActions}>
-				{isHost || isSpeaker ? (
+				{showVoiceActions && (isHost || isSpeaker) ? (
 					<HostMicButton state={micState} size="md" onClick={onToggleMic} />
 				) : null}
-				{isListener && !isSpeaker ? (
+				{showVoiceActions && isListener && !isSpeaker ? (
 					<BeSpeakerButton state={beSpeakerState} onClick={onBeSpeaker} />
 				) : null}
 				<button

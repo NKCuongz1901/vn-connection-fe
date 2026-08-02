@@ -15,6 +15,7 @@ type DetailTalkroomListenerPanelProps = {
 	isHost?: boolean
 	isListener?: boolean
 	isSpeaker?: boolean
+	isRoomLiving?: boolean
 	listenerCount: number
 	listeners?: TalkRoomListenerInRoom[]
 	loadingListeners?: boolean
@@ -31,6 +32,7 @@ function DetailTalkroomListenerPanel({
 	isHost = false,
 	isListener = false,
 	isSpeaker = false,
+	isRoomLiving = true,
 	listenerCount,
 	listeners = [],
 	loadingListeners = false,
@@ -60,6 +62,7 @@ function DetailTalkroomListenerPanel({
 				isHost={isHost}
 				isListener={isListener}
 				isSpeaker={isSpeaker}
+				isRoomLiving={isRoomLiving}
 				micState={micState}
 				beSpeakerState={beSpeakerState}
 				onToggleMic={onToggleMic}

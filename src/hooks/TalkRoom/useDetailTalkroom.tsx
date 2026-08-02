@@ -34,6 +34,7 @@ export type ValidatePreJoinRoomResult = ValidatePreTalkroomModel & {
 
 type UseDetailTalkroomOptions = {
 	onRoomSocketEvent?: (event: string, data?: unknown) => void
+	onRoomTimeUp?: (data?: unknown) => void
 }
 
 export default function useDetailTalkroom(
@@ -368,6 +369,9 @@ export default function useDetailTalkroom(
 				case 'room_inactive_warning':
 					// openSuccess({ message: '...' }) hoặc toast sau
 					break
+				case 'room_time_up':
+					options?.onRoomTimeUp?.(data)
+					break
 				case 'room_force_closed':
 				case 'room_inactive_force_closed':
 					handleLeaveRoom().finally(() => {
@@ -388,6 +392,7 @@ export default function useDetailTalkroom(
 			handleUpdateSpeakerLiveStatus,
 			onChangeRoute,
 			options?.onRoomSocketEvent,
+			options?.onRoomTimeUp,
 		],
 	)
 

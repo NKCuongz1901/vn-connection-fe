@@ -10,6 +10,7 @@ import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/Det
 import TalkRoomHeaderActionButton from '@/Components/TalkRoom/DetailTalkroom/TalkRoomHeaderActionButton'
 import DetailTalkroomTiming from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomTiming'
 import TalkRoomListenerLeaveRoom from '@/Components/Modal/TalkRoomListenerLeaveRoom'
+import TalkRoomSessionEndModal from '@/Components/Modal/TalkRoomSessionEndModal'
 import TalkRoomTransferHostRoleModal from '@/Components/Modal/TalkRoomTransferHostRoleModal'
 import useDetailTalkroom from '@/hooks/TalkRoom/useDetailTalkroom'
 import useHostMicToggle from '@/hooks/TalkRoom/useHostMicToggle'
@@ -25,13 +26,16 @@ import { mainRoutes } from '@/routes/MainRoutes'
 import { getUserInfo } from '@/ultis/storage'
 import {
 	formatTalkRoomLevelLabel,
+	ForceRoomCloseOptions,
 	getListenerBeSpeakerState,
 	getTalkRoomListenerCount,
 	getTalkRoomTransferHostSpeakerOptions,
 	isCurrentUserGuestSpeaker,
 	isTalkRoomLive,
 	isTalkRoomSocketEventForCurrentUser,
+	parseTalkRoomSocketRoomTimeUp,
 	resolveRaiseHandSlotId,
+	RoomEndStatus,
 } from '@/ultis/talkRoom'
 
 import classes from './DetailTalkroom.module.scss'
@@ -46,6 +50,8 @@ function DetailTalkroom({ id }: { id: string }) {
 	const onRoomSocketEventRef = useRef<
 		((event: string, data?: unknown) => void) | undefined
 	>()
+	const onRoomTimeUpRef = useRef<((data?: unknown) => void) | undefined>()
+	const sessionEndTriggeredRef = useRef(false)
 	const isPromotingRef = useRef(false)
 	const autoPromoteAttemptedRef = useRef(false)
 	const lastEmittedTalkingRef = useRef<boolean | null>(null)
@@ -53,6 +59,12 @@ function DetailTalkroom({ id }: { id: string }) {
 	const [isMuteRoom, setIsMuteRoom] = useState(false)
 	const [transferHostModalOpen, setTransferHostModalOpen] = useState(false)
 	const [listenerLeaveModalOpen, setListenerLeaveModalOpen] = useState(false)
+	const [sessionEndModalOpen, setSessionEndModalOpen] = useState(false)
+	const [roomEndStatus, setRoomEndStatus] = useState<RoomEndStatus>('none')
+	const [isRoomLiving, setIsRoomLiving] = useState(true)
+	const [sessionEndStartedAtMs, setSessionEndStartedAtMs] = useState<
+		number | null
+	>(null)
 	const [leavingRoom, setLeavingRoom] = useState(false)
 	const currentUserId = getUserInfo('id') as string | undefined
 
@@ -73,6 +85,7 @@ function DetailTalkroom({ id }: { id: string }) {
 	} = useDetailTalkroom(id, {
 		onRoomSocketEvent: (event, data) =>
 			onRoomSocketEventRef.current?.(event, data),
+		onRoomTimeUp: (data) => onRoomTimeUpRef.current?.(data),
 	})
 	const { onChangeRoute } = useLocalePath()
 	const agoraIntegration =
@@ -101,7 +114,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		isTalkRoomLive(talkRoomDetail?.status) ||
 		joinTalkRoomResult?.data?.room_info?.status === 'live'
 
-	const showVolumeButton = isListener && isRoomLive
+	const showVolumeButton = isListener && isRoomLive && isRoomLiving
 
 	const { connect, setMic, disconnect, isAgoraJoined, micEnabled } = useTalkRoomAgora({
 		agoraIntegration,
@@ -306,7 +319,7 @@ function DetailTalkroom({ id }: { id: string }) {
 
 	useEffect(() => {
 		if (!isListener || !canUseWhep) return
-		if (!isRoomLive) return
+		if (!isRoomLive || !isRoomLiving) return
 
 		connectWhep()
 
@@ -317,6 +330,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		isListener,
 		canUseWhep,
 		isRoomLive,
+		isRoomLiving,
 		connectWhep,
 		disconnectWhep,
 	])
@@ -326,6 +340,76 @@ function DetailTalkroom({ id }: { id: string }) {
 		if (isListener) await disconnectWhep()
 		await onLeaveRoom()
 	}, [disconnect, disconnectWhep, isHost, isSpeaker, isListener, onLeaveRoom])
+
+	const forceRoomClose = useCallback(
+		async ({ roomEndStatus: nextStatus, callLeaveRoom }: ForceRoomCloseOptions) => {
+			if (nextStatus === 'sessionEnd' && sessionEndTriggeredRef.current) {
+				return
+			}
+
+			if (nextStatus === 'sessionEnd') {
+				sessionEndTriggeredRef.current = true
+			}
+
+			if (isHost || isSpeaker) await disconnect()
+			if (isListener) await disconnectWhep()
+
+			setRoomEndStatus(nextStatus)
+			setIsRoomLiving(false)
+
+			if (callLeaveRoom) {
+				await onLeaveRoom()
+				onChangeRoute(mainRoutes.talkroom)
+				return
+			}
+
+			if (nextStatus === 'sessionEnd') {
+				setSessionEndStartedAtMs(Date.now())
+				setSessionEndModalOpen(true)
+			}
+		},
+		[
+			disconnect,
+			disconnectWhep,
+			isHost,
+			isSpeaker,
+			isListener,
+			onLeaveRoom,
+			onChangeRoute,
+		],
+	)
+
+	const handleRoomTimeUp = useCallback(
+		(data?: unknown) => {
+			const parsed = parseTalkRoomSocketRoomTimeUp(data)
+			if (!parsed) return
+
+			if (parsed.reason === 'INACTIVITY_TIMEOUT') {
+				forceRoomClose({
+					roomEndStatus: 'notActive',
+					callLeaveRoom: true,
+				})
+				return
+			}
+
+			forceRoomClose({
+				roomEndStatus: 'sessionEnd',
+				callLeaveRoom: false,
+			})
+		},
+		[forceRoomClose],
+	)
+
+	const handleLiveTimeUp = useCallback(() => {
+		forceRoomClose({
+			roomEndStatus: 'sessionEnd',
+			callLeaveRoom: false,
+		})
+	}, [forceRoomClose])
+
+	useEffect(() => {
+		onRoomTimeUpRef.current = handleRoomTimeUp
+	}, [handleRoomTimeUp])
 
 	const handleConfirmLeaveRoom = useCallback(async () => {
 		setLeavingRoom(true)
@@ -471,6 +555,7 @@ function DetailTalkroom({ id }: { id: string }) {
 					isHost={isHost}
 					isListener={isListener}
 					isSpeaker={isSpeaker}
+					isRoomLiving={isRoomLiving}
 					listenerCount={listenerCount}
 					listeners={listenersInRoom}
 					loadingListeners={loadingListenersInRoom}
@@ -488,7 +573,12 @@ function DetailTalkroom({ id }: { id: string }) {
 	const _renderTimerContent = () => {
 		return (
 			<div className={classes.timerContent}>
-				<DetailTalkroomTiming talkRoomDetail={talkRoomDetail} />
+				<DetailTalkroomTiming
+					talkRoomDetail={talkRoomDetail}
+					roomEndStatus={roomEndStatus}
+					sessionEndStartedAtMs={sessionEndStartedAtMs}
+					onLiveTimeUp={handleLiveTimeUp}
+				/>
 			</div>
 		)
 	}
@@ -520,6 +610,10 @@ function DetailTalkroom({ id }: { id: string }) {
 				loading={leavingRoom}
 				onClose={() => setListenerLeaveModalOpen(false)}
 				onLeave={handleConfirmLeaveRoom}
+			/>
+			<TalkRoomSessionEndModal
+				open={sessionEndModalOpen}
+				onClose={() => setSessionEndModalOpen(false)}
 			/>
 			<Flex className={classes.header}>
 				<IconChevronLeft className={classes.iconBack} onClick={onLeave} />

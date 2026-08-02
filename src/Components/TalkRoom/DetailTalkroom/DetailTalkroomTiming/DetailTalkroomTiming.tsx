@@ -10,24 +10,41 @@ import {
 	getTalkRoomPreStartTimingDescription,
 	getTalkRoomScheduledStartAt,
 	isTalkRoomCountRoomLiveVisible,
+	isTalkRoomCountSessionEndVisible,
 	isTalkRoomCountWaitingVisible,
 	isTalkRoomPreStartTimingVisible,
+	RoomEndStatus,
 } from '@/ultis/talkRoom'
 
 import LiveTiming from './LiveTiming'
 import PreStartTiming from './PreStartTiming'
+import SessionEndTiming from './SessionEndTiming'
 import WaitingTiming from './WaitingTiming'
 
 type DetailTalkroomTimingProps = {
 	talkRoomDetail?: TalkRoomDetail | null
+	roomEndStatus?: RoomEndStatus
+	sessionEndStartedAtMs?: number | null
+	onLiveTimeUp?: () => void
 }
 
 /** Renders the in-room timing banner based on the current talk room phase. */
-function DetailTalkroomTiming({ talkRoomDetail }: DetailTalkroomTimingProps) {
+function DetailTalkroomTiming({
+	talkRoomDetail,
+	roomEndStatus = 'none',
+	sessionEndStartedAtMs = null,
+	onLiveTimeUp,
+}: DetailTalkroomTimingProps) {
 	const scheduledAt = useMemo(
 		() => getTalkRoomScheduledStartAt(talkRoomDetail ?? undefined),
 		[talkRoomDetail],
 	)
+
+	const showSessionEnd = isTalkRoomCountSessionEndVisible(roomEndStatus)
+
+	if (showSessionEnd && sessionEndStartedAtMs) {
+		return <SessionEndTiming sessionEndStartedAtMs={sessionEndStartedAtMs} />
+	}
 
 	const showPreStart = isTalkRoomPreStartTimingVisible(
 		talkRoomDetail ?? undefined,
@@ -35,9 +52,9 @@ function DetailTalkroomTiming({ talkRoomDetail }: DetailTalkroomTimingProps) {
 	const showCountWaiting = isTalkRoomCountWaitingVisible(
 		talkRoomDetail ?? undefined,
 	)
-	const showCountRoomLive = isTalkRoomCountRoomLiveVisible(
-		talkRoomDetail ?? undefined,
-	)
+	const showCountRoomLive =
+		roomEndStatus === 'none' &&
+		isTalkRoomCountRoomLiveVisible(talkRoomDetail ?? undefined)
 
 	if (showPreStart) {
 		const startTimeLabel = formatTalkRoomStartTime(scheduledAt)
@@ -66,7 +83,7 @@ function DetailTalkroomTiming({ talkRoomDetail }: DetailTalkroomTimingProps) {
 			talkRoomDetail ?? undefined,
 		)
 
-		return <LiveTiming secondsLeft={liveSeconds} />
+		return <LiveTiming secondsLeft={liveSeconds} onTimeUp={onLiveTimeUp} />
 	}
 
 	return null

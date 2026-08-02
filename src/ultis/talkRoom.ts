@@ -239,6 +239,58 @@ export const formatTalkRoomCountdownMmSs = (totalSeconds: number) => {
 
 export const TALK_ROOM_DEFAULT_MAX_DURATION_SECONDS = 300
 export const TALK_ROOM_COUNT_WAITING_MIN_SECONDS = 10
+export const TALK_ROOM_SESSION_END_DURATION_SECONDS = 600
+
+export type RoomEndStatus = 'none' | 'sessionEnd' | 'timeUp' | 'notActive'
+
+export type ForceRoomCloseOptions = {
+	roomEndStatus: Exclude<RoomEndStatus, 'none'>
+	callLeaveRoom: boolean
+}
+
+/** Parses room_time_up socket payload when the room status is ended. */
+export const parseTalkRoomSocketRoomTimeUp = (
+	data?: unknown,
+): { reason: string } | null => {
+	if (!data || typeof data !== 'object') return null
+
+	const payload = data as Record<string, unknown>
+	const actionDetails = payload.action_details as
+		| Record<string, unknown>
+		| undefined
+	const roomInfo = actionDetails?.room_info as
+		| Record<string, unknown>
+		| undefined
+
+	const status = String(
+		payload.status ?? roomInfo?.status ?? actionDetails?.status ?? '',
+	).toLowerCase()
+
+	if (status !== 'ended') return null
+
+	const reason = String(
+		payload.reason ?? actionDetails?.reason ?? 'NONE',
+	).toUpperCase()
+
+	return { reason }
+}
+
+/** Returns remaining seconds in the post-live chat window. */
+export const getTalkRoomSessionEndSecondsLeft = (
+	sessionEndStartedAtMs: number | null,
+) => {
+	if (!sessionEndStartedAtMs) {
+		return TALK_ROOM_SESSION_END_DURATION_SECONDS
+	}
+
+	const elapsed = Math.floor((Date.now() - sessionEndStartedAtMs) / 1000)
+
+	return Math.max(0, TALK_ROOM_SESSION_END_DURATION_SECONDS - elapsed)
+}
+
+export const isTalkRoomCountSessionEndVisible = (
+	roomEndStatus: RoomEndStatus,
+) => roomEndStatus === 'sessionEnd'
 
 export const TALK_ROOM_EARLY_ACCESS_MINUTES = 10
 
