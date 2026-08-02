@@ -9,6 +9,7 @@ import DetailTalkroomListenerPanel from '@/Components/TalkRoom/DetailTalkroom/De
 import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomSpeakerStage'
 import TalkRoomHeaderActionButton from '@/Components/TalkRoom/DetailTalkroom/TalkRoomHeaderActionButton'
 import DetailTalkroomTiming from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomTiming'
+import TalkRoomListenerLeaveRoom from '@/Components/Modal/TalkRoomListenerLeaveRoom'
 import TalkRoomTransferHostRoleModal from '@/Components/Modal/TalkRoomTransferHostRoleModal'
 import useDetailTalkroom from '@/hooks/TalkRoom/useDetailTalkroom'
 import useHostMicToggle from '@/hooks/TalkRoom/useHostMicToggle'
@@ -51,6 +52,7 @@ function DetailTalkroom({ id }: { id: string }) {
 	const [speakerMicOptimisticOn, setSpeakerMicOptimisticOn] = useState(false)
 	const [isMuteRoom, setIsMuteRoom] = useState(false)
 	const [transferHostModalOpen, setTransferHostModalOpen] = useState(false)
+	const [listenerLeaveModalOpen, setListenerLeaveModalOpen] = useState(false)
 	const [leavingRoom, setLeavingRoom] = useState(false)
 	const currentUserId = getUserInfo('id') as string | undefined
 
@@ -330,6 +332,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		try {
 			await handleLeaveRoomWithMedia()
 			setTransferHostModalOpen(false)
+			setListenerLeaveModalOpen(false)
 			onChangeRoute(mainRoutes.talkroom)
 		} finally {
 			setLeavingRoom(false)
@@ -340,6 +343,11 @@ function DetailTalkroom({ id }: { id: string }) {
 		if (!isHost) return
 		setTransferHostModalOpen(true)
 	}, [isHost])
+
+	const handleListenerLeaveClick = useCallback(() => {
+		if (!isListener || isHost || isSpeaker) return
+		setListenerLeaveModalOpen(true)
+	}, [isListener, isHost, isSpeaker])
 
 	const transferHostSpeakerOptions = useMemo(
 		() => getTalkRoomTransferHostSpeakerOptions(talkRoomDetail ?? undefined),
@@ -364,7 +372,11 @@ function DetailTalkroom({ id }: { id: string }) {
 		onGetDetailTalkRoom,
 		onLeaveRoom: handleLeaveRoomWithMedia,
 		onChangeRoute,
-		onLeaveClick: isHost ? handleHostLeaveClick : undefined,
+		onLeaveClick: isHost
+			? handleHostLeaveClick
+			: isListener && !isSpeaker
+				? handleListenerLeaveClick
+				: undefined,
 		onMicOn: () => {
 			handleConnectAgora()
 			if (currentUserId) {
@@ -502,6 +514,12 @@ function DetailTalkroom({ id }: { id: string }) {
 				onClose={() => setTransferHostModalOpen(false)}
 				onAssignSpeaker={handleAssignSpeakerAndLeave}
 				onSkipAssigning={handleConfirmLeaveRoom}
+			/>
+			<TalkRoomListenerLeaveRoom
+				open={listenerLeaveModalOpen}
+				loading={leavingRoom}
+				onClose={() => setListenerLeaveModalOpen(false)}
+				onLeave={handleConfirmLeaveRoom}
 			/>
 			<Flex className={classes.header}>
 				<IconChevronLeft className={classes.iconBack} onClick={onLeave} />
