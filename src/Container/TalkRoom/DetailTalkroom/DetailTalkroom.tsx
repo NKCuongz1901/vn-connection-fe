@@ -9,6 +9,7 @@ import DetailTalkroomListenerPanel from '@/Components/TalkRoom/DetailTalkroom/De
 import HostMicButton from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomListenerPanel/HostMicButton'
 import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomSpeakerStage'
 import DetailTalkroomTiming from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomTiming'
+import TalkRoomTransferHostRoleModal from '@/Components/Modal/TalkRoomTransferHostRoleModal'
 import useDetailTalkroom from '@/hooks/TalkRoom/useDetailTalkroom'
 import useHostMicToggle from '@/hooks/TalkRoom/useHostMicToggle'
 import useTalkRoomAgora from '@/hooks/TalkRoom/useTalkRoomAgora'
@@ -16,11 +17,13 @@ import useTalkRoomWhep from '@/hooks/TalkRoom/useTalkRoomWhep'
 import { TALK_ROOM_ROLE } from '@/Variable/talkRoom.variable'
 import ShareIcon from '@/svg/FriendSvg/ShareIcon'
 import { useLocalePath } from '@/ultis/route'
+import { mainRoutes } from '@/routes/MainRoutes'
 import { getUserInfo } from '@/ultis/storage'
 import {
 	formatTalkRoomLevelLabel,
 	getListenerBeSpeakerState,
 	getTalkRoomListenerCount,
+	getTalkRoomTransferHostSpeakerOptions,
 	isCurrentUserGuestSpeaker,
 	isTalkRoomLive,
 	isTalkRoomSocketEventForCurrentUser,
@@ -42,6 +45,8 @@ function DetailTalkroom({ id }: { id: string }) {
 	const isPromotingRef = useRef(false)
 	const autoPromoteAttemptedRef = useRef(false)
 	const [speakerMicOptimisticOn, setSpeakerMicOptimisticOn] = useState(false)
+	const [transferHostModalOpen, setTransferHostModalOpen] = useState(false)
+	const [leavingRoom, setLeavingRoom] = useState(false)
 	const currentUserId = getUserInfo('id') as string | undefined
 
 	const {
@@ -247,6 +252,35 @@ function DetailTalkroom({ id }: { id: string }) {
 		await onLeaveRoom()
 	}, [disconnect, disconnectWhep, isHost, isSpeaker, isListener, onLeaveRoom])
 
+	const handleConfirmLeaveRoom = useCallback(async () => {
+		setLeavingRoom(true)
+		try {
+			await handleLeaveRoomWithMedia()
+			setTransferHostModalOpen(false)
+			onChangeRoute(mainRoutes.talkroom)
+		} finally {
+			setLeavingRoom(false)
+		}
+	}, [handleLeaveRoomWithMedia, onChangeRoute])
+
+	const handleHostLeaveClick = useCallback(() => {
+		if (!isHost) return
+		setTransferHostModalOpen(true)
+	}, [isHost])
+
+	const transferHostSpeakerOptions = useMemo(
+		() => getTalkRoomTransferHostSpeakerOptions(talkRoomDetail ?? undefined),
+		[talkRoomDetail],
+	)
+
+	const handleAssignSpeakerAndLeave = useCallback(
+		async (_slotId: 1 | 2) => {
+			// TODO: call stopHosting / transfer host API with slotId
+			await handleConfirmLeaveRoom()
+		},
+		[handleConfirmLeaveRoom],
+	)
+
 	const { micState, onToggleMic, onInvite, onLeave } = useHostMicToggle({
 		roomId: id,
 		talkRoomDetail,
@@ -257,6 +291,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		onGetDetailTalkRoom,
 		onLeaveRoom: handleLeaveRoomWithMedia,
 		onChangeRoute,
+		onLeaveClick: isHost ? handleHostLeaveClick : undefined,
 		onMicOn: handleConnectAgora,
 		onMicOff: () => setMic(false),
 	})
@@ -357,6 +392,14 @@ function DetailTalkroom({ id }: { id: string }) {
 					style={{ display: 'none' }}
 				/>
 			) : null}
+			<TalkRoomTransferHostRoleModal
+				open={transferHostModalOpen}
+				loading={leavingRoom}
+				speakerOptions={transferHostSpeakerOptions}
+				onClose={() => setTransferHostModalOpen(false)}
+				onAssignSpeaker={handleAssignSpeakerAndLeave}
+				onSkipAssigning={handleConfirmLeaveRoom}
+			/>
 			<Flex className={classes.header}>
 				<IconChevronLeft className={classes.iconBack} onClick={onLeave} />
 				<div className={classes.title}>Live room</div>

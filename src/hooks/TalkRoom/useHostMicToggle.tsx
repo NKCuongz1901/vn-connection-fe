@@ -20,6 +20,7 @@ type UseHostMicToggleProps = {
 	onGetDetailTalkRoom: (roomId?: string) => Promise<TalkRoomDetail | null>
 	onLeaveRoom: () => Promise<void>
 	onChangeRoute: (path: string) => void
+	onLeaveClick?: () => void
 	onMicOn?: () => void | Promise<void>
 	onMicOff?: () => void
 }
@@ -35,6 +36,7 @@ export default function useHostMicToggle({
 	onGetDetailTalkRoom,
 	onLeaveRoom,
 	onChangeRoute,
+	onLeaveClick,
 	onMicOn,
 	onMicOff,
 }: UseHostMicToggleProps) {
@@ -90,9 +92,14 @@ export default function useHostMicToggle({
 	}, [talkRoomDetail?.dynamic_link])
 
 	const handleLeave = useCallback(async () => {
+		if (onLeaveClick) {
+			onLeaveClick()
+			return
+		}
+
 		await onLeaveRoom()
 		onChangeRoute(mainRoutes.talkroom)
-	}, [onLeaveRoom, onChangeRoute])
+	}, [onLeaveClick, onLeaveRoom, onChangeRoute])
 
 	return {
 		micState: micState as HostMicState,

@@ -838,6 +838,22 @@ export const buildTalkRoomSpeakerSlots = (
 	return slots
 }
 
+/** Guest speaker slot options for transfer-host modal. */
+export const getTalkRoomTransferHostSpeakerOptions = (
+	room?: TalkRoomRoom,
+): { slotId: 1 | 2; label: string; disabled: boolean }[] => {
+	const maxSpeakers = room?.max_speakers ?? 2
+	const slots = buildTalkRoomSpeakerSlots(room, maxSpeakers)
+
+	return slots
+		.filter((slot) => !slot.isHost)
+		.map((slot, index) => ({
+			slotId: (index + 1) as 1 | 2,
+			label: `Assign to speaker ${index + 1}`,
+			disabled: slot.type === 'empty',
+		}))
+}
+
 export const buildEmptyTalkRoomSpeakerSlots = (
 	maxSpeakers = 2,
 ): TalkRoomSpeakerSlot[] => buildTalkRoomSpeakerSlots(undefined, maxSpeakers)
