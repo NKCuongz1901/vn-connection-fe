@@ -667,10 +667,6 @@ export type ToggleMicPayload = {
 	is_on: boolean
 }
 
-export type EmitTalkingPayload = {
-	is_talking: boolean
-}
-
 export const toogleMic = async ({
 	id,
 	payload,
@@ -679,18 +675,6 @@ export const toogleMic = async ({
 	payload: ToggleMicPayload
 }) => {
 	const url = `${TALKROOM_ROUTES.baseTalkroomRoute}/socket/${id}/toggle_mic`
-
-	return await axios.post(url, payload)
-}
-
-export const emitTalkingStatus = async ({
-	id,
-	payload,
-}: {
-	id: string
-	payload: EmitTalkingPayload
-}) => {
-	const url = `${TALKROOM_ROUTES.baseTalkroomRoute}/socket/${id}/on_talking`
 
 	return await axios.post(url, payload)
 }

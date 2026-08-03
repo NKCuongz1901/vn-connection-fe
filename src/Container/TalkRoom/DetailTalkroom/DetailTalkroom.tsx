@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Flex } from 'antd'
 import { IconChevronLeft } from '@tabler/icons-react'
 
-import { toogleMic, emitTalkingStatus } from '@/apis/talkRoomApis'
+import { toogleMic } from '@/apis/talkRoomApis'
 import DetailTalkroomListenerPanel from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomListenerPanel'
 import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomSpeakerStage'
 import TalkRoomHeaderActionButton from '@/Components/TalkRoom/DetailTalkroom/TalkRoomHeaderActionButton'
@@ -86,6 +86,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		onTransitionToSpeaker,
 		speakerStatusMap,
 		onUpdateSpeakerLiveStatus,
+		emitRoomEvent,
 	} = useDetailTalkroom(id, {
 		onRoomSocketEvent: (event, data) =>
 			onRoomSocketEventRef.current?.(event, data),
@@ -294,7 +295,7 @@ function DetailTalkroom({ id }: { id: string }) {
 	}, [talkRoomDetail, isSpeaker, currentUserId])
 
 	useEffect(() => {
-		if (!currentUserId || !(isHost || isSpeaker)) return
+		if (!currentUserId || !(isHost || isSpeaker) || !isRoomLiving) return
 
 		if (!micEnabled) {
 			onUpdateSpeakerLiveStatus(currentUserId, { is_talking: false })
@@ -307,17 +308,17 @@ function DetailTalkroom({ id }: { id: string }) {
 		if (lastEmittedTalkingRef.current === isLocalTalking) return
 
 		lastEmittedTalkingRef.current = isLocalTalking
-		emitTalkingStatus({
-			id,
-			payload: { is_talking: isLocalTalking },
-		}).catch(() => undefined)
+		emitRoomEvent(currentUserId, 'on_talking', {
+			is_talking: isLocalTalking,
+		})
 	}, [
 		currentUserId,
 		isHost,
 		isSpeaker,
+		isRoomLiving,
 		micEnabled,
 		isLocalTalking,
-		id,
+		emitRoomEvent,
 		onUpdateSpeakerLiveStatus,
 	])
 

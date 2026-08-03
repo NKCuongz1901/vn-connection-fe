@@ -396,7 +396,7 @@ export default function useDetailTalkroom(
 		],
 	)
 
-	const { isConnected } = useTalkRoomSocket({
+	const { isConnected, emitRoomEvent } = useTalkRoomSocket({
 		roomId: id,
 		enabled: isJoined,
 		onRoomEvent: handleRoomSocketEvent,
@@ -457,5 +457,6 @@ export default function useDetailTalkroom(
 		onPostRaiseHand: handlePostRaiseHand,
 		onTransitionToSpeaker: handleTransitionToSpeaker,
 		onUpdateSpeakerLiveStatus: handleUpdateSpeakerLiveStatus,
+		emitRoomEvent,
 	}
 }

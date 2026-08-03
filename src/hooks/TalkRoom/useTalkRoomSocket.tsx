@@ -1,5 +1,5 @@
 import { Centrifuge, Subscription } from 'centrifuge'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { getTokenSocket } from '@/apis/talkRoomApis'
 
@@ -7,6 +7,28 @@ type TalkroomSocketType = {
 	roomId: string
 	enabled?: boolean
 	onRoomEvent?: (event: string, data: any) => void
+}
+
+/** Normalizes server events and client emit payloads from Centrifugo. */
+export const normalizeTalkRoomSocketPublication = (message?: {
+	data?: Record<string, unknown>
+	event?: string
+	user_id?: string
+	payload?: Record<string, unknown>
+}) => {
+	if (!message) return { event: undefined, payload: undefined }
+
+	const event =
+		(message.data?.event_type as string | undefined) ?? message.event
+
+	const payload =
+		message.data ??
+		({
+			user_id: message.user_id,
+			...(message.payload ?? {}),
+		} as Record<string, unknown>)
+
+	return { event, payload }
 }
 
 export default function useTalkRoomSocket(props: TalkroomSocketType) {
@@ -17,6 +39,25 @@ export default function useTalkRoomSocket(props: TalkroomSocketType) {
 	const [isConnected, setIsConnected] = useState<boolean>(false)
 
 	onRoomEventRef.current = onRoomEvent
+
+	const emitRoomEvent = useCallback(
+		(
+			userId: string,
+			event: string,
+			payload: Record<string, unknown>,
+		) => {
+			if (!userId || !subscriptionRef.current) return
+
+			subscriptionRef.current
+				.publish({
+					user_id: userId,
+					event,
+					payload,
+				})
+				.catch(() => undefined)
+		},
+		[],
+	)
 
 	useEffect(() => {
 		if (!enabled || !roomId) return
@@ -38,22 +79,17 @@ export default function useTalkRoomSocket(props: TalkroomSocketType) {
 			)
 
 			centrifuge.on('connected', () => {
-				console.log('connected to centrifugal')
 				setIsConnected(true)
 			})
 			centrifuge.on('disconnected', () => {
-				console.log('disconnected from centrifugal')
 				setIsConnected(false)
 			})
 
 			const subcribe = centrifuge.newSubscription(`public:${roomId}`)
 
 			subcribe.on('publication', (ctx) => {
-				console.log('publication', ctx)
 				const message = ctx.data
-				console.log('message', message)
-				const event = message?.data?.event_type ?? message?.event
-				const payload = message?.data
+				const { event, payload } = normalizeTalkRoomSocketPublication(message)
 
 				if (!event) return
 				onRoomEventRef.current?.(event, payload)
@@ -79,5 +115,5 @@ export default function useTalkRoomSocket(props: TalkroomSocketType) {
 		}
 	}, [roomId, enabled])
 
-	return { isConnected }
+	return { isConnected, emitRoomEvent }
 }
