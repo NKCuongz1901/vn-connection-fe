@@ -1,10 +1,10 @@
 'use client'
 
 import { Spin } from 'antd'
-import { IconClock } from '@tabler/icons-react'
 import { memo } from 'react'
 
 import CModal from '@/Components/Custom/CModal/CModal'
+import TimeUpIcon from '@/svg/Talkroom/TimeUpIcon'
 
 import classes from './TalkRoomTimeUpModal.module.scss'
 
@@ -43,18 +43,14 @@ function TalkRoomTimeUpModal({
 		>
 			<div className={classes.wrapper}>
 				<div className={classes.iconSection}>
-					<IconClock
-						size={40}
-						className={classes.clockIcon}
-						stroke={1.5}
-					/>
+					<TimeUpIcon width={40} height={32} />
 				</div>
 
 				<div className={classes.info}>
 					<h2 className={classes.title}>Time&apos;s up</h2>
 					<p className={classes.description}>
-						The chat time has ended. You will be redirected out of this Talk
-						Room.
+						This session has ended. Please join another room or the next one
+						soon
 					</p>
 				</div>
 
@@ -65,7 +61,7 @@ function TalkRoomTimeUpModal({
 						disabled={loading}
 						onClick={() => onConfirm?.()}
 					>
-						{loading ? <Spin size="small" /> : 'OK'}
+						{loading ? <Spin size="small" /> : 'Find another room'}
 					</button>
 				</div>
 			</div>
