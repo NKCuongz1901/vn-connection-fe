@@ -11,6 +11,7 @@ import TalkRoomHeaderActionButton from '@/Components/TalkRoom/DetailTalkroom/Tal
 import DetailTalkroomTiming from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomTiming'
 import TalkRoomListenerLeaveRoom from '@/Components/Modal/TalkRoomListenerLeaveRoom'
 import TalkRoomSessionEndModal from '@/Components/Modal/TalkRoomSessionEndModal'
+import TalkRoomTimeUpModal from '@/Components/Modal/TalkRoomTimeUpModal'
 import TalkRoomTransferHostRoleModal from '@/Components/Modal/TalkRoomTransferHostRoleModal'
 import useDetailTalkroom from '@/hooks/TalkRoom/useDetailTalkroom'
 import useHostMicToggle from '@/hooks/TalkRoom/useHostMicToggle'
@@ -29,6 +30,7 @@ import {
 	ForceRoomCloseOptions,
 	getListenerBeSpeakerState,
 	getTalkRoomListenerCount,
+	getTalkRoomSessionEndSecondsLeft,
 	getTalkRoomTransferHostSpeakerOptions,
 	isCurrentUserGuestSpeaker,
 	isTalkRoomLive,
@@ -52,6 +54,7 @@ function DetailTalkroom({ id }: { id: string }) {
 	>()
 	const onRoomTimeUpRef = useRef<((data?: unknown) => void) | undefined>()
 	const sessionEndTriggeredRef = useRef(false)
+	const timeUpTriggeredRef = useRef(false)
 	const isPromotingRef = useRef(false)
 	const autoPromoteAttemptedRef = useRef(false)
 	const lastEmittedTalkingRef = useRef<boolean | null>(null)
@@ -60,6 +63,7 @@ function DetailTalkroom({ id }: { id: string }) {
 	const [transferHostModalOpen, setTransferHostModalOpen] = useState(false)
 	const [listenerLeaveModalOpen, setListenerLeaveModalOpen] = useState(false)
 	const [sessionEndModalOpen, setSessionEndModalOpen] = useState(false)
+	const [timeUpModalOpen, setTimeUpModalOpen] = useState(false)
 	const [roomEndStatus, setRoomEndStatus] = useState<RoomEndStatus>('none')
 	const [isRoomLiving, setIsRoomLiving] = useState(true)
 	const [sessionEndStartedAtMs, setSessionEndStartedAtMs] = useState<
@@ -407,6 +411,42 @@ function DetailTalkroom({ id }: { id: string }) {
 		})
 	}, [forceRoomClose])
 
+	const handleSessionEndTimeUp = useCallback(() => {
+		if (timeUpTriggeredRef.current) return
+
+		timeUpTriggeredRef.current = true
+		setRoomEndStatus('timeUp')
+		setTimeUpModalOpen(true)
+	}, [])
+
+	useEffect(() => {
+		if (roomEndStatus !== 'sessionEnd' || !sessionEndStartedAtMs) return
+
+		const secondsLeft = getTalkRoomSessionEndSecondsLeft(sessionEndStartedAtMs)
+		if (secondsLeft <= 0) {
+			handleSessionEndTimeUp()
+			return
+		}
+
+		const timeoutId = window.setTimeout(
+			handleSessionEndTimeUp,
+			secondsLeft * 1000,
+		)
+
+		return () => window.clearTimeout(timeoutId)
+	}, [roomEndStatus, sessionEndStartedAtMs, handleSessionEndTimeUp])
+
+	const handleForceLeaveRoom = useCallback(async () => {
+		setLeavingRoom(true)
+		try {
+			await handleLeaveRoomWithMedia()
+			setTimeUpModalOpen(false)
+			onChangeRoute(mainRoutes.talkroom)
+		} finally {
+			setLeavingRoom(false)
+		}
+	}, [handleLeaveRoomWithMedia, onChangeRoute])
+
 	useEffect(() => {
 		onRoomTimeUpRef.current = handleRoomTimeUp
 	}, [handleRoomTimeUp])
@@ -578,6 +618,7 @@ function DetailTalkroom({ id }: { id: string }) {
 					roomEndStatus={roomEndStatus}
 					sessionEndStartedAtMs={sessionEndStartedAtMs}
 					onLiveTimeUp={handleLiveTimeUp}
+					onSessionEndTimeUp={handleSessionEndTimeUp}
 				/>
 			</div>
 		)
@@ -614,6 +655,11 @@ function DetailTalkroom({ id }: { id: string }) {
 			<TalkRoomSessionEndModal
 				open={sessionEndModalOpen}
 				onClose={() => setSessionEndModalOpen(false)}
+			/>
+			<TalkRoomTimeUpModal
+				open={timeUpModalOpen}
+				loading={leavingRoom}
+				onConfirm={handleForceLeaveRoom}
 			/>
 			<Flex className={classes.header}>
 				<IconChevronLeft className={classes.iconBack} onClick={onLeave} />

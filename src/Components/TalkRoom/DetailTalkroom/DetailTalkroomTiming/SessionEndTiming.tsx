@@ -1,7 +1,7 @@
 'use client'
 
 import { IconClock } from '@tabler/icons-react'
-import { memo, useEffect, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 
 import {
 	formatTalkRoomCountdownMmSs,
@@ -13,13 +13,22 @@ import useTalkRoomCountdown from './useTalkRoomCountdown'
 
 type SessionEndTimingProps = {
 	sessionEndStartedAtMs: number
+	onTimeUp?: () => void
 }
 
 /** countSessionEnd banner: post-live chat countdown (MM:SS). */
-function SessionEndTiming({ sessionEndStartedAtMs }: SessionEndTimingProps) {
+function SessionEndTiming({
+	sessionEndStartedAtMs,
+	onTimeUp,
+}: SessionEndTimingProps) {
 	const [secondsLeft, setSecondsLeft] = useState(() =>
 		getTalkRoomSessionEndSecondsLeft(sessionEndStartedAtMs),
 	)
+	const hasTriggeredTimeUpRef = useRef(false)
+
+	useEffect(() => {
+		hasTriggeredTimeUpRef.current = false
+	}, [sessionEndStartedAtMs])
 
 	useEffect(() => {
 		const tick = () => {
@@ -31,6 +40,13 @@ function SessionEndTiming({ sessionEndStartedAtMs }: SessionEndTimingProps) {
 
 		return () => clearInterval(intervalId)
 	}, [sessionEndStartedAtMs])
+
+	useEffect(() => {
+		if (secondsLeft > 0 || hasTriggeredTimeUpRef.current) return
+
+		hasTriggeredTimeUpRef.current = true
+		onTimeUp?.()
+	}, [secondsLeft, onTimeUp])
 
 	const countdown = useTalkRoomCountdown(secondsLeft)
 	const countdownLabel =

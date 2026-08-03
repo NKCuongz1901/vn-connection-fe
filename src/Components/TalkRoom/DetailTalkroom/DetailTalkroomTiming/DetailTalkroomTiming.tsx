@@ -26,6 +26,7 @@ type DetailTalkroomTimingProps = {
 	roomEndStatus?: RoomEndStatus
 	sessionEndStartedAtMs?: number | null
 	onLiveTimeUp?: () => void
+	onSessionEndTimeUp?: () => void
 }
 
 /** Renders the in-room timing banner based on the current talk room phase. */
@@ -34,6 +35,7 @@ function DetailTalkroomTiming({
 	roomEndStatus = 'none',
 	sessionEndStartedAtMs = null,
 	onLiveTimeUp,
+	onSessionEndTimeUp,
 }: DetailTalkroomTimingProps) {
 	const scheduledAt = useMemo(
 		() => getTalkRoomScheduledStartAt(talkRoomDetail ?? undefined),
@@ -43,7 +45,12 @@ function DetailTalkroomTiming({
 	const showSessionEnd = isTalkRoomCountSessionEndVisible(roomEndStatus)
 
 	if (showSessionEnd && sessionEndStartedAtMs) {
-		return <SessionEndTiming sessionEndStartedAtMs={sessionEndStartedAtMs} />
+		return (
+			<SessionEndTiming
+				sessionEndStartedAtMs={sessionEndStartedAtMs}
+				onTimeUp={onSessionEndTimeUp}
+			/>
+		)
 	}
 
 	const showPreStart = isTalkRoomPreStartTimingVisible(
