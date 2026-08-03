@@ -14,6 +14,7 @@ import TalkRoomListenerLeaveRoom from '@/Components/Modal/TalkRoomListenerLeaveR
 import TalkRoomSessionEndModal from '@/Components/Modal/TalkRoomSessionEndModal'
 import TalkRoomTimeUpModal from '@/Components/Modal/TalkRoomTimeUpModal'
 import TalkRoomTransferHostRoleModal from '@/Components/Modal/TalkRoomTransferHostRoleModal'
+import { showTalkRoomSpeakerPromoteToast } from '@/Components/Toast/SocketToastContent'
 import useDetailTalkroom from '@/hooks/TalkRoom/useDetailTalkroom'
 import useHostMicToggle from '@/hooks/TalkRoom/useHostMicToggle'
 import useTalkRoomAgora from '@/hooks/TalkRoom/useTalkRoomAgora'
@@ -214,6 +215,7 @@ function DetailTalkroom({ id }: { id: string }) {
 				})
 			}
 			await onGetDetailTalkRoom(id)
+			showTalkRoomSpeakerPromoteToast()
 		} catch (error) {
 			console.error('Failed to promote to speaker', error)
 		} finally {

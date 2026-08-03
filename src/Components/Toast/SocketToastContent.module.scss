@@ -4,12 +4,27 @@
 	width: 100%;
 	min-width: 280px;
 	max-width: 480px;
-	background: #feedeb;
 	border-radius: 999px;
 	padding: 4px 8px;
 	box-shadow:
 		0 4px 24px rgba(0, 8, 25, 0.04),
 		0 0 1px rgba(0, 8, 25, 0.08);
+}
+
+.toastError {
+	background: #feedeb;
+
+	.title {
+		color: #cd3031;
+	}
+}
+
+.toastSuccess {
+	background: #e7f5e9;
+
+	.title {
+		color: #1b8024;
+	}
 }
 
 .statusIcon {
@@ -33,7 +48,6 @@
 
 .title {
 	margin: 0;
-	color: #cd3031;
 	font-size: 16px;
 	font-weight: 600;
 	line-height: 24px;
