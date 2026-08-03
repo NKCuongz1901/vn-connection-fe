@@ -4,6 +4,7 @@ import { IconX } from '@tabler/icons-react'
 import { memo, useState } from 'react'
 
 import useCreateTalkRoom from '@/hooks/TalkRoom/useCreateTalkRoom'
+import { TalkRoomListItem } from '@/apis/talkRoomApis'
 
 import CButton from '@/Components/Custom/CButton'
 import CCheckboxSelect from '@/Components/Custom/CCheckboxSelect'
@@ -20,12 +21,14 @@ export interface ModalCreateTalkRoomProps {
 	open: boolean
 	onClose: () => void
 	onSuccess?: () => void
+	onInstantRoomCreated?: (room: TalkRoomListItem) => void
 }
 
 function ModalCreateTalkRoom({
 	open,
 	onClose,
 	onSuccess,
+	onInstantRoomCreated,
 }: ModalCreateTalkRoomProps) {
 	const {
 		form,
@@ -52,7 +55,7 @@ function ModalCreateTalkRoom({
 		dayOptions,
 		handleSubmit,
 		handleClose,
-	} = useCreateTalkRoom({ onClose, onSuccess })
+	} = useCreateTalkRoom({ onClose, onSuccess, onInstantRoomCreated })
 
 	const [ruleModalOpen, setRuleModalOpen] = useState(false)
 

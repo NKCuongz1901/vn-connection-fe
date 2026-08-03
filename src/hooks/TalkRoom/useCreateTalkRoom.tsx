@@ -6,6 +6,8 @@ import { isArray } from '@/ultis/array'
 
 import { levelOptions } from '@/Variable/common.variable'
 
+import { TalkRoomListItem } from '@/apis/talkRoomApis'
+
 import useTalkRoom from './useTalkRoom'
 import useTalkRoomSchedule from './useTalkRoomSchedule'
 
@@ -38,9 +40,11 @@ const initialForm: CreateTalkRoomForm = {
 
 export default function useCreateTalkRoom({
 	onSuccess,
+	onInstantRoomCreated,
 	onClose,
 }: {
 	onSuccess?: () => void
+	onInstantRoomCreated?: (room: TalkRoomListItem) => void
 	onClose?: () => void
 } = {}) {
 	const {
@@ -174,8 +178,14 @@ export default function useCreateTalkRoom({
 
 		if (room) {
 			resetForm()
-			onSuccess?.()
 			onClose?.()
+
+			if (!scheduleEnabled) {
+				onInstantRoomCreated?.(room)
+				return
+			}
+
+			onSuccess?.()
 		}
 	}, [
 		buildSchedules,
@@ -183,8 +193,10 @@ export default function useCreateTalkRoom({
 		form,
 		onClose,
 		onCreateTalkRoom,
+		onInstantRoomCreated,
 		onSuccess,
 		resetForm,
+		scheduleEnabled,
 		validate,
 	])
 

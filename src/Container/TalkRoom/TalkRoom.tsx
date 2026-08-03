@@ -19,12 +19,14 @@ import TalkRoomListEmpty from '@/Components/TalkRoom/TalkRoomListEmpty'
 import TalkRoomProfileInfo from '@/Components/TalkRoom/TalkRoomProfileInfo/TalkRoomProfileInfo'
 import TalkRoomStats from '@/Components/TalkRoom/TalkRoomStats/TalkRoomStats'
 import { createConversation } from '@/apis/conversationApis'
+import { canCreateTalkRoom } from '@/apis/talkRoomApis'
 import useTalkRoom from '@/hooks/TalkRoom/useTalkRoom'
 import useProfile from '@/hooks/Profile/useProfile'
 import { useModal } from '@/context/ModalContext'
 import { mainRoutes } from '@/routes/MainRoutes'
 import BookIcon from '@/svg/BookIcon'
 import {
+	setTalkRoomAutoJoinFlag,
 	TalkRoomRoom,
 	formatHostMinutes,
 	isTalkRoomUserNotified,
@@ -143,7 +145,34 @@ function TalkRoom() {
 		onGetConnectedCountry()
 	}
 
-	const handleOpenCreateTalkRoomWarning = () => {
+	const ensureCanCreateTalkRoom = async () => {
+		try {
+			const res: any = await canCreateTalkRoom()
+			const payload = res?.results?.object
+			const canCreate = payload?.can_create ?? payload?.canCreate
+
+			if (canCreate === false) {
+				const denyReason =
+					payload?.deny_reason ?? payload?.denyReason ?? payload?.reason
+				openError(
+					typeof denyReason === 'string'
+						? denyReason
+						: 'You cannot create a talk room right now',
+				)
+				return false
+			}
+
+			return true
+		} catch (error) {
+			openError(error)
+			return false
+		}
+	}
+
+	const handleOpenCreateTalkRoomWarning = async () => {
+		const canCreate = await ensureCanCreateTalkRoom()
+		if (!canCreate) return
+
 		setCreateTalkRoomWarningOpen(true)
 	}
 
@@ -152,7 +181,10 @@ function TalkRoom() {
 		setCreateRoomModalOpen(true)
 	}
 
-	const handleCreateRoomFromConnected = () => {
+	const handleCreateRoomFromConnected = async () => {
+		const canCreate = await ensureCanCreateTalkRoom()
+		if (!canCreate) return
+
 		setConnectedUsersModalOpen(false)
 		setConnectedCountriesModalOpen(false)
 		setCreateRoomModalOpen(true)
@@ -162,6 +194,31 @@ function TalkRoom() {
 		setCreateRoomModalOpen(false)
 		onGetMyTalkRoomAnalysis()
 		onGetListTalkRoom(true)
+	}
+
+	const requestMicrophonePermission = async () => {
+		if (!navigator.mediaDevices?.getUserMedia) return
+
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+			stream.getTracks().forEach((track) => track.stop())
+		} catch {
+			// Host can still enter the room and enable mic later.
+		}
+	}
+
+	const handleInstantRoomCreated = (room: TalkRoomRoom) => {
+		if (!room?.id) return
+
+		setCreateRoomModalOpen(false)
+		onGetMyTalkRoomAnalysis()
+		onGetListTalkRoom(true)
+		setTalkRoomAutoJoinFlag(room.id)
+
+		window.setTimeout(async () => {
+			await requestMicrophonePermission()
+			onChangeRoute(`${mainRoutes.talkroom}/${room.id}`)
+		}, 500)
 	}
 
 	const _renderProfile = () => {
@@ -447,6 +504,7 @@ function TalkRoom() {
 					open
 					onClose={() => setCreateRoomModalOpen(false)}
 					onSuccess={handleCreateRoomSuccess}
+					onInstantRoomCreated={handleInstantRoomCreated}
 				/>
 			)}
 

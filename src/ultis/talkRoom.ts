@@ -241,6 +241,25 @@ export const TALK_ROOM_DEFAULT_MAX_DURATION_SECONDS = 300
 export const TALK_ROOM_COUNT_WAITING_MIN_SECONDS = 10
 export const TALK_ROOM_SESSION_END_DURATION_SECONDS = 600
 
+export const TALK_ROOM_AUTO_JOIN_STORAGE_KEY = 'talkroom_auto_join_room_id'
+
+/** Marks a room for host auto-join after instant create (skips can-join validate). */
+export const setTalkRoomAutoJoinFlag = (roomId: string) => {
+	if (typeof window === 'undefined' || !roomId) return
+	sessionStorage.setItem(TALK_ROOM_AUTO_JOIN_STORAGE_KEY, roomId)
+}
+
+/** Returns true once when auto-join flag matches the current room id. */
+export const consumeTalkRoomAutoJoinFlag = (roomId: string) => {
+	if (typeof window === 'undefined' || !roomId) return false
+
+	const flaggedRoomId = sessionStorage.getItem(TALK_ROOM_AUTO_JOIN_STORAGE_KEY)
+	if (flaggedRoomId !== roomId) return false
+
+	sessionStorage.removeItem(TALK_ROOM_AUTO_JOIN_STORAGE_KEY)
+	return true
+}
+
 export type RoomEndStatus = 'none' | 'sessionEnd' | 'timeUp' | 'notActive'
 
 export type ForceRoomCloseOptions = {

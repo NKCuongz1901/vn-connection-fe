@@ -49,6 +49,8 @@ import ModalTalkRoomWelcome from '@/Components/Modal/ModalTalkRoomWelcome'
 import LiveIcon from '@/svg/Talkroom/LiveIcon'
 import ModalTalkRoomSoundQuality from '@/Components/Modal/ModalTalkRoomSoundQuality'
 import ModalCreateTalkRoom from '@/Components/Modal/ModalCreateTalkRoom'
+import { TalkRoomListItem } from '@/apis/talkRoomApis'
+import { setTalkRoomAutoJoinFlag } from '@/ultis/talkRoom'
 
 const Overview = () => {
 	const { loadingContext } = useLoading()
@@ -153,6 +155,30 @@ const Overview = () => {
 
 	const handleCloseCreateTalkRoomModal = () => {
 		setCreateTalkRoomModal({ open: false })
+	}
+
+	const requestMicrophonePermission = async () => {
+		if (!navigator.mediaDevices?.getUserMedia) return
+
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+			stream.getTracks().forEach((track) => track.stop())
+		} catch {
+			// Host can still enter the room and enable mic later.
+		}
+	}
+
+	const handleInstantRoomCreated = (room: TalkRoomListItem) => {
+		if (!room?.id) return
+
+		handleCloseCreateTalkRoomModal()
+		onRefreshTalkroomOverview()
+		setTalkRoomAutoJoinFlag(room.id)
+
+		window.setTimeout(async () => {
+			await requestMicrophonePermission()
+			onChangeRoute(`${mainRoutes.talkroom}/${room.id}`)
+		}, 500)
 	}
 
 	const handleConfirmTalkRoomWelcome = async () => {
@@ -760,6 +786,7 @@ const Overview = () => {
 					open
 					onClose={handleCloseCreateTalkRoomModal}
 					onSuccess={onRefreshTalkroomOverview}
+					onInstantRoomCreated={handleInstantRoomCreated}
 				/>
 			)}
 			{!!checkmail?.open && (

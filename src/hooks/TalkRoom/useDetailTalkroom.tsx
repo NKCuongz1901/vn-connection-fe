@@ -26,6 +26,7 @@ import { TALK_ROOM_JOIN_REASON, TALK_ROOM_ROLE } from '@/Variable/talkRoom.varia
 import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
 import {
+	consumeTalkRoomAutoJoinFlag,
 	getTalkRoomConversationId,
 	getTalkRoomSocketTalkingStatus,
 	getTalkRoomSocketTargetUserId,
@@ -419,15 +420,19 @@ export default function useDetailTalkroom(
 	const handleEnterRoom = useCallback(async () => {
 		if (!id) return
 
-		const validation = await handleValidatePreJoinRoom(id)
-		if (!validation) return
+		const shouldSkipValidate = consumeTalkRoomAutoJoinFlag(id)
 
-		const canProceed =
-			validation.canJoin === true ||
-			validation.isRejoin === true ||
-			validation.reason === TALK_ROOM_JOIN_REASON.HOST_NOT_JOINED
+		if (!shouldSkipValidate) {
+			const validation = await handleValidatePreJoinRoom(id)
+			if (!validation) return
 
-		if (!canProceed) return
+			const canProceed =
+				validation.canJoin === true ||
+				validation.isRejoin === true ||
+				validation.reason === TALK_ROOM_JOIN_REASON.HOST_NOT_JOINED
+
+			if (!canProceed) return
+		}
 
 		const joinResult = await handleJoinTalkRoom(id)
 		if (!joinResult?.success) return
