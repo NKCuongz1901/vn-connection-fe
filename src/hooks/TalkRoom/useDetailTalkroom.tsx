@@ -17,11 +17,16 @@ import {
 	validatePreTalkroom,
 	ValidatePreTalkroomModel,
 } from '@/apis/talkRoomApis'
+import {
+	joinConversation,
+	leaveConversation,
+} from '@/apis/conversationApis'
 import { useModal } from '@/context/ModalContext'
 import { TALK_ROOM_JOIN_REASON, TALK_ROOM_ROLE } from '@/Variable/talkRoom.variable'
 import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
 import {
+	getTalkRoomConversationId,
 	getTalkRoomSocketTalkingStatus,
 	getTalkRoomSocketTargetUserId,
 	TalkRoomSpeakerStatusMap,
@@ -303,12 +308,21 @@ export default function useDetailTalkroom(
 
 	const handleLeaveRoom = useCallback(async () => {
 		if (!id) return
+
+		const conversationId = getTalkRoomConversationId(talkRoomDetail)
+
 		try {
+			if (conversationId) {
+				await leaveConversation({ id: conversationId, status: false }).catch(
+					() => undefined,
+				)
+			}
+
 			await leaveTalkroom({ id })
 		} catch (error) {
 			openError(error)
 		}
-	}, [id, openError])
+	}, [id, talkRoomDetail, openError])
 
 	const handleRoomSocketEvent = useCallback(
 		(event: string, data?: unknown) => {
@@ -418,10 +432,17 @@ export default function useDetailTalkroom(
 		const joinResult = await handleJoinTalkRoom(id)
 		if (!joinResult?.success) return
 
-		await Promise.all([
+		const [room] = await Promise.all([
 			handleGetDetailTalkRoom(id),
 			handleGetListenerInRoom(id),
 		])
+
+		const conversationId = getTalkRoomConversationId(room)
+		if (conversationId) {
+			await joinConversation({ id: conversationId, status: true }).catch(
+				() => undefined,
+			)
+		}
 	}, [
 		id,
 		handleValidatePreJoinRoom,

@@ -116,14 +116,31 @@
 			gap: 12px;
 
 			.timerContent {
-				flex: 1;
 				display: flex;
 				flex-direction: column;
 			}
 
 			.chatContent {
 				flex: 4;
-				background-color: orange;
+				display: flex;
+				flex-direction: column;
+				max-height: calc(100vh - 280px);
+				border-radius: 8px;
+				overflow: hidden;
+			}
+
+			.chatEmpty {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 100%;
+				height: 100%;
+				padding: 16px;
+				border-radius: 8px;
+				background: #fff;
+				color: var(--text-secondary, #48546b);
+				font-size: 14px;
+				text-align: center;
 			}
 		}
 	}

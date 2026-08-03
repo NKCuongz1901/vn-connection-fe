@@ -9,6 +9,7 @@ import DetailTalkroomListenerPanel from '@/Components/TalkRoom/DetailTalkroom/De
 import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomSpeakerStage'
 import TalkRoomHeaderActionButton from '@/Components/TalkRoom/DetailTalkroom/TalkRoomHeaderActionButton'
 import DetailTalkroomTiming from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomTiming'
+import DetailTalkroomChatPanel from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomChatPanel'
 import TalkRoomListenerLeaveRoom from '@/Components/Modal/TalkRoomListenerLeaveRoom'
 import TalkRoomSessionEndModal from '@/Components/Modal/TalkRoomSessionEndModal'
 import TalkRoomTimeUpModal from '@/Components/Modal/TalkRoomTimeUpModal'
@@ -29,6 +30,7 @@ import {
 	formatTalkRoomLevelLabel,
 	ForceRoomCloseOptions,
 	getListenerBeSpeakerState,
+	getTalkRoomConversationId,
 	getTalkRoomListenerCount,
 	getTalkRoomSessionEndSecondsLeft,
 	getTalkRoomTransferHostSpeakerOptions,
@@ -118,6 +120,11 @@ function DetailTalkroom({ id }: { id: string }) {
 	const isRoomLive =
 		isTalkRoomLive(talkRoomDetail?.status) ||
 		joinTalkRoomResult?.data?.room_info?.status === 'live'
+
+	const conversationId = useMemo(
+		() => getTalkRoomConversationId(talkRoomDetail ?? undefined),
+		[talkRoomDetail],
+	)
 
 	const showVolumeButton = isListener && isRoomLive && isRoomLiving
 
@@ -626,7 +633,19 @@ function DetailTalkroom({ id }: { id: string }) {
 	}
 
 	const _renderChatContent = () => {
-		return <div className={classes.chatContent}></div>
+		if (!conversationId) {
+			return (
+				<div className={classes.chatContent}>
+					<div className={classes.chatEmpty}>Chat is not available for this room.</div>
+				</div>
+			)
+		}
+
+		return (
+			<div className={classes.chatContent}>
+				<DetailTalkroomChatPanel convId={conversationId} />
+			</div>
+		)
 	}
 
 	return (

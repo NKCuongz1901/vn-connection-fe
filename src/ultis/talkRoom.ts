@@ -292,6 +292,23 @@ export const isTalkRoomCountSessionEndVisible = (
 	roomEndStatus: RoomEndStatus,
 ) => roomEndStatus === 'sessionEnd'
 
+/** Resolves the talk room chat conversation id (mirrors mobile currentConversationId). */
+export const getTalkRoomConversationId = (
+	detail?: Pick<TalkRoomRoom, 'schedules'> & {
+		conversation_id?: string | null
+	} | null,
+): string => {
+	if (!detail) return ''
+
+	if (detail.conversation_id) return detail.conversation_id
+
+	const scheduleConversationId = detail.schedules?.find(
+		(schedule) => schedule.conversation_id,
+	)?.conversation_id
+
+	return scheduleConversationId ?? ''
+}
+
 export const TALK_ROOM_EARLY_ACCESS_MINUTES = 10
 
 const TALK_ROOM_EARLY_ACCESS_SECONDS = TALK_ROOM_EARLY_ACCESS_MINUTES * 60
