@@ -27,10 +27,14 @@ const genderFill = {
 
 type DetailTalkroomListenerItemProps = {
 	listener: TalkRoomListenerInRoom
+	onClick?: () => void
 }
 
 /** Single listener card: avatar, country flag, name, age and gender. */
-function DetailTalkroomListenerItem({ listener }: DetailTalkroomListenerItemProps) {
+function DetailTalkroomListenerItem({
+	listener,
+	onClick,
+}: DetailTalkroomListenerItemProps) {
 	const user = listener.user
 	const countryCode = user?.country_code || user?.i_am_from || ''
 	const IconGender =
@@ -39,7 +43,24 @@ function DetailTalkroomListenerItem({ listener }: DetailTalkroomListenerItemProp
 		genderFill[user?.gender as keyof typeof genderFill] ?? genderFill.OTHER
 
 	return (
-		<div className={classes.listenerItem}>
+		<div
+			className={clsx(classes.listenerItem, {
+				[classes.listenerItemClickable]: Boolean(onClick),
+			})}
+			onClick={onClick}
+			role={onClick ? 'button' : undefined}
+			tabIndex={onClick ? 0 : undefined}
+			onKeyDown={
+				onClick
+					? (event) => {
+							if (event.key === 'Enter' || event.key === ' ') {
+								event.preventDefault()
+								onClick()
+							}
+						}
+					: undefined
+			}
+		>
 			<div className={classes.listenerAvatarWrap}>
 				<CAvatar
 					src={user?.avatar}

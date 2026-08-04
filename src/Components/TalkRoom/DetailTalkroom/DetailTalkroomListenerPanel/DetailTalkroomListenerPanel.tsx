@@ -25,6 +25,7 @@ type DetailTalkroomListenerPanelProps = {
 	onBeSpeaker?: () => void
 	onLeaveRoom?: () => void
 	onInvite?: () => void
+	onListenerClick?: (userId: string) => void
 }
 
 /** Listener section shell: header, empty/list body, and footer actions. */
@@ -42,6 +43,7 @@ function DetailTalkroomListenerPanel({
 	onBeSpeaker,
 	onLeaveRoom,
 	onInvite,
+	onListenerClick,
 }: DetailTalkroomListenerPanelProps) {
 	const showEmpty = listeners.length === 0 && !loadingListeners
 
@@ -55,6 +57,7 @@ function DetailTalkroomListenerPanel({
 					<DetailTalkroomListenerList
 						listeners={listeners}
 						loading={loadingListeners}
+						onListenerClick={onListenerClick}
 					/>
 				)}
 			</div>

@@ -3,7 +3,7 @@
 import { memo, useMemo } from 'react'
 
 import { TalkRoomDetail } from '@/apis/talkRoomApis'
-import { buildTalkRoomSpeakerSlots, TalkRoomSpeakerStatusMap } from '@/ultis/talkRoom'
+import { buildTalkRoomSpeakerSlots, resolveSpeakerUserId, TalkRoomSpeakerStatusMap } from '@/ultis/talkRoom'
 
 import DetailTalkroomSpeakerSlot from '../DetailTalkroomSpeakerSlot'
 import classes from './DetailTalkroomSpeakerStage.module.scss'
@@ -12,12 +12,14 @@ type DetailTalkroomSpeakerStageProps = {
 	talkRoomDetail?: TalkRoomDetail | null
 	maxSpeakers?: number
 	speakerStatusMap?: TalkRoomSpeakerStatusMap
+	onSpeakerSlotClick?: (userId?: string, isHostSlot?: boolean) => void
 }
 
 function DetailTalkroomSpeakerStage({
 	talkRoomDetail,
 	maxSpeakers = 2,
 	speakerStatusMap,
+	onSpeakerSlotClick,
 }: DetailTalkroomSpeakerStageProps) {
 	const slots = useMemo(
 		() =>
@@ -32,7 +34,19 @@ function DetailTalkroomSpeakerStage({
 	return (
 		<div className={classes.stage}>
 			{slots.map((slot) => (
-				<DetailTalkroomSpeakerSlot key={slot.key} slot={slot} />
+				<DetailTalkroomSpeakerSlot
+					key={slot.key}
+					slot={slot}
+					onClick={
+						onSpeakerSlotClick && slot.type === 'filled'
+							? () =>
+									onSpeakerSlotClick(
+										resolveSpeakerUserId(slot.speaker),
+										slot.isHost,
+									)
+							: undefined
+					}
+				/>
 			))}
 		</div>
 	)

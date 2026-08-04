@@ -22,6 +22,7 @@ export type TalkRoomAnalysis = {
 type TalkRoomStatsProps = {
 	data?: TalkRoomAnalysis | null
 	loading?: boolean
+	showHostTimeCard?: boolean
 	onClickPeople?: () => void
 	onClickCountries?: () => void
 }
@@ -29,6 +30,7 @@ type TalkRoomStatsProps = {
 function TalkRoomStats({
 	data,
 	loading,
+	showHostTimeCard = true,
 	onClickPeople,
 	onClickCountries,
 }: TalkRoomStatsProps) {
@@ -101,18 +103,20 @@ function TalkRoomStats({
 				</div>
 			</div>
 
-			<div className={classes.timeCard}>
-				<div className={classes.timeHeader}>
-					<div className={classes.iconWrap}>
-						<MicroPhoneIcon fill="#006B35" width={16} height={16} />
+			{showHostTimeCard ? (
+				<div className={classes.timeCard}>
+					<div className={classes.timeHeader}>
+						<div className={classes.iconWrap}>
+							<MicroPhoneIcon fill="#006B35" width={16} height={16} />
+						</div>
+						<span className={classes.timeLabel}>Total host time</span>
 					</div>
-					<span className={classes.timeLabel}>Total host time</span>
+					<div className={classes.timeValueRow}>
+						<span className={classes.timeValue}>{totalHostTimeInMinutes}</span>
+						<span className={classes.timeUnit}>Min</span>
+					</div>
 				</div>
-				<div className={classes.timeValueRow}>
-					<span className={classes.timeValue}>{totalHostTimeInMinutes}</span>
-					<span className={classes.timeUnit}>Min</span>
-				</div>
-			</div>
+			) : null}
 		</div>
 	)
 }

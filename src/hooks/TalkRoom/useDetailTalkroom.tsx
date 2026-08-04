@@ -5,14 +5,20 @@ import { useCallback, useEffect, useState } from 'react'
 import {
 	getDetailTalkRoom,
 	getListenerInRoom,
+	getTalkRoomUserProfile,
+	inviteToSpeaker,
 	joinTalkroom,
 	JoinTalkroomAgora,
 	JoinTalkroomModel,
+	kickUserFromTalkRoom,
 	leaveTalkroom,
 	postRaiseHand,
 	RaiseHandPayload,
+	stepDownToListener,
+	stopHosting,
 	TalkRoomDetail,
 	TalkRoomListenerInRoom,
+	TalkRoomUserProfileStats,
 	transitionRole,
 	validatePreTalkroom,
 	ValidatePreTalkroomModel,
@@ -21,7 +27,14 @@ import {
 	joinConversation,
 	leaveConversation,
 } from '@/apis/conversationApis'
+import { addFriend } from '@/apis/friendApis'
+import { blockUser, getUserProfile } from '@/apis/userApis'
+import type {
+	TalkRoomParticipantProfileAction,
+	TalkRoomParticipantProfileRole,
+} from '@/Components/Modal/TalkRoomParticipantProfileModal'
 import { useModal } from '@/context/ModalContext'
+import { UserProps } from '@/interface/User/User.interface'
 import { TALK_ROOM_JOIN_REASON, TALK_ROOM_ROLE } from '@/Variable/talkRoom.variable'
 import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
@@ -41,13 +54,20 @@ export type ValidatePreJoinRoomResult = ValidatePreTalkroomModel & {
 type UseDetailTalkroomOptions = {
 	onRoomSocketEvent?: (event: string, data?: unknown) => void
 	onRoomTimeUp?: (data?: unknown) => void
+	onAssignAsHost?: (userId: string) => void
+}
+
+export type TalkRoomParticipantProfileModalState = {
+	open: boolean
+	userId?: string
+	role?: TalkRoomParticipantProfileRole
 }
 
 export default function useDetailTalkroom(
 	id: string,
 	options?: UseDetailTalkroomOptions,
 ) {
-	const { openError } = useModal()
+	const { openError, openConfirm, openSuccess } = useModal()
 	const { onChangeRoute } = useLocalePath()
 	const [talkRoomDetail, setTalkRoomDetail] = useState<TalkRoomDetail | null>(
 		null,
@@ -70,6 +90,17 @@ export default function useDetailTalkroom(
 		useState<JoinTalkroomAgora | null>(null)
 	const [speakerStatusMap, setSpeakerStatusMap] =
 		useState<TalkRoomSpeakerStatusMap>({})
+	const [participantProfileModal, setParticipantProfileModal] =
+		useState<TalkRoomParticipantProfileModalState>({ open: false })
+	const [participantUserProfile, setParticipantUserProfile] =
+		useState<UserProps | null>(null)
+	const [participantTalkRoomStats, setParticipantTalkRoomStats] =
+		useState<TalkRoomUserProfileStats | null>(null)
+	const [loadingParticipantProfile, setLoadingParticipantProfile] =
+		useState(false)
+	const [participantActionLoading, setParticipantActionLoading] =
+		useState(false)
+	const [participantReportOpen, setParticipantReportOpen] = useState(false)
 
 	const handleUpdateSpeakerLiveStatus = useCallback(
 		(
@@ -307,6 +338,203 @@ export default function useDetailTalkroom(
 		[id, openError],
 	)
 
+	const handleCloseParticipantProfile = useCallback(() => {
+		setParticipantProfileModal({ open: false })
+		setParticipantUserProfile(null)
+		setParticipantTalkRoomStats(null)
+		setParticipantReportOpen(false)
+	}, [])
+
+	const handleFetchParticipantProfile = useCallback(
+		async (userId: string) => {
+			if (!userId) return
+
+			setLoadingParticipantProfile(true)
+			try {
+				const [userRes, statsRes]: any[] = await Promise.all([
+					getUserProfile({ id: userId, params: { fields: ['$all'] } }),
+					getTalkRoomUserProfile({
+						userId,
+						params: { fields: ['$all'] },
+					}),
+				])
+
+				if (userRes?.code === 200) {
+					setParticipantUserProfile(userRes?.results?.object ?? null)
+				}
+				if (statsRes?.code === 200) {
+					setParticipantTalkRoomStats(statsRes?.results?.object ?? null)
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingParticipantProfile(false)
+			}
+		},
+		[openError],
+	)
+
+	const handleOpenParticipantProfile = useCallback(
+		(userId: string, role: TalkRoomParticipantProfileRole) => {
+			if (!userId) return
+
+			setParticipantProfileModal({ open: true, userId, role })
+			setParticipantUserProfile(null)
+			setParticipantTalkRoomStats(null)
+			setParticipantReportOpen(false)
+			handleFetchParticipantProfile(userId)
+		},
+		[handleFetchParticipantProfile],
+	)
+
+	const refreshRoomAfterParticipantAction = useCallback(async () => {
+		await Promise.all([
+			handleGetDetailTalkRoom(id),
+			handleGetListenerInRoom(id),
+		])
+	}, [id, handleGetDetailTalkRoom, handleGetListenerInRoom])
+
+	const runParticipantRoomAction = useCallback(
+		async (action: () => Promise<unknown>, successMessage?: string) => {
+			setParticipantActionLoading(true)
+			try {
+				const res: any = await action()
+				if (res?.code === 200) {
+					if (successMessage) {
+						openSuccess({ message: successMessage })
+					}
+					handleCloseParticipantProfile()
+					await refreshRoomAfterParticipantAction()
+					return true
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setParticipantActionLoading(false)
+			}
+			return false
+		},
+		[
+			handleCloseParticipantProfile,
+			openError,
+			openSuccess,
+			refreshRoomAfterParticipantAction,
+		],
+	)
+
+	const handleParticipantProfileAction = useCallback(
+		(action: TalkRoomParticipantProfileAction) => {
+			const targetUserId = participantProfileModal.userId
+			if (!id || !targetUserId) return
+
+			switch (action) {
+				case 'stop_hosting':
+					openConfirm({
+						message: 'Do you want to stop hosting this room?',
+						onAccept: () =>
+							runParticipantRoomAction(
+								() => stopHosting({ id }),
+								'You stopped hosting successfully',
+							),
+					})
+					break
+				case 'invite_to_speaker':
+					runParticipantRoomAction(
+						() =>
+							inviteToSpeaker({
+								id,
+								payload: { user_id: targetUserId },
+							}),
+						'Invite sent successfully',
+					)
+					break
+				case 'remove_from_room':
+					openConfirm({
+						message: 'Remove this user from the room?',
+						onAccept: () =>
+							runParticipantRoomAction(
+								() =>
+									kickUserFromTalkRoom({
+										id,
+										payload: { user_id: targetUserId },
+									}),
+								'User removed from room',
+							),
+					})
+					break
+				case 'stepdown_to_listener':
+					openConfirm({
+						message: 'Make this speaker become a listener?',
+						onAccept: () =>
+							runParticipantRoomAction(
+								() =>
+									stepDownToListener({
+										id,
+										payload: { user_id: targetUserId },
+									}),
+								'Speaker moved to listener',
+							),
+					})
+					break
+				case 'assign_as_host':
+					handleCloseParticipantProfile()
+					options?.onAssignAsHost?.(targetUserId)
+					break
+				case 'add_friend':
+					setParticipantActionLoading(true)
+					addFriend({ friend_id: targetUserId })
+						.then((res: any) => {
+							if (res?.code === 200) {
+								openSuccess({ message: 'Friend request sent successfully' })
+								handleFetchParticipantProfile(targetUserId)
+							}
+						})
+						.catch(openError)
+						.finally(() => setParticipantActionLoading(false))
+					break
+				case 'report':
+					setParticipantReportOpen(true)
+					break
+				case 'block':
+					openConfirm({
+						message: 'Do you want to block this user?',
+						onAccept: () => {
+							setParticipantActionLoading(true)
+							blockUser(targetUserId)
+								.then((res) => {
+									if (res) {
+										openSuccess({
+											message: 'You have successfully blocked this user',
+										})
+										handleCloseParticipantProfile()
+									}
+								})
+								.catch(openError)
+								.finally(() => setParticipantActionLoading(false))
+						},
+					})
+					break
+				default:
+					break
+			}
+		},
+		[
+			id,
+			participantProfileModal.userId,
+			openConfirm,
+			runParticipantRoomAction,
+			handleCloseParticipantProfile,
+			options?.onAssignAsHost,
+			openSuccess,
+			handleFetchParticipantProfile,
+			openError,
+		],
+	)
+
+	const handleCloseParticipantReport = useCallback(() => {
+		setParticipantReportOpen(false)
+	}, [])
+
 	const handleLeaveRoom = useCallback(async () => {
 		if (!id) return
 
@@ -474,6 +702,12 @@ export default function useDetailTalkroom(
 		totalListenersInRoom,
 		loadingListenersInRoom,
 		speakerStatusMap,
+		participantProfileModal,
+		participantUserProfile,
+		participantTalkRoomStats,
+		loadingParticipantProfile,
+		participantActionLoading,
+		participantReportOpen,
 
 		onGetDetailTalkRoom: handleGetDetailTalkRoom,
 		onGetListenerInRoom: handleGetListenerInRoom,
@@ -483,6 +717,10 @@ export default function useDetailTalkroom(
 		onPostRaiseHand: handlePostRaiseHand,
 		onTransitionToSpeaker: handleTransitionToSpeaker,
 		onUpdateSpeakerLiveStatus: handleUpdateSpeakerLiveStatus,
+		onOpenParticipantProfile: handleOpenParticipantProfile,
+		onCloseParticipantProfile: handleCloseParticipantProfile,
+		onParticipantProfileAction: handleParticipantProfileAction,
+		onCloseParticipantReport: handleCloseParticipantReport,
 		emitRoomEvent,
 	}
 }

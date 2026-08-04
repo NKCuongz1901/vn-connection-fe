@@ -14,8 +14,8 @@ export default function ToastProvider({
 		<>
 			{children}
 			<ToastContainer
-				position="bottom-right"
-				autoClose={5000}
+				position="top-right"
+				autoClose={3000}
 				hideProgressBar
 				newestOnTop
 				closeOnClick={false}

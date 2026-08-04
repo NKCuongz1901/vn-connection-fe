@@ -679,13 +679,93 @@ export const toogleMic = async ({
 	return await axios.post(url, payload)
 }
 
-export const hostApproveRaiseHand = async () => {}
+export type TalkRoomUserProfileStats = {
+	countriesConnected?: number
+	peopleTalked?: number
+	totalTalkedTimeInMinutes?: number
+	totalHostTimeInMinutes?: number
+	todaySecondsUsed?: number
+	todayRemainingSeconds?: number
+	totalTalkedSeconds?: number
+}
 
-export const stepDownToListener = async () => {}
+export const getTalkRoomUserProfile = async ({
+	userId,
+	params = { fields: ['$all'] },
+}: {
+	userId: string
+	params?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomUserProfile}/${userId}`
 
-export const hostKickListener = async () => {}
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
 
-export const stopHosting = async () => {}
+export type TalkRoomTargetUserPayload = {
+	user_id: string
+}
+
+export const inviteToSpeaker = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: TalkRoomTargetUserPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/invite_to_speaker`
+
+	return await axios.post(url, payload)
+}
+
+export const kickUserFromTalkRoom = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: TalkRoomTargetUserPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/kick_user`
+
+	return await axios.post(url, payload)
+}
+
+export const stepDownToListener = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: TalkRoomTargetUserPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/stepdown_to_listener`
+
+	return await axios.post(url, payload)
+}
+
+export const stopHosting = async ({
+	id,
+	payload = {},
+}: {
+	id: string
+	payload?: Record<string, unknown>
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/stop_hosting`
+
+	return await axios.post(url, payload)
+}
+
+export const hostApproveRaiseHand = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: { user_id: string; is_approved: boolean; slot_id?: number }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/host_approve_raise_hand`
+
+	return await axios.post(url, payload)
+}
 
 export const getTokenSocket = async () => {
 	const url = TALKROOM_ROUTES.getTokenSocket

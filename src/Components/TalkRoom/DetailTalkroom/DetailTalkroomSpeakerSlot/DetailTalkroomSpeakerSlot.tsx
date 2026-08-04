@@ -15,9 +15,10 @@ import classes from './DetailTalkroomSpeakerSlot.module.scss'
 
 type DetailTalkroomSpeakerSlotProps = {
 	slot: TalkRoomSpeakerSlot
+	onClick?: () => void
 }
 
-function DetailTalkroomSpeakerSlot({ slot }: DetailTalkroomSpeakerSlotProps) {
+function DetailTalkroomSpeakerSlot({ slot, onClick }: DetailTalkroomSpeakerSlotProps) {
 	if (slot.type === 'empty') {
 		return (
 			<div className={classes.slot}>
@@ -35,7 +36,24 @@ function DetailTalkroomSpeakerSlot({ slot }: DetailTalkroomSpeakerSlotProps) {
 	const statusIcon = getSpeakerMicStatusIcon(speaker)
 
 	return (
-		<div className={classes.slot}>
+		<div
+			className={clsx(classes.slot, {
+				[classes.slotClickable]: Boolean(onClick),
+			})}
+			onClick={onClick}
+			role={onClick ? 'button' : undefined}
+			tabIndex={onClick ? 0 : undefined}
+			onKeyDown={
+				onClick
+					? (event) => {
+							if (event.key === 'Enter' || event.key === ' ') {
+								event.preventDefault()
+								onClick()
+							}
+						}
+					: undefined
+			}
+		>
 			<div className={classes.avatarWrap}>
 				<CAvatar
 					src={speaker?.avatar}

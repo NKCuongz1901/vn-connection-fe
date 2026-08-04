@@ -7,6 +7,8 @@ import { IconChevronLeft } from '@tabler/icons-react'
 import { toogleMic } from '@/apis/talkRoomApis'
 import DetailTalkroomListenerPanel from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomListenerPanel'
 import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomSpeakerStage'
+import TalkRoomParticipantProfileModal from '@/Components/Modal/TalkRoomParticipantProfileModal'
+import type { TalkRoomParticipantProfileRole } from '@/Components/Modal/TalkRoomParticipantProfileModal'
 import TalkRoomHeaderActionButton from '@/Components/TalkRoom/DetailTalkroom/TalkRoomHeaderActionButton'
 import DetailTalkroomTiming from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomTiming'
 import DetailTalkroomChatPanel from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomChatPanel'
@@ -90,10 +92,21 @@ function DetailTalkroom({ id }: { id: string }) {
 		speakerStatusMap,
 		onUpdateSpeakerLiveStatus,
 		emitRoomEvent,
+		participantProfileModal,
+		participantUserProfile,
+		participantTalkRoomStats,
+		loadingParticipantProfile,
+		participantActionLoading,
+		participantReportOpen,
+		onOpenParticipantProfile,
+		onCloseParticipantProfile,
+		onParticipantProfileAction,
+		onCloseParticipantReport,
 	} = useDetailTalkroom(id, {
 		onRoomSocketEvent: (event, data) =>
 			onRoomSocketEventRef.current?.(event, data),
 		onRoomTimeUp: (data) => onRoomTimeUpRef.current?.(data),
+		onAssignAsHost: () => setTransferHostModalOpen(true),
 	})
 	const { onChangeRoute } = useLocalePath()
 	const agoraIntegration =
@@ -550,6 +563,26 @@ function DetailTalkroom({ id }: { id: string }) {
 		})
 	}, [beSpeakerState, talkRoomDetail, onPostRaiseHand])
 
+	const handleSpeakerSlotClick = useCallback(
+		(userId?: string, isHostSlot?: boolean) => {
+			if (!isHost || !userId) return
+
+			const role: TalkRoomParticipantProfileRole = isHostSlot
+				? 'host-self'
+				: 'speaker'
+			onOpenParticipantProfile(userId, role)
+		},
+		[isHost, onOpenParticipantProfile],
+	)
+
+	const handleListenerClick = useCallback(
+		(userId?: string) => {
+			if (!isHost || !userId) return
+			onOpenParticipantProfile(userId, 'listener')
+		},
+		[isHost, onOpenParticipantProfile],
+	)
+
 	const listenerCount =
 		totalListenersInRoom > 0
 			? totalListenersInRoom
@@ -593,6 +626,7 @@ function DetailTalkroom({ id }: { id: string }) {
 				<DetailTalkroomSpeakerStage
 					talkRoomDetail={talkRoomDetail}
 					speakerStatusMap={speakerStatusMap}
+					onSpeakerSlotClick={isHost ? handleSpeakerSlotClick : undefined}
 				/>
 			</div>
 		)
@@ -615,6 +649,7 @@ function DetailTalkroom({ id }: { id: string }) {
 					onBeSpeaker={handleBeSpeaker}
 					onLeaveRoom={onLeave}
 					onInvite={onInvite}
+					onListenerClick={handleListenerClick}
 				/>
 			</div>
 		)
@@ -682,6 +717,18 @@ function DetailTalkroom({ id }: { id: string }) {
 				open={timeUpModalOpen}
 				loading={leavingRoom}
 				onConfirm={handleForceLeaveRoom}
+			/>
+			<TalkRoomParticipantProfileModal
+				open={participantProfileModal.open}
+				role={participantProfileModal.role ?? 'listener'}
+				userProfile={participantUserProfile}
+				talkRoomStats={participantTalkRoomStats}
+				loadingProfile={loadingParticipantProfile}
+				actionLoading={participantActionLoading}
+				reportOpen={participantReportOpen}
+				onClose={onCloseParticipantProfile}
+				onCloseReport={onCloseParticipantReport}
+				onAction={onParticipantProfileAction}
 			/>
 			<Flex className={classes.header}>
 				<IconChevronLeft className={classes.iconBack} onClick={onLeave} />
