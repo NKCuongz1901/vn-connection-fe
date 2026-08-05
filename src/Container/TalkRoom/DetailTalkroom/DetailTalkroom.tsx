@@ -86,6 +86,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		totalListenersInRoom,
 		loadingListenersInRoom,
 		onGetDetailTalkRoom,
+		onGetListenerInRoom,
 		onLeaveRoom,
 		onPostRaiseHand,
 		onTransitionToSpeaker,
@@ -227,7 +228,10 @@ function DetailTalkroom({ id }: { id: string }) {
 					is_talking: false,
 				})
 			}
-			await onGetDetailTalkRoom(id)
+			await Promise.all([
+				onGetDetailTalkRoom(id),
+				onGetListenerInRoom(id),
+			])
 			showTalkRoomSpeakerPromoteToast()
 		} catch (error) {
 			console.error('Failed to promote to speaker', error)
@@ -240,6 +244,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		connect,
 		id,
 		onGetDetailTalkRoom,
+		onGetListenerInRoom,
 		hasSpeakerRole,
 		isHost,
 		currentUserId,
@@ -563,24 +568,60 @@ function DetailTalkroom({ id }: { id: string }) {
 		})
 	}, [beSpeakerState, talkRoomDetail, onPostRaiseHand])
 
+	const handleOpenParticipantProfile = useCallback(
+		(
+			userId?: string,
+			target?: 'host' | 'speaker' | 'listener',
+		) => {
+			if (!userId) return
+
+			const isSelf = userId === currentUserId
+
+			if (isHost) {
+				const role: TalkRoomParticipantProfileRole = isSelf
+					? 'host-self'
+					: target === 'speaker'
+						? 'speaker'
+						: 'listener'
+				onOpenParticipantProfile(userId, role)
+				return
+			}
+
+			if (isSpeaker) {
+				onOpenParticipantProfile(
+					userId,
+					isSelf ? 'speaker-self' : 'speaker-other',
+				)
+				return
+			}
+
+			if (isListener) {
+				onOpenParticipantProfile(
+					userId,
+					isSelf ? 'listener-self' : 'listener-other',
+				)
+			}
+		},
+		[currentUserId, isHost, isSpeaker, isListener, onOpenParticipantProfile],
+	)
+
+	const canOpenParticipantProfile = isHost || isSpeaker || isListener
+
 	const handleSpeakerSlotClick = useCallback(
 		(userId?: string, isHostSlot?: boolean) => {
-			if (!isHost || !userId) return
-
-			const role: TalkRoomParticipantProfileRole = isHostSlot
-				? 'host-self'
-				: 'speaker'
-			onOpenParticipantProfile(userId, role)
+			handleOpenParticipantProfile(
+				userId,
+				isHostSlot ? 'host' : 'speaker',
+			)
 		},
-		[isHost, onOpenParticipantProfile],
+		[handleOpenParticipantProfile],
 	)
 
 	const handleListenerClick = useCallback(
 		(userId?: string) => {
-			if (!isHost || !userId) return
-			onOpenParticipantProfile(userId, 'listener')
+			handleOpenParticipantProfile(userId, 'listener')
 		},
-		[isHost, onOpenParticipantProfile],
+		[handleOpenParticipantProfile],
 	)
 
 	const listenerCount =
@@ -626,7 +667,9 @@ function DetailTalkroom({ id }: { id: string }) {
 				<DetailTalkroomSpeakerStage
 					talkRoomDetail={talkRoomDetail}
 					speakerStatusMap={speakerStatusMap}
-					onSpeakerSlotClick={isHost ? handleSpeakerSlotClick : undefined}
+					onSpeakerSlotClick={
+						canOpenParticipantProfile ? handleSpeakerSlotClick : undefined
+					}
 				/>
 			</div>
 		)
@@ -649,7 +692,9 @@ function DetailTalkroom({ id }: { id: string }) {
 					onBeSpeaker={handleBeSpeaker}
 					onLeaveRoom={onLeave}
 					onInvite={onInvite}
-					onListenerClick={handleListenerClick}
+					onListenerClick={
+						canOpenParticipantProfile ? handleListenerClick : undefined
+					}
 				/>
 			</div>
 		)

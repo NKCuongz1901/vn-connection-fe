@@ -47,6 +47,10 @@ export type TalkRoomParticipantProfileRole =
 	| 'host-self'
 	| 'speaker'
 	| 'listener'
+	| 'listener-self'
+	| 'listener-other'
+	| 'speaker-self'
+	| 'speaker-other'
 
 export type TalkRoomParticipantProfileAction =
 	| 'stop_hosting'
@@ -154,6 +158,38 @@ const ACTION_CONFIG: Record<
 			icon: <FlagIcon width={24} height={24} fill="#48546B" />,
 		},
 	],
+	'listener-self': [],
+	'listener-other': [
+		{
+			key: 'add_friend',
+			label: 'Add friend',
+			icon: <FriendNormalIcon width={24} height={24} fill="#48546B" />,
+		},
+		{
+			key: 'report',
+			label: 'Report',
+			icon: <FlagIcon width={24} height={24} fill="#48546B" />,
+		},
+	],
+	'speaker-self': [
+		{
+			key: 'stepdown_to_listener',
+			label: 'Stop speaking',
+			icon: <UserTagIcon width={24} height={24} fill="#48546B" />,
+		},
+	],
+	'speaker-other': [
+		{
+			key: 'add_friend',
+			label: 'Add friend',
+			icon: <FriendNormalIcon width={24} height={24} fill="#48546B" />,
+		},
+		{
+			key: 'report',
+			label: 'Report',
+			icon: <FlagIcon width={24} height={24} fill="#48546B" />,
+		},
+	],
 }
 
 /** Builds language display items from user profile API data. */
@@ -204,7 +240,7 @@ const buildLanguageDisplayItems = (user?: UserProps | null) => {
 	return displayItems
 }
 
-/** Profile modal shown when host clicks a participant on stage or in listener list. */
+/** Profile modal shown when a participant is clicked on stage or in the listener list. */
 function TalkRoomParticipantProfileModal({
 	open,
 	role,
@@ -267,6 +303,12 @@ function TalkRoomParticipantProfileModal({
 		if (item.key === 'add_friend' && is_friend) return false
 		return true
 	})
+
+	const hideHostTimeCard =
+		role === 'listener-self' ||
+		role === 'listener-other' ||
+		role === 'speaker-self' ||
+		role === 'speaker-other'
 
 	const statsData = {
 		countriesConnected: talkRoomStats?.countriesConnected ?? 0,
@@ -394,32 +436,38 @@ function TalkRoomParticipantProfileModal({
 							<TalkRoomStats
 								data={statsData}
 								loading={loadingProfile}
-								showHostTimeCard
+								showHostTimeCard={!hideHostTimeCard}
 							/>
 						</div>
 
-						<div className={classes.divider} />
+						{actions.length > 0 ? (
+							<>
+								<div className={classes.divider} />
 
-						<div className={classes.actions}>
-							{actions.map((action) => (
-								<button
-									key={action.key}
-									type="button"
-									className={classes.actionItem}
-									disabled={actionLoading || loadingProfile}
-									onClick={() => onAction?.(action.key)}
-								>
-									<span className={classes.actionIcon}>{action.icon}</span>
-									<span
-										className={clsx(classes.actionLabel, {
-											[classes.actionLabelWarning]: action.warning,
-										})}
-									>
-										{action.label}
-									</span>
-								</button>
-							))}
-						</div>
+								<div className={classes.actions}>
+									{actions.map((action) => (
+										<button
+											key={action.key}
+											type="button"
+											className={classes.actionItem}
+											disabled={actionLoading || loadingProfile}
+											onClick={() => onAction?.(action.key)}
+										>
+											<span className={classes.actionIcon}>
+												{action.icon}
+											</span>
+											<span
+												className={clsx(classes.actionLabel, {
+													[classes.actionLabelWarning]: action.warning,
+												})}
+											>
+												{action.label}
+											</span>
+										</button>
+									))}
+								</div>
+							</>
+						) : null}
 					</div>
 				</div>
 			</CModal>

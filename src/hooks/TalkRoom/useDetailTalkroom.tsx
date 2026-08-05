@@ -463,8 +463,12 @@ export default function useDetailTalkroom(
 					})
 					break
 				case 'stepdown_to_listener':
+					const isSpeakerSelf =
+						participantProfileModal.role === 'speaker-self'
 					openConfirm({
-						message: 'Make this speaker become a listener?',
+						message: isSpeakerSelf
+							? 'Do you want to stop speaking?'
+							: 'Make this speaker become a listener?',
 						onAccept: () =>
 							runParticipantRoomAction(
 								() =>
@@ -472,7 +476,9 @@ export default function useDetailTalkroom(
 										id,
 										payload: { user_id: targetUserId },
 									}),
-								'Speaker moved to listener',
+								isSpeakerSelf
+									? 'You stopped speaking'
+									: 'Speaker moved to listener',
 							),
 					})
 					break
@@ -521,6 +527,7 @@ export default function useDetailTalkroom(
 		[
 			id,
 			participantProfileModal.userId,
+			participantProfileModal.role,
 			openConfirm,
 			runParticipantRoomAction,
 			handleCloseParticipantProfile,
