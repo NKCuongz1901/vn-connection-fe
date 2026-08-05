@@ -98,6 +98,7 @@ export const showSocketToast = ({
 }
 
 export const TALK_ROOM_SPEAKER_PROMOTE_TOAST_ID = 'talkroom-speaker-promote'
+export const TALK_ROOM_AUTO_CLOSE_TOAST_ID = 'talkroom-auto-close'
 
 export const showTalkRoomSpeakerPromoteToast = () => {
 	showSocketToast({
@@ -106,6 +107,15 @@ export const showTalkRoomSpeakerPromoteToast = () => {
 		variant: 'success',
 		toastId: TALK_ROOM_SPEAKER_PROMOTE_TOAST_ID,
 		showClose: false,
+	})
+}
+
+export const showTalkRoomAutoCloseToast = () => {
+	showSocketToast({
+		title: 'Room closed automatically',
+		content: 'Room closed automatically when no one joined in 5 minutes',
+		variant: 'error',
+		toastId: TALK_ROOM_AUTO_CLOSE_TOAST_ID,
 	})
 }
 

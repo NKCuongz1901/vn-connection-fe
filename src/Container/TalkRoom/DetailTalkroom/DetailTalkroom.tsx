@@ -12,11 +12,15 @@ import type { TalkRoomParticipantProfileRole } from '@/Components/Modal/TalkRoom
 import TalkRoomHeaderActionButton from '@/Components/TalkRoom/DetailTalkroom/TalkRoomHeaderActionButton'
 import DetailTalkroomTiming from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomTiming'
 import DetailTalkroomChatPanel from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomChatPanel'
+import TalkRoomForceClosedModal from '@/Components/Modal/TalkRoomForceClosedModal'
 import TalkRoomListenerLeaveRoom from '@/Components/Modal/TalkRoomListenerLeaveRoom'
 import TalkRoomSessionEndModal from '@/Components/Modal/TalkRoomSessionEndModal'
 import TalkRoomTimeUpModal from '@/Components/Modal/TalkRoomTimeUpModal'
 import TalkRoomTransferHostRoleModal from '@/Components/Modal/TalkRoomTransferHostRoleModal'
-import { showTalkRoomSpeakerPromoteToast } from '@/Components/Toast/SocketToastContent'
+import {
+	showTalkRoomAutoCloseToast,
+	showTalkRoomSpeakerPromoteToast,
+} from '@/Components/Toast/SocketToastContent'
 import useDetailTalkroom from '@/hooks/TalkRoom/useDetailTalkroom'
 import useHostMicToggle from '@/hooks/TalkRoom/useHostMicToggle'
 import useTalkRoomAgora from '@/hooks/TalkRoom/useTalkRoomAgora'
@@ -58,8 +62,10 @@ function DetailTalkroom({ id }: { id: string }) {
 		((event: string, data?: unknown) => void) | undefined
 	>()
 	const onRoomTimeUpRef = useRef<((data?: unknown) => void) | undefined>()
+	const onRoomForceClosedRef = useRef<(() => void) | undefined>()
 	const sessionEndTriggeredRef = useRef(false)
 	const timeUpTriggeredRef = useRef(false)
+	const forceCloseTriggeredRef = useRef(false)
 	const isPromotingRef = useRef(false)
 	const autoPromoteAttemptedRef = useRef(false)
 	const lastEmittedTalkingRef = useRef<boolean | null>(null)
@@ -69,6 +75,7 @@ function DetailTalkroom({ id }: { id: string }) {
 	const [listenerLeaveModalOpen, setListenerLeaveModalOpen] = useState(false)
 	const [sessionEndModalOpen, setSessionEndModalOpen] = useState(false)
 	const [timeUpModalOpen, setTimeUpModalOpen] = useState(false)
+	const [forceClosedModalOpen, setForceClosedModalOpen] = useState(false)
 	const [roomEndStatus, setRoomEndStatus] = useState<RoomEndStatus>('none')
 	const [isRoomLiving, setIsRoomLiving] = useState(true)
 	const [sessionEndStartedAtMs, setSessionEndStartedAtMs] = useState<
@@ -107,6 +114,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		onRoomSocketEvent: (event, data) =>
 			onRoomSocketEventRef.current?.(event, data),
 		onRoomTimeUp: (data) => onRoomTimeUpRef.current?.(data),
+		onRoomForceClosed: () => onRoomForceClosedRef.current?.(),
 		onAssignAsHost: () => setTransferHostModalOpen(true),
 	})
 	const { onChangeRoute } = useLocalePath()
@@ -447,6 +455,38 @@ function DetailTalkroom({ id }: { id: string }) {
 		setTimeUpModalOpen(true)
 	}, [])
 
+	const handleForceClosedRoom = useCallback(async () => {
+		if (forceCloseTriggeredRef.current) return
+		forceCloseTriggeredRef.current = true
+
+		if (isHost || isSpeaker) await disconnect()
+		if (isListener) await disconnectWhep()
+
+		setRoomEndStatus('forceClosed')
+		setIsRoomLiving(false)
+
+		if (isHost) {
+			showTalkRoomAutoCloseToast()
+		}
+
+		try {
+			await onLeaveRoom()
+		} catch {
+			// Still show the force-closed dialog.
+		}
+
+		setForceClosedModalOpen(true)
+	}, [disconnect, disconnectWhep, isHost, isSpeaker, isListener, onLeaveRoom])
+
+	const handleWaitingTimeUp = useCallback(() => {
+		handleForceClosedRoom()
+	}, [handleForceClosedRoom])
+
+	const handleForceClosedModalConfirm = useCallback(() => {
+		setForceClosedModalOpen(false)
+		onChangeRoute(mainRoutes.talkroom)
+	}, [onChangeRoute])
+
 	useEffect(() => {
 		if (roomEndStatus !== 'sessionEnd' || !sessionEndStartedAtMs) return
 
@@ -478,6 +518,10 @@ function DetailTalkroom({ id }: { id: string }) {
 	useEffect(() => {
 		onRoomTimeUpRef.current = handleRoomTimeUp
 	}, [handleRoomTimeUp])
+
+	useEffect(() => {
+		onRoomForceClosedRef.current = handleForceClosedRoom
+	}, [handleForceClosedRoom])
 
 	const handleConfirmLeaveRoom = useCallback(async () => {
 		setLeavingRoom(true)
@@ -709,6 +753,7 @@ function DetailTalkroom({ id }: { id: string }) {
 					sessionEndStartedAtMs={sessionEndStartedAtMs}
 					onLiveTimeUp={handleLiveTimeUp}
 					onSessionEndTimeUp={handleSessionEndTimeUp}
+					onWaitingTimeUp={handleWaitingTimeUp}
 				/>
 			</div>
 		)
@@ -762,6 +807,10 @@ function DetailTalkroom({ id }: { id: string }) {
 				open={timeUpModalOpen}
 				loading={leavingRoom}
 				onConfirm={handleForceLeaveRoom}
+			/>
+			<TalkRoomForceClosedModal
+				open={forceClosedModalOpen}
+				onConfirm={handleForceClosedModalConfirm}
 			/>
 			<TalkRoomParticipantProfileModal
 				open={participantProfileModal.open}

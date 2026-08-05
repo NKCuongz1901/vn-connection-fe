@@ -260,7 +260,12 @@ export const consumeTalkRoomAutoJoinFlag = (roomId: string) => {
 	return true
 }
 
-export type RoomEndStatus = 'none' | 'sessionEnd' | 'timeUp' | 'notActive'
+export type RoomEndStatus =
+	| 'none'
+	| 'sessionEnd'
+	| 'timeUp'
+	| 'notActive'
+	| 'forceClosed'
 
 export type ForceRoomCloseOptions = {
 	roomEndStatus: Exclude<RoomEndStatus, 'none'>

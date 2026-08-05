@@ -1,7 +1,7 @@
 'use client'
 
 import { IconClock } from '@tabler/icons-react'
-import { memo } from 'react'
+import { memo, useEffect, useRef } from 'react'
 
 import { formatTalkRoomCountdownMmSs } from '@/ultis/talkRoom'
 
@@ -10,13 +10,31 @@ import useTalkRoomCountdown from './useTalkRoomCountdown'
 
 type WaitingTimingProps = {
 	secondsLeft: number
+	onTimeUp?: () => void
 }
 
 /** countWaiting banner: live room waiting for session countdown (MM:SS). */
-function WaitingTiming({ secondsLeft }: WaitingTimingProps) {
+function WaitingTiming({ secondsLeft, onTimeUp }: WaitingTimingProps) {
 	const countdown = useTalkRoomCountdown(secondsLeft)
+	const hasTriggeredTimeUpRef = useRef(false)
+
+	useEffect(() => {
+		hasTriggeredTimeUpRef.current = false
+	}, [secondsLeft])
+
+	useEffect(() => {
+		if (countdown !== 0 || secondsLeft <= 0 || hasTriggeredTimeUpRef.current) {
+			return
+		}
+
+		hasTriggeredTimeUpRef.current = true
+		onTimeUp?.()
+	}, [countdown, secondsLeft, onTimeUp])
+
 	const countdownLabel =
-		countdown == null ? formatTalkRoomCountdownMmSs(secondsLeft) : formatTalkRoomCountdownMmSs(countdown)
+		countdown == null
+			? formatTalkRoomCountdownMmSs(secondsLeft)
+			: formatTalkRoomCountdownMmSs(countdown)
 
 	return (
 		<div className={`${classes.card} ${classes.cardWarning}`}>

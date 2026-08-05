@@ -54,6 +54,7 @@ export type ValidatePreJoinRoomResult = ValidatePreTalkroomModel & {
 type UseDetailTalkroomOptions = {
 	onRoomSocketEvent?: (event: string, data?: unknown) => void
 	onRoomTimeUp?: (data?: unknown) => void
+	onRoomForceClosed?: () => void
 	onAssignAsHost?: (userId: string) => void
 }
 
@@ -624,9 +625,7 @@ export default function useDetailTalkroom(
 					break
 				case 'room_force_closed':
 				case 'room_inactive_force_closed':
-					handleLeaveRoom().finally(() => {
-						onChangeRoute(mainRoutes.talkroom)
-					})
+					options?.onRoomForceClosed?.()
 					break
 				default:
 					break
@@ -643,6 +642,7 @@ export default function useDetailTalkroom(
 			onChangeRoute,
 			options?.onRoomSocketEvent,
 			options?.onRoomTimeUp,
+			options?.onRoomForceClosed,
 		],
 	)
 
