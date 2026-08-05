@@ -45,6 +45,14 @@ axios.interceptors.request.use(
 		if (!cachedFid) cachedFid = await getFid()
 		if (cachedFid) config.headers['firebase-device-id'] = cachedFid
 
+		if (typeof window !== 'undefined') {
+			config.headers['device-info'] = JSON.stringify({
+				deviceName: navigator.userAgent,
+				deviceModel: 'Web Browser',
+				brand: 'Web',
+			})
+		}
+
 		// Authorization token
 		const accessToken = getStorageCookie('token')
 		if (accessToken && !config.headers['Authorization']) {

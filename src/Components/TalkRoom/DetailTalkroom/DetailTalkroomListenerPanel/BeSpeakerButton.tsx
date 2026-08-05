@@ -27,7 +27,7 @@ function BeSpeakerButton({ state, onClick }: BeSpeakerButtonProps) {
 			onClick={onClick}
 			aria-label={isDisabled ? 'Be speaker unavailable' : 'Be speaker'}
 		>
-			<HandIcon width="24" height="24" fill="#ffffff" />
+			<HandIcon width={24} height={24} fill="#ffffff" />
 			<span className={classes.beSpeakerButtonLabel}>Be speaker</span>
 		</button>
 	)

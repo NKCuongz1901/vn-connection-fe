@@ -38,11 +38,23 @@ function HostMicButton({ state, size = 'md', onClick }: HostMicButtonProps) {
 			}
 		>
 			{state === 'disabled' ? (
-				<HostMicOffIcon width={iconSize} height={iconSize} fill="#94a3b8" />
+				<HostMicOffIcon
+					width={Number(iconSize)}
+					height={Number(iconSize)}
+					fill="#94a3b8"
+				/>
 			) : state === 'on' ? (
-				<HostMicOnIcon width={iconSize} height={iconSize} fill="#ffffff" />
+				<HostMicOnIcon
+					width={Number(iconSize)}
+					height={Number(iconSize)}
+					fill="#ffffff"
+				/>
 			) : (
-				<HostMicOffIcon width={iconSize} height={iconSize} fill="#ffffff" />
+				<HostMicOffIcon
+					width={Number(iconSize)}
+					height={Number(iconSize)}
+					fill="#ffffff"
+				/>
 			)}
 		</button>
 	)
