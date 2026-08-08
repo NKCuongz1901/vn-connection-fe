@@ -77,12 +77,15 @@ const refreshToken = async () => {
 		isRefreshing = true
 		try {
 			const refreshToken = getStorageCookie('refresh_token')
+			const deviceId = cachedFid || (await getFid())
 			const response: any = await axios.post('/auth/refresh', {
 				refresh_token: refreshToken,
+				...(deviceId ? { device_id: deviceId } : {}),
 			})
 			if (response?.code === 200) {
 				const newAccessToken = response.results?.object?.access_token
 				const newRefreshToken = response.results?.object?.refresh_token
+				console.log('Check refresh token:', response)
 				if (isPersistCookie()) {
 					handleStorageCookie({
 						key: 'token',
