@@ -13,6 +13,7 @@ export type TalkRoomTransferHostSpeakerOption = {
 	slotId: 1 | 2
 	label: string
 	disabled?: boolean
+	userId?: string
 }
 
 export interface TalkRoomTransferHostRoleModalProps {

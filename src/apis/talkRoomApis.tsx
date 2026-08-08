@@ -60,6 +60,9 @@ export type TalkRoomDetail = TalkRoomListItem & {
 			name?: string
 		}
 	}[]
+	yourAreHost?: boolean
+	youAreListener?: boolean
+	isUserSpeaker?: boolean
 }
 
 export type TalkRoomListFilters = {
@@ -743,12 +746,17 @@ export const stepDownToListener = async ({
 	return await axios.post(url, payload)
 }
 
+export type StopHostingPayload = {
+	newHostId?: string
+	isLeave?: boolean
+}
+
 export const stopHosting = async ({
 	id,
 	payload = {},
 }: {
 	id: string
-	payload?: Record<string, unknown>
+	payload?: StopHostingPayload
 }) => {
 	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/stop_hosting`
 

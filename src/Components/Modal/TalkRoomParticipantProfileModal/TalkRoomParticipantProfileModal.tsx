@@ -70,6 +70,7 @@ type TalkRoomParticipantProfileModalProps = {
 	loadingProfile?: boolean
 	actionLoading?: boolean
 	reportOpen?: boolean
+	showStopHosting?: boolean
 	onClose: () => void
 	onCloseReport?: () => void
 	onAction?: (action: TalkRoomParticipantProfileAction) => void
@@ -249,6 +250,7 @@ function TalkRoomParticipantProfileModal({
 	loadingProfile = false,
 	actionLoading = false,
 	reportOpen = false,
+	showStopHosting = false,
 	onClose,
 	onCloseReport,
 	onAction,
@@ -301,6 +303,7 @@ function TalkRoomParticipantProfileModal({
 
 	const actions = ACTION_CONFIG[role].filter((item) => {
 		if (item.key === 'add_friend' && is_friend) return false
+		if (item.key === 'stop_hosting' && !showStopHosting) return false
 		return true
 	})
 

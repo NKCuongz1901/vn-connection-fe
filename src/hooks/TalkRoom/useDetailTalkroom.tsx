@@ -35,7 +35,7 @@ import type {
 } from '@/Components/Modal/TalkRoomParticipantProfileModal'
 import { useModal } from '@/context/ModalContext'
 import { UserProps } from '@/interface/User/User.interface'
-import { TALK_ROOM_JOIN_REASON, TALK_ROOM_ROLE } from '@/Variable/talkRoom.variable'
+import { TALK_ROOM_CONNECTION_TYPE, TALK_ROOM_JOIN_REASON, TALK_ROOM_ROLE } from '@/Variable/talkRoom.variable'
 import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
 import {
@@ -43,6 +43,7 @@ import {
 	getTalkRoomConversationId,
 	getTalkRoomSocketTalkingStatus,
 	getTalkRoomSocketTargetUserId,
+	parseTalkRoomSocketHostTransferred,
 	TalkRoomSpeakerStatusMap,
 } from '@/ultis/talkRoom'
 import useTalkRoomSocket from './useTalkRoomSocket'
@@ -55,7 +56,11 @@ type UseDetailTalkroomOptions = {
 	onRoomSocketEvent?: (event: string, data?: unknown) => void
 	onRoomTimeUp?: (data?: unknown) => void
 	onRoomForceClosed?: () => void
-	onAssignAsHost?: (userId: string) => void
+	onStopHosting?: () => void
+	onHostTransferred?: (payload: {
+		previousUserId?: string
+		newHostId?: string
+	}) => void
 }
 
 export type TalkRoomParticipantProfileModalState = {
@@ -121,6 +126,46 @@ export default function useDetailTalkroom(
 		[],
 	)
 
+	const syncRoomUserRoleFromDetail = useCallback((room?: TalkRoomDetail | null) => {
+		if (!room) return
+
+		if (room.yourAreHost === true) {
+			setRoomUserRole(TALK_ROOM_ROLE.HOST)
+			return
+		}
+
+		if (room.isUserSpeaker === true) {
+			setRoomUserRole(TALK_ROOM_ROLE.SPEAKER)
+			return
+		}
+
+		if (room.youAreListener === true) {
+			setRoomUserRole(TALK_ROOM_ROLE.LISTENER)
+
+			const streamWssUrl = room.stream_wss_url
+			if (streamWssUrl) {
+				const listenerIntegration: JoinTalkroomAgora = {
+					connection_type: TALK_ROOM_CONNECTION_TYPE.MEDIA_SERVER,
+					stream_wss_url: streamWssUrl,
+					user_role: TALK_ROOM_ROLE.LISTENER,
+				}
+				setRoleIntegration(listenerIntegration)
+				setJoinTalkRoomResult((prev) => {
+					if (!prev?.data) return prev
+
+					return {
+						...prev,
+						data: {
+							...prev.data,
+							role: TALK_ROOM_ROLE.LISTENER,
+							agora: listenerIntegration,
+						},
+					}
+				})
+			}
+		}
+	}, [])
+
 	const handleGetDetailTalkRoom = useCallback(
 		async (
 			roomId: string = id,
@@ -136,6 +181,7 @@ export default function useDetailTalkroom(
 				if (code === 200) {
 					const room: TalkRoomDetail = results?.object ?? null
 					setTalkRoomDetail(room)
+					syncRoomUserRoleFromDetail(room)
 					return room
 				}
 			} catch (error) {
@@ -146,7 +192,7 @@ export default function useDetailTalkroom(
 
 			return null
 		},
-		[id, openError],
+		[id, openError, syncRoomUserRoleFromDetail],
 	)
 
 	const handleValidatePreJoinRoom = useCallback(
@@ -269,6 +315,88 @@ export default function useDetailTalkroom(
 			})
 		},
 		[],
+	)
+
+	const applyListenerRole = useCallback(
+		(newConnection?: JoinTalkroomAgora | null) => {
+			setRoomUserRole(TALK_ROOM_ROLE.LISTENER)
+			if (!newConnection) return
+
+			setRoleIntegration(newConnection)
+			setJoinTalkRoomResult((prev) => {
+				if (!prev?.data) return prev
+
+				return {
+					...prev,
+					data: {
+						...prev.data,
+						role: TALK_ROOM_ROLE.LISTENER,
+						agora: newConnection,
+					},
+				}
+			})
+		},
+		[],
+	)
+
+	const applyHostRole = useCallback(
+		(newConnection?: JoinTalkroomAgora | null) => {
+			setRoomUserRole(TALK_ROOM_ROLE.HOST)
+			if (!newConnection) return
+
+			setRoleIntegration(newConnection)
+			setJoinTalkRoomResult((prev) => {
+				if (!prev?.data) return prev
+
+				return {
+					...prev,
+					data: {
+						...prev.data,
+						role: TALK_ROOM_ROLE.HOST,
+						agora: newConnection,
+					},
+				}
+			})
+		},
+		[],
+	)
+
+	const handleTransitionRole = useCallback(
+		async (fromRole: string, toRole: string) => {
+			if (!id) return null
+
+			try {
+				const res: any = await transitionRole({
+					id,
+					payload: {
+						from_role: fromRole,
+						to_role: toRole,
+					},
+				})
+				const { code, results } = res || {}
+
+				if (code !== 200) return null
+
+				const transitionData =
+					results?.object?.data ?? results?.object ?? results ?? null
+				const newConnection = transitionData?.new_connection ?? null
+
+				if (toRole === TALK_ROOM_ROLE.SPEAKER) {
+					applySpeakerRole(newConnection)
+				} else if (toRole === TALK_ROOM_ROLE.LISTENER) {
+					applyListenerRole(newConnection)
+				} else if (toRole === TALK_ROOM_ROLE.HOST) {
+					applyHostRole(newConnection)
+				}
+
+				return { newConnection }
+			} catch (error) {
+				openError(error)
+			}
+
+			return null
+		},
+		[id, applySpeakerRole, applyListenerRole, applyHostRole, openError],
 	)
 
 	const handleTransitionToSpeaker = useCallback(async () => {
@@ -430,14 +558,8 @@ export default function useDetailTalkroom(
 
 			switch (action) {
 				case 'stop_hosting':
-					openConfirm({
-						message: 'Do you want to stop hosting this room?',
-						onAccept: () =>
-							runParticipantRoomAction(
-								() => stopHosting({ id }),
-								'You stopped hosting successfully',
-							),
-					})
+					handleCloseParticipantProfile()
+					options?.onStopHosting?.()
 					break
 				case 'invite_to_speaker':
 					runParticipantRoomAction(
@@ -484,8 +606,18 @@ export default function useDetailTalkroom(
 					})
 					break
 				case 'assign_as_host':
-					handleCloseParticipantProfile()
-					options?.onAssignAsHost?.(targetUserId)
+					openConfirm({
+						message: 'Do you want to assign this speaker as host?',
+						onAccept: () =>
+							runParticipantRoomAction(
+								() =>
+									stopHosting({
+										id,
+										payload: { newHostId: targetUserId },
+									}),
+								'Host role assigned successfully',
+							),
+					})
 					break
 				case 'add_friend':
 					setParticipantActionLoading(true)
@@ -532,7 +664,7 @@ export default function useDetailTalkroom(
 			openConfirm,
 			runParticipantRoomAction,
 			handleCloseParticipantProfile,
-			options?.onAssignAsHost,
+			options?.onStopHosting,
 			openSuccess,
 			handleFetchParticipantProfile,
 			openError,
@@ -617,6 +749,16 @@ export default function useDetailTalkroom(
 						handleGetListenerInRoom(id)
 					}
 					break
+				case 'host_transferred':
+				case 'speaker_auto_pushed_to_host': {
+					const transferPayload = parseTalkRoomSocketHostTransferred(data)
+					handleGetDetailTalkRoom(id)
+					handleGetListenerInRoom(id)
+					if (transferPayload) {
+						options?.onHostTransferred?.(transferPayload)
+					}
+					break
+				}
 				case 'room_inactive_warning':
 					// openSuccess({ message: '...' }) hoặc toast sau
 					break
@@ -643,6 +785,7 @@ export default function useDetailTalkroom(
 			options?.onRoomSocketEvent,
 			options?.onRoomTimeUp,
 			options?.onRoomForceClosed,
+			options?.onHostTransferred,
 		],
 	)
 
@@ -723,6 +866,7 @@ export default function useDetailTalkroom(
 		onLeaveRoom: handleLeaveRoom,
 		onPostRaiseHand: handlePostRaiseHand,
 		onTransitionToSpeaker: handleTransitionToSpeaker,
+		onTransitionRole: handleTransitionRole,
 		onUpdateSpeakerLiveStatus: handleUpdateSpeakerLiveStatus,
 		onOpenParticipantProfile: handleOpenParticipantProfile,
 		onCloseParticipantProfile: handleCloseParticipantProfile,

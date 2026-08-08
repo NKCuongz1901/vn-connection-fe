@@ -89,6 +89,9 @@ export type TalkRoomRoom = {
 	created_at?: string
 	is_joined?: boolean
 	is_your_room?: boolean
+	yourAreHost?: boolean
+	youAreListener?: boolean
+	isUserSpeaker?: boolean
 	dynamic_link?: string
 	joined_friends?: TalkRoomJoinedFriend[]
 	total_friends_joined?: number
@@ -479,6 +482,58 @@ export const getHostSpeaker = (room?: TalkRoomRoom) => {
 				}
 			: undefined)
 	)
+}
+
+/** Active in-room host (stage host slot), not merely the room creator. */
+export const isCurrentUserTalkRoomHost = (
+	room?: TalkRoomRoom,
+	userId?: string,
+): boolean => {
+	if (!userId) return false
+
+	if (room?.yourAreHost === true) return true
+	if (room?.youAreListener === true || room?.isUserSpeaker === true) {
+		return false
+	}
+
+	const hostUserId = resolveSpeakerUserId(getHostSpeaker(room))
+
+	return hostUserId != null && hostUserId === userId
+}
+
+/** Whether the current user is a listener per room detail flags. */
+export const isCurrentUserTalkRoomListener = (room?: TalkRoomRoom): boolean => {
+	return room?.youAreListener === true
+}
+
+/** Whether the room has at least one guest speaker on stage (role === speaker). */
+export const hasTalkRoomAnotherSpeaker = (room?: TalkRoomRoom) => {
+	return (room?.speakers ?? []).some((speaker) => speaker?.role === 'speaker')
+}
+
+/** Parses host_transferred / speaker_auto_pushed_to_host socket payloads. */
+export const parseTalkRoomSocketHostTransferred = (
+	data?: unknown,
+): { previousUserId?: string; newHostId?: string } | null => {
+	if (!data || typeof data !== 'object') return null
+
+	const payload = data as Record<string, unknown>
+	const actionDetails = (payload.action_details ??
+		payload.actionDetail ??
+		payload.action_detail) as Record<string, unknown> | undefined
+
+	if (!actionDetails) return null
+
+	const previousUserId =
+		(actionDetails.previous_user_id as string | undefined) ??
+		(actionDetails.previousUserId as string | undefined)
+	const newHostId =
+		(actionDetails.new_host_id as string | undefined) ??
+		(actionDetails.newHostId as string | undefined)
+
+	if (!previousUserId && !newHostId) return null
+
+	return { previousUserId, newHostId }
 }
 
 export const getHostMicState = (
@@ -1003,10 +1058,27 @@ export const buildTalkRoomSpeakerSlots = (
 	return slots
 }
 
+/** Guest speaker user id for stage slot 1 or 2 (1-indexed). */
+export const getTalkRoomGuestSpeakerUserIdBySlot = (
+	room?: TalkRoomRoom,
+	slotId: 1 | 2 = 1,
+) => {
+	const maxSpeakers = room?.max_speakers ?? 2
+	const slots = buildTalkRoomSpeakerSlots(room, maxSpeakers)
+	const guestSlots = slots.filter((slot) => !slot.isHost)
+
+	return resolveSpeakerUserId(guestSlots[slotId - 1]?.speaker)
+}
+
 /** Guest speaker slot options for transfer-host modal. */
 export const getTalkRoomTransferHostSpeakerOptions = (
 	room?: TalkRoomRoom,
-): { slotId: 1 | 2; label: string; disabled: boolean }[] => {
+): {
+	slotId: 1 | 2
+	label: string
+	disabled: boolean
+	userId?: string
+}[] => {
 	const maxSpeakers = room?.max_speakers ?? 2
 	const slots = buildTalkRoomSpeakerSlots(room, maxSpeakers)
 
@@ -1016,6 +1088,7 @@ export const getTalkRoomTransferHostSpeakerOptions = (
 			slotId: (index + 1) as 1 | 2,
 			label: `Assign to speaker ${index + 1}`,
 			disabled: slot.type === 'empty',
+			userId: resolveSpeakerUserId(slot.speaker),
 		}))
 }
 

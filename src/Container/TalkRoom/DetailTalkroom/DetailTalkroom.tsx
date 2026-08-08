@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Flex } from 'antd'
 import { IconChevronLeft } from '@tabler/icons-react'
 
-import { toogleMic } from '@/apis/talkRoomApis'
+import { stopHosting, toogleMic } from '@/apis/talkRoomApis'
 import DetailTalkroomListenerPanel from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomListenerPanel'
 import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomSpeakerStage'
 import TalkRoomParticipantProfileModal from '@/Components/Modal/TalkRoomParticipantProfileModal'
@@ -41,7 +41,11 @@ import {
 	getTalkRoomListenerCount,
 	getTalkRoomSessionEndSecondsLeft,
 	getTalkRoomTransferHostSpeakerOptions,
+	hasTalkRoomAnotherSpeaker,
 	isCurrentUserGuestSpeaker,
+	isCurrentUserTalkRoomHost,
+	isCurrentUserTalkRoomListener,
+	isTalkRoomCountSessionEndVisible,
 	isTalkRoomLive,
 	isTalkRoomSocketEventForCurrentUser,
 	parseTalkRoomSocketRoomTimeUp,
@@ -57,12 +61,21 @@ const SPEAKER_PROMOTE_EVENTS = [
 	'listener_accept_to_speaker_success',
 ] as const
 
+type TransferHostModalMode = 'leave' | 'stopHosting'
+
 function DetailTalkroom({ id }: { id: string }) {
 	const onRoomSocketEventRef = useRef<
 		((event: string, data?: unknown) => void) | undefined
 	>()
 	const onRoomTimeUpRef = useRef<((data?: unknown) => void) | undefined>()
 	const onRoomForceClosedRef = useRef<(() => void) | undefined>()
+	const onHostTransferredRef = useRef<
+		| ((payload: {
+				previousUserId?: string
+				newHostId?: string
+		  }) => void | Promise<void>)
+		| undefined
+	>()
 	const sessionEndTriggeredRef = useRef(false)
 	const timeUpTriggeredRef = useRef(false)
 	const forceCloseTriggeredRef = useRef(false)
@@ -72,6 +85,10 @@ function DetailTalkroom({ id }: { id: string }) {
 	const [speakerMicOptimisticOn, setSpeakerMicOptimisticOn] = useState(false)
 	const [isMuteRoom, setIsMuteRoom] = useState(false)
 	const [transferHostModalOpen, setTransferHostModalOpen] = useState(false)
+	const [transferHostModalMode, setTransferHostModalMode] =
+		useState<TransferHostModalMode>('leave')
+	const [transferHostActionLoading, setTransferHostActionLoading] =
+		useState(false)
 	const [listenerLeaveModalOpen, setListenerLeaveModalOpen] = useState(false)
 	const [sessionEndModalOpen, setSessionEndModalOpen] = useState(false)
 	const [timeUpModalOpen, setTimeUpModalOpen] = useState(false)
@@ -97,6 +114,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		onLeaveRoom,
 		onPostRaiseHand,
 		onTransitionToSpeaker,
+		onTransitionRole,
 		speakerStatusMap,
 		onUpdateSpeakerLiveStatus,
 		emitRoomEvent,
@@ -115,17 +133,28 @@ function DetailTalkroom({ id }: { id: string }) {
 			onRoomSocketEventRef.current?.(event, data),
 		onRoomTimeUp: (data) => onRoomTimeUpRef.current?.(data),
 		onRoomForceClosed: () => onRoomForceClosedRef.current?.(),
-		onAssignAsHost: () => setTransferHostModalOpen(true),
+		onStopHosting: () => {
+			setTransferHostModalMode('stopHosting')
+			setTransferHostModalOpen(true)
+		},
+		onHostTransferred: (payload) => onHostTransferredRef.current?.(payload),
 	})
 	const { onChangeRoute } = useLocalePath()
 	const agoraIntegration =
 		roleIntegration ?? joinTalkRoomResult?.data?.agora ?? null
-	const isHost =
-		talkRoomDetail?.is_your_room === true ||
-		(talkRoomDetail as any)?.yourAreHost === true
+	const isHost = useMemo(
+		() =>
+			isCurrentUserTalkRoomHost(
+				talkRoomDetail ?? undefined,
+				currentUserId,
+			),
+		[talkRoomDetail, currentUserId],
+	)
 	const hasSpeakerRole =
-		roomUserRole === TALK_ROOM_ROLE.SPEAKER ||
-		joinTalkRoomResult?.data?.role === TALK_ROOM_ROLE.SPEAKER
+		!isCurrentUserTalkRoomListener(talkRoomDetail ?? undefined) &&
+		(roomUserRole === TALK_ROOM_ROLE.SPEAKER ||
+			joinTalkRoomResult?.data?.role === TALK_ROOM_ROLE.SPEAKER ||
+			talkRoomDetail?.isUserSpeaker === true)
 	const isGuestSpeakerOnStage = useMemo(
 		() => isCurrentUserGuestSpeaker(talkRoomDetail ?? undefined, currentUserId),
 		[talkRoomDetail, currentUserId],
@@ -135,6 +164,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		!isSpeaker &&
 		(roomUserRole === TALK_ROOM_ROLE.LISTENER ||
 			joinTalkRoomResult?.data?.role === TALK_ROOM_ROLE.LISTENER ||
+			isCurrentUserTalkRoomListener(talkRoomDetail ?? undefined) ||
 			agoraIntegration?.connection_type === 'media_server' ||
 			agoraIntegration?.user_role === 'listener')
 	const streamUrl =
@@ -151,10 +181,11 @@ function DetailTalkroom({ id }: { id: string }) {
 
 	const showVolumeButton = isListener && isRoomLive && isRoomLiving
 
-	const { connect, setMic, disconnect, isAgoraJoined, micEnabled } = useTalkRoomAgora({
-		agoraIntegration,
-		enabled: isHost || isSpeaker || isListener,
-	})
+	const { connect, setMic, disconnect, isAgoraJoined, micEnabled } =
+		useTalkRoomAgora({
+			agoraIntegration,
+			enabled: isHost || isSpeaker || isListener,
+		})
 
 	const isLocalTalking = useTalkRoomLocalTalking({
 		enabled: (isHost || isSpeaker) && isAgoraJoined,
@@ -236,10 +267,7 @@ function DetailTalkroom({ id }: { id: string }) {
 					is_talking: false,
 				})
 			}
-			await Promise.all([
-				onGetDetailTalkRoom(id),
-				onGetListenerInRoom(id),
-			])
+			await Promise.all([onGetDetailTalkRoom(id), onGetListenerInRoom(id)])
 			showTalkRoomSpeakerPromoteToast()
 		} catch (error) {
 			console.error('Failed to promote to speaker', error)
@@ -261,7 +289,11 @@ function DetailTalkroom({ id }: { id: string }) {
 
 	const handleRoomSocketEvent = useCallback(
 		(event: string, data?: unknown) => {
-			if (SPEAKER_PROMOTE_EVENTS.includes(event as (typeof SPEAKER_PROMOTE_EVENTS)[number])) {
+			if (
+				SPEAKER_PROMOTE_EVENTS.includes(
+					event as (typeof SPEAKER_PROMOTE_EVENTS)[number],
+				)
+			) {
 				if (!isTalkRoomSocketEventForCurrentUser(data, currentUserId)) return
 
 				handlePromoteToSpeaker()
@@ -382,7 +414,10 @@ function DetailTalkroom({ id }: { id: string }) {
 	}, [disconnect, disconnectWhep, isHost, isSpeaker, isListener, onLeaveRoom])
 
 	const forceRoomClose = useCallback(
-		async ({ roomEndStatus: nextStatus, callLeaveRoom }: ForceRoomCloseOptions) => {
+		async ({
+			roomEndStatus: nextStatus,
+			callLeaveRoom,
+		}: ForceRoomCloseOptions) => {
 			if (nextStatus === 'sessionEnd' && sessionEndTriggeredRef.current) {
 				return
 			}
@@ -537,6 +572,7 @@ function DetailTalkroom({ id }: { id: string }) {
 
 	const handleHostLeaveClick = useCallback(() => {
 		if (!isHost) return
+		setTransferHostModalMode('leave')
 		setTransferHostModalOpen(true)
 	}, [isHost])
 
@@ -550,13 +586,139 @@ function DetailTalkroom({ id }: { id: string }) {
 		[talkRoomDetail],
 	)
 
-	const handleAssignSpeakerAndLeave = useCallback(
-		async (_slotId: 1 | 2) => {
-			// TODO: call stopHosting / transfer host API with slotId
-			await handleConfirmLeaveRoom()
+	const showStopHostingAction = useMemo(() => {
+		if (!isHost) return false
+		if (isTalkRoomCountSessionEndVisible(roomEndStatus)) return false
+
+		return hasTalkRoomAnotherSpeaker(talkRoomDetail ?? undefined)
+	}, [isHost, roomEndStatus, talkRoomDetail])
+
+	const handleHostTransferred = useCallback(
+		async ({
+			previousUserId,
+			newHostId,
+		}: {
+			previousUserId?: string
+			newHostId?: string
+		}) => {
+			if (!currentUserId) return
+
+			try {
+				if (previousUserId === currentUserId) {
+					await disconnect()
+					setSpeakerMicOptimisticOn(false)
+				} else if (newHostId === currentUserId) {
+					await disconnect()
+					const result = await onTransitionRole(
+						TALK_ROOM_ROLE.SPEAKER,
+						TALK_ROOM_ROLE.HOST,
+					)
+					const newConnection = result?.newConnection
+					if (newConnection) {
+						await connect({ micOn: false, integration: newConnection })
+					}
+				}
+			} catch (error) {
+				console.error('Failed to handle host transfer', error)
+			}
 		},
-		[handleConfirmLeaveRoom],
+		[currentUserId, disconnect, connect, onTransitionRole],
 	)
+
+	useEffect(() => {
+		onHostTransferredRef.current = handleHostTransferred
+	}, [handleHostTransferred])
+
+	const handleRefreshAfterStopHosting = useCallback(async () => {
+		const room = await onGetDetailTalkRoom(id)
+		await onGetListenerInRoom(id)
+
+		if (room?.youAreListener !== true) return
+
+		await disconnect()
+		setSpeakerMicOptimisticOn(false)
+	}, [
+		id,
+		onGetDetailTalkRoom,
+		onGetListenerInRoom,
+		disconnect,
+	])
+
+	const handleStopHostingAssign = useCallback(
+		async (slotId: 1 | 2) => {
+			const option = transferHostSpeakerOptions.find(
+				(speakerOption) => speakerOption.slotId === slotId,
+			)
+			if (!option?.userId) return
+
+			setTransferHostActionLoading(true)
+			try {
+				await stopHosting({
+					id,
+					payload: { newHostId: option.userId },
+				})
+				setTransferHostModalOpen(false)
+				await handleRefreshAfterStopHosting()
+			} catch (error) {
+				console.error('Failed to stop hosting', error)
+			} finally {
+				setTransferHostActionLoading(false)
+			}
+		},
+		[id, transferHostSpeakerOptions, handleRefreshAfterStopHosting],
+	)
+
+	const handleStopHostingSkip = useCallback(async () => {
+		setTransferHostActionLoading(true)
+		try {
+			await stopHosting({ id })
+			setTransferHostModalOpen(false)
+			await handleRefreshAfterStopHosting()
+		} catch (error) {
+			console.error('Failed to stop hosting', error)
+		} finally {
+			setTransferHostActionLoading(false)
+		}
+	}, [id, handleRefreshAfterStopHosting])
+
+	const handleLeaveAssignSpeaker = useCallback(
+		async (slotId: 1 | 2) => {
+			const option = transferHostSpeakerOptions.find(
+				(speakerOption) => speakerOption.slotId === slotId,
+			)
+			if (!option?.userId) return
+
+			setLeavingRoom(true)
+			try {
+				await stopHosting({
+					id,
+					payload: { newHostId: option.userId, isLeave: true },
+				})
+				if (isHost || isSpeaker) await disconnect()
+				if (isListener) await disconnectWhep()
+				await onLeaveRoom()
+				setTransferHostModalOpen(false)
+				onChangeRoute(mainRoutes.talkroom)
+			} catch (error) {
+				console.error('Failed to assign host and leave', error)
+			} finally {
+				setLeavingRoom(false)
+			}
+		},
+		[
+			transferHostSpeakerOptions,
+			id,
+			isHost,
+			isSpeaker,
+			isListener,
+			disconnect,
+			disconnectWhep,
+			onLeaveRoom,
+			onChangeRoute,
+		],
+	)
+
+	const handleAssignSpeakerAndLeave = handleLeaveAssignSpeaker
 
 	const { micState, onToggleMic, onInvite, onLeave } = useHostMicToggle({
 		roomId: id,
@@ -613,10 +775,7 @@ function DetailTalkroom({ id }: { id: string }) {
 	}, [beSpeakerState, talkRoomDetail, onPostRaiseHand])
 
 	const handleOpenParticipantProfile = useCallback(
-		(
-			userId?: string,
-			target?: 'host' | 'speaker' | 'listener',
-		) => {
+		(userId?: string, target?: 'host' | 'speaker' | 'listener') => {
 			if (!userId) return
 
 			const isSelf = userId === currentUserId
@@ -653,10 +812,7 @@ function DetailTalkroom({ id }: { id: string }) {
 
 	const handleSpeakerSlotClick = useCallback(
 		(userId?: string, isHostSlot?: boolean) => {
-			handleOpenParticipantProfile(
-				userId,
-				isHostSlot ? 'host' : 'speaker',
-			)
+			handleOpenParticipantProfile(userId, isHostSlot ? 'host' : 'speaker')
 		},
 		[handleOpenParticipantProfile],
 	)
@@ -691,9 +847,7 @@ function DetailTalkroom({ id }: { id: string }) {
 					<div className={classes.ctaButtons}>
 						{showVolumeButton ? (
 							<TalkRoomHeaderActionButton
-								ariaLabel={
-									isMuteRoom ? 'Unmute room audio' : 'Mute room audio'
-								}
+								ariaLabel={isMuteRoom ? 'Unmute room audio' : 'Mute room audio'}
 								onClick={handleToggleRoomVolume}
 							>
 								{isMuteRoom ? (
@@ -703,7 +857,10 @@ function DetailTalkroom({ id }: { id: string }) {
 								)}
 							</TalkRoomHeaderActionButton>
 						) : null}
-						<TalkRoomHeaderActionButton ariaLabel="Share room" onClick={onInvite}>
+						<TalkRoomHeaderActionButton
+							ariaLabel="Share room"
+							onClick={onInvite}
+						>
 							<ShareIcon fill="#FFFFFF" />
 						</TalkRoomHeaderActionButton>
 					</div>
@@ -763,7 +920,9 @@ function DetailTalkroom({ id }: { id: string }) {
 		if (!conversationId) {
 			return (
 				<div className={classes.chatContent}>
-					<div className={classes.chatEmpty}>Chat is not available for this room.</div>
+					<div className={classes.chatEmpty}>
+						Chat is not available for this room.
+					</div>
 				</div>
 			)
 		}
@@ -787,11 +946,19 @@ function DetailTalkroom({ id }: { id: string }) {
 			) : null}
 			<TalkRoomTransferHostRoleModal
 				open={transferHostModalOpen}
-				loading={leavingRoom}
+				loading={leavingRoom || transferHostActionLoading}
 				speakerOptions={transferHostSpeakerOptions}
 				onClose={() => setTransferHostModalOpen(false)}
-				onAssignSpeaker={handleAssignSpeakerAndLeave}
-				onSkipAssigning={handleConfirmLeaveRoom}
+				onAssignSpeaker={
+					transferHostModalMode === 'stopHosting'
+						? handleStopHostingAssign
+						: handleAssignSpeakerAndLeave
+				}
+				onSkipAssigning={
+					transferHostModalMode === 'stopHosting'
+						? handleStopHostingSkip
+						: handleConfirmLeaveRoom
+				}
 			/>
 			<TalkRoomListenerLeaveRoom
 				open={listenerLeaveModalOpen}
@@ -820,6 +987,7 @@ function DetailTalkroom({ id }: { id: string }) {
 				loadingProfile={loadingParticipantProfile}
 				actionLoading={participantActionLoading}
 				reportOpen={participantReportOpen}
+				showStopHosting={showStopHostingAction}
 				onClose={onCloseParticipantProfile}
 				onCloseReport={onCloseParticipantReport}
 				onAction={onParticipantProfileAction}
