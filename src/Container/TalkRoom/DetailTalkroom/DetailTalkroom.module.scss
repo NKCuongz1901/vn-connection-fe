@@ -26,11 +26,13 @@
 	.content {
 		width: 100%;
 		height: 100%;
+		min-width: 0;
 		display: flex;
 		gap: 12px;
 
 		.leftContent {
 			flex: 2;
+			min-width: 0;
 			display: flex;
 			flex-direction: column;
 			gap: 12px;
@@ -103,25 +105,35 @@
 			}
 
 			.listenerContent {
-				flex: 1;
+				flex: 3;
 				display: flex;
 				flex-direction: column;
 				min-height: 0;
 			}
 		}
 		.rightContent {
-			flex: 1;
+			flex: 0 0 360px;
+			width: 360px;
+			max-width: 360px;
+			min-width: 0;
+			min-height: 0;
 			display: flex;
 			flex-direction: column;
 			gap: 12px;
+			overflow: hidden;
 
 			.timerContent {
 				display: flex;
 				flex-direction: column;
+				flex-shrink: 0;
 			}
 
 			.chatContent {
-				flex: 4;
+				flex: 1;
+				min-height: 0;
+				min-width: 0;
+				width: 100%;
+				max-width: 100%;
 				display: flex;
 				flex-direction: column;
 				max-height: calc(100vh - 280px);
