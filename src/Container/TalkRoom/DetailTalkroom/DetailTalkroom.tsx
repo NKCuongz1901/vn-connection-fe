@@ -16,9 +16,11 @@ import TalkRoomForceClosedModal from '@/Components/Modal/TalkRoomForceClosedModa
 import TalkRoomListenerLeaveRoom from '@/Components/Modal/TalkRoomListenerLeaveRoom'
 import TalkRoomSessionEndModal from '@/Components/Modal/TalkRoomSessionEndModal'
 import TalkRoomTimeUpModal from '@/Components/Modal/TalkRoomTimeUpModal'
+import TalkRoomSpeakerInvitationModal from '@/Components/Modal/TalkRoomSpeakerInvitationModal'
 import TalkRoomTransferHostRoleModal from '@/Components/Modal/TalkRoomTransferHostRoleModal'
 import {
 	showTalkRoomAutoCloseToast,
+	showTalkRoomListenerRejectInviteToast,
 	showTalkRoomSpeakerPromoteToast,
 	showTalkRoomUserKickedToast,
 } from '@/Components/Toast/SocketToastContent'
@@ -43,6 +45,7 @@ import {
 	getTalkRoomSessionEndSecondsLeft,
 	getTalkRoomTransferHostSpeakerOptions,
 	hasTalkRoomAnotherSpeaker,
+	hasTalkRoomEmptyGuestSpeakerSlot,
 	isCurrentUserGuestSpeaker,
 	isCurrentUserTalkRoomHost,
 	isCurrentUserTalkRoomListener,
@@ -56,9 +59,12 @@ import {
 
 import classes from './DetailTalkroom.module.scss'
 
-const SPEAKER_PROMOTE_EVENTS = [
+const SPEAKER_PROMOTE_MIC_ON_EVENTS = [
 	'raise_hand_accepted',
 	'promote_to_speaker',
+] as const
+
+const SPEAKER_PROMOTE_MIC_OFF_EVENTS = [
 	'listener_accept_to_speaker_success',
 ] as const
 
@@ -82,6 +88,10 @@ function DetailTalkroom({ id }: { id: string }) {
 	>()
 	const onRoomSpeakerSteppedDownRef = useRef<
 		((targetUserId: string) => void | Promise<void>) | undefined
+	>()
+	const onListenerRejectInviteRef = useRef<
+		| ((payload: { targetUserId?: string; userName?: string }) => void)
+		| undefined
 	>()
 	const sessionEndTriggeredRef = useRef(false)
 	const timeUpTriggeredRef = useRef(false)
@@ -136,6 +146,10 @@ function DetailTalkroom({ id }: { id: string }) {
 		onCloseParticipantProfile,
 		onParticipantProfileAction,
 		onCloseParticipantReport,
+		speakerInvitationOpen,
+		speakerInvitationLoading,
+		onAcceptSpeakerInvitation,
+		onRejectSpeakerInvitation,
 	} = useDetailTalkroom(id, {
 		onRoomSocketEvent: (event, data) =>
 			onRoomSocketEventRef.current?.(event, data),
@@ -150,6 +164,8 @@ function DetailTalkroom({ id }: { id: string }) {
 			onRoomUserKickedRef.current?.(kickedUserId),
 		onRoomSpeakerSteppedDown: (targetUserId) =>
 			onRoomSpeakerSteppedDownRef.current?.(targetUserId),
+		onListenerRejectInvite: (payload) =>
+			onListenerRejectInviteRef.current?.(payload),
 	})
 	const { onChangeRoute } = useLocalePath()
 	const agoraIntegration =
@@ -247,42 +263,55 @@ function DetailTalkroom({ id }: { id: string }) {
 		await connectWhep()
 	}, [connectWhep, disconnectWhep])
 
-	const handlePromoteToSpeaker = useCallback(async () => {
-		if (isPromotingRef.current || isHost) return
-		if (hasSpeakerRole && isAgoraJoinedRef.current) return
+	const handlePromoteToSpeaker = useCallback(
+		async (options?: { autoOnMic?: boolean }) => {
+			const autoOnMic = options?.autoOnMic ?? true
+			if (isPromotingRef.current || isHost) return
+			if (hasSpeakerRole && isAgoraJoinedRef.current) return
 
-		isPromotingRef.current = true
+			isPromotingRef.current = true
 
-		try {
-			await disconnectWhep()
+			try {
+				await disconnectWhep()
 
-			const result = await onTransitionToSpeaker()
-			const newConnection = result?.newConnection
+				const result = await onTransitionToSpeaker()
+				const newConnection = result?.newConnection
 
-			if (!newConnection) return
+				if (!newConnection) return
 
-			await connect({ micOn: true, integration: newConnection })
+				await connect({ micOn: autoOnMic, integration: newConnection })
 
-			await toogleMic({
-				id,
-				payload: { is_on: true },
-			})
+				if (autoOnMic) {
+					await toogleMic({
+						id,
+						payload: { is_on: true },
+					})
 
-			setSpeakerMicOptimisticOn(true)
-			if (currentUserId) {
-				onUpdateSpeakerLiveStatus(currentUserId, {
-					is_open_mic: true,
-					is_talking: false,
-				})
+					setSpeakerMicOptimisticOn(true)
+					if (currentUserId) {
+						onUpdateSpeakerLiveStatus(currentUserId, {
+							is_open_mic: true,
+							is_talking: false,
+						})
+					}
+					showTalkRoomSpeakerPromoteToast()
+				} else {
+					setSpeakerMicOptimisticOn(false)
+					if (currentUserId) {
+						onUpdateSpeakerLiveStatus(currentUserId, {
+							is_open_mic: false,
+							is_talking: false,
+						})
+					}
+				}
+
+				await Promise.all([onGetDetailTalkRoom(id), onGetListenerInRoom(id)])
+			} catch (error) {
+				console.error('Failed to promote to speaker', error)
+			} finally {
+				isPromotingRef.current = false
 			}
-			await Promise.all([onGetDetailTalkRoom(id), onGetListenerInRoom(id)])
-			showTalkRoomSpeakerPromoteToast()
-		} catch (error) {
-			console.error('Failed to promote to speaker', error)
-		} finally {
-			isPromotingRef.current = false
-		}
-	}, [
+		}, [
 		disconnectWhep,
 		onTransitionToSpeaker,
 		connect,
@@ -297,14 +326,21 @@ function DetailTalkroom({ id }: { id: string }) {
 
 	const handleRoomSocketEvent = useCallback(
 		(event: string, data?: unknown) => {
-			if (
-				SPEAKER_PROMOTE_EVENTS.includes(
-					event as (typeof SPEAKER_PROMOTE_EVENTS)[number],
+			if (!isTalkRoomSocketEventForCurrentUser(data, currentUserId)) {
+				// Non-self promote events are handled via detail refetch in the hook.
+			} else if (
+				SPEAKER_PROMOTE_MIC_ON_EVENTS.includes(
+					event as (typeof SPEAKER_PROMOTE_MIC_ON_EVENTS)[number],
 				)
 			) {
-				if (!isTalkRoomSocketEventForCurrentUser(data, currentUserId)) return
-
-				handlePromoteToSpeaker()
+				handlePromoteToSpeaker({ autoOnMic: true })
+				return
+			} else if (
+				SPEAKER_PROMOTE_MIC_OFF_EVENTS.includes(
+					event as (typeof SPEAKER_PROMOTE_MIC_OFF_EVENTS)[number],
+				)
+			) {
+				handlePromoteToSpeaker({ autoOnMic: false })
 				return
 			}
 
@@ -619,6 +655,13 @@ function DetailTalkroom({ id }: { id: string }) {
 		return !isTalkRoomCountSessionEndVisible(roomEndStatus)
 	}, [isHost, roomEndStatus])
 
+	const showInviteToSpeakerAction = useMemo(() => {
+		if (!isHost) return false
+		if (isTalkRoomCountSessionEndVisible(roomEndStatus)) return false
+
+		return hasTalkRoomEmptyGuestSpeakerSlot(talkRoomDetail ?? undefined)
+	}, [isHost, roomEndStatus, talkRoomDetail])
+
 	const handleRoomUserKicked = useCallback(
 		async (kickedUserId: string) => {
 			if (!currentUserId || kickedUserId !== currentUserId) return
@@ -710,6 +753,13 @@ function DetailTalkroom({ id }: { id: string }) {
 	useEffect(() => {
 		onRoomSpeakerSteppedDownRef.current = handleRoomSpeakerSteppedDown
 	}, [handleRoomSpeakerSteppedDown])
+
+	useEffect(() => {
+		onListenerRejectInviteRef.current = ({ userName }) => {
+			if (!isHost) return
+			showTalkRoomListenerRejectInviteToast(userName)
+		}
+	}, [isHost])
 
 	const handleRefreshAfterStopHosting = useCallback(async () => {
 		const room = await onGetDetailTalkRoom(id)
@@ -1056,6 +1106,12 @@ function DetailTalkroom({ id }: { id: string }) {
 				open={forceClosedModalOpen}
 				onConfirm={handleForceClosedModalConfirm}
 			/>
+			<TalkRoomSpeakerInvitationModal
+				open={speakerInvitationOpen}
+				loading={speakerInvitationLoading}
+				onAccept={onAcceptSpeakerInvitation}
+				onDecline={onRejectSpeakerInvitation}
+			/>
 			<TalkRoomParticipantProfileModal
 				open={participantProfileModal.open}
 				role={participantProfileModal.role ?? 'listener'}
@@ -1074,6 +1130,10 @@ function DetailTalkroom({ id }: { id: string }) {
 				showAssignAsHost={
 					showAssignAsHostAction &&
 					participantProfileModal.role === 'speaker'
+				}
+				showInviteToSpeaker={
+					showInviteToSpeakerAction &&
+					participantProfileModal.role === 'listener'
 				}
 				onClose={onCloseParticipantProfile}
 				onCloseReport={onCloseParticipantReport}

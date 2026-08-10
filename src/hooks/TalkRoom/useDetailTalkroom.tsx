@@ -1,11 +1,14 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
+	acceptInviteToSpeaker,
 	getDetailTalkRoom,
 	getListenerInRoom,
+	getRaiseHandUser,
 	getTalkRoomUserProfile,
+	hostApproveRaiseHand,
 	inviteToSpeaker,
 	joinTalkroom,
 	JoinTalkroomAgora,
@@ -14,6 +17,7 @@ import {
 	leaveTalkroom,
 	postRaiseHand,
 	RaiseHandPayload,
+	rejectInviteToSpeaker,
 	stepDownToListener,
 	stopHosting,
 	TalkRoomDetail,
@@ -31,6 +35,8 @@ import type {
 	TalkRoomParticipantProfileRole,
 } from '@/Components/Modal/TalkRoomParticipantProfileModal'
 import {
+	showTalkRoomInviteSentToast,
+	showTalkRoomListenerRejectInviteToast,
 	showTalkRoomUserKickedToast,
 } from '@/Components/Toast/SocketToastContent'
 import { useModal } from '@/context/ModalContext'
@@ -41,6 +47,7 @@ import {
 } from '@/Variable/talkRoom.variable'
 import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
+import { getUserInfo } from '@/ultis/storage'
 import {
 	consumeTalkRoomAutoJoinFlag,
 	getTalkRoomConversationId,
@@ -52,6 +59,8 @@ import {
 	canProceedTalkRoomJoin,
 	parseTalkRoomValidatePreJoin,
 	parseTalkRoomSocketHostTransferred,
+	parseTalkRoomSocketSpeakerInvite,
+	getTalkRoomSocketUserName,
 	TalkRoomPreJoinValidation,
 	TalkRoomSpeakerStatusMap,
 } from '@/ultis/talkRoom'
@@ -70,6 +79,14 @@ type UseDetailTalkroomOptions = {
 	}) => void
 	onRoomUserKicked?: (kickedUserId: string) => void
 	onRoomSpeakerSteppedDown?: (targetUserId: string) => void
+	onHostInviteToSpeaker?: (payload: {
+		inviteId: string
+		targetUserId: string
+	}) => void
+	onListenerRejectInvite?: (payload: {
+		targetUserId?: string
+		userName?: string
+	}) => void
 }
 
 export type TalkRoomParticipantProfileModalState = {
@@ -116,6 +133,13 @@ export default function useDetailTalkroom(
 	const [participantActionLoading, setParticipantActionLoading] =
 		useState(false)
 	const [participantReportOpen, setParticipantReportOpen] = useState(false)
+	const [raiseHandUserIds, setRaiseHandUserIds] = useState<string[]>([])
+	const [speakerInvitation, setSpeakerInvitation] = useState<{
+		inviteId: string
+	} | null>(null)
+	const [speakerInvitationLoading, setSpeakerInvitationLoading] =
+		useState(false)
+	const isInviteToSpeakerInFlightRef = useRef(false)
 
 	const handleUpdateSpeakerLiveStatus = useCallback(
 		(
@@ -479,6 +503,91 @@ export default function useDetailTalkroom(
 		[id, openError],
 	)
 
+	const handleGetRaiseHandUsers = useCallback(
+		async (roomId: string = id): Promise<string[]> => {
+			if (!roomId) return []
+
+			try {
+				const res: any = await getRaiseHandUser({ id: roomId })
+				const { code, results } = res || {}
+
+				if (code === 200) {
+					const rows =
+						results?.objects?.rows ??
+						results?.object?.rows ??
+						results?.object ??
+						[]
+					const ids = (Array.isArray(rows) ? rows : [])
+						.map(
+							(row: { user_id?: string; user?: { id?: string } }) =>
+								row?.user_id ?? row?.user?.id,
+						)
+						.filter(Boolean) as string[]
+
+					setRaiseHandUserIds(ids)
+					return ids
+				}
+			} catch (error) {
+				openError(error)
+			}
+
+			return []
+		},
+		[id, openError],
+	)
+
+	const handleCloseSpeakerInvitation = useCallback(() => {
+		setSpeakerInvitation(null)
+	}, [])
+
+	const handleAcceptSpeakerInvitation = useCallback(async () => {
+		if (!id || !speakerInvitation?.inviteId) return
+
+		setSpeakerInvitationLoading(true)
+		try {
+			const res: any = await acceptInviteToSpeaker({
+				id,
+				payload: { invite_id: speakerInvitation.inviteId },
+			})
+			if (res?.code === 200) {
+				handleCloseSpeakerInvitation()
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setSpeakerInvitationLoading(false)
+		}
+	}, [
+		id,
+		speakerInvitation?.inviteId,
+		handleCloseSpeakerInvitation,
+		openError,
+	])
+
+	const handleRejectSpeakerInvitation = useCallback(async () => {
+		if (!id || !speakerInvitation?.inviteId) return
+
+		setSpeakerInvitationLoading(true)
+		try {
+			const res: any = await rejectInviteToSpeaker({
+				id,
+				payload: { invite_id: speakerInvitation.inviteId },
+			})
+			if (res?.code === 200) {
+				handleCloseSpeakerInvitation()
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setSpeakerInvitationLoading(false)
+		}
+	}, [
+		id,
+		speakerInvitation?.inviteId,
+		handleCloseSpeakerInvitation,
+		openError,
+	])
+
 	const handleCloseParticipantProfile = useCallback(() => {
 		setParticipantProfileModal({ open: false })
 		setParticipantUserProfile(null)
@@ -580,14 +689,38 @@ export default function useDetailTalkroom(
 					options?.onStopHosting?.()
 					break
 				case 'invite_to_speaker':
-					runParticipantRoomAction(
-						() =>
-							inviteToSpeaker({
-								id,
-								payload: { user_id: targetUserId },
-							}),
-						'Invite sent successfully',
-					)
+					if (isInviteToSpeakerInFlightRef.current) return
+
+					isInviteToSpeakerInFlightRef.current = true
+					setParticipantActionLoading(true)
+					;(async () => {
+						try {
+							const raisedHandIds = await handleGetRaiseHandUsers()
+							const hasRaiseHand = raisedHandIds.includes(targetUserId)
+							const res: any = hasRaiseHand
+								? await hostApproveRaiseHand({
+										id,
+										payload: {
+											user_id: targetUserId,
+											is_approved: true,
+										},
+									})
+								: await inviteToSpeaker({
+										id,
+										payload: { user_id: targetUserId },
+									})
+
+							if (res?.code === 200) {
+								showTalkRoomInviteSentToast()
+								handleCloseParticipantProfile()
+							}
+						} catch (error) {
+							openError(error)
+						} finally {
+							isInviteToSpeakerInFlightRef.current = false
+							setParticipantActionLoading(false)
+						}
+					})()
 					break
 				case 'remove_from_room':
 					openConfirm({
@@ -714,6 +847,7 @@ export default function useDetailTalkroom(
 			handleFetchParticipantProfile,
 			openError,
 			closeModal,
+			handleGetRaiseHandUsers,
 		],
 	)
 
@@ -807,8 +941,36 @@ export default function useDetailTalkroom(
 						event === 'listener_accept_to_speaker_success'
 					) {
 						handleGetListenerInRoom(id)
+						handleGetRaiseHandUsers()
 					}
 					break
+				case 'host_invite_to_speaker': {
+					const invitePayload = parseTalkRoomSocketSpeakerInvite(data)
+					if (invitePayload) {
+						const currentUserId = getUserInfo('id') as string | undefined
+						const isInvitedListener =
+							currentUserId &&
+							invitePayload.targetUserId === currentUserId &&
+							talkRoomDetail?.yourAreHost !== true
+
+						if (isInvitedListener) {
+							setSpeakerInvitation({
+								inviteId: invitePayload.inviteId,
+							})
+						}
+						options?.onHostInviteToSpeaker?.(invitePayload)
+					}
+					break
+				}
+				case 'listener_reject_to_speaker_success': {
+					const rejectUserId = getTalkRoomSocketTargetUserId(data)
+					options?.onListenerRejectInvite?.({
+						targetUserId: rejectUserId,
+						userName: getTalkRoomSocketUserName(data),
+					})
+					handleGetRaiseHandUsers()
+					break
+				}
 				case 'host_transferred':
 				case 'speaker_auto_pushed_to_host': {
 					const transferPayload = parseTalkRoomSocketHostTransferred(data)
@@ -847,6 +1009,7 @@ export default function useDetailTalkroom(
 		},
 		[
 			id,
+			talkRoomDetail?.yourAreHost,
 			handleGetDetailTalkRoom,
 			handleGetListenerInRoom,
 			handleLeaveRoom,
@@ -857,6 +1020,9 @@ export default function useDetailTalkroom(
 			options?.onRoomForceClosed,
 			options?.onHostTransferred,
 			options?.onRoomSpeakerSteppedDown,
+			options?.onHostInviteToSpeaker,
+			options?.onListenerRejectInvite,
+			handleGetRaiseHandUsers,
 		],
 	)
 
@@ -889,6 +1055,7 @@ export default function useDetailTalkroom(
 		if (!joinResult?.success) return
 
 		await handleGetListenerInRoom(id)
+		await handleGetRaiseHandUsers(id)
 
 		const conversationId = getTalkRoomConversationId(room)
 		if (conversationId) {
@@ -902,6 +1069,7 @@ export default function useDetailTalkroom(
 		handleJoinTalkRoom,
 		handleGetDetailTalkRoom,
 		handleGetListenerInRoom,
+		handleGetRaiseHandUsers,
 		onChangeRoute,
 	])
 
@@ -929,6 +1097,9 @@ export default function useDetailTalkroom(
 		loadingParticipantProfile,
 		participantActionLoading,
 		participantReportOpen,
+		raiseHandUserIds,
+		speakerInvitationOpen: Boolean(speakerInvitation),
+		speakerInvitationLoading,
 
 		onGetDetailTalkRoom: handleGetDetailTalkRoom,
 		onGetListenerInRoom: handleGetListenerInRoom,
@@ -943,6 +1114,9 @@ export default function useDetailTalkroom(
 		onCloseParticipantProfile: handleCloseParticipantProfile,
 		onParticipantProfileAction: handleParticipantProfileAction,
 		onCloseParticipantReport: handleCloseParticipantReport,
+		onAcceptSpeakerInvitation: handleAcceptSpeakerInvitation,
+		onRejectSpeakerInvitation: handleRejectSpeakerInvitation,
+		onCloseSpeakerInvitation: handleCloseSpeakerInvitation,
 		emitRoomEvent,
 	}
 }

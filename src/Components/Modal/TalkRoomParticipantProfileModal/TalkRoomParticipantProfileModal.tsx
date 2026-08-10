@@ -74,6 +74,7 @@ type TalkRoomParticipantProfileModalProps = {
 	showRemoveFromRoom?: boolean
 	showStepDownToListener?: boolean
 	showAssignAsHost?: boolean
+	showInviteToSpeaker?: boolean
 	onClose: () => void
 	onCloseReport?: () => void
 	onAction?: (action: TalkRoomParticipantProfileAction) => void
@@ -257,6 +258,7 @@ function TalkRoomParticipantProfileModal({
 	showRemoveFromRoom = true,
 	showStepDownToListener = true,
 	showAssignAsHost = false,
+	showInviteToSpeaker = false,
 	onClose,
 	onCloseReport,
 	onAction,
@@ -315,6 +317,7 @@ function TalkRoomParticipantProfileModal({
 			return false
 		}
 		if (item.key === 'assign_as_host' && !showAssignAsHost) return false
+		if (item.key === 'invite_to_speaker' && !showInviteToSpeaker) return false
 		return true
 	})
 

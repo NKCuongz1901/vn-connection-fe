@@ -100,6 +100,9 @@ export const showSocketToast = ({
 export const TALK_ROOM_SPEAKER_PROMOTE_TOAST_ID = 'talkroom-speaker-promote'
 export const TALK_ROOM_AUTO_CLOSE_TOAST_ID = 'talkroom-auto-close'
 export const TALK_ROOM_USER_KICKED_TOAST_ID = 'talkroom-user-kicked'
+export const TALK_ROOM_INVITE_SENT_TOAST_ID = 'talkroom-invite-sent'
+export const TALK_ROOM_LISTENER_REJECT_INVITE_TOAST_ID =
+	'talkroom-listener-reject-invite'
 
 export const showTalkRoomSpeakerPromoteToast = () => {
 	showSocketToast({
@@ -126,6 +129,24 @@ export const showTalkRoomUserKickedToast = () => {
 		content: 'You cannot rejoin this room session',
 		variant: 'error',
 		toastId: TALK_ROOM_USER_KICKED_TOAST_ID,
+	})
+}
+
+export const showTalkRoomInviteSentToast = () => {
+	showSocketToast({
+		title: 'Speaker invitation sent',
+		variant: 'success',
+		toastId: TALK_ROOM_INVITE_SENT_TOAST_ID,
+		showClose: false,
+	})
+}
+
+export const showTalkRoomListenerRejectInviteToast = (userName?: string) => {
+	const name = userName?.trim() || 'This user'
+	showSocketToast({
+		title: `${name} chose not to speak`,
+		variant: 'error',
+		toastId: TALK_ROOM_LISTENER_REJECT_INVITE_TOAST_ID,
 	})
 }
 

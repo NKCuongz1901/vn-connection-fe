@@ -786,6 +786,34 @@ export const hostApproveRaiseHand = async ({
 	return await axios.post(url, payload)
 }
 
+export type TalkRoomSpeakerInvitePayload = {
+	invite_id: string
+}
+
+export const acceptInviteToSpeaker = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: TalkRoomSpeakerInvitePayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/accept_invite_to_speaker`
+
+	return await axios.post(url, payload)
+}
+
+export const rejectInviteToSpeaker = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: TalkRoomSpeakerInvitePayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/reject_invite_to_speaker`
+
+	return await axios.post(url, payload)
+}
+
 export const getTokenSocket = async () => {
 	const url = TALKROOM_ROUTES.getTokenSocket
 	return await axios.post(url, {})

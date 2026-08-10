@@ -1,0 +1,79 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	background: #fff;
+}
+
+.iconSection {
+	display: flex;
+	align-items: flex-start;
+	padding: 24px 16px 0;
+}
+
+.info {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 24px 16px;
+}
+
+.title {
+	margin: 0;
+	color: var(--text-primary, #0f1729);
+	font-size: var(--title-large-size, 20px);
+	font-weight: 600;
+	line-height: var(--title-large-line-height, 28px);
+}
+
+.description {
+	margin: 0;
+	color: var(--text-primary, #0f1729);
+	font-size: var(--body-base-size, 14px);
+	font-weight: 400;
+	line-height: var(--body-base-line-height, 20px);
+}
+
+.footer {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 0 16px 16px;
+}
+
+.acceptBtn,
+.declineBtn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	min-height: 48px;
+	padding: 12px 16px;
+	border: none;
+	border-radius: 999px;
+	cursor: pointer;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	font-family: inherit;
+}
+
+.acceptBtn {
+	color: #fff;
+	background: var(--component-button-primary-bg-default, #e55a0f);
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}
+
+.declineBtn {
+	color: var(--component-button-ghost-fg-default, #0f1729);
+	background: transparent;
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}

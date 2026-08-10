@@ -1117,6 +1117,79 @@ export const buildTalkRoomSpeakerSlots = (
 	return slots
 }
 
+/** Whether at least one guest speaker slot is empty. */
+export const hasTalkRoomEmptyGuestSpeakerSlot = (
+	room?: TalkRoomRoom,
+): boolean => {
+	const maxSpeakers = room?.max_speakers ?? 2
+	const slots = buildTalkRoomSpeakerSlots(room, maxSpeakers)
+
+	return slots.some((slot) => !slot.isHost && slot.type === 'empty')
+}
+
+/** Whether all guest speaker slots are occupied. */
+export const isTalkRoomGuestSpeakerSlotsFull = (
+	room?: TalkRoomRoom,
+): boolean => !hasTalkRoomEmptyGuestSpeakerSlot(room)
+
+/** Parses invite id from socket payloads (`host_invite_to_speaker`, etc.). */
+export const getTalkRoomSocketInviteId = (data?: unknown): string | undefined => {
+	if (!data || typeof data !== 'object') return undefined
+
+	const payload = data as Record<string, unknown>
+	const actionDetails = payload.action_details as
+		| Record<string, unknown>
+		| undefined
+
+	return (
+		(payload.id as string | undefined) ??
+		(payload.invite_id as string | undefined) ??
+		(actionDetails?.invite_id as string | undefined) ??
+		(actionDetails?.id as string | undefined)
+	)
+}
+
+/** Parses invited listener id from invite socket payloads (`host_invite_to_speaker`). */
+export const getTalkRoomSocketInviteTargetUserId = (
+	data?: unknown,
+): string | undefined => {
+	if (!data || typeof data !== 'object') return undefined
+
+	const payload = data as Record<string, unknown>
+	const actionDetails = payload.action_details as
+		| Record<string, unknown>
+		| undefined
+
+	return (
+		(payload.target_id as string | undefined) ??
+		(payload.targetId as string | undefined) ??
+		(actionDetails?.target_id as string | undefined) ??
+		(actionDetails?.targetId as string | undefined)
+	)
+}
+
+/** Parses host invite-to-speaker socket payload. */
+export const parseTalkRoomSocketSpeakerInvite = (
+	data?: unknown,
+): { inviteId: string; targetUserId: string } | null => {
+	const inviteId = getTalkRoomSocketInviteId(data)
+	const targetUserId = getTalkRoomSocketInviteTargetUserId(data)
+
+	if (!inviteId || !targetUserId) return null
+
+	return { inviteId, targetUserId }
+}
+
+/** Parses display name from talk room socket user_info payload. */
+export const getTalkRoomSocketUserName = (data?: unknown): string | undefined => {
+	if (!data || typeof data !== 'object') return undefined
+
+	const payload = data as Record<string, unknown>
+	const userInfo = payload.user_info as Record<string, unknown> | undefined
+
+	return (userInfo?.name as string | undefined) ?? undefined
+}
+
 /** Guest speaker user id for stage slot 1 or 2 (1-indexed). */
 export const getTalkRoomGuestSpeakerUserIdBySlot = (
 	room?: TalkRoomRoom,
