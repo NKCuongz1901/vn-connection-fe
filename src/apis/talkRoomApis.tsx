@@ -740,12 +740,17 @@ export const kickUserFromTalkRoom = async ({
 	return await axios.post(url, payload)
 }
 
+export type TalkRoomStepDownToListenerPayload = {
+	currentRole: string
+	targetId: string
+}
+
 export const stepDownToListener = async ({
 	id,
 	payload,
 }: {
 	id: string
-	payload: TalkRoomTargetUserPayload
+	payload: TalkRoomStepDownToListenerPayload
 }) => {
 	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/stepdown_to_listener`
 

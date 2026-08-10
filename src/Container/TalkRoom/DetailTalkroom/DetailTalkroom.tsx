@@ -80,6 +80,9 @@ function DetailTalkroom({ id }: { id: string }) {
 	const onRoomUserKickedRef = useRef<
 		((kickedUserId: string) => void | Promise<void>) | undefined
 	>()
+	const onRoomSpeakerSteppedDownRef = useRef<
+		((targetUserId: string) => void | Promise<void>) | undefined
+	>()
 	const sessionEndTriggeredRef = useRef(false)
 	const timeUpTriggeredRef = useRef(false)
 	const forceCloseTriggeredRef = useRef(false)
@@ -145,6 +148,8 @@ function DetailTalkroom({ id }: { id: string }) {
 		onHostTransferred: (payload) => onHostTransferredRef.current?.(payload),
 		onRoomUserKicked: (kickedUserId) =>
 			onRoomUserKickedRef.current?.(kickedUserId),
+		onRoomSpeakerSteppedDown: (targetUserId) =>
+			onRoomSpeakerSteppedDownRef.current?.(targetUserId),
 	})
 	const { onChangeRoute } = useLocalePath()
 	const agoraIntegration =
@@ -602,6 +607,12 @@ function DetailTalkroom({ id }: { id: string }) {
 		return !isTalkRoomCountSessionEndVisible(roomEndStatus)
 	}, [isHost, roomEndStatus])
 
+	const showStepDownToListenerAction = useMemo(() => {
+		if (!isHost && !isSpeaker) return false
+
+		return !isTalkRoomCountSessionEndVisible(roomEndStatus)
+	}, [isHost, isSpeaker, roomEndStatus])
+
 	const handleRoomUserKicked = useCallback(
 		async (kickedUserId: string) => {
 			if (!currentUserId || kickedUserId !== currentUserId) return
@@ -635,6 +646,17 @@ function DetailTalkroom({ id }: { id: string }) {
 			onLeaveRoom,
 			onChangeRoute,
 		],
+	)
+
+	const handleRoomSpeakerSteppedDown = useCallback(
+		async (targetUserId: string) => {
+			if (!currentUserId || targetUserId !== currentUserId) return
+
+			await new Promise((resolve) => window.setTimeout(resolve, 200))
+			await disconnect()
+			setSpeakerMicOptimisticOn(false)
+		},
+		[currentUserId, disconnect],
 	)
 
 	const handleHostTransferred = useCallback(
@@ -676,6 +698,10 @@ function DetailTalkroom({ id }: { id: string }) {
 	useEffect(() => {
 		onRoomUserKickedRef.current = handleRoomUserKicked
 	}, [handleRoomUserKicked])
+
+	useEffect(() => {
+		onRoomSpeakerSteppedDownRef.current = handleRoomSpeakerSteppedDown
+	}, [handleRoomSpeakerSteppedDown])
 
 	const handleRefreshAfterStopHosting = useCallback(async () => {
 		const room = await onGetDetailTalkRoom(id)
@@ -1032,6 +1058,7 @@ function DetailTalkroom({ id }: { id: string }) {
 				reportOpen={participantReportOpen}
 				showStopHosting={showStopHostingAction}
 				showRemoveFromRoom={showRemoveFromRoomAction}
+				showStepDownToListener={showStepDownToListenerAction}
 				onClose={onCloseParticipantProfile}
 				onCloseReport={onCloseParticipantReport}
 				onAction={onParticipantProfileAction}

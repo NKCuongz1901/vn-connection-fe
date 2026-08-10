@@ -72,6 +72,7 @@ type TalkRoomParticipantProfileModalProps = {
 	reportOpen?: boolean
 	showStopHosting?: boolean
 	showRemoveFromRoom?: boolean
+	showStepDownToListener?: boolean
 	onClose: () => void
 	onCloseReport?: () => void
 	onAction?: (action: TalkRoomParticipantProfileAction) => void
@@ -253,6 +254,7 @@ function TalkRoomParticipantProfileModal({
 	reportOpen = false,
 	showStopHosting = false,
 	showRemoveFromRoom = true,
+	showStepDownToListener = true,
 	onClose,
 	onCloseReport,
 	onAction,
@@ -307,6 +309,9 @@ function TalkRoomParticipantProfileModal({
 		if (item.key === 'add_friend' && is_friend) return false
 		if (item.key === 'stop_hosting' && !showStopHosting) return false
 		if (item.key === 'remove_from_room' && !showRemoveFromRoom) return false
+		if (item.key === 'stepdown_to_listener' && !showStepDownToListener) {
+			return false
+		}
 		return true
 	})
 

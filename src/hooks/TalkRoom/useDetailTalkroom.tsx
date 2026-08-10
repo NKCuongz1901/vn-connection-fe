@@ -69,6 +69,7 @@ type UseDetailTalkroomOptions = {
 		newHostId?: string
 	}) => void
 	onRoomUserKicked?: (kickedUserId: string) => void
+	onRoomSpeakerSteppedDown?: (targetUserId: string) => void
 }
 
 export type TalkRoomParticipantProfileModalState = {
@@ -605,25 +606,44 @@ export default function useDetailTalkroom(
 						},
 					})
 					break
-				case 'stepdown_to_listener':
-					const isSpeakerSelf = participantProfileModal.role === 'speaker-self'
+				case 'stepdown_to_listener': {
+					const isSpeakerSelf =
+						participantProfileModal.role === 'speaker-self'
+					const stepDownPayload = {
+						currentRole: TALK_ROOM_ROLE.SPEAKER,
+						targetId: targetUserId,
+					}
+
+					if (isSpeakerSelf) {
+						runParticipantRoomAction(
+							() =>
+								stepDownToListener({
+									id,
+									payload: stepDownPayload,
+								}),
+							undefined,
+							{ skipRefresh: true },
+						)
+						break
+					}
+
 					openConfirm({
-						message: isSpeakerSelf
-							? 'Do you want to stop speaking?'
-							: 'Make this speaker become a listener?',
-						onAccept: () =>
-							runParticipantRoomAction(
+						message: 'Make this speaker become a listener?',
+						onAccept: async () => {
+							const ok = await runParticipantRoomAction(
 								() =>
 									stepDownToListener({
 										id,
-										payload: { user_id: targetUserId },
+										payload: stepDownPayload,
 									}),
-								isSpeakerSelf
-									? 'You stopped speaking'
-									: 'Speaker moved to listener',
-							),
+								undefined,
+								{ skipRefresh: true },
+							)
+							if (ok) closeModal()
+						},
 					})
 					break
+				}
 				case 'assign_as_host':
 					openConfirm({
 						message: 'Do you want to assign this speaker as host?',
@@ -793,6 +813,16 @@ export default function useDetailTalkroom(
 					}
 					break
 				}
+				case 'speaker_stepped_down':
+				case 'speaker_removed': {
+					const steppedDownUserId = getTalkRoomSocketTargetUserId(data)
+					handleGetDetailTalkRoom(id)
+					handleGetListenerInRoom(id)
+					if (steppedDownUserId) {
+						options?.onRoomSpeakerSteppedDown?.(steppedDownUserId)
+					}
+					break
+				}
 				case 'room_inactive_warning':
 					// openSuccess({ message: '...' }) hoặc toast sau
 					break
@@ -820,6 +850,7 @@ export default function useDetailTalkroom(
 			options?.onRoomTimeUp,
 			options?.onRoomForceClosed,
 			options?.onHostTransferred,
+			options?.onRoomSpeakerSteppedDown,
 		],
 	)
 
