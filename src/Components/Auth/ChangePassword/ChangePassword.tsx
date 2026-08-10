@@ -79,6 +79,7 @@ const ChangePassword = ({
 					<CInputPassword
 						isRequired
 						value={password}
+						error={errors?.password}
 						label={isRegister ? 'Password' : 'New password'}
 						onChange={(e) => onChangePassword(e.target.value)}
 					/>
@@ -112,7 +113,8 @@ const ChangePassword = ({
 					{isRegister && (
 						<Flex align="center" gap={4}>
 							<CCheckbox
-								value={checked}
+								// value={checked}
+								checked={checked}
 								onChange={() => onChangeCommonData('checked')(!checked)}
 							/>
 							<div>
