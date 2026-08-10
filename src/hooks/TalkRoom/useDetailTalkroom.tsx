@@ -646,16 +646,22 @@ export default function useDetailTalkroom(
 				}
 				case 'assign_as_host':
 					openConfirm({
-						message: 'Do you want to assign this speaker as host?',
-						onAccept: () =>
-							runParticipantRoomAction(
+						titleLabel: 'Assign as Host',
+						message:
+							"Your host role will pass to another member. You'll stay as a listener and can leave anytime.",
+						confirmLabel: 'Assign as Host',
+						onAccept: async () => {
+							const ok = await runParticipantRoomAction(
 								() =>
 									stopHosting({
 										id,
 										payload: { newHostId: targetUserId },
 									}),
-								'Host role assigned successfully',
-							),
+								undefined,
+								{ skipRefresh: true },
+							)
+							if (ok) closeModal()
+						},
 					})
 					break
 				case 'add_friend':

@@ -613,6 +613,12 @@ function DetailTalkroom({ id }: { id: string }) {
 		return !isTalkRoomCountSessionEndVisible(roomEndStatus)
 	}, [isHost, isSpeaker, roomEndStatus])
 
+	const showAssignAsHostAction = useMemo(() => {
+		if (!isHost) return false
+
+		return !isTalkRoomCountSessionEndVisible(roomEndStatus)
+	}, [isHost, roomEndStatus])
+
 	const handleRoomUserKicked = useCallback(
 		async (kickedUserId: string) => {
 			if (!currentUserId || kickedUserId !== currentUserId) return
@@ -671,10 +677,12 @@ function DetailTalkroom({ id }: { id: string }) {
 
 			try {
 				if (previousUserId === currentUserId) {
+					await new Promise((resolve) => window.setTimeout(resolve, 200))
 					await disconnect()
 					setSpeakerMicOptimisticOn(false)
 				} else if (newHostId === currentUserId) {
 					await disconnect()
+					await new Promise((resolve) => window.setTimeout(resolve, 500))
 					const result = await onTransitionRole(
 						TALK_ROOM_ROLE.SPEAKER,
 						TALK_ROOM_ROLE.HOST,
@@ -1058,7 +1066,15 @@ function DetailTalkroom({ id }: { id: string }) {
 				reportOpen={participantReportOpen}
 				showStopHosting={showStopHostingAction}
 				showRemoveFromRoom={showRemoveFromRoomAction}
-				showStepDownToListener={showStepDownToListenerAction}
+				showStepDownToListener={
+					showStepDownToListenerAction &&
+					(participantProfileModal.role === 'speaker' ||
+						participantProfileModal.role === 'speaker-self')
+				}
+				showAssignAsHost={
+					showAssignAsHostAction &&
+					participantProfileModal.role === 'speaker'
+				}
 				onClose={onCloseParticipantProfile}
 				onCloseReport={onCloseParticipantReport}
 				onAction={onParticipantProfileAction}
