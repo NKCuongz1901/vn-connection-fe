@@ -1,5 +1,7 @@
 import dayjs from 'dayjs'
 
+import type { ValidatePreTalkroomModel } from '@/apis/talkRoomApis'
+import { TALK_ROOM_JOIN_REASON } from '@/Variable/talkRoom.variable'
 import { CountriesOptions } from '@/Variable/countryVariable'
 
 export type TalkRoomAvatarLayout = 'single' | 'double' | 'triple'
@@ -643,6 +645,63 @@ export const getTalkRoomSocketTargetUserId = (
 		(userInfo?.id as string | undefined)
 	)
 }
+
+/** Parses leave reason from `user_left_room` socket payload. */
+export const getTalkRoomSocketLeaveReason = (
+	data?: unknown,
+): string | undefined => {
+	if (!data || typeof data !== 'object') return undefined
+
+	const payload = data as Record<string, unknown>
+	const actionDetails = payload.action_details as
+		| Record<string, unknown>
+		| undefined
+
+	return (
+		(actionDetails?.leave_reason as string | undefined) ??
+		(actionDetails?.leaveReason as string | undefined) ??
+		(payload.leave_reason as string | undefined) ??
+		(payload.leaveReason as string | undefined)
+	)
+}
+
+/** Whether socket leave reason indicates the user was kicked from the room. */
+export const isTalkRoomSocketLeaveReasonKicked = (
+	leaveReason?: string,
+): boolean => {
+	if (!leaveReason) return false
+
+	return leaveReason.toUpperCase() === 'KICKED'
+}
+
+export type TalkRoomPreJoinValidation = ValidatePreTalkroomModel & {
+	isRejoin: boolean
+}
+
+/** Whether pre-join validation blocked the user because they were kicked. */
+export const isTalkRoomPreJoinBlockedByKick = (
+	data?: ValidatePreTalkroomModel | null,
+): boolean => data?.reason === TALK_ROOM_JOIN_REASON.USER_KICKED
+
+/** Parses can-join API payload into a join decision model (null when blocked/kicked). */
+export const parseTalkRoomValidatePreJoin = (
+	data?: ValidatePreTalkroomModel | null,
+): TalkRoomPreJoinValidation | null => {
+	if (!data || isTalkRoomPreJoinBlockedByKick(data)) return null
+
+	return {
+		...data,
+		isRejoin: data.reason === TALK_ROOM_JOIN_REASON.USER_ALREADY_JOINED,
+	}
+}
+
+/** Whether the client may proceed to join after pre-join validation. */
+export const canProceedTalkRoomJoin = (
+	validation: TalkRoomPreJoinValidation,
+): boolean =>
+	validation.canJoin === true ||
+	validation.isRejoin === true ||
+	validation.reason === TALK_ROOM_JOIN_REASON.HOST_NOT_JOINED
 
 export const isTalkRoomSocketEventForCurrentUser = (
 	data?: unknown,

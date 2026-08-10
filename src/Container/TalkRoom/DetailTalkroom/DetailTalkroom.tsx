@@ -20,6 +20,7 @@ import TalkRoomTransferHostRoleModal from '@/Components/Modal/TalkRoomTransferHo
 import {
 	showTalkRoomAutoCloseToast,
 	showTalkRoomSpeakerPromoteToast,
+	showTalkRoomUserKickedToast,
 } from '@/Components/Toast/SocketToastContent'
 import useDetailTalkroom from '@/hooks/TalkRoom/useDetailTalkroom'
 import useHostMicToggle from '@/hooks/TalkRoom/useHostMicToggle'
@@ -76,9 +77,13 @@ function DetailTalkroom({ id }: { id: string }) {
 		  }) => void | Promise<void>)
 		| undefined
 	>()
+	const onRoomUserKickedRef = useRef<
+		((kickedUserId: string) => void | Promise<void>) | undefined
+	>()
 	const sessionEndTriggeredRef = useRef(false)
 	const timeUpTriggeredRef = useRef(false)
 	const forceCloseTriggeredRef = useRef(false)
+	const kickedTriggeredRef = useRef(false)
 	const isPromotingRef = useRef(false)
 	const autoPromoteAttemptedRef = useRef(false)
 	const lastEmittedTalkingRef = useRef<boolean | null>(null)
@@ -138,6 +143,8 @@ function DetailTalkroom({ id }: { id: string }) {
 			setTransferHostModalOpen(true)
 		},
 		onHostTransferred: (payload) => onHostTransferredRef.current?.(payload),
+		onRoomUserKicked: (kickedUserId) =>
+			onRoomUserKickedRef.current?.(kickedUserId),
 	})
 	const { onChangeRoute } = useLocalePath()
 	const agoraIntegration =
@@ -589,6 +596,47 @@ function DetailTalkroom({ id }: { id: string }) {
 		return hasTalkRoomAnotherSpeaker(talkRoomDetail ?? undefined)
 	}, [isHost, roomEndStatus, talkRoomDetail])
 
+	const showRemoveFromRoomAction = useMemo(() => {
+		if (!isHost) return false
+
+		return !isTalkRoomCountSessionEndVisible(roomEndStatus)
+	}, [isHost, roomEndStatus])
+
+	const handleRoomUserKicked = useCallback(
+		async (kickedUserId: string) => {
+			if (!currentUserId || kickedUserId !== currentUserId) return
+			if (kickedTriggeredRef.current) return
+			kickedTriggeredRef.current = true
+
+			showTalkRoomUserKickedToast()
+
+			if (isHost || isSpeaker) await disconnect()
+			if (isListener) await disconnectWhep()
+
+			setIsRoomLiving(false)
+
+			try {
+				await onLeaveRoom()
+			} catch {
+				// User may already be removed server-side.
+			}
+
+			window.setTimeout(() => {
+				onChangeRoute(mainRoutes.talkroom)
+			}, 300)
+		},
+		[
+			currentUserId,
+			disconnect,
+			disconnectWhep,
+			isHost,
+			isSpeaker,
+			isListener,
+			onLeaveRoom,
+			onChangeRoute,
+		],
+	)
+
 	const handleHostTransferred = useCallback(
 		async ({
 			previousUserId,
@@ -624,6 +672,10 @@ function DetailTalkroom({ id }: { id: string }) {
 	useEffect(() => {
 		onHostTransferredRef.current = handleHostTransferred
 	}, [handleHostTransferred])
+
+	useEffect(() => {
+		onRoomUserKickedRef.current = handleRoomUserKicked
+	}, [handleRoomUserKicked])
 
 	const handleRefreshAfterStopHosting = useCallback(async () => {
 		const room = await onGetDetailTalkRoom(id)
@@ -979,6 +1031,7 @@ function DetailTalkroom({ id }: { id: string }) {
 				actionLoading={participantActionLoading}
 				reportOpen={participantReportOpen}
 				showStopHosting={showStopHostingAction}
+				showRemoveFromRoom={showRemoveFromRoomAction}
 				onClose={onCloseParticipantProfile}
 				onCloseReport={onCloseParticipantReport}
 				onAction={onParticipantProfileAction}

@@ -30,11 +30,13 @@ import type {
 	TalkRoomParticipantProfileAction,
 	TalkRoomParticipantProfileRole,
 } from '@/Components/Modal/TalkRoomParticipantProfileModal'
+import {
+	showTalkRoomUserKickedToast,
+} from '@/Components/Toast/SocketToastContent'
 import { useModal } from '@/context/ModalContext'
 import { UserProps } from '@/interface/User/User.interface'
 import {
 	TALK_ROOM_CONNECTION_TYPE,
-	TALK_ROOM_JOIN_REASON,
 	TALK_ROOM_ROLE,
 } from '@/Variable/talkRoom.variable'
 import { useLocalePath } from '@/ultis/route'
@@ -42,16 +44,20 @@ import { mainRoutes } from '@/routes/MainRoutes'
 import {
 	consumeTalkRoomAutoJoinFlag,
 	getTalkRoomConversationId,
+	getTalkRoomSocketLeaveReason,
 	getTalkRoomSocketTalkingStatus,
 	getTalkRoomSocketTargetUserId,
+	isTalkRoomPreJoinBlockedByKick,
+	isTalkRoomSocketLeaveReasonKicked,
+	canProceedTalkRoomJoin,
+	parseTalkRoomValidatePreJoin,
 	parseTalkRoomSocketHostTransferred,
+	TalkRoomPreJoinValidation,
 	TalkRoomSpeakerStatusMap,
 } from '@/ultis/talkRoom'
 import useTalkRoomSocket from './useTalkRoomSocket'
 
-export type ValidatePreJoinRoomResult = ValidatePreTalkroomModel & {
-	isRejoin: boolean
-}
+export type ValidatePreJoinRoomResult = TalkRoomPreJoinValidation
 
 type UseDetailTalkroomOptions = {
 	onRoomSocketEvent?: (event: string, data?: unknown) => void
@@ -62,6 +68,7 @@ type UseDetailTalkroomOptions = {
 		previousUserId?: string
 		newHostId?: string
 	}) => void
+	onRoomUserKicked?: (kickedUserId: string) => void
 }
 
 export type TalkRoomParticipantProfileModalState = {
@@ -74,7 +81,7 @@ export default function useDetailTalkroom(
 	id: string,
 	options?: UseDetailTalkroomOptions,
 ) {
-	const { openError, openConfirm, openSuccess } = useModal()
+	const { openError, openConfirm, openSuccess, closeModal } = useModal()
 	const { onChangeRoute } = useLocalePath()
 	const [talkRoomDetail, setTalkRoomDetail] = useState<TalkRoomDetail | null>(
 		null,
@@ -215,12 +222,12 @@ export default function useDetailTalkroom(
 					const data: ValidatePreTalkroomModel = results?.object ?? null
 					setValidatePreJoin(data)
 
-					if (!data) return null
-
-					return {
-						...data,
-						isRejoin: data.reason === TALK_ROOM_JOIN_REASON.USER_ALREADY_JOINED,
+					if (isTalkRoomPreJoinBlockedByKick(data)) {
+						showTalkRoomUserKickedToast()
+						return null
 					}
+
+					return parseTalkRoomValidatePreJoin(data)
 				}
 			} catch (error) {
 				openError(error)
@@ -528,7 +535,11 @@ export default function useDetailTalkroom(
 	}, [id, handleGetDetailTalkRoom, handleGetListenerInRoom])
 
 	const runParticipantRoomAction = useCallback(
-		async (action: () => Promise<unknown>, successMessage?: string) => {
+		async (
+			action: () => Promise<unknown>,
+			successMessage?: string,
+			options?: { skipRefresh?: boolean },
+		) => {
 			setParticipantActionLoading(true)
 			try {
 				const res: any = await action()
@@ -537,7 +548,9 @@ export default function useDetailTalkroom(
 						openSuccess({ message: successMessage })
 					}
 					handleCloseParticipantProfile()
-					await refreshRoomAfterParticipantAction()
+					if (!options?.skipRefresh) {
+						await refreshRoomAfterParticipantAction()
+					}
 					return true
 				}
 			} catch (error) {
@@ -578,15 +591,18 @@ export default function useDetailTalkroom(
 				case 'remove_from_room':
 					openConfirm({
 						message: 'Remove this user from the room?',
-						onAccept: () =>
-							runParticipantRoomAction(
+						onAccept: async () => {
+							const ok = await runParticipantRoomAction(
 								() =>
 									kickUserFromTalkRoom({
 										id,
-										payload: { user_id: targetUserId },
+										payload: { userId: targetUserId },
 									}),
-								'User removed from room',
-							),
+								undefined,
+								{ skipRefresh: true },
+							)
+							if (ok) closeModal()
+						},
 					})
 					break
 				case 'stepdown_to_listener':
@@ -671,6 +687,7 @@ export default function useDetailTalkroom(
 			openSuccess,
 			handleFetchParticipantProfile,
 			openError,
+			closeModal,
 		],
 	)
 
@@ -700,10 +717,24 @@ export default function useDetailTalkroom(
 		(event: string, data?: unknown) => {
 			switch (event) {
 				case 'user_joined_room':
-				case 'user_left_room':
 					handleGetDetailTalkRoom(id)
 					handleGetListenerInRoom(id)
 					break
+				case 'user_left_room': {
+					const leftUserId = getTalkRoomSocketTargetUserId(data)
+					const leaveReason = getTalkRoomSocketLeaveReason(data)
+
+					if (
+						leftUserId &&
+						isTalkRoomSocketLeaveReasonKicked(leaveReason)
+					) {
+						options?.onRoomUserKicked?.(leftUserId)
+					}
+
+					handleGetDetailTalkRoom(id)
+					handleGetListenerInRoom(id)
+					break
+				}
 				case 'room_went_live':
 					handleGetDetailTalkRoom(id)
 					break
@@ -802,26 +833,25 @@ export default function useDetailTalkroom(
 		if (!id) return
 
 		const shouldSkipValidate = consumeTalkRoomAutoJoinFlag(id)
+		const room = await handleGetDetailTalkRoom(id)
+
+		if (!room) {
+			onChangeRoute(mainRoutes.talkroom)
+			return
+		}
 
 		if (!shouldSkipValidate) {
 			const validation = await handleValidatePreJoinRoom(id)
-			if (!validation) return
-
-			const canProceed =
-				validation.canJoin === true ||
-				validation.isRejoin === true ||
-				validation.reason === TALK_ROOM_JOIN_REASON.HOST_NOT_JOINED
-
-			if (!canProceed) return
+			if (!validation || !canProceedTalkRoomJoin(validation)) {
+				onChangeRoute(mainRoutes.talkroom)
+				return
+			}
 		}
 
 		const joinResult = await handleJoinTalkRoom(id)
 		if (!joinResult?.success) return
 
-		const [room] = await Promise.all([
-			handleGetDetailTalkRoom(id),
-			handleGetListenerInRoom(id),
-		])
+		await handleGetListenerInRoom(id)
 
 		const conversationId = getTalkRoomConversationId(room)
 		if (conversationId) {
@@ -835,6 +865,7 @@ export default function useDetailTalkroom(
 		handleJoinTalkRoom,
 		handleGetDetailTalkRoom,
 		handleGetListenerInRoom,
+		onChangeRoute,
 	])
 
 	useEffect(() => {

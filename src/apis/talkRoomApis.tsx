@@ -724,12 +724,16 @@ export const inviteToSpeaker = async ({
 	return await axios.post(url, payload)
 }
 
+export type TalkRoomKickUserPayload = {
+	userId: string
+}
+
 export const kickUserFromTalkRoom = async ({
 	id,
 	payload,
 }: {
 	id: string
-	payload: TalkRoomTargetUserPayload
+	payload: TalkRoomKickUserPayload
 }) => {
 	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/kick_user`
 
