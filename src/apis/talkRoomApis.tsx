@@ -555,6 +555,8 @@ export type JoinTalkroomAgora = {
 	expires_at?: number
 	stream_wss_url?: string
 	stream_hls_url?: string
+	stream_wss_url_https?: string
+	stream_hls_url_https?: string
 }
 
 export type JoinTalkroomData = {

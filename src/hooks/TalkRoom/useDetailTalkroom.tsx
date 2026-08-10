@@ -23,10 +23,7 @@ import {
 	validatePreTalkroom,
 	ValidatePreTalkroomModel,
 } from '@/apis/talkRoomApis'
-import {
-	joinConversation,
-	leaveConversation,
-} from '@/apis/conversationApis'
+import { joinConversation, leaveConversation } from '@/apis/conversationApis'
 import { addFriend } from '@/apis/friendApis'
 import { blockUser, getUserProfile } from '@/apis/userApis'
 import type {
@@ -35,7 +32,11 @@ import type {
 } from '@/Components/Modal/TalkRoomParticipantProfileModal'
 import { useModal } from '@/context/ModalContext'
 import { UserProps } from '@/interface/User/User.interface'
-import { TALK_ROOM_CONNECTION_TYPE, TALK_ROOM_JOIN_REASON, TALK_ROOM_ROLE } from '@/Variable/talkRoom.variable'
+import {
+	TALK_ROOM_CONNECTION_TYPE,
+	TALK_ROOM_JOIN_REASON,
+	TALK_ROOM_ROLE,
+} from '@/Variable/talkRoom.variable'
 import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
 import {
@@ -126,45 +127,48 @@ export default function useDetailTalkroom(
 		[],
 	)
 
-	const syncRoomUserRoleFromDetail = useCallback((room?: TalkRoomDetail | null) => {
-		if (!room) return
+	const syncRoomUserRoleFromDetail = useCallback(
+		(room?: TalkRoomDetail | null) => {
+			if (!room) return
 
-		if (room.yourAreHost === true) {
-			setRoomUserRole(TALK_ROOM_ROLE.HOST)
-			return
-		}
-
-		if (room.isUserSpeaker === true) {
-			setRoomUserRole(TALK_ROOM_ROLE.SPEAKER)
-			return
-		}
-
-		if (room.youAreListener === true) {
-			setRoomUserRole(TALK_ROOM_ROLE.LISTENER)
-
-			const streamWssUrl = room.stream_wss_url
-			if (streamWssUrl) {
-				const listenerIntegration: JoinTalkroomAgora = {
-					connection_type: TALK_ROOM_CONNECTION_TYPE.MEDIA_SERVER,
-					stream_wss_url: streamWssUrl,
-					user_role: TALK_ROOM_ROLE.LISTENER,
-				}
-				setRoleIntegration(listenerIntegration)
-				setJoinTalkRoomResult((prev) => {
-					if (!prev?.data) return prev
-
-					return {
-						...prev,
-						data: {
-							...prev.data,
-							role: TALK_ROOM_ROLE.LISTENER,
-							agora: listenerIntegration,
-						},
-					}
-				})
+			if (room.yourAreHost === true) {
+				setRoomUserRole(TALK_ROOM_ROLE.HOST)
+				return
 			}
-		}
-	}, [])
+
+			if (room.isUserSpeaker === true) {
+				setRoomUserRole(TALK_ROOM_ROLE.SPEAKER)
+				return
+			}
+
+			if (room.youAreListener === true) {
+				setRoomUserRole(TALK_ROOM_ROLE.LISTENER)
+
+				const streamWssUrl = room.stream_wss_url_https
+				if (streamWssUrl) {
+					const listenerIntegration: JoinTalkroomAgora = {
+						connection_type: TALK_ROOM_CONNECTION_TYPE.MEDIA_SERVER,
+						stream_wss_url: streamWssUrl,
+						user_role: TALK_ROOM_ROLE.LISTENER,
+					}
+					setRoleIntegration(listenerIntegration)
+					setJoinTalkRoomResult((prev) => {
+						if (!prev?.data) return prev
+
+						return {
+							...prev,
+							data: {
+								...prev.data,
+								role: TALK_ROOM_ROLE.LISTENER,
+								agora: listenerIntegration,
+							},
+						}
+					})
+				}
+			}
+		},
+		[],
+	)
 
 	const handleGetDetailTalkRoom = useCallback(
 		async (
@@ -586,8 +590,7 @@ export default function useDetailTalkroom(
 					})
 					break
 				case 'stepdown_to_listener':
-					const isSpeakerSelf =
-						participantProfileModal.role === 'speaker-self'
+					const isSpeakerSelf = participantProfileModal.role === 'speaker-self'
 					openConfirm({
 						message: isSpeakerSelf
 							? 'Do you want to stop speaking?'

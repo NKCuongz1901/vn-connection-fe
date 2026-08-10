@@ -143,11 +143,7 @@ function DetailTalkroom({ id }: { id: string }) {
 	const agoraIntegration =
 		roleIntegration ?? joinTalkRoomResult?.data?.agora ?? null
 	const isHost = useMemo(
-		() =>
-			isCurrentUserTalkRoomHost(
-				talkRoomDetail ?? undefined,
-				currentUserId,
-			),
+		() => isCurrentUserTalkRoomHost(talkRoomDetail ?? undefined, currentUserId),
 		[talkRoomDetail, currentUserId],
 	)
 	const hasSpeakerRole =
@@ -168,8 +164,8 @@ function DetailTalkroom({ id }: { id: string }) {
 			agoraIntegration?.connection_type === 'media_server' ||
 			agoraIntegration?.user_role === 'listener')
 	const streamUrl =
-		agoraIntegration?.stream_wss_url ||
-		(talkRoomDetail as { stream_wss_url?: string } | null)?.stream_wss_url
+		talkRoomDetail?.stream_wss_url_https ??
+		agoraIntegration?.stream_wss_url_https
 	const isRoomLive =
 		isTalkRoomLive(talkRoomDetail?.status) ||
 		joinTalkRoomResult?.data?.room_info?.status === 'live'
@@ -637,12 +633,7 @@ function DetailTalkroom({ id }: { id: string }) {
 
 		await disconnect()
 		setSpeakerMicOptimisticOn(false)
-	}, [
-		id,
-		onGetDetailTalkRoom,
-		onGetListenerInRoom,
-		disconnect,
-	])
+	}, [id, onGetDetailTalkRoom, onGetListenerInRoom, disconnect])
 
 	const handleStopHostingAssign = useCallback(
 		async (slotId: 1 | 2) => {
