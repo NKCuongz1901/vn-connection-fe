@@ -4,6 +4,7 @@ import {
 	useRouter,
 	useSearchParams,
 } from 'next/navigation'
+import { useCallback } from 'react'
 
 export function useLocalePath() {
 	const params = useParams()
@@ -12,19 +13,33 @@ export function useLocalePath() {
 	const pathname = localePathname.split('/').slice(2).join('/')
 
 	const locale = params?.locale || 'en'
-	const handleGetPath = (path: string) => {
-		const cleanPath = path ? path.replace(/^\/+/, '') : '' // Xóa dấu `/` ở đầu nếu có
-		return cleanPath ? `/${locale}/${cleanPath}` : `/${locale}`
-	}
-	const handleChangeRoute = (path: string) => {
-		router.push(handleGetPath(path))
-	}
-	const handleOpenNewRoute = (path: string) => {
-		window.open(handleGetPath(path), '_blank')
-	}
-	const handleGetParam = () => {
+
+	const handleGetPath = useCallback(
+		(path: string) => {
+			const cleanPath = path ? path.replace(/^\/+/, '') : '' // Xóa dấu `/` ở đầu nếu có
+			return cleanPath ? `/${locale}/${cleanPath}` : `/${locale}`
+		},
+		[locale],
+	)
+
+	const handleChangeRoute = useCallback(
+		(path: string) => {
+			router.push(handleGetPath(path))
+		},
+		[router, handleGetPath],
+	)
+
+	const handleOpenNewRoute = useCallback(
+		(path: string) => {
+			window.open(handleGetPath(path), '_blank')
+		},
+		[handleGetPath],
+	)
+
+	const handleGetParam = useCallback(() => {
 		return params || []
-	}
+	}, [params])
+
 	return {
 		pathname: pathname,
 		localePathname: localePathname,
