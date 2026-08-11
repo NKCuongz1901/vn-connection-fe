@@ -46,6 +46,8 @@ import {
 	getTalkRoomTransferHostSpeakerOptions,
 	hasTalkRoomAnotherSpeaker,
 	hasTalkRoomEmptyGuestSpeakerSlot,
+	getTalkRoomFilterRaiseHandIds,
+	getTalkRoomTotalRaiseHand,
 	isCurrentUserGuestSpeaker,
 	isCurrentUserTalkRoomHost,
 	isCurrentUserTalkRoomListener,
@@ -54,6 +56,7 @@ import {
 	isTalkRoomSocketEventForCurrentUser,
 	parseTalkRoomSocketRoomTimeUp,
 	resolveRaiseHandSlotId,
+	sortTalkRoomListenersByRaiseHand,
 	RoomEndStatus,
 } from '@/ultis/talkRoom'
 
@@ -150,6 +153,13 @@ function DetailTalkroom({ id }: { id: string }) {
 		speakerInvitationLoading,
 		onAcceptSpeakerInvitation,
 		onRejectSpeakerInvitation,
+		raiseHandUserIds,
+		slotUserRaiseHand,
+		isFilterRaiseHand,
+		filterRaiseHandSlot,
+		onApproveRaiseHand,
+		onSwitchToFilterRaiseHand,
+		onCloseFilterRaiseHand,
 	} = useDetailTalkroom(id, {
 		onRoomSocketEvent: (event, data) =>
 			onRoomSocketEventRef.current?.(event, data),
@@ -890,8 +900,41 @@ function DetailTalkroom({ id }: { id: string }) {
 		[talkRoomDetail, isListener],
 	)
 
+	const listenerHasRaiseHand = useMemo(
+		() =>
+			currentUserId != null && raiseHandUserIds.includes(currentUserId),
+		[currentUserId, raiseHandUserIds],
+	)
+
+	const totalRaiseHand = useMemo(
+		() => getTalkRoomTotalRaiseHand(slotUserRaiseHand),
+		[slotUserRaiseHand],
+	)
+
+	const displayListeners = useMemo(() => {
+		const filterIds = isFilterRaiseHand
+			? getTalkRoomFilterRaiseHandIds(slotUserRaiseHand, filterRaiseHandSlot)
+			: raiseHandUserIds
+
+		return sortTalkRoomListenersByRaiseHand(listenersInRoom, filterIds)
+	}, [
+		listenersInRoom,
+		isFilterRaiseHand,
+		slotUserRaiseHand,
+		filterRaiseHandSlot,
+		raiseHandUserIds,
+	])
+
 	const handleBeSpeaker = useCallback(async () => {
 		if (beSpeakerState === 'disabled') return
+
+		const hasRaiseHand =
+			currentUserId != null && raiseHandUserIds.includes(currentUserId)
+
+		if (hasRaiseHand) {
+			await onPostRaiseHand({ isRaiseHand: false })
+			return
+		}
 
 		const slotId = resolveRaiseHandSlotId(talkRoomDetail ?? undefined, 1)
 
@@ -899,7 +942,19 @@ function DetailTalkroom({ id }: { id: string }) {
 			isRaiseHand: true,
 			slotId,
 		})
-	}, [beSpeakerState, talkRoomDetail, onPostRaiseHand])
+	}, [
+		beSpeakerState,
+		currentUserId,
+		raiseHandUserIds,
+		talkRoomDetail,
+		onPostRaiseHand,
+	])
+
+	const handleEmptySpeakerSlotClick = useCallback(() => {
+		if (!isHost) return
+
+		onSwitchToFilterRaiseHand(null)
+	}, [isHost, onSwitchToFilterRaiseHand])
 
 	const handleOpenParticipantProfile = useCallback(
 		(userId?: string, target?: 'host' | 'speaker' | 'listener') => {
@@ -945,10 +1000,27 @@ function DetailTalkroom({ id }: { id: string }) {
 	)
 
 	const handleListenerClick = useCallback(
-		(userId?: string) => {
+		async (userId?: string) => {
+			if (!userId) return
+
+			if (
+				isHost &&
+				isFilterRaiseHand &&
+				raiseHandUserIds.includes(userId)
+			) {
+				await onApproveRaiseHand(userId)
+				return
+			}
+
 			handleOpenParticipantProfile(userId, 'listener')
 		},
-		[handleOpenParticipantProfile],
+		[
+			isHost,
+			isFilterRaiseHand,
+			raiseHandUserIds,
+			onApproveRaiseHand,
+			handleOpenParticipantProfile,
+		],
 	)
 
 	const listenerCount =
@@ -995,8 +1067,15 @@ function DetailTalkroom({ id }: { id: string }) {
 				<DetailTalkroomSpeakerStage
 					talkRoomDetail={talkRoomDetail}
 					speakerStatusMap={speakerStatusMap}
+					isHost={isHost}
+					totalRaiseHand={totalRaiseHand}
 					onSpeakerSlotClick={
 						canOpenParticipantProfile ? handleSpeakerSlotClick : undefined
+					}
+					onEmptySlotClick={
+						isHost && totalRaiseHand > 0
+							? handleEmptySpeakerSlotClick
+							: undefined
 					}
 				/>
 			</div>
@@ -1012,10 +1091,13 @@ function DetailTalkroom({ id }: { id: string }) {
 					isSpeaker={isSpeaker}
 					isRoomLiving={isRoomLiving}
 					listenerCount={listenerCount}
-					listeners={listenersInRoom}
+					listeners={displayListeners}
+					raiseHandUserIds={raiseHandUserIds}
+					isFilterRaiseHand={isFilterRaiseHand}
 					loadingListeners={loadingListenersInRoom}
 					micState={micState}
 					beSpeakerState={beSpeakerState}
+					hasRaiseHand={listenerHasRaiseHand}
 					onToggleMic={onToggleMic}
 					onBeSpeaker={handleBeSpeaker}
 					onLeaveRoom={onLeave}
@@ -1023,6 +1105,7 @@ function DetailTalkroom({ id }: { id: string }) {
 					onListenerClick={
 						canOpenParticipantProfile ? handleListenerClick : undefined
 					}
+					onCloseFilterRaiseHand={onCloseFilterRaiseHand}
 				/>
 			</div>
 		)

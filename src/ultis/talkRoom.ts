@@ -554,7 +554,7 @@ export const getHostMicState = (
 	return 'off'
 }
 
-/** Be speaker button state for listeners — same enable rules as host mic. */
+/** Be speaker button state for listeners — listeners may raise hand even when slots are full. */
 export const getListenerBeSpeakerState = (
 	room?: TalkRoomRoom,
 	options?: { isListener?: boolean },
@@ -1131,6 +1131,138 @@ export const hasTalkRoomEmptyGuestSpeakerSlot = (
 export const isTalkRoomGuestSpeakerSlotsFull = (
 	room?: TalkRoomRoom,
 ): boolean => !hasTalkRoomEmptyGuestSpeakerSlot(room)
+
+export type TalkRoomSlotRaiseHandMap = Record<number, string[]>
+
+const TALK_ROOM_RAISE_HAND_SLOTS = [1, 2] as const
+
+/** Flattens per-slot raise hand map into unique user ids. */
+export const flattenTalkRoomSlotRaiseHand = (
+	slotMap: TalkRoomSlotRaiseHandMap,
+): string[] => {
+	const ids = new Set<string>()
+
+	for (const slot of TALK_ROOM_RAISE_HAND_SLOTS) {
+		for (const userId of slotMap[slot] ?? []) {
+			if (userId) ids.add(userId)
+		}
+	}
+
+	return Array.from(ids)
+}
+
+/** Total listeners waiting with raised hand across all guest slots. */
+export const getTalkRoomTotalRaiseHand = (
+	slotMap: TalkRoomSlotRaiseHandMap,
+): number => flattenTalkRoomSlotRaiseHand(slotMap).length
+
+/** Builds per-slot raise hand map from raised-hands API rows. */
+export const buildTalkRoomSlotRaiseHandFromRows = (
+	rows: Array<{
+		user_id?: string
+		user?: { id?: string }
+		slot_id?: number
+		slotId?: number
+	}>,
+): TalkRoomSlotRaiseHandMap => {
+	const slotMap: TalkRoomSlotRaiseHandMap = { 1: [], 2: [] }
+
+	for (const row of rows) {
+		const userId = row.user_id ?? row.user?.id
+		if (!userId) continue
+
+		const slotId = row.slot_id ?? row.slotId ?? 1
+		if (slotId !== 1 && slotId !== 2) continue
+
+		if (!slotMap[slotId].includes(userId)) {
+			slotMap[slotId].push(userId)
+		}
+	}
+
+	return slotMap
+}
+
+/** Adds a user to a guest speaker slot raise-hand queue. */
+export const addTalkRoomSlotRaiseHand = (
+	slotMap: TalkRoomSlotRaiseHandMap,
+	userId: string,
+	slotIndex = 1,
+): TalkRoomSlotRaiseHandMap => {
+	const slot = slotIndex === 2 ? 2 : 1
+	const next: TalkRoomSlotRaiseHandMap = {
+		1: (slotMap[1] ?? []).filter((id) => id !== userId),
+		2: (slotMap[2] ?? []).filter((id) => id !== userId),
+	}
+
+	if (!next[slot].includes(userId)) {
+		next[slot] = [...next[slot], userId]
+	}
+
+	return next
+}
+
+/** Removes a user from all raise-hand slot queues. */
+export const removeTalkRoomSlotRaiseHand = (
+	slotMap: TalkRoomSlotRaiseHandMap,
+	userId: string,
+): TalkRoomSlotRaiseHandMap => ({
+	1: (slotMap[1] ?? []).filter((id) => id !== userId),
+	2: (slotMap[2] ?? []).filter((id) => id !== userId),
+})
+
+/** Raise-hand user ids for filter mode (all slots or one slot). */
+export const getTalkRoomFilterRaiseHandIds = (
+	slotMap: TalkRoomSlotRaiseHandMap,
+	filterSlot: number | null,
+): string[] => {
+	if (filterSlot === 1 || filterSlot === 2) {
+		return slotMap[filterSlot] ?? []
+	}
+
+	return flattenTalkRoomSlotRaiseHand(slotMap)
+}
+
+/** Sorts listeners so raised-hand users appear first. */
+export const sortTalkRoomListenersByRaiseHand = <T extends { user_id?: string }>(
+	listeners: T[],
+	raiseHandUserIds: string[],
+): T[] => {
+	if (raiseHandUserIds.length === 0) return listeners
+
+	const raisedSet = new Set(raiseHandUserIds)
+
+	return [...listeners].sort((a, b) => {
+		const aRaised = raisedSet.has(a.user_id ?? '')
+		const bRaised = raisedSet.has(b.user_id ?? '')
+
+		if (aRaised && !bRaised) return -1
+		if (!aRaised && bRaised) return 1
+
+		return 0
+	})
+}
+
+/** Parses guest speaker slot index from talk room socket payloads. */
+export const getTalkRoomSocketSlotId = (
+	data?: unknown,
+	defaultSlot = 1,
+): number => {
+	if (!data || typeof data !== 'object') return defaultSlot
+
+	const payload = data as Record<string, unknown>
+	const actionDetails = payload.action_details as
+		| Record<string, unknown>
+		| undefined
+	const raw =
+		actionDetails?.slot_id ??
+		actionDetails?.slotId ??
+		payload.slot_id ??
+		payload.slotId
+
+	const slot = Number(raw)
+
+	return slot === 2 ? 2 : 1
+}
 
 /** Parses invite id from socket payloads (`host_invite_to_speaker`, etc.). */
 export const getTalkRoomSocketInviteId = (data?: unknown): string | undefined => {

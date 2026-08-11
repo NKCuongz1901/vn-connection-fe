@@ -10,6 +10,7 @@ import classes from './DetailTalkroomListenerPanel.module.scss'
 
 type DetailTalkroomListenerListProps = {
 	listeners: TalkRoomListenerInRoom[]
+	raiseHandUserIds?: string[]
 	loading?: boolean
 	onListenerClick?: (userId: string) => void
 }
@@ -17,6 +18,7 @@ type DetailTalkroomListenerListProps = {
 /** Scrollable grid of listeners in the talk room. */
 function DetailTalkroomListenerList({
 	listeners,
+	raiseHandUserIds = [],
 	loading = false,
 	onListenerClick,
 }: DetailTalkroomListenerListProps) {
@@ -34,6 +36,11 @@ function DetailTalkroomListenerList({
 				<DetailTalkroomListenerItem
 					key={listener.id || listener.user_id}
 					listener={listener}
+					hasRaiseHand={
+						listener.user_id
+							? raiseHandUserIds.includes(listener.user_id)
+							: false
+					}
 					onClick={
 						onListenerClick && listener.user_id
 							? () => onListenerClick(listener.user_id)

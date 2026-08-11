@@ -10,25 +10,32 @@ import classes from './DetailTalkroomListenerPanel.module.scss'
 
 type BeSpeakerButtonProps = {
 	state: HostMicState
+	hasRaiseHand?: boolean
 	onClick?: () => void
 }
 
-/** Listener "Be speaker" pill button with disabled opacity per Figma. */
-function BeSpeakerButton({ state, onClick }: BeSpeakerButtonProps) {
+/** Listener be-speaker / cancel-speaker pill button. */
+function BeSpeakerButton({
+	state,
+	hasRaiseHand = false,
+	onClick,
+}: BeSpeakerButtonProps) {
 	const isDisabled = state === 'disabled'
+	const label = hasRaiseHand ? 'Cancel speaker' : 'Be speaker'
 
 	return (
 		<button
 			type="button"
 			className={clsx(classes.beSpeakerButton, {
 				[classes.beSpeakerButtonDisabled]: isDisabled,
+				[classes.beSpeakerButtonCancel]: hasRaiseHand && !isDisabled,
 			})}
 			disabled={isDisabled}
 			onClick={onClick}
-			aria-label={isDisabled ? 'Be speaker unavailable' : 'Be speaker'}
+			aria-label={isDisabled ? 'Be speaker unavailable' : label}
 		>
-			<HandIcon width={24} height={24} fill="#ffffff" />
-			<span className={classes.beSpeakerButtonLabel}>Be speaker</span>
+			<HandIcon width={24} height={24} fill={hasRaiseHand ? '#0F1729' : '#ffffff'} />
+			<span className={classes.beSpeakerButtonLabel}>{label}</span>
 		</button>
 	)
 }

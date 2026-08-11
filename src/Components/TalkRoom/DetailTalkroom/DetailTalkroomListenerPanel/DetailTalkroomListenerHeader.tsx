@@ -6,11 +6,15 @@ import classes from './DetailTalkroomListenerPanel.module.scss'
 
 type DetailTalkroomListenerHeaderProps = {
 	listenerCount: number
+	isFilterRaiseHand?: boolean
+	onCloseFilterRaiseHand?: () => void
 }
 
 /** Listener section header with title and count badge. */
 function DetailTalkroomListenerHeader({
 	listenerCount,
+	isFilterRaiseHand = false,
+	onCloseFilterRaiseHand,
 }: DetailTalkroomListenerHeaderProps) {
 	return (
 		<div className={classes.header}>
@@ -18,6 +22,20 @@ function DetailTalkroomListenerHeader({
 				<h3 className={classes.headerTitle}>Listeners</h3>
 				<span className={classes.headerBadge}>{listenerCount}</span>
 			</div>
+			{isFilterRaiseHand ? (
+				<div className={classes.filterRaiseHandBanner}>
+					<span className={classes.filterRaiseHandText}>
+						Tap a raised-hand listener to accept as speaker
+					</span>
+					<button
+						type="button"
+						className={classes.filterRaiseHandClose}
+						onClick={onCloseFilterRaiseHand}
+					>
+						Close
+					</button>
+				</div>
+			) : null}
 		</div>
 	)
 }

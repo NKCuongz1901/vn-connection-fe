@@ -103,6 +103,8 @@ export const TALK_ROOM_USER_KICKED_TOAST_ID = 'talkroom-user-kicked'
 export const TALK_ROOM_INVITE_SENT_TOAST_ID = 'talkroom-invite-sent'
 export const TALK_ROOM_LISTENER_REJECT_INVITE_TOAST_ID =
 	'talkroom-listener-reject-invite'
+export const TALK_ROOM_RAISE_HAND_TOAST_ID = 'talkroom-raise-hand'
+export const TALK_ROOM_NO_SPEAKER_SLOT_TOAST_ID = 'talkroom-no-speaker-slot'
 
 export const showTalkRoomSpeakerPromoteToast = () => {
 	showSocketToast({
@@ -147,6 +149,23 @@ export const showTalkRoomListenerRejectInviteToast = (userName?: string) => {
 		title: `${name} chose not to speak`,
 		variant: 'error',
 		toastId: TALK_ROOM_LISTENER_REJECT_INVITE_TOAST_ID,
+	})
+}
+
+export const showTalkRoomRaiseHandToast = () => {
+	showSocketToast({
+		title: 'You have raised your hand',
+		variant: 'success',
+		toastId: TALK_ROOM_RAISE_HAND_TOAST_ID,
+		showClose: false,
+	})
+}
+
+export const showTalkRoomNoSpeakerSlotToast = () => {
+	showSocketToast({
+		title: 'The room has no available slot for new speakers',
+		variant: 'error',
+		toastId: TALK_ROOM_NO_SPEAKER_SLOT_TOAST_ID,
 	})
 }
 

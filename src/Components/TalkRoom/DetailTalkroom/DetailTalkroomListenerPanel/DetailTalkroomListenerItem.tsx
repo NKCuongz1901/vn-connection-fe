@@ -8,6 +8,7 @@ import CAvatar from '@/Components/Custom/CAvatar'
 import DotIcon from '@/svg/DotIcon'
 import FeMaleIcon from '@/svg/FeMaleIcon'
 import GenderIcon from '@/svg/GenderIcon'
+import HandIcon from '@/svg/Talkroom/HandIcon'
 import MaleIcon from '@/svg/MaleIcon'
 import { mappingFlag } from '@/Variable/countryVariable'
 
@@ -27,12 +28,14 @@ const genderFill = {
 
 type DetailTalkroomListenerItemProps = {
 	listener: TalkRoomListenerInRoom
+	hasRaiseHand?: boolean
 	onClick?: () => void
 }
 
 /** Single listener card: avatar, country flag, name, age and gender. */
 function DetailTalkroomListenerItem({
 	listener,
+	hasRaiseHand = false,
 	onClick,
 }: DetailTalkroomListenerItemProps) {
 	const user = listener.user
@@ -61,12 +64,21 @@ function DetailTalkroomListenerItem({
 					: undefined
 			}
 		>
-			<div className={classes.listenerAvatarWrap}>
+			<div
+				className={clsx(classes.listenerAvatarWrap, {
+					[classes.listenerAvatarRaiseHand]: hasRaiseHand,
+				})}
+			>
 				<CAvatar
 					src={user?.avatar}
 					size={64}
 					className={classes.listenerAvatar}
 				/>
+				{hasRaiseHand ? (
+					<div className={classes.listenerRaiseHandBadge}>
+						<HandIcon width={12} height={12} fill="#E55A0F" />
+					</div>
+				) : null}
 				{!!countryCode && (
 					<div className={classes.listenerFlagWrapper}>
 						<div

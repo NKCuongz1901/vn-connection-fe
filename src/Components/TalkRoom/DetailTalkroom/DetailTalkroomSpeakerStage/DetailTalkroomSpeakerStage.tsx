@@ -3,7 +3,11 @@
 import { memo, useMemo } from 'react'
 
 import { TalkRoomDetail } from '@/apis/talkRoomApis'
-import { buildTalkRoomSpeakerSlots, resolveSpeakerUserId, TalkRoomSpeakerStatusMap } from '@/ultis/talkRoom'
+import {
+	buildTalkRoomSpeakerSlots,
+	resolveSpeakerUserId,
+	TalkRoomSpeakerStatusMap,
+} from '@/ultis/talkRoom'
 
 import DetailTalkroomSpeakerSlot from '../DetailTalkroomSpeakerSlot'
 import classes from './DetailTalkroomSpeakerStage.module.scss'
@@ -12,14 +16,20 @@ type DetailTalkroomSpeakerStageProps = {
 	talkRoomDetail?: TalkRoomDetail | null
 	maxSpeakers?: number
 	speakerStatusMap?: TalkRoomSpeakerStatusMap
+	isHost?: boolean
+	totalRaiseHand?: number
 	onSpeakerSlotClick?: (userId?: string, isHostSlot?: boolean) => void
+	onEmptySlotClick?: () => void
 }
 
 function DetailTalkroomSpeakerStage({
 	talkRoomDetail,
 	maxSpeakers = 2,
 	speakerStatusMap,
+	isHost = false,
+	totalRaiseHand = 0,
 	onSpeakerSlotClick,
+	onEmptySlotClick,
 }: DetailTalkroomSpeakerStageProps) {
 	const slots = useMemo(
 		() =>
@@ -37,14 +47,17 @@ function DetailTalkroomSpeakerStage({
 				<DetailTalkroomSpeakerSlot
 					key={slot.key}
 					slot={slot}
+					totalRaiseHand={slot.type === 'empty' ? totalRaiseHand : 0}
 					onClick={
-						onSpeakerSlotClick && slot.type === 'filled'
+						slot.type === 'filled' && onSpeakerSlotClick
 							? () =>
 									onSpeakerSlotClick(
 										resolveSpeakerUserId(slot.speaker),
 										slot.isHost,
 									)
-							: undefined
+							: slot.type === 'empty' && isHost && onEmptySlotClick
+								? onEmptySlotClick
+								: undefined
 					}
 				/>
 			))}

@@ -22,6 +22,32 @@
 	justify-content: center;
 }
 
+.emptyAvatarWaiting {
+	border-style: solid;
+	border-color: rgba(255, 255, 255, 0.48);
+	background: rgba(255, 255, 255, 0.12);
+	flex-direction: column;
+	gap: 4px;
+	padding: 8px 4px;
+}
+
+.emptyWaitingCount {
+	color: #fff;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 20px;
+}
+
+.emptyWaitingLabel {
+	color: rgba(255, 255, 255, 0.88);
+	font-size: 12px;
+	line-height: 16px;
+}
+
+.emptySlotClickable {
+	cursor: pointer;
+}
+
 .avatarWrap {
 	position: relative;
 	width: 80px;

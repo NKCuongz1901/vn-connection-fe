@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import { memo } from 'react'
 
 import CAvatar from '@/Components/Custom/CAvatar'
+import HandIcon from '@/svg/Talkroom/HandIcon'
 import UserMicOffIcon from '@/svg/Talkroom/UserMicOffIcon'
 import UserMicOnIcon from '@/svg/Talkroom/UserMicOnIcon'
 import WaveSoundIcon from '@/svg/Talkroom/WaveSoundIcon'
@@ -15,15 +16,53 @@ import classes from './DetailTalkroomSpeakerSlot.module.scss'
 
 type DetailTalkroomSpeakerSlotProps = {
 	slot: TalkRoomSpeakerSlot
+	totalRaiseHand?: number
 	onClick?: () => void
 }
 
-function DetailTalkroomSpeakerSlot({ slot, onClick }: DetailTalkroomSpeakerSlotProps) {
+function DetailTalkroomSpeakerSlot({
+	slot,
+	totalRaiseHand = 0,
+	onClick,
+}: DetailTalkroomSpeakerSlotProps) {
 	if (slot.type === 'empty') {
+		const showWaiting = totalRaiseHand > 0
+
 		return (
-			<div className={classes.slot}>
-				<div className={classes.emptyAvatar}>
-					<IconPlus size={24} stroke={1.5} color="#fff" />
+			<div
+				className={clsx(classes.slot, {
+					[classes.emptySlotClickable]: Boolean(onClick),
+				})}
+				onClick={onClick}
+				role={onClick ? 'button' : undefined}
+				tabIndex={onClick ? 0 : undefined}
+				onKeyDown={
+					onClick
+						? (event) => {
+								if (event.key === 'Enter' || event.key === ' ') {
+									event.preventDefault()
+									onClick()
+								}
+							}
+						: undefined
+				}
+			>
+				<div
+					className={clsx(classes.emptyAvatar, {
+						[classes.emptyAvatarWaiting]: showWaiting,
+					})}
+				>
+					{showWaiting ? (
+						<>
+							<HandIcon width={20} height={20} fill="#E55A0F" />
+							<span className={classes.emptyWaitingCount}>
+								{totalRaiseHand}
+							</span>
+							<span className={classes.emptyWaitingLabel}>Waiting</span>
+						</>
+					) : (
+						<IconPlus size={24} stroke={1.5} color="#fff" />
+					)}
 				</div>
 				<span className={classes.label}>{slot.label}</span>
 			</div>

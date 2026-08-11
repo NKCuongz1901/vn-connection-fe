@@ -15,6 +15,7 @@ type DetailTalkroomListenerFooterProps = {
 	isRoomLiving?: boolean
 	micState: HostMicState
 	beSpeakerState: HostMicState
+	hasRaiseHand?: boolean
 	onToggleMic?: () => void
 	onBeSpeaker?: () => void
 	onLeaveRoom?: () => void
@@ -28,6 +29,7 @@ function DetailTalkroomListenerFooter({
 	isRoomLiving = true,
 	micState,
 	beSpeakerState,
+	hasRaiseHand = false,
 	onToggleMic,
 	onBeSpeaker,
 	onLeaveRoom,
@@ -41,7 +43,11 @@ function DetailTalkroomListenerFooter({
 					<HostMicButton state={micState} size="md" onClick={onToggleMic} />
 				) : null}
 				{showVoiceActions && isListener && !isSpeaker ? (
-					<BeSpeakerButton state={beSpeakerState} onClick={onBeSpeaker} />
+					<BeSpeakerButton
+						state={beSpeakerState}
+						hasRaiseHand={hasRaiseHand}
+						onClick={onBeSpeaker}
+					/>
 				) : null}
 				<button
 					type="button"

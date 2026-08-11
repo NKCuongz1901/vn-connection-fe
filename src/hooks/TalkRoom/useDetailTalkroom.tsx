@@ -37,6 +37,8 @@ import type {
 import {
 	showTalkRoomInviteSentToast,
 	showTalkRoomListenerRejectInviteToast,
+	showTalkRoomNoSpeakerSlotToast,
+	showTalkRoomRaiseHandToast,
 	showTalkRoomUserKickedToast,
 } from '@/Components/Toast/SocketToastContent'
 import { useModal } from '@/context/ModalContext'
@@ -61,8 +63,15 @@ import {
 	parseTalkRoomSocketHostTransferred,
 	parseTalkRoomSocketSpeakerInvite,
 	getTalkRoomSocketUserName,
+	addTalkRoomSlotRaiseHand,
+	buildTalkRoomSlotRaiseHandFromRows,
+	flattenTalkRoomSlotRaiseHand,
+	getTalkRoomSocketSlotId,
+	isTalkRoomGuestSpeakerSlotsFull,
+	removeTalkRoomSlotRaiseHand,
 	TalkRoomPreJoinValidation,
 	TalkRoomSpeakerStatusMap,
+	TalkRoomSlotRaiseHandMap,
 } from '@/ultis/talkRoom'
 import useTalkRoomSocket from './useTalkRoomSocket'
 
@@ -134,12 +143,101 @@ export default function useDetailTalkroom(
 		useState(false)
 	const [participantReportOpen, setParticipantReportOpen] = useState(false)
 	const [raiseHandUserIds, setRaiseHandUserIds] = useState<string[]>([])
+	const [slotUserRaiseHand, setSlotUserRaiseHand] =
+		useState<TalkRoomSlotRaiseHandMap>({ 1: [], 2: [] })
+	const [isFilterRaiseHand, setIsFilterRaiseHand] = useState(false)
+	const [filterRaiseHandSlot, setFilterRaiseHandSlot] = useState<number | null>(
+		null,
+	)
 	const [speakerInvitation, setSpeakerInvitation] = useState<{
 		inviteId: string
 	} | null>(null)
 	const [speakerInvitationLoading, setSpeakerInvitationLoading] =
 		useState(false)
 	const isInviteToSpeakerInFlightRef = useRef(false)
+
+	const applySlotRaiseHandMap = useCallback(
+		(slotMap: TalkRoomSlotRaiseHandMap) => {
+			setSlotUserRaiseHand(slotMap)
+			setRaiseHandUserIds(flattenTalkRoomSlotRaiseHand(slotMap))
+		},
+		[],
+	)
+
+	const handleAddRaiseHandUser = useCallback(
+		(userId: string, slotIndex = 1) => {
+			if (!userId) return
+
+			setSlotUserRaiseHand((prev) => {
+				const next = addTalkRoomSlotRaiseHand(prev, userId, slotIndex)
+				setRaiseHandUserIds(flattenTalkRoomSlotRaiseHand(next))
+
+				return next
+			})
+		},
+		[],
+	)
+
+	const handleRemoveRaiseHandUser = useCallback((userId: string) => {
+		if (!userId) return
+
+		setSlotUserRaiseHand((prev) => {
+			const next = removeTalkRoomSlotRaiseHand(prev, userId)
+			setRaiseHandUserIds(flattenTalkRoomSlotRaiseHand(next))
+
+			return next
+		})
+	}, [])
+
+	const handleSwitchToFilterRaiseHand = useCallback((slot?: number | null) => {
+		setFilterRaiseHandSlot(slot ?? null)
+		setIsFilterRaiseHand(true)
+	}, [])
+
+	const handleCloseFilterRaiseHand = useCallback(() => {
+		setIsFilterRaiseHand(false)
+		setFilterRaiseHandSlot(null)
+	}, [])
+
+	const handleApproveRaiseHand = useCallback(
+		async (userId: string) => {
+			if (!id || !userId) return false
+
+			if (isTalkRoomGuestSpeakerSlotsFull(talkRoomDetail ?? undefined)) {
+				showTalkRoomNoSpeakerSlotToast()
+
+				return false
+			}
+
+			try {
+				const res: any = await hostApproveRaiseHand({
+					id,
+					payload: {
+						user_id: userId,
+						is_approved: true,
+					},
+				})
+
+				if (res?.code === 200) {
+					handleRemoveRaiseHandUser(userId)
+					handleCloseFilterRaiseHand()
+
+					return true
+				}
+			} catch (error) {
+				openError(error)
+			}
+
+			return false
+		},
+		[
+			id,
+			talkRoomDetail,
+			openError,
+			handleRemoveRaiseHandUser,
+			handleCloseFilterRaiseHand,
+		],
+	)
 
 	const handleUpdateSpeakerLiveStatus = useCallback(
 		(
@@ -517,14 +615,13 @@ export default function useDetailTalkroom(
 						results?.object?.rows ??
 						results?.object ??
 						[]
-					const ids = (Array.isArray(rows) ? rows : [])
-						.map(
-							(row: { user_id?: string; user?: { id?: string } }) =>
-								row?.user_id ?? row?.user?.id,
-						)
-						.filter(Boolean) as string[]
+					const slotMap = buildTalkRoomSlotRaiseHandFromRows(
+						Array.isArray(rows) ? rows : [],
+					)
+					const ids = flattenTalkRoomSlotRaiseHand(slotMap)
 
-					setRaiseHandUserIds(ids)
+					applySlotRaiseHandMap(slotMap)
+
 					return ids
 				}
 			} catch (error) {
@@ -533,7 +630,7 @@ export default function useDetailTalkroom(
 
 			return []
 		},
-		[id, openError],
+		[id, openError, applySlotRaiseHandMap],
 	)
 
 	const handleCloseSpeakerInvitation = useCallback(() => {
@@ -697,6 +794,17 @@ export default function useDetailTalkroom(
 						try {
 							const raisedHandIds = await handleGetRaiseHandUsers()
 							const hasRaiseHand = raisedHandIds.includes(targetUserId)
+
+							if (
+								hasRaiseHand &&
+								isTalkRoomGuestSpeakerSlotsFull(
+									talkRoomDetail ?? undefined,
+								)
+							) {
+								showTalkRoomNoSpeakerSlotToast()
+								return
+							}
+
 							const res: any = hasRaiseHand
 								? await hostApproveRaiseHand({
 										id,
@@ -837,6 +945,7 @@ export default function useDetailTalkroom(
 		},
 		[
 			id,
+			talkRoomDetail,
 			participantProfileModal.userId,
 			participantProfileModal.role,
 			openConfirm,
@@ -884,6 +993,10 @@ export default function useDetailTalkroom(
 					const leftUserId = getTalkRoomSocketTargetUserId(data)
 					const leaveReason = getTalkRoomSocketLeaveReason(data)
 
+					if (leftUserId) {
+						handleRemoveRaiseHandUser(leftUserId)
+					}
+
 					if (
 						leftUserId &&
 						isTalkRoomSocketLeaveReasonKicked(leaveReason)
@@ -927,6 +1040,28 @@ export default function useDetailTalkroom(
 					const isTalking = getTalkRoomSocketTalkingStatus(data)
 					if (userId && typeof isTalking === 'boolean') {
 						handleUpdateSpeakerLiveStatus(userId, { is_talking: isTalking })
+					}
+					break
+				}
+				case 'listener_raise_hand': {
+					const userId = getTalkRoomSocketTargetUserId(data)
+					const slotId = getTalkRoomSocketSlotId(data, 1)
+					const currentUserId = getUserInfo('id') as string | undefined
+
+					if (userId) {
+						handleAddRaiseHandUser(userId, slotId)
+
+						if (currentUserId && userId === currentUserId) {
+							showTalkRoomRaiseHandToast()
+						}
+					}
+					break
+				}
+				case 'listener_lower_hand': {
+					const userId = getTalkRoomSocketTargetUserId(data)
+
+					if (userId) {
+						handleRemoveRaiseHandUser(userId)
 					}
 					break
 				}
@@ -1014,6 +1149,8 @@ export default function useDetailTalkroom(
 			handleGetListenerInRoom,
 			handleLeaveRoom,
 			handleUpdateSpeakerLiveStatus,
+			handleAddRaiseHandUser,
+			handleRemoveRaiseHandUser,
 			onChangeRoute,
 			options?.onRoomSocketEvent,
 			options?.onRoomTimeUp,
@@ -1098,6 +1235,9 @@ export default function useDetailTalkroom(
 		participantActionLoading,
 		participantReportOpen,
 		raiseHandUserIds,
+		slotUserRaiseHand,
+		isFilterRaiseHand,
+		filterRaiseHandSlot,
 		speakerInvitationOpen: Boolean(speakerInvitation),
 		speakerInvitationLoading,
 
@@ -1117,6 +1257,9 @@ export default function useDetailTalkroom(
 		onAcceptSpeakerInvitation: handleAcceptSpeakerInvitation,
 		onRejectSpeakerInvitation: handleRejectSpeakerInvitation,
 		onCloseSpeakerInvitation: handleCloseSpeakerInvitation,
+		onApproveRaiseHand: handleApproveRaiseHand,
+		onSwitchToFilterRaiseHand: handleSwitchToFilterRaiseHand,
+		onCloseFilterRaiseHand: handleCloseFilterRaiseHand,
 		emitRoomEvent,
 	}
 }
