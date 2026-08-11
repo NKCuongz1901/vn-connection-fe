@@ -774,12 +774,17 @@ export const stopHosting = async ({
 	return await axios.post(url, payload)
 }
 
+export type HostApproveRaiseHandPayload = {
+	userId: string
+	isAccepted: boolean
+}
+
 export const hostApproveRaiseHand = async ({
 	id,
 	payload,
 }: {
 	id: string
-	payload: { user_id: string; is_approved: boolean; slot_id?: number }
+	payload: HostApproveRaiseHandPayload
 }) => {
 	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/host_approve_raise_hand`
 

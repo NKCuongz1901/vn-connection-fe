@@ -213,8 +213,8 @@ export default function useDetailTalkroom(
 				const res: any = await hostApproveRaiseHand({
 					id,
 					payload: {
-						user_id: userId,
-						is_approved: true,
+						userId,
+						isAccepted: true,
 					},
 				})
 
@@ -809,8 +809,8 @@ export default function useDetailTalkroom(
 								? await hostApproveRaiseHand({
 										id,
 										payload: {
-											user_id: targetUserId,
-											is_approved: true,
+											userId: targetUserId,
+											isAccepted: true,
 										},
 									})
 								: await inviteToSpeaker({
