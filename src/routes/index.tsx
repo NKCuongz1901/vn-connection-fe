@@ -86,6 +86,7 @@ export const CONVERSATION_ROUTES = {
 	language: 'language',
 	readMessage: 'message/read_message',
 	quickMessage: 'quick-chat',
+	listChatlocationOverview: 'conversation/overview-chat-location',
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',

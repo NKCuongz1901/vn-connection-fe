@@ -461,3 +461,17 @@ export const adminDeleteMessage = async ({
 		data: {},
 	})
 }
+
+// API Chat location
+export const getListChatlocationOverview = async ({
+	page,
+	limit,
+}: {
+	page: number
+	limit: number
+}) => {
+	const url = `${CONVERSATION_ROUTES.listChatlocationOverview}`
+	return await axios.get(url, {
+		params: convertParams({ page, limit }),
+	})
+}

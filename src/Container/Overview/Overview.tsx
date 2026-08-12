@@ -6,6 +6,7 @@ import { useLoading } from '@/context/LoadingContext'
 import useOverview from '@/hooks/Overview/useOverview'
 
 import { arrayFrom, isArray } from '@/ultis/array'
+import { getDiffFromNow } from '@/ultis/date'
 import { useLocalePath } from '@/ultis/route'
 import { formatNumberString } from '@/ultis/string'
 
@@ -24,6 +25,7 @@ import ItemEventTicket from '@/Components/Event/ItemEventTicket'
 import ModalCRUDEvent from '@/Components/Event/ModalCRUDEvent'
 import ModelChooseHangout from '@/Components/Hangout/ModelChooseHangout'
 import EventIcon from '@/svg/Event'
+import GlobalIcon from '@/svg/GlobalIcon'
 import PencilIcon from '@/svg/Hangout/PencilIcon'
 import MarkIcon from '@/svg/MarkIcon'
 import Message2Icon from '@/svg/Message2Icon'
@@ -73,6 +75,8 @@ const Overview = () => {
 		listTalkroom,
 		totalTalkroom,
 		statsTalkroom,
+		listChatlocation,
+		totalChatlocation,
 
 		setModal,
 		OnChangeTitleHangout,
@@ -106,6 +110,9 @@ const Overview = () => {
 	const [talkRoomRuleModal, setTalkRoomRuleModal] = useState<{
 		open: boolean
 	}>({ open: false })
+	const [chatRoomTab, setChatRoomTab] = useState<'language' | 'location'>(
+		'language',
+	)
 
 	const handleOpenTalkRoomJoinModal = (roomId: string) => {
 		if (userData.keyIntroTalkRoom === true) {
@@ -488,92 +495,205 @@ const Overview = () => {
 			</Flex>
 		)
 	}
+	const _renderChatRoomLanguageList = () => {
+		if (!loading.chatroom && !isArray(listChatRoom, 1)) return null
+
+		return (
+			<Flex className={classes.chatRoomList}>
+				{loading.chatroom
+					? arrayFrom(10).map((_, index) => (
+							<Flex key={index} vertical className={classes.chatRoomItem}>
+								<Skeleton.Avatar
+									active
+									className={classes.contentSkeletonAva}
+								/>
+								<Skeleton.Input
+									active
+									className={classes.contentSkeletonInput}
+								/>
+								<Skeleton.Input
+									active
+									className={classes.contentSkeletonInput2}
+								/>
+							</Flex>
+						))
+					: isArray(listChatRoom, 1) &&
+						listChatRoom.map((i) => {
+							const {
+								id,
+								avatar,
+								title,
+								amount_of_user,
+								amount_of_user_online,
+							} = i || {}
+							return (
+								<Flex
+									key={id}
+									vertical
+									className={classes.chatRoomItem}
+									onClick={() =>
+										onChangeRoute(
+											`${mainRoutes.chatRoom}?type=language&id=${id}`,
+										)
+									}
+								>
+									<div>
+										<CAvatarBandage
+											isHidden
+											src={avatar}
+											className={clsx(classes.chatRoomAva, {
+												[classes.leftFlag]: !!LEFT_FLAG[title],
+											})}
+											classBandage={classes.chatRoomBandage}
+										/>
+									</div>
+									<div className={classes.chatRoomLabel}>{title}</div>
+									<div className={classes.chatRoomNum}>
+										{formatNumberString(amount_of_user)} members
+									</div>
+									<Flex className={classes.totalOnl}>
+										<div className={classes.online} />
+										<div>
+											{formatNumberString(amount_of_user_online)} members online
+										</div>
+									</Flex>
+								</Flex>
+							)
+						})}
+			</Flex>
+		)
+	}
+
+	const _renderChatRoomLocationList = () => {
+		if (!loading.chatlocation && !isArray(listChatlocation, 1)) return null
+
+		return (
+			<Flex className={classes.chatLocationList}>
+				{loading.chatlocation
+					? arrayFrom(6).map((_, index) => (
+							<Flex key={index} vertical className={classes.chatLocationItem}>
+								<Skeleton.Input
+									active
+									className={classes.chatLocationSkeletonTitle}
+								/>
+								<Skeleton.Avatar
+									active
+									className={classes.chatLocationSkeletonAva}
+								/>
+								<Skeleton.Input
+									active
+									className={classes.chatLocationSkeletonMeta}
+								/>
+							</Flex>
+						))
+					: isArray(listChatlocation, 1) &&
+						listChatlocation.map((item) => {
+							const {
+								id,
+								title,
+								avatars = [],
+								amount_of_user,
+								amount_of_user_online,
+								last_message,
+							} = item || {}
+							const visibleAvatars = (avatars || []).slice(0, 3)
+							const moreCount = Math.max(
+								(amount_of_user || 0) - (avatars || []).length,
+								0,
+							)
+							const lastMessageAt = last_message?.created_at
+							const { value: timeAgo, unit } = lastMessageAt
+								? getDiffFromNow({ input: lastMessageAt })
+								: { value: '', unit: '' }
+
+							return (
+								<Flex
+									key={id}
+									vertical
+									className={classes.chatLocationItem}
+									onClick={() =>
+										onChangeRoute(
+											`${mainRoutes.chatRoom}?type=location&id=${id}`,
+										)
+									}
+								>
+									<Flex className={classes.chatLocationTitle}>
+										<span className={classes.chatLocationGlobe}>
+											<GlobalIcon fill="#006b35" width={12} height={12} />
+										</span>
+										<span className={classes.chatLocationName}>{title}</span>
+									</Flex>
+									<Flex className={classes.chatLocationAvatars}>
+										<Flex className={classes.chatLocationAvatarStack}>
+											{visibleAvatars.map((src, index) => (
+												<div
+													key={`${id}-avatar-${index}`}
+													className={classes.chatLocationAvatar}
+												>
+													<CAvatar src={src} size={24} />
+												</div>
+											))}
+										</Flex>
+										{moreCount > 0 && (
+											<span className={classes.chatLocationMore}>
+												+{formatNumberString(moreCount)}
+											</span>
+										)}
+									</Flex>
+									<Flex vertical className={classes.chatLocationMeta}>
+										<Flex className={classes.chatLocationOnline}>
+											<span className={classes.chatLocationOnlineDot} />
+											<span>
+												{formatNumberString(amount_of_user_online || 0)} online
+											</span>
+										</Flex>
+										{lastMessageAt && (
+											<span className={classes.chatLocationTime}>
+												{timeAgo}
+												{unit ? ` ${unit}s ago` : ''}
+											</span>
+										)}
+									</Flex>
+								</Flex>
+							)
+						})}
+			</Flex>
+		)
+	}
+
 	const _renderChatRoom = () => {
+		const isLocationTab = chatRoomTab === 'location'
+
 		return (
 			<Flex vertical className={classes.chatRoomWrapper}>
 				<Flex
 					className={classes.title}
 					onClick={() => onChangeRoute(mainRoutes.chatRoom)}
 				>
-					<EventTitle
-						hiddenAdd
-						label="Chat room"
-						number={total.chatroom}
-						icon={<Message2Icon />}
-					/>
+					<EventTitle hiddenAdd label="Chat room" icon={<Message2Icon />} />
 				</Flex>
 				<Flex vertical className={classes.chatRoom}>
-					{!(!loading.chatroom && !isArray(listChatRoom, 1)) && (
-						<>
-							<Flex className={classes.chatRoomList}>
-								{loading.chatroom
-									? arrayFrom(10).map((_, index) => (
-											<Flex
-												key={index}
-												vertical
-												className={classes.chatRoomItem}
-											>
-												<Skeleton.Avatar
-													active
-													className={classes.contentSkeletonAva}
-												/>
-												<Skeleton.Input
-													active
-													className={classes.contentSkeletonInput}
-												/>
-												<Skeleton.Input
-													active
-													className={classes.contentSkeletonInput2}
-												/>
-											</Flex>
-										))
-									: isArray(listChatRoom, 1) &&
-										listChatRoom.map((i) => {
-											const {
-												id,
-												avatar,
-												title,
-												amount_of_user,
-												amount_of_user_online,
-											} = i || {}
-											return (
-												<Flex
-													key={id}
-													vertical
-													className={classes.chatRoomItem}
-													onClick={() =>
-														onChangeRoute(
-															`${mainRoutes.chatRoom}?type=language&id=${id}`,
-														)
-													}
-												>
-													<div>
-														<CAvatarBandage
-															isHidden
-															src={avatar}
-															className={clsx(classes.chatRoomAva, {
-																[classes.leftFlag]: !!LEFT_FLAG[title],
-															})}
-															classBandage={classes.chatRoomBandage}
-														/>
-													</div>
-													<div className={classes.chatRoomLabel}>{title}</div>
-													<div className={classes.chatRoomNum}>
-														{formatNumberString(amount_of_user)} members
-													</div>
-													<Flex className={classes.totalOnl}>
-														<div className={classes.online} />
-														<div>
-															{formatNumberString(amount_of_user_online)}{' '}
-															members online
-														</div>
-													</Flex>
-												</Flex>
-											)
-										})}
-							</Flex>
-						</>
-					)}
+					<Flex className={classes.chatRoomTabs}>
+						<div
+							className={clsx(classes.chatRoomTab, {
+								[classes.chatRoomTabActive]: !isLocationTab,
+							})}
+							onClick={() => setChatRoomTab('language')}
+						>
+							Language chat ({total.chatroom})
+						</div>
+						<div
+							className={clsx(classes.chatRoomTab, {
+								[classes.chatRoomTabActive]: isLocationTab,
+							})}
+							onClick={() => setChatRoomTab('location')}
+						>
+							Location chat ({totalChatlocation})
+						</div>
+					</Flex>
+					{isLocationTab
+						? _renderChatRoomLocationList()
+						: _renderChatRoomLanguageList()}
 				</Flex>
 			</Flex>
 		)

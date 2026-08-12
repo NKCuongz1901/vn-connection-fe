@@ -5,7 +5,11 @@ import { useEffect, useRef, useState } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { getChatRoomList, getConvClubList } from '@/apis/conversationApis'
+import {
+	getChatRoomList,
+	getConvClubList,
+	getListChatlocationOverview,
+} from '@/apis/conversationApis'
 import { getUserOpenHangout } from '@/apis/hangoutApi'
 import { getListPost, getmyEventInHome } from '@/apis/postApis'
 import { getUserProfile, updateUserProfile } from '@/apis/userApis'
@@ -84,6 +88,7 @@ export default function useOverview() {
 		network: false,
 		chatroom: false,
 		talkroom: false,
+		chatlocation: false,
 	})
 	const [total, setTotal] = useState({ event: 0, network: 0, chatroom: 0 })
 
@@ -97,6 +102,29 @@ export default function useOverview() {
 	const [totalTalkroom, setTotalTalkroom] = useState(0)
 	const [statsTalkroom, setStatsTalkroom] = useState<any>({})
 	const [listTalkroom, setListTalkroom] = useState<any[]>([])
+
+	const [listChatlocation, setListChatlocation] = useState<any[]>([])
+	const [totalChatlocation, setTotalChatlocation] = useState(0)
+
+	const handleGetListChatLocationOverview = async () => {
+		setLoading((prev) => ({ ...prev, chatlocation: true }))
+		try {
+			const res: any = await getListChatlocationOverview({
+				page: 1,
+				limit: 30,
+			})
+			const { code, results } = res || {}
+			if (code === 200) {
+				const { rows, count } = results?.objects || {}
+				setListChatlocation(rows || [])
+				setTotalChatlocation(count || 0)
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoading((prev) => ({ ...prev, chatlocation: false }))
+		}
+	}
 
 	const handleGetTalkroomOverview = async () => {
 		setLoading((prev) => ({ ...prev, talkroom: true }))
@@ -534,6 +562,7 @@ export default function useOverview() {
 		handleGetListNetwork()
 		handleGetListChatRoom()
 		handleGetTalkroomOverview()
+		handleGetListChatLocationOverview()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -567,6 +596,8 @@ export default function useOverview() {
 		listTalkroom,
 		totalTalkroom,
 		statsTalkroom,
+		listChatlocation,
+		totalChatlocation,
 
 		OnChangeTitleHangout: handleOnChangeTitleHangout,
 		onUpdateUserInfo: handleUpdateUserInfo,
