@@ -323,9 +323,11 @@ export const isTalkRoomCountSessionEndVisible = (
 
 /** Resolves the talk room chat conversation id (mirrors mobile currentConversationId). */
 export const getTalkRoomConversationId = (
-	detail?: Pick<TalkRoomRoom, 'schedules'> & {
-		conversation_id?: string | null
-	} | null,
+	detail?:
+		| (Pick<TalkRoomRoom, 'schedules'> & {
+				conversation_id?: string | null
+		  })
+		| null,
 ): string => {
 	if (!detail) return ''
 
@@ -560,6 +562,8 @@ export const getListenerBeSpeakerState = (
 	options?: { isListener?: boolean },
 ): HostMicState => {
 	if (!options?.isListener) return 'disabled'
+
+	if (isTalkRoomCountWaitingVisible(room)) return 'off'
 
 	if (!isTalkRoomLive(room?.status)) return 'disabled'
 
@@ -1128,9 +1132,8 @@ export const hasTalkRoomEmptyGuestSpeakerSlot = (
 }
 
 /** Whether all guest speaker slots are occupied. */
-export const isTalkRoomGuestSpeakerSlotsFull = (
-	room?: TalkRoomRoom,
-): boolean => !hasTalkRoomEmptyGuestSpeakerSlot(room)
+export const isTalkRoomGuestSpeakerSlotsFull = (room?: TalkRoomRoom): boolean =>
+	!hasTalkRoomEmptyGuestSpeakerSlot(room)
 
 export type TalkRoomSlotRaiseHandMap = Record<number, string[]>
 
@@ -1223,7 +1226,9 @@ export const getTalkRoomFilterRaiseHandIds = (
 }
 
 /** Sorts listeners so raised-hand users appear first. */
-export const sortTalkRoomListenersByRaiseHand = <T extends { user_id?: string }>(
+export const sortTalkRoomListenersByRaiseHand = <
+	T extends { user_id?: string },
+>(
 	listeners: T[],
 	raiseHandUserIds: string[],
 ): T[] => {
@@ -1265,7 +1270,9 @@ export const getTalkRoomSocketSlotId = (
 }
 
 /** Parses invite id from socket payloads (`host_invite_to_speaker`, etc.). */
-export const getTalkRoomSocketInviteId = (data?: unknown): string | undefined => {
+export const getTalkRoomSocketInviteId = (
+	data?: unknown,
+): string | undefined => {
 	if (!data || typeof data !== 'object') return undefined
 
 	const payload = data as Record<string, unknown>
@@ -1313,7 +1320,9 @@ export const parseTalkRoomSocketSpeakerInvite = (
 }
 
 /** Parses display name from talk room socket user_info payload. */
-export const getTalkRoomSocketUserName = (data?: unknown): string | undefined => {
+export const getTalkRoomSocketUserName = (
+	data?: unknown,
+): string | undefined => {
 	if (!data || typeof data !== 'object') return undefined
 
 	const payload = data as Record<string, unknown>
