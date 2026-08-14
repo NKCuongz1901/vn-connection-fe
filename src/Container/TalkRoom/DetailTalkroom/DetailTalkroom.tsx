@@ -949,36 +949,69 @@ function DetailTalkroom({ id }: { id: string }) {
 		raiseHandUserIds,
 	])
 
-	const handleBeSpeaker = useCallback(async () => {
-		if (beSpeakerState === 'disabled') return
+	/** Toggles raise hand; preferred slot falls back to the other free slot. */
+	const handleToggleRaiseHand = useCallback(
+		async (preferredSlot: 1 | 2) => {
+			if (beSpeakerState === 'disabled') return
 
-		const hasRaiseHand =
-			currentUserId != null && raiseHandUserIds.includes(currentUserId)
+			const hasRaiseHand =
+				currentUserId != null && raiseHandUserIds.includes(currentUserId)
 
-		if (hasRaiseHand) {
-			await onPostRaiseHand({ isRaiseHand: false })
-			return
-		}
+			if (hasRaiseHand) {
+				await onPostRaiseHand({ isRaiseHand: false })
+				return
+			}
 
-		const slotId = resolveRaiseHandSlotId(talkRoomDetail ?? undefined, 1)
+			await onPostRaiseHand({
+				isRaiseHand: true,
+				slotId: resolveRaiseHandSlotId(
+					talkRoomDetail ?? undefined,
+					preferredSlot,
+				),
+			})
+		},
+		[
+			beSpeakerState,
+			currentUserId,
+			raiseHandUserIds,
+			talkRoomDetail,
+			onPostRaiseHand,
+		],
+	)
 
-		await onPostRaiseHand({
-			isRaiseHand: true,
-			slotId,
-		})
-	}, [
-		beSpeakerState,
-		currentUserId,
-		raiseHandUserIds,
-		talkRoomDetail,
-		onPostRaiseHand,
-	])
+	const handleBeSpeaker = useCallback(
+		() => handleToggleRaiseHand(1),
+		[handleToggleRaiseHand],
+	)
 
-	const handleEmptySpeakerSlotClick = useCallback(() => {
-		if (!isHost) return
+	const handleEmptySpeakerSlotClick = useCallback(
+		async (slotId: 1 | 2) => {
+			if (isHost) {
+				if (totalRaiseHand > 0) onSwitchToFilterRaiseHand(slotId)
+				return
+			}
 
-		onSwitchToFilterRaiseHand(null)
-	}, [isHost, onSwitchToFilterRaiseHand])
+			if (isSpeaker || !isListener) return
+
+			await handleToggleRaiseHand(slotId)
+		},
+		[
+			isHost,
+			isSpeaker,
+			isListener,
+			totalRaiseHand,
+			onSwitchToFilterRaiseHand,
+			handleToggleRaiseHand,
+		],
+	)
+
+	// Host opens the raise hand queue; listener raises a hand for that slot.
+	const canClickEmptySpeakerSlot = isHost
+		? totalRaiseHand > 0
+		: isListener &&
+			!isSpeaker &&
+			isRoomLiving &&
+			beSpeakerState !== 'disabled'
 
 	const handleOpenParticipantProfile = useCallback(
 		(userId?: string, target?: 'host' | 'speaker' | 'listener') => {
@@ -1097,14 +1130,13 @@ function DetailTalkroom({ id }: { id: string }) {
 				<DetailTalkroomSpeakerStage
 					talkRoomDetail={talkRoomDetail}
 					speakerStatusMap={speakerStatusMap}
-					isHost={isHost}
 					isRoomLiving={isRoomLiving}
 					totalRaiseHand={totalRaiseHand}
 					onSpeakerSlotClick={
 						canOpenParticipantProfile ? handleSpeakerSlotClick : undefined
 					}
 					onEmptySlotClick={
-						isHost && totalRaiseHand > 0
+						canClickEmptySpeakerSlot
 							? handleEmptySpeakerSlotClick
 							: undefined
 					}

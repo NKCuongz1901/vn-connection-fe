@@ -1064,6 +1064,7 @@ export type TalkRoomSpeakerSlot = {
 	type: TalkRoomSpeakerSlotType
 	isHost: boolean
 	label: string
+	slotId?: 1 | 2
 	speaker?: TalkRoomFilledSpeaker
 }
 
@@ -1116,6 +1117,7 @@ export const buildTalkRoomSpeakerSlots = (
 			type: speaker ? 'filled' : 'empty',
 			isHost: false,
 			label: `Speaker ${i + 1}`,
+			slotId: (i + 1) as 1 | 2,
 			speaker: withLiveStatus(speaker),
 		})
 	}
