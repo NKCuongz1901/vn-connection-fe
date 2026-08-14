@@ -1137,6 +1137,29 @@ export const hasTalkRoomEmptyGuestSpeakerSlot = (
 export const isTalkRoomGuestSpeakerSlotsFull = (room?: TalkRoomRoom): boolean =>
 	!hasTalkRoomEmptyGuestSpeakerSlot(room)
 
+/** User ids currently sitting on the speaker stage (host slot + guest speakers). */
+export const getTalkRoomStageUserIds = (room?: TalkRoomRoom): string[] =>
+	buildTalkRoomSpeakerSlots(room, room?.max_speakers ?? 2)
+		.map((slot) => resolveSpeakerUserId(slot.speaker))
+		.filter((userId): userId is string => Boolean(userId))
+
+/** Drops listener rows whose user already moved up to the speaker stage. */
+export const excludeTalkRoomStageUsersFromListeners = <
+	T extends { user_id?: string },
+>(
+	listeners: T[],
+	room?: TalkRoomRoom,
+	extraUserIds: (string | undefined)[] = [],
+): T[] => {
+	const excludedIds = new Set(
+		[...getTalkRoomStageUserIds(room), ...extraUserIds].filter(Boolean),
+	)
+
+	if (excludedIds.size === 0) return listeners
+
+	return listeners.filter((listener) => !excludedIds.has(listener.user_id ?? ''))
+}
+
 export type TalkRoomSlotRaiseHandMap = Record<number, string[]>
 
 const TALK_ROOM_RAISE_HAND_SLOTS = [1, 2] as const

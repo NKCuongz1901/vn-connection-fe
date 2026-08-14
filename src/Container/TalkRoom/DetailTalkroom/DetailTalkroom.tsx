@@ -39,6 +39,7 @@ import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { getUserInfo } from '@/ultis/storage'
 import {
+	excludeTalkRoomStageUsersFromListeners,
 	formatTalkRoomLevelLabel,
 	ForceRoomCloseOptions,
 	getListenerBeSpeakerState,
@@ -923,14 +924,25 @@ function DetailTalkroom({ id }: { id: string }) {
 		[slotUserRaiseHand],
 	)
 
+	// Listener rows can lag behind the stage, so stage users are always filtered out.
+	const listenerRows = useMemo(
+		() =>
+			excludeTalkRoomStageUsersFromListeners(
+				listenersInRoom,
+				talkRoomDetail ?? undefined,
+				isHost || isSpeaker ? [currentUserId] : [],
+			),
+		[listenersInRoom, talkRoomDetail, isHost, isSpeaker, currentUserId],
+	)
+
 	const displayListeners = useMemo(() => {
 		const filterIds = isFilterRaiseHand
 			? getTalkRoomFilterRaiseHandIds(slotUserRaiseHand, filterRaiseHandSlot)
 			: raiseHandUserIds
 
-		return sortTalkRoomListenersByRaiseHand(listenersInRoom, filterIds)
+		return sortTalkRoomListenersByRaiseHand(listenerRows, filterIds)
 	}, [
-		listenersInRoom,
+		listenerRows,
 		isFilterRaiseHand,
 		slotUserRaiseHand,
 		filterRaiseHandSlot,
@@ -1035,9 +1047,10 @@ function DetailTalkroom({ id }: { id: string }) {
 		],
 	)
 
+	const promotedListenerCount = listenersInRoom.length - listenerRows.length
 	const listenerCount =
 		totalListenersInRoom > 0
-			? totalListenersInRoom
+			? Math.max(0, totalListenersInRoom - promotedListenerCount)
 			: getTalkRoomListenerCount(talkRoomDetail ?? undefined)
 
 	const hasGuestSpeaker = useMemo(
