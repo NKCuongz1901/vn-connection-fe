@@ -9,6 +9,8 @@ import DetailTalkroomListenerPanel from '@/Components/TalkRoom/DetailTalkroom/De
 import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomSpeakerStage'
 import TalkRoomParticipantProfileModal from '@/Components/Modal/TalkRoomParticipantProfileModal'
 import type { TalkRoomParticipantProfileRole } from '@/Components/Modal/TalkRoomParticipantProfileModal'
+import TalkRoomConnectedCountryModal from '@/Components/Modal/TalkRoomConnectedCountryModal'
+import TalkRoomConnectedUserModal from '@/Components/Modal/TalkRoomConnectedUserModal'
 import TalkRoomHeaderActionButton from '@/Components/TalkRoom/DetailTalkroom/TalkRoomHeaderActionButton'
 import DetailTalkroomTiming from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomTiming'
 import DetailTalkroomChatPanel from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomChatPanel'
@@ -145,10 +147,20 @@ function DetailTalkroom({ id }: { id: string }) {
 		loadingParticipantProfile,
 		participantActionLoading,
 		participantReportOpen,
+		participantConnectedModal,
+		participantConnectedUsers,
+		participantConnectedCountries,
+		totalParticipantConnectedUsers,
+		loadingParticipantConnectedPeople,
+		loadingParticipantConnectedCountries,
 		onOpenParticipantProfile,
 		onCloseParticipantProfile,
 		onParticipantProfileAction,
 		onCloseParticipantReport,
+		onOpenParticipantConnectedPeople,
+		onLoadMoreParticipantConnectedPeople,
+		onOpenParticipantConnectedCountries,
+		onCloseParticipantConnectedModal,
 		speakerInvitationOpen,
 		speakerInvitationLoading,
 		onAcceptSpeakerInvitation,
@@ -1220,7 +1232,26 @@ function DetailTalkroom({ id }: { id: string }) {
 				}
 				onClose={onCloseParticipantProfile}
 				onCloseReport={onCloseParticipantReport}
+				onClickConnectedPeople={onOpenParticipantConnectedPeople}
+				onClickConnectedCountries={onOpenParticipantConnectedCountries}
 				onAction={onParticipantProfileAction}
+			/>
+			<TalkRoomConnectedUserModal
+				open={participantConnectedModal === 'people'}
+				users={participantConnectedUsers}
+				total={totalParticipantConnectedUsers}
+				loading={loadingParticipantConnectedPeople}
+				hasMore={
+					participantConnectedUsers.length < totalParticipantConnectedUsers
+				}
+				onLoadMore={onLoadMoreParticipantConnectedPeople}
+				onClose={onCloseParticipantConnectedModal}
+			/>
+			<TalkRoomConnectedCountryModal
+				open={participantConnectedModal === 'countries'}
+				countries={participantConnectedCountries}
+				loading={loadingParticipantConnectedCountries}
+				onClose={onCloseParticipantConnectedModal}
 			/>
 			<Flex className={classes.header}>
 				<IconChevronLeft className={classes.iconBack} onClick={onLeave} />
