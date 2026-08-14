@@ -1074,18 +1074,8 @@ export const buildTalkRoomSpeakerSlots = (
 	speakerStatusMap?: TalkRoomSpeakerStatusMap,
 ): TalkRoomSpeakerSlot[] => {
 	const speakers = room?.speakers ?? []
-	const hostSpeaker =
-		speakers.find((speaker) => speaker?.role === 'host') ??
-		(room?.host_user
-			? {
-					id: room.host_user.id,
-					name: room.host_user.name,
-					avatar: room.host_user.avatar,
-					i_am_from: room.host_user.i_am_from,
-					role: 'host',
-					is_open_mic: false,
-				}
-			: undefined)
+
+	const hostSpeaker = speakers.find((speaker) => speaker?.role === 'host')
 	const guestSpeakers = speakers.filter(
 		(speaker) => speaker?.role === 'speaker',
 	)
