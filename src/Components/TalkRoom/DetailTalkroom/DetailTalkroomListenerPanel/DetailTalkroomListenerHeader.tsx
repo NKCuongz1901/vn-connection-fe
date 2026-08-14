@@ -20,7 +20,9 @@ function DetailTalkroomListenerHeader({
 		<div className={classes.header}>
 			<div className={classes.headerTitleRow}>
 				<h3 className={classes.headerTitle}>Listeners</h3>
-				<span className={classes.headerBadge}>{listenerCount}</span>
+				{listenerCount > 0 ? (
+					<span className={classes.headerBadge}>{listenerCount}</span>
+				) : null}
 			</div>
 			{isFilterRaiseHand ? (
 				<div className={classes.filterRaiseHandBanner}>

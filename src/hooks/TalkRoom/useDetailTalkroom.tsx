@@ -1259,6 +1259,8 @@ export default function useDetailTalkroom(
 					const steppedDownUserId = getTalkRoomSocketTargetUserId(data)
 					handleGetDetailTalkRoom(id)
 					handleGetListenerInRoom(id)
+					// The listener rows can still be stale right after the role change.
+					window.setTimeout(() => handleGetListenerInRoom(id), 800)
 					if (steppedDownUserId) {
 						options?.onRoomSpeakerSteppedDown?.(steppedDownUserId)
 					}

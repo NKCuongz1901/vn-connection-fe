@@ -20,6 +20,8 @@ type DetailTalkroomListenerPanelProps = {
 	listeners?: TalkRoomListenerInRoom[]
 	raiseHandUserIds?: string[]
 	isFilterRaiseHand?: boolean
+	hasGuestSpeaker?: boolean
+	totalParticipants?: number
 	loadingListeners?: boolean
 	micState: HostMicState
 	beSpeakerState: HostMicState
@@ -42,6 +44,8 @@ function DetailTalkroomListenerPanel({
 	listeners = [],
 	raiseHandUserIds = [],
 	isFilterRaiseHand = false,
+	hasGuestSpeaker = false,
+	totalParticipants = 0,
 	loadingListeners = false,
 	micState,
 	beSpeakerState,
@@ -53,7 +57,11 @@ function DetailTalkroomListenerPanel({
 	onListenerClick,
 	onCloseFilterRaiseHand,
 }: DetailTalkroomListenerPanelProps) {
-	const showEmpty = listeners.length === 0 && !loadingListeners
+	const noListener = listeners.length === 0 && !loadingListeners
+	// Invite CTA only while the room still waits for a second person to join.
+	const showEmpty = noListener && !hasGuestSpeaker && totalParticipants < 2
+	// Room detail count can update before the listener rows arrive (e.g. after a step down).
+	const awaitingListeners = noListener && !showEmpty && listenerCount > 0
 
 	return (
 		<div className={classes.panel}>
@@ -65,11 +73,11 @@ function DetailTalkroomListenerPanel({
 			<div className={classes.body}>
 				{showEmpty ? (
 					<DetailTalkroomListenerEmpty onInvite={onInvite} />
-				) : (
+				) : noListener && !awaitingListeners ? null : (
 					<DetailTalkroomListenerList
 						listeners={listeners}
 						raiseHandUserIds={raiseHandUserIds}
-						loading={loadingListeners}
+						loading={loadingListeners || awaitingListeners}
 						onListenerClick={onListenerClick}
 					/>
 				)}

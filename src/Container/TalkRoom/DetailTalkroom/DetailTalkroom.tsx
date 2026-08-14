@@ -1040,6 +1040,11 @@ function DetailTalkroom({ id }: { id: string }) {
 			? totalListenersInRoom
 			: getTalkRoomListenerCount(talkRoomDetail ?? undefined)
 
+	const hasGuestSpeaker = useMemo(
+		() => hasTalkRoomAnotherSpeaker(talkRoomDetail ?? undefined),
+		[talkRoomDetail],
+	)
+
 	const _renderHostContent = () => {
 		return (
 			<div className={classes.hostContent}>
@@ -1106,6 +1111,8 @@ function DetailTalkroom({ id }: { id: string }) {
 					listeners={displayListeners}
 					raiseHandUserIds={raiseHandUserIds}
 					isFilterRaiseHand={isFilterRaiseHand}
+					hasGuestSpeaker={hasGuestSpeaker}
+					totalParticipants={talkRoomDetail?.total_participants ?? 0}
 					loadingListeners={loadingListenersInRoom}
 					micState={micState}
 					beSpeakerState={beSpeakerState}
