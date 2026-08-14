@@ -7,6 +7,8 @@ import {
 	getDetailTalkRoom,
 	getListenerInRoom,
 	getRaiseHandUser,
+	getTalkRoomUserConnectedCountries,
+	getTalkRoomUserConnectedPeople,
 	getTalkRoomUserProfile,
 	hostApproveRaiseHand,
 	inviteToSpeaker,
@@ -21,6 +23,7 @@ import {
 	stepDownToListener,
 	stopHosting,
 	TalkRoomDetail,
+	TalkRoomConnectedUser,
 	TalkRoomListenerInRoom,
 	TalkRoomUserProfileStats,
 	transitionRole,
@@ -50,6 +53,7 @@ import {
 import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { getUserInfo } from '@/ultis/storage'
+import { uniqueArray } from '@/ultis/array'
 import {
 	consumeTalkRoomAutoJoinFlag,
 	getTalkRoomConversationId,
@@ -142,6 +146,28 @@ export default function useDetailTalkroom(
 	const [participantActionLoading, setParticipantActionLoading] =
 		useState(false)
 	const [participantReportOpen, setParticipantReportOpen] = useState(false)
+	const [participantConnectedModal, setParticipantConnectedModal] = useState<
+		'people' | 'countries' | null
+	>(null)
+	const [participantConnectedUsers, setParticipantConnectedUsers] = useState<
+		TalkRoomConnectedUser[]
+	>([])
+	const [participantConnectedCountries, setParticipantConnectedCountries] =
+		useState<string[]>([])
+	const [totalParticipantConnectedUsers, setTotalParticipantConnectedUsers] =
+		useState(0)
+	const [loadingParticipantConnectedPeople, setLoadingParticipantConnectedPeople] =
+		useState(false)
+	const [
+		loadingParticipantConnectedCountries,
+		setLoadingParticipantConnectedCountries,
+	] = useState(false)
+	const participantConnectedPeoplePaginationRef = useRef({
+		page: 1,
+		limit: 30,
+		totalPage: 0,
+		userId: '',
+	})
 	const [raiseHandUserIds, setRaiseHandUserIds] = useState<string[]>([])
 	const [slotUserRaiseHand, setSlotUserRaiseHand] =
 		useState<TalkRoomSlotRaiseHandMap>({ 1: [], 2: [] })
@@ -690,6 +716,118 @@ export default function useDetailTalkroom(
 		setParticipantUserProfile(null)
 		setParticipantTalkRoomStats(null)
 		setParticipantReportOpen(false)
+		setParticipantConnectedModal(null)
+	}, [])
+
+	/** Loads connected people for the selected participant profile. */
+	const handleGetParticipantConnectedPeople = useCallback(
+		async (userId: string, reset = false) => {
+			if (!userId || loadingParticipantConnectedPeople) return
+
+			const pagination = participantConnectedPeoplePaginationRef.current
+			if (reset || pagination.userId !== userId) {
+				pagination.page = 1
+				pagination.totalPage = 0
+				pagination.userId = userId
+				setParticipantConnectedUsers([])
+				setTotalParticipantConnectedUsers(0)
+			}
+
+			setLoadingParticipantConnectedPeople(true)
+			try {
+				const { page, limit } = pagination
+				const res: any = await getTalkRoomUserConnectedPeople({
+					userId,
+					params: {
+						fields: ['$all'],
+						page,
+						limit,
+					},
+				})
+				const { code, results, pagination: responsePagination } = res || {}
+
+				if (code === 200) {
+					const rows: TalkRoomConnectedUser[] =
+						results?.objects?.rows ?? []
+					const count =
+						results?.objects?.count ??
+						responsePagination?.total ??
+						rows.length
+
+					pagination.totalPage = Math.ceil(count / limit) || 0
+					setParticipantConnectedUsers((prev) =>
+						uniqueArray(
+							page === 1 ? rows : [...prev, ...rows],
+							'id',
+						) as TalkRoomConnectedUser[],
+					)
+					setTotalParticipantConnectedUsers(count)
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingParticipantConnectedPeople(false)
+			}
+		},
+		[loadingParticipantConnectedPeople, openError],
+	)
+
+	/** Opens the selected participant's connected-people modal. */
+	const handleOpenParticipantConnectedPeople = useCallback(() => {
+		const userId = participantProfileModal.userId
+		if (!userId) return
+
+		setParticipantConnectedModal('people')
+		handleGetParticipantConnectedPeople(userId, true)
+	}, [
+		handleGetParticipantConnectedPeople,
+		participantProfileModal.userId,
+	])
+
+	/** Loads the next page of the selected participant's connected people. */
+	const handleLoadMoreParticipantConnectedPeople = useCallback(() => {
+		const pagination = participantConnectedPeoplePaginationRef.current
+		if (
+			loadingParticipantConnectedPeople ||
+			pagination.page >= pagination.totalPage
+		) {
+			return
+		}
+
+		pagination.page += 1
+		handleGetParticipantConnectedPeople(pagination.userId)
+	}, [
+		handleGetParticipantConnectedPeople,
+		loadingParticipantConnectedPeople,
+	])
+
+	/** Opens and loads the selected participant's connected countries. */
+	const handleOpenParticipantConnectedCountries = useCallback(async () => {
+		const userId = participantProfileModal.userId
+		if (!userId || loadingParticipantConnectedCountries) return
+
+		setParticipantConnectedModal('countries')
+		setParticipantConnectedCountries([])
+		setLoadingParticipantConnectedCountries(true)
+		try {
+			const res: any = await getTalkRoomUserConnectedCountries({ userId })
+			if (res?.code === 200) {
+				setParticipantConnectedCountries(res?.results?.object ?? [])
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoadingParticipantConnectedCountries(false)
+		}
+	}, [
+		loadingParticipantConnectedCountries,
+		openError,
+		participantProfileModal.userId,
+	])
+
+	/** Closes a connected-list modal and returns to the profile modal. */
+	const handleCloseParticipantConnectedModal = useCallback(() => {
+		setParticipantConnectedModal(null)
 	}, [])
 
 	const handleFetchParticipantProfile = useCallback(
@@ -1121,6 +1259,8 @@ export default function useDetailTalkroom(
 					const steppedDownUserId = getTalkRoomSocketTargetUserId(data)
 					handleGetDetailTalkRoom(id)
 					handleGetListenerInRoom(id)
+					// The listener rows can still be stale right after the role change.
+					window.setTimeout(() => handleGetListenerInRoom(id), 800)
 					if (steppedDownUserId) {
 						options?.onRoomSpeakerSteppedDown?.(steppedDownUserId)
 					}
@@ -1234,6 +1374,12 @@ export default function useDetailTalkroom(
 		loadingParticipantProfile,
 		participantActionLoading,
 		participantReportOpen,
+		participantConnectedModal,
+		participantConnectedUsers,
+		participantConnectedCountries,
+		totalParticipantConnectedUsers,
+		loadingParticipantConnectedPeople,
+		loadingParticipantConnectedCountries,
 		raiseHandUserIds,
 		slotUserRaiseHand,
 		isFilterRaiseHand,
@@ -1254,6 +1400,13 @@ export default function useDetailTalkroom(
 		onCloseParticipantProfile: handleCloseParticipantProfile,
 		onParticipantProfileAction: handleParticipantProfileAction,
 		onCloseParticipantReport: handleCloseParticipantReport,
+		onOpenParticipantConnectedPeople: handleOpenParticipantConnectedPeople,
+		onLoadMoreParticipantConnectedPeople:
+			handleLoadMoreParticipantConnectedPeople,
+		onOpenParticipantConnectedCountries:
+			handleOpenParticipantConnectedCountries,
+		onCloseParticipantConnectedModal:
+			handleCloseParticipantConnectedModal,
 		onAcceptSpeakerInvitation: handleAcceptSpeakerInvitation,
 		onRejectSpeakerInvitation: handleRejectSpeakerInvitation,
 		onCloseSpeakerInvitation: handleCloseSpeakerInvitation,

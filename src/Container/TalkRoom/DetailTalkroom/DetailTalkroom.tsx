@@ -9,6 +9,8 @@ import DetailTalkroomListenerPanel from '@/Components/TalkRoom/DetailTalkroom/De
 import DetailTalkroomSpeakerStage from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomSpeakerStage'
 import TalkRoomParticipantProfileModal from '@/Components/Modal/TalkRoomParticipantProfileModal'
 import type { TalkRoomParticipantProfileRole } from '@/Components/Modal/TalkRoomParticipantProfileModal'
+import TalkRoomConnectedCountryModal from '@/Components/Modal/TalkRoomConnectedCountryModal'
+import TalkRoomConnectedUserModal from '@/Components/Modal/TalkRoomConnectedUserModal'
 import TalkRoomHeaderActionButton from '@/Components/TalkRoom/DetailTalkroom/TalkRoomHeaderActionButton'
 import DetailTalkroomTiming from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomTiming'
 import DetailTalkroomChatPanel from '@/Components/TalkRoom/DetailTalkroom/DetailTalkroomChatPanel'
@@ -37,6 +39,7 @@ import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { getUserInfo } from '@/ultis/storage'
 import {
+	excludeTalkRoomStageUsersFromListeners,
 	formatTalkRoomLevelLabel,
 	ForceRoomCloseOptions,
 	getListenerBeSpeakerState,
@@ -145,10 +148,20 @@ function DetailTalkroom({ id }: { id: string }) {
 		loadingParticipantProfile,
 		participantActionLoading,
 		participantReportOpen,
+		participantConnectedModal,
+		participantConnectedUsers,
+		participantConnectedCountries,
+		totalParticipantConnectedUsers,
+		loadingParticipantConnectedPeople,
+		loadingParticipantConnectedCountries,
 		onOpenParticipantProfile,
 		onCloseParticipantProfile,
 		onParticipantProfileAction,
 		onCloseParticipantReport,
+		onOpenParticipantConnectedPeople,
+		onLoadMoreParticipantConnectedPeople,
+		onOpenParticipantConnectedCountries,
+		onCloseParticipantConnectedModal,
 		speakerInvitationOpen,
 		speakerInvitationLoading,
 		onAcceptSpeakerInvitation,
@@ -911,50 +924,94 @@ function DetailTalkroom({ id }: { id: string }) {
 		[slotUserRaiseHand],
 	)
 
+	// Listener rows can lag behind the stage, so stage users are always filtered out.
+	const listenerRows = useMemo(
+		() =>
+			excludeTalkRoomStageUsersFromListeners(
+				listenersInRoom,
+				talkRoomDetail ?? undefined,
+				isHost || isSpeaker ? [currentUserId] : [],
+			),
+		[listenersInRoom, talkRoomDetail, isHost, isSpeaker, currentUserId],
+	)
+
 	const displayListeners = useMemo(() => {
 		const filterIds = isFilterRaiseHand
 			? getTalkRoomFilterRaiseHandIds(slotUserRaiseHand, filterRaiseHandSlot)
 			: raiseHandUserIds
 
-		return sortTalkRoomListenersByRaiseHand(listenersInRoom, filterIds)
+		return sortTalkRoomListenersByRaiseHand(listenerRows, filterIds)
 	}, [
-		listenersInRoom,
+		listenerRows,
 		isFilterRaiseHand,
 		slotUserRaiseHand,
 		filterRaiseHandSlot,
 		raiseHandUserIds,
 	])
 
-	const handleBeSpeaker = useCallback(async () => {
-		if (beSpeakerState === 'disabled') return
+	/** Toggles raise hand; preferred slot falls back to the other free slot. */
+	const handleToggleRaiseHand = useCallback(
+		async (preferredSlot: 1 | 2) => {
+			if (beSpeakerState === 'disabled') return
 
-		const hasRaiseHand =
-			currentUserId != null && raiseHandUserIds.includes(currentUserId)
+			const hasRaiseHand =
+				currentUserId != null && raiseHandUserIds.includes(currentUserId)
 
-		if (hasRaiseHand) {
-			await onPostRaiseHand({ isRaiseHand: false })
-			return
-		}
+			if (hasRaiseHand) {
+				await onPostRaiseHand({ isRaiseHand: false })
+				return
+			}
 
-		const slotId = resolveRaiseHandSlotId(talkRoomDetail ?? undefined, 1)
+			await onPostRaiseHand({
+				isRaiseHand: true,
+				slotId: resolveRaiseHandSlotId(
+					talkRoomDetail ?? undefined,
+					preferredSlot,
+				),
+			})
+		},
+		[
+			beSpeakerState,
+			currentUserId,
+			raiseHandUserIds,
+			talkRoomDetail,
+			onPostRaiseHand,
+		],
+	)
 
-		await onPostRaiseHand({
-			isRaiseHand: true,
-			slotId,
-		})
-	}, [
-		beSpeakerState,
-		currentUserId,
-		raiseHandUserIds,
-		talkRoomDetail,
-		onPostRaiseHand,
-	])
+	const handleBeSpeaker = useCallback(
+		() => handleToggleRaiseHand(1),
+		[handleToggleRaiseHand],
+	)
 
-	const handleEmptySpeakerSlotClick = useCallback(() => {
-		if (!isHost) return
+	const handleEmptySpeakerSlotClick = useCallback(
+		async (slotId: 1 | 2) => {
+			if (isHost) {
+				if (totalRaiseHand > 0) onSwitchToFilterRaiseHand(slotId)
+				return
+			}
 
-		onSwitchToFilterRaiseHand(null)
-	}, [isHost, onSwitchToFilterRaiseHand])
+			if (isSpeaker || !isListener) return
+
+			await handleToggleRaiseHand(slotId)
+		},
+		[
+			isHost,
+			isSpeaker,
+			isListener,
+			totalRaiseHand,
+			onSwitchToFilterRaiseHand,
+			handleToggleRaiseHand,
+		],
+	)
+
+	// Host opens the raise hand queue; listener raises a hand for that slot.
+	const canClickEmptySpeakerSlot = isHost
+		? totalRaiseHand > 0
+		: isListener &&
+			!isSpeaker &&
+			isRoomLiving &&
+			beSpeakerState !== 'disabled'
 
 	const handleOpenParticipantProfile = useCallback(
 		(userId?: string, target?: 'host' | 'speaker' | 'listener') => {
@@ -1023,10 +1080,16 @@ function DetailTalkroom({ id }: { id: string }) {
 		],
 	)
 
+	const promotedListenerCount = listenersInRoom.length - listenerRows.length
 	const listenerCount =
 		totalListenersInRoom > 0
-			? totalListenersInRoom
+			? Math.max(0, totalListenersInRoom - promotedListenerCount)
 			: getTalkRoomListenerCount(talkRoomDetail ?? undefined)
+
+	const hasGuestSpeaker = useMemo(
+		() => hasTalkRoomAnotherSpeaker(talkRoomDetail ?? undefined),
+		[talkRoomDetail],
+	)
 
 	const _renderHostContent = () => {
 		return (
@@ -1067,13 +1130,13 @@ function DetailTalkroom({ id }: { id: string }) {
 				<DetailTalkroomSpeakerStage
 					talkRoomDetail={talkRoomDetail}
 					speakerStatusMap={speakerStatusMap}
-					isHost={isHost}
+					isRoomLiving={isRoomLiving}
 					totalRaiseHand={totalRaiseHand}
 					onSpeakerSlotClick={
 						canOpenParticipantProfile ? handleSpeakerSlotClick : undefined
 					}
 					onEmptySlotClick={
-						isHost && totalRaiseHand > 0
+						canClickEmptySpeakerSlot
 							? handleEmptySpeakerSlotClick
 							: undefined
 					}
@@ -1094,6 +1157,8 @@ function DetailTalkroom({ id }: { id: string }) {
 					listeners={displayListeners}
 					raiseHandUserIds={raiseHandUserIds}
 					isFilterRaiseHand={isFilterRaiseHand}
+					hasGuestSpeaker={hasGuestSpeaker}
+					totalParticipants={talkRoomDetail?.total_participants ?? 0}
 					loadingListeners={loadingListenersInRoom}
 					micState={micState}
 					beSpeakerState={beSpeakerState}
@@ -1220,7 +1285,26 @@ function DetailTalkroom({ id }: { id: string }) {
 				}
 				onClose={onCloseParticipantProfile}
 				onCloseReport={onCloseParticipantReport}
+				onClickConnectedPeople={onOpenParticipantConnectedPeople}
+				onClickConnectedCountries={onOpenParticipantConnectedCountries}
 				onAction={onParticipantProfileAction}
+			/>
+			<TalkRoomConnectedUserModal
+				open={participantConnectedModal === 'people'}
+				users={participantConnectedUsers}
+				total={totalParticipantConnectedUsers}
+				loading={loadingParticipantConnectedPeople}
+				hasMore={
+					participantConnectedUsers.length < totalParticipantConnectedUsers
+				}
+				onLoadMore={onLoadMoreParticipantConnectedPeople}
+				onClose={onCloseParticipantConnectedModal}
+			/>
+			<TalkRoomConnectedCountryModal
+				open={participantConnectedModal === 'countries'}
+				countries={participantConnectedCountries}
+				loading={loadingParticipantConnectedCountries}
+				onClose={onCloseParticipantConnectedModal}
 			/>
 			<Flex className={classes.header}>
 				<IconChevronLeft className={classes.iconBack} onClick={onLeave} />

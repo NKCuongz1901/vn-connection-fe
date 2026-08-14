@@ -77,6 +77,8 @@ type TalkRoomParticipantProfileModalProps = {
 	showInviteToSpeaker?: boolean
 	onClose: () => void
 	onCloseReport?: () => void
+	onClickConnectedPeople?: () => void
+	onClickConnectedCountries?: () => void
 	onAction?: (action: TalkRoomParticipantProfileAction) => void
 }
 
@@ -261,6 +263,8 @@ function TalkRoomParticipantProfileModal({
 	showInviteToSpeaker = false,
 	onClose,
 	onCloseReport,
+	onClickConnectedPeople,
+	onClickConnectedCountries,
 	onAction,
 }: TalkRoomParticipantProfileModalProps) {
 	const displayItems = useMemo(
@@ -454,6 +458,8 @@ function TalkRoomParticipantProfileModal({
 								data={statsData}
 								loading={loadingProfile}
 								showHostTimeCard={!hideHostTimeCard}
+								onClickPeople={onClickConnectedPeople}
+								onClickCountries={onClickConnectedCountries}
 							/>
 						</div>
 

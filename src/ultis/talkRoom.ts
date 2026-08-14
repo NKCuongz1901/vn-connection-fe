@@ -323,9 +323,11 @@ export const isTalkRoomCountSessionEndVisible = (
 
 /** Resolves the talk room chat conversation id (mirrors mobile currentConversationId). */
 export const getTalkRoomConversationId = (
-	detail?: Pick<TalkRoomRoom, 'schedules'> & {
-		conversation_id?: string | null
-	} | null,
+	detail?:
+		| (Pick<TalkRoomRoom, 'schedules'> & {
+				conversation_id?: string | null
+		  })
+		| null,
 ): string => {
 	if (!detail) return ''
 
@@ -560,6 +562,8 @@ export const getListenerBeSpeakerState = (
 	options?: { isListener?: boolean },
 ): HostMicState => {
 	if (!options?.isListener) return 'disabled'
+
+	if (isTalkRoomCountWaitingVisible(room)) return 'off'
 
 	if (!isTalkRoomLive(room?.status)) return 'disabled'
 
@@ -1060,6 +1064,7 @@ export type TalkRoomSpeakerSlot = {
 	type: TalkRoomSpeakerSlotType
 	isHost: boolean
 	label: string
+	slotId?: 1 | 2
 	speaker?: TalkRoomFilledSpeaker
 }
 
@@ -1070,9 +1075,11 @@ export const buildTalkRoomSpeakerSlots = (
 	speakerStatusMap?: TalkRoomSpeakerStatusMap,
 ): TalkRoomSpeakerSlot[] => {
 	const speakers = room?.speakers ?? []
+
+	// Host slot stays empty until the host is on stage, unless the viewer is the host.
 	const hostSpeaker =
 		speakers.find((speaker) => speaker?.role === 'host') ??
-		(room?.host_user
+		(room?.yourAreHost === true && room?.host_user
 			? {
 					id: room.host_user.id,
 					name: room.host_user.name,
@@ -1110,6 +1117,7 @@ export const buildTalkRoomSpeakerSlots = (
 			type: speaker ? 'filled' : 'empty',
 			isHost: false,
 			label: `Speaker ${i + 1}`,
+			slotId: (i + 1) as 1 | 2,
 			speaker: withLiveStatus(speaker),
 		})
 	}
@@ -1128,9 +1136,31 @@ export const hasTalkRoomEmptyGuestSpeakerSlot = (
 }
 
 /** Whether all guest speaker slots are occupied. */
-export const isTalkRoomGuestSpeakerSlotsFull = (
+export const isTalkRoomGuestSpeakerSlotsFull = (room?: TalkRoomRoom): boolean =>
+	!hasTalkRoomEmptyGuestSpeakerSlot(room)
+
+/** User ids currently sitting on the speaker stage (host slot + guest speakers). */
+export const getTalkRoomStageUserIds = (room?: TalkRoomRoom): string[] =>
+	buildTalkRoomSpeakerSlots(room, room?.max_speakers ?? 2)
+		.map((slot) => resolveSpeakerUserId(slot.speaker))
+		.filter((userId): userId is string => Boolean(userId))
+
+/** Drops listener rows whose user already moved up to the speaker stage. */
+export const excludeTalkRoomStageUsersFromListeners = <
+	T extends { user_id?: string },
+>(
+	listeners: T[],
 	room?: TalkRoomRoom,
-): boolean => !hasTalkRoomEmptyGuestSpeakerSlot(room)
+	extraUserIds: (string | undefined)[] = [],
+): T[] => {
+	const excludedIds = new Set(
+		[...getTalkRoomStageUserIds(room), ...extraUserIds].filter(Boolean),
+	)
+
+	if (excludedIds.size === 0) return listeners
+
+	return listeners.filter((listener) => !excludedIds.has(listener.user_id ?? ''))
+}
 
 export type TalkRoomSlotRaiseHandMap = Record<number, string[]>
 
@@ -1223,7 +1253,9 @@ export const getTalkRoomFilterRaiseHandIds = (
 }
 
 /** Sorts listeners so raised-hand users appear first. */
-export const sortTalkRoomListenersByRaiseHand = <T extends { user_id?: string }>(
+export const sortTalkRoomListenersByRaiseHand = <
+	T extends { user_id?: string },
+>(
 	listeners: T[],
 	raiseHandUserIds: string[],
 ): T[] => {
@@ -1265,7 +1297,9 @@ export const getTalkRoomSocketSlotId = (
 }
 
 /** Parses invite id from socket payloads (`host_invite_to_speaker`, etc.). */
-export const getTalkRoomSocketInviteId = (data?: unknown): string | undefined => {
+export const getTalkRoomSocketInviteId = (
+	data?: unknown,
+): string | undefined => {
 	if (!data || typeof data !== 'object') return undefined
 
 	const payload = data as Record<string, unknown>
@@ -1313,7 +1347,9 @@ export const parseTalkRoomSocketSpeakerInvite = (
 }
 
 /** Parses display name from talk room socket user_info payload. */
-export const getTalkRoomSocketUserName = (data?: unknown): string | undefined => {
+export const getTalkRoomSocketUserName = (
+	data?: unknown,
+): string | undefined => {
 	if (!data || typeof data !== 'object') return undefined
 
 	const payload = data as Record<string, unknown>

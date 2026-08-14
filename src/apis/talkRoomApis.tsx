@@ -450,6 +450,30 @@ export const getTalkRoomConnectedPeople = async ({
 	})
 }
 
+export const getTalkRoomUserConnectedCountries = async ({
+	userId,
+}: {
+	userId: string
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomUserProfile}/${userId}/connected-countries`
+
+	return await axios.get(url)
+}
+
+export const getTalkRoomUserConnectedPeople = async ({
+	userId,
+	params = {},
+}: {
+	userId: string
+	params?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomUserProfile}/${userId}/connected-people`
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
 export const getTalkRoomLeaderBoard = async ({
 	params = {},
 }: {
