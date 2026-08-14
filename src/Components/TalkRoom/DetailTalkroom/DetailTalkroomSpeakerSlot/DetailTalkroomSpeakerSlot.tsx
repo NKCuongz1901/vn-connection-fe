@@ -17,12 +17,14 @@ import classes from './DetailTalkroomSpeakerSlot.module.scss'
 type DetailTalkroomSpeakerSlotProps = {
 	slot: TalkRoomSpeakerSlot
 	totalRaiseHand?: number
+	showMicStatus?: boolean
 	onClick?: () => void
 }
 
 function DetailTalkroomSpeakerSlot({
 	slot,
 	totalRaiseHand = 0,
+	showMicStatus = true,
 	onClick,
 }: DetailTalkroomSpeakerSlotProps) {
 	if (slot.type === 'empty') {
@@ -72,7 +74,7 @@ function DetailTalkroomSpeakerSlot({
 	const { speaker, isHost, label } = slot
 	const displayName = speaker?.name || label
 	const countryCode = speaker?.i_am_from
-	const statusIcon = getSpeakerMicStatusIcon(speaker)
+	const statusIcon = showMicStatus ? getSpeakerMicStatusIcon(speaker) : null
 
 	return (
 		<div

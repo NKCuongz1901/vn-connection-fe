@@ -17,6 +17,7 @@ type DetailTalkroomSpeakerStageProps = {
 	maxSpeakers?: number
 	speakerStatusMap?: TalkRoomSpeakerStatusMap
 	isHost?: boolean
+	isRoomLiving?: boolean
 	totalRaiseHand?: number
 	onSpeakerSlotClick?: (userId?: string, isHostSlot?: boolean) => void
 	onEmptySlotClick?: () => void
@@ -27,6 +28,7 @@ function DetailTalkroomSpeakerStage({
 	maxSpeakers = 2,
 	speakerStatusMap,
 	isHost = false,
+	isRoomLiving = true,
 	totalRaiseHand = 0,
 	onSpeakerSlotClick,
 	onEmptySlotClick,
@@ -48,6 +50,7 @@ function DetailTalkroomSpeakerStage({
 					key={slot.key}
 					slot={slot}
 					totalRaiseHand={slot.type === 'empty' ? totalRaiseHand : 0}
+					showMicStatus={isRoomLiving}
 					onClick={
 						slot.type === 'filled' && onSpeakerSlotClick
 							? () =>

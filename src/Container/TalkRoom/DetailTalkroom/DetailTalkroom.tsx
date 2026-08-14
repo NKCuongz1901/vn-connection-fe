@@ -1085,6 +1085,7 @@ function DetailTalkroom({ id }: { id: string }) {
 					talkRoomDetail={talkRoomDetail}
 					speakerStatusMap={speakerStatusMap}
 					isHost={isHost}
+					isRoomLiving={isRoomLiving}
 					totalRaiseHand={totalRaiseHand}
 					onSpeakerSlotClick={
 						canOpenParticipantProfile ? handleSpeakerSlotClick : undefined
