@@ -77,9 +77,11 @@ function ChatLocation(props: ChatLocationProps) {
 		onEnterChatLocation,
 		onRefreshMyChatLocation,
 		listMyMiniChat,
+		listFullMiniChat,
 
 		// Actions
 		onGetListMyMiniChat,
+		onGetListFullMiniChat,
 	} = useChatLocation({ id })
 	const [mapValue, setMapValue] = useState({
 		address: '',
@@ -90,6 +92,7 @@ function ChatLocation(props: ChatLocationProps) {
 	useEffect(() => {
 		if (!id) return
 		onGetListMyMiniChat(id)
+		onGetListFullMiniChat(id)
 	}, [id])
 
 	// Open a joined mini chat while preserving its parent location in the URL.
@@ -217,8 +220,10 @@ function ChatLocation(props: ChatLocationProps) {
 						id={activeMiniChatId || id}
 						isChatLocation
 						miniChats={listMyMiniChat}
+						fullMiniChats={listFullMiniChat}
 						activeMiniChatId={activeMiniChatId}
 						miniChatsLoading={loading.getMyMiniChat}
+						fullMiniChatsLoading={loading.getFullMiniChat}
 						onSelectMiniChat={handleSelectMiniChat}
 						onSelectParentChat={handleSelectParentChat}
 						onSuccess={({ type }) => {

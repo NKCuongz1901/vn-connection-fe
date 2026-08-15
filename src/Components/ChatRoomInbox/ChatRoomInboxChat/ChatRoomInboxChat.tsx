@@ -1,6 +1,6 @@
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
-import { memo } from 'react'
+import { memo, useState } from 'react'
 
 import useChatRoomInboxChat from '@/hooks/ChatRoomInbox/useChatRoomInboxChat'
 
@@ -8,6 +8,7 @@ import { onPushState } from '@/ultis/route'
 import { formatNumberString } from '@/ultis/string'
 
 import MiniChatTopicBar from '@/Components/ChatLocation/MiniChatTopicBar/MiniChatTopicBar'
+import ModalSelectMiniChat from '@/Components/ChatLocation/ModalSelectMiniChat/ModalSelectMiniChat'
 import ChatRoomChatBox from '@/Components/ChatRoomChatBox'
 import AdminDeleteMessageModal, {
 	AdminDeleteMessageReasonModal,
@@ -23,7 +24,10 @@ import ModalViewMember from '../ModalViewMember'
 import ModelPin from '../ModelPin'
 import SettingConv from '../SettingConv'
 
-import { MiniChatItemProps } from '@/interface/Conversation/Conversation.interface'
+import {
+	FullMiniChatItemProps,
+	MiniChatItemProps,
+} from '@/interface/Conversation/Conversation.interface'
 
 import classes from './ChatRoomInboxChat.module.scss'
 
@@ -36,8 +40,10 @@ interface ChatRoomInboxChatProps {
 	isNoHeader?: boolean
 	isChatLocation?: boolean
 	miniChats?: MiniChatItemProps[]
+	fullMiniChats?: FullMiniChatItemProps[]
 	activeMiniChatId?: string
 	miniChatsLoading?: boolean
+	fullMiniChatsLoading?: boolean
 	onSelectMiniChat?: (item: MiniChatItemProps) => void
 	onSelectParentChat?: () => void
 	onSuccess?: any
@@ -49,12 +55,15 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 		isNoHeader,
 		isChatLocation,
 		miniChats = [],
+		fullMiniChats = [],
 		activeMiniChatId,
 		miniChatsLoading,
+		fullMiniChatsLoading,
 		onSelectMiniChat,
 		onSelectParentChat,
 		onChangeModal = () => null,
 	} = props
+	const [openSelectMiniChat, setOpenSelectMiniChat] = useState(false)
 	const {
 		_scrollRef,
 
@@ -222,6 +231,7 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 						items={miniChats}
 						activeId={activeMiniChatId}
 						loading={miniChatsLoading}
+						onExpand={() => setOpenSelectMiniChat(true)}
 						onSelect={onSelectMiniChat}
 						onSelectHome={onSelectParentChat}
 					/>
@@ -254,6 +264,13 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 			)}
 
 			{modal?.type && _renderModal()}
+			{openSelectMiniChat && (
+				<ModalSelectMiniChat
+					items={fullMiniChats}
+					loading={fullMiniChatsLoading}
+					onClose={() => setOpenSelectMiniChat(false)}
+				/>
+			)}
 
 			<AdminDeleteMessageModal
 				open={!!adminDeleteTarget && !openAdminDeleteReason}

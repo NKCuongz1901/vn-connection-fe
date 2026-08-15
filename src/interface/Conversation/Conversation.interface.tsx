@@ -186,3 +186,20 @@ export interface MiniChatItemProps {
 	is_read: boolean
 	amount_of_user_online: number
 }
+
+export interface FullMiniChatItemProps {
+	id: string
+	title: string
+	avatar: string
+	amount_of_user: number
+	amount_of_message: number
+	created_at: string
+	last_message: {
+		id: string
+		content: string
+		type: string
+		created_at: string
+	} | null
+	joined: boolean
+	is_read: boolean
+}

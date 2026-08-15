@@ -5,7 +5,10 @@ import useDetailChatRoom from '@/hooks/ChatRoom/useDetailChatRoom'
 import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
 import ChatRoomInboxChat from '@/Components/ChatRoomInbox/ChatRoomInboxChat'
 
-import { MiniChatItemProps } from '@/interface/Conversation/Conversation.interface'
+import {
+	FullMiniChatItemProps,
+	MiniChatItemProps,
+} from '@/interface/Conversation/Conversation.interface'
 
 import classes from './DetailChatRoom.module.scss'
 
@@ -13,8 +16,10 @@ interface DetailChatRoomProps {
 	id: string
 	isChatLocation?: boolean
 	miniChats?: MiniChatItemProps[]
+	fullMiniChats?: FullMiniChatItemProps[]
 	activeMiniChatId?: string
 	miniChatsLoading?: boolean
+	fullMiniChatsLoading?: boolean
 	onSelectMiniChat?: (item: MiniChatItemProps) => void
 	onSelectParentChat?: () => void
 	onSuccess?: any
@@ -25,8 +30,10 @@ const DetailChatRoom = (props: DetailChatRoomProps) => {
 		id,
 		isChatLocation,
 		miniChats,
+		fullMiniChats,
 		activeMiniChatId,
 		miniChatsLoading,
+		fullMiniChatsLoading,
 		onSelectMiniChat,
 		onSelectParentChat,
 		onSuccess = () => null,
@@ -77,8 +84,10 @@ const DetailChatRoom = (props: DetailChatRoomProps) => {
 				convId={id}
 				isChatLocation={isChatLocation}
 				miniChats={miniChats}
+				fullMiniChats={fullMiniChats}
 				activeMiniChatId={activeMiniChatId}
 				miniChatsLoading={miniChatsLoading}
+				fullMiniChatsLoading={fullMiniChatsLoading}
 				onSelectMiniChat={onSelectMiniChat}
 				onSelectParentChat={onSelectParentChat}
 				onSuccess={onSuccess}

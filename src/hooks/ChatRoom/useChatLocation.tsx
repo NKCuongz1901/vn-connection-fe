@@ -2,6 +2,7 @@ import {
 	createConversation,
 	findChatLocation,
 	getListActiveChatLocation,
+	getListFullMiniChat,
 	getListMyChatLocation,
 	getListMyMiniChat,
 	getListSuggestChatLocation,
@@ -9,6 +10,7 @@ import {
 import { useModal } from '@/context/ModalContext'
 import {
 	ChatLocationItemProps,
+	FullMiniChatItemProps,
 	MiniChatItemProps,
 } from '@/interface/Conversation/Conversation.interface'
 import { onPushState } from '@/ultis/route'
@@ -54,7 +56,9 @@ export default function useChatLocation(props: useChatLocationProps) {
 		null,
 	)
 	const [listMyMiniChat, setListMyMiniChat] = useState<MiniChatItemProps[]>([])
-	const [listFullMiniChat, setListFullMiniChat] = useState<any[]>([])
+	const [listFullMiniChat, setListFullMiniChat] = useState<
+		FullMiniChatItemProps[]
+	>([])
 
 	const handleGetListMyMiniChat = async (parentId: string) => {
 		setLoading((prev) => ({ ...prev, getMyMiniChat: true }))
@@ -72,6 +76,23 @@ export default function useChatLocation(props: useChatLocationProps) {
 			openError(error.message)
 		} finally {
 			setLoading((prev) => ({ ...prev, getMyMiniChat: false }))
+		}
+	}
+
+	const handleGetListFullMiniChat = async (parentId: string) => {
+		setLoading((prev) => ({ ...prev, getFullMiniChat: true }))
+		try {
+			const res: any = await getListFullMiniChat({
+				parent_id: parentId,
+			})
+			const { code, results } = res
+			if (code === 200) {
+				setListFullMiniChat(results.objects.rows || [])
+			}
+		} catch (error) {
+			openError(error.message)
+		} finally {
+			setLoading((prev) => ({ ...prev, getFullMiniChat: false }))
 		}
 	}
 
@@ -224,6 +245,7 @@ export default function useChatLocation(props: useChatLocationProps) {
 		onFindChatLocation: handleFindChatLocation,
 		onEnterChatLocation: handleEnterChatLocation,
 		onGetListMyMiniChat: handleGetListMyMiniChat,
+		onGetListFullMiniChat: handleGetListFullMiniChat,
 		onRefreshMyChatLocation: handleGetListMyChatLocation,
 	}
 }
