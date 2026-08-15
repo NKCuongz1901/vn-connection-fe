@@ -1,11 +1,12 @@
 'use client'
 
 import { Flex } from 'antd'
-import { memo, useEffect, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 
 import CInputMap from '@/Components/Custom/CInputMap'
 import ChatLocationItem from '@/Components/ChatLocation/ChatLocationItem/ChatLocationItem'
 import ChatLocationList from '@/Components/ChatLocation/ChatLocationList/ChatLocationList'
+import { showMiniChatJoinedToast } from '@/Components/Toast/SocketToastContent'
 import useChatLocation, {
 	ChatLocationEntry,
 } from '@/hooks/ChatRoom/useChatLocation'
@@ -91,6 +92,7 @@ function ChatLocation(props: ChatLocationProps) {
 		latitude: 0,
 		longitude: 0,
 	})
+	const pendingJoinIdRef = useRef<string | null>(null)
 
 	useEffect(() => {
 		if (!id) return
@@ -98,10 +100,35 @@ function ChatLocation(props: ChatLocationProps) {
 		onGetListFullMiniChat(id)
 	}, [id])
 
-	// Open a joined mini chat while preserving its parent location in the URL.
-	const handleSelectMiniChat = (item: Pick<MiniChatItemProps, 'id'>) => {
+	// Open a mini chat while preserving its parent location in the URL.
+	const handleSelectMiniChat = (
+		item: Pick<MiniChatItemProps, 'id'>,
+		options?: { isJoining?: boolean },
+	) => {
 		if (!id || !item.id) return
+		// Only rooms opened from the selector should confirm the join with a toast.
+		pendingJoinIdRef.current = options?.isJoining ? item.id : null
 		onPushState({ type: 'location', id, mini_id: item.id })
+	}
+
+	// Refresh location lists after a join/leave and confirm intentional joins.
+	const handleSuccessDetailChat = ({
+		type,
+		id: convId,
+	}: {
+		type?: string
+		id?: string
+	}) => {
+		if (type !== 'join' && type !== 'leave') return
+
+		onRefreshMyChatLocation()
+		onGetListMyMiniChat(id)
+		onGetListFullMiniChat(id)
+
+		if (type === 'join' && pendingJoinIdRef.current === convId) {
+			pendingJoinIdRef.current = null
+			showMiniChatJoinedToast()
+		}
 	}
 
 	// Return from a mini chat to the parent chat-location room.
@@ -240,13 +267,7 @@ function ChatLocation(props: ChatLocationProps) {
 						onSelectMiniChat={handleSelectMiniChat}
 						onSelectParentChat={handleSelectParentChat}
 						onLeaveMiniChat={handleLeaveMiniChat}
-						onSuccess={({ type }) => {
-							if (type === 'join' || type === 'leave') {
-								onRefreshMyChatLocation()
-								onGetListMyMiniChat(id)
-								onGetListFullMiniChat(id)
-							}
-						}}
+						onSuccess={handleSuccessDetailChat}
 					/>
 				</div>
 			</div>

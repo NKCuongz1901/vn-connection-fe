@@ -21,7 +21,10 @@ interface DetailChatRoomProps {
 	miniChatsLoading?: boolean
 	fullMiniChatsLoading?: boolean
 	miniChatActionId?: string
-	onSelectMiniChat?: (item: Pick<MiniChatItemProps, 'id'>) => void
+	onSelectMiniChat?: (
+		item: Pick<MiniChatItemProps, 'id'>,
+		options?: { isJoining?: boolean },
+	) => void
 	onSelectParentChat?: () => void
 	onLeaveMiniChat?: (item: FullMiniChatItemProps) => Promise<boolean>
 	onSuccess?: any

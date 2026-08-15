@@ -46,7 +46,10 @@ interface ChatRoomInboxChatProps {
 	miniChatsLoading?: boolean
 	fullMiniChatsLoading?: boolean
 	miniChatActionId?: string
-	onSelectMiniChat?: (item: Pick<MiniChatItemProps, 'id'>) => void
+	onSelectMiniChat?: (
+		item: Pick<MiniChatItemProps, 'id'>,
+		options?: { isJoining?: boolean },
+	) => void
 	onSelectParentChat?: () => void
 	onLeaveMiniChat?: (item: FullMiniChatItemProps) => Promise<boolean>
 	onSuccess?: any
@@ -79,7 +82,7 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 			setLeaveMiniChatTarget(item)
 			return
 		}
-		onSelectMiniChat?.(item)
+		onSelectMiniChat?.(item, { isJoining: true })
 	}
 
 	// Confirm leaving the selected joined mini chat.

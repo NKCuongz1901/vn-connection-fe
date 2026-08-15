@@ -8,6 +8,7 @@ import {
 	getListSuggestChatLocation,
 	leaveConvById,
 } from '@/apis/conversationApis'
+import { showMiniChatLeftToast } from '@/Components/Toast/SocketToastContent'
 import { useModal } from '@/context/ModalContext'
 import {
 	ChatLocationItemProps,
@@ -114,6 +115,7 @@ export default function useChatLocation(props: useChatLocationProps) {
 				handleGetListMyMiniChat(id),
 				handleGetListFullMiniChat(id),
 			])
+			showMiniChatLeftToast()
 			return true
 		} catch (error) {
 			openError(error)
