@@ -1,4 +1,5 @@
 import {
+	createConversation,
 	findChatLocation,
 	getListActiveChatLocation,
 	getListMyChatLocation,
@@ -6,6 +7,7 @@ import {
 } from '@/apis/conversationApis'
 import { useModal } from '@/context/ModalContext'
 import { ChatLocationItemProps } from '@/interface/Conversation/Conversation.interface'
+import { onPushState } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
 import { useEffect, useState } from 'react'
 
@@ -13,10 +15,10 @@ interface useChatLocationProps {
 	tabOpts?: { value: string; label: string }[]
 }
 
-export interface FindChatLocationItem {
+export interface ChatLocationEntry {
 	id: string | null
 	title: string
-	level: number
+	level?: number
 }
 
 export default function useChatLocation(props: useChatLocationProps) {
@@ -34,11 +36,16 @@ export default function useChatLocation(props: useChatLocationProps) {
 	const [listActiveChatLocation, setListActiveChatLocation] = useState<
 		ChatLocationItemProps[]
 	>([])
-	const [listSuggestChatLocation, setListSuggestChatLocation] = useState([])
+	const [listSuggestChatLocation, setListSuggestChatLocation] = useState<
+		ChatLocationEntry[]
+	>([])
 	const [listFindChatLocation, setListFindChatLocation] = useState<
-		FindChatLocationItem[]
+		ChatLocationEntry[]
 	>([])
 	const [findKeyword, setFindKeyword] = useState('')
+	const [enteringLocationKey, setEnteringLocationKey] = useState<string | null>(
+		null,
+	)
 
 	const handleGetListMyChatLocation = async () => {
 		setLoading((prev) => ({ ...prev, myChatLocation: true }))
@@ -128,6 +135,45 @@ export default function useChatLocation(props: useChatLocationProps) {
 		}
 	}
 
+	// Resolve an existing location or create a new location room before opening it.
+	const handleEnterChatLocation = async (item: ChatLocationEntry) => {
+		const { id, title, level } = item || {}
+		const locationKey = id || `${title}-${level || ''}`
+		if (!title || enteringLocationKey) return
+
+		setEnteringLocationKey(locationKey)
+		try {
+			if (id) {
+				onPushState({ type: 'location', id })
+				return
+			}
+			if (!level) {
+				openError({
+					message: 'Unable to create this location because its level is missing.',
+				})
+				return
+			}
+
+			const res: any = await createConversation({
+				title,
+				kind: 'CHAT_LOCATION',
+				level,
+			})
+			const createdId = res?.results?.object?.id
+			if (res?.code !== 200 || !createdId) {
+				openError(res)
+				return
+			}
+
+			await handleGetListMyChatLocation()
+			onPushState({ type: 'location', id: createdId })
+		} catch (error) {
+			openError(error)
+		} finally {
+			setEnteringLocationKey(null)
+		}
+	}
+
 	useEffect(() => {
 		handleGetListMyChatLocation()
 		handleGetListActiveChatLocation()
@@ -141,8 +187,11 @@ export default function useChatLocation(props: useChatLocationProps) {
 		listSuggestChatLocation,
 		listFindChatLocation,
 		findKeyword,
+		enteringLocationKey,
 
 		// Actions
 		onFindChatLocation: handleFindChatLocation,
+		onEnterChatLocation: handleEnterChatLocation,
+		onRefreshMyChatLocation: handleGetListMyChatLocation,
 	}
 }

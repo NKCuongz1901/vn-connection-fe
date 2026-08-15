@@ -48,7 +48,7 @@ export default function useChatRoom(props: useChatRoomProps) {
 	const [openModal, setOpenModal] = useState(false)
 
 	const isChatRoomDetail = useMemo(
-		() => type === 'language' && !!id,
+		() => ['language', 'location'].includes(type) && !!id,
 		[type, id],
 	)
 	const handleGetListChatRoom = async (isNotLoading = false) => {
@@ -172,6 +172,11 @@ export default function useChatRoom(props: useChatRoomProps) {
 		handleGetProfile()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
+	useEffect(() => {
+		if (tabOpts.some((option) => option.value === type)) {
+			setTab(type)
+		}
+	}, [tabOpts, type])
 	return {
 		openModal,
 		loading,

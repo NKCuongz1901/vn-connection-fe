@@ -13,6 +13,58 @@
 	padding: 0 16px;
 }
 
+.detailLayout {
+	display: flex;
+	width: 100%;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.detailSidebar {
+	display: flex;
+	width: 198px;
+	min-width: 198px;
+	flex-direction: column;
+	align-self: stretch;
+	padding: 16px 0;
+	overflow: hidden;
+	border-right: 1px solid #eef3f6;
+	background: #fff;
+}
+
+.detailSidebarTitle {
+	padding: 16px 16px 12px;
+	color: #0f1729;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+}
+
+.detailRoomList {
+	display: flex;
+	min-height: 0;
+	flex: 1;
+	flex-direction: column;
+	gap: 12px;
+	padding: 0 12px;
+	overflow-y: auto;
+}
+
+.detailRoomItem {
+	width: 100%;
+	flex-shrink: 0;
+}
+
+.detailChat {
+	display: flex;
+	min-width: 0;
+	min-height: 0;
+	flex: 1;
+	padding: 24px 32px;
+	overflow: hidden;
+}
+
 .findSection {
 	width: 100%;
 }
@@ -199,6 +251,14 @@
 }
 
 @media (max-width: 769px) {
+	.detailSidebar {
+		display: none;
+	}
+
+	.detailChat {
+		padding: 12px;
+	}
+
 	.suggestList {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}

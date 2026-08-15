@@ -4,30 +4,40 @@ import { Flex } from 'antd'
 import { memo, useState } from 'react'
 
 import CInputMap from '@/Components/Custom/CInputMap'
+import ChatLocationItem from '@/Components/ChatLocation/ChatLocationItem/ChatLocationItem'
 import ChatLocationList from '@/Components/ChatLocation/ChatLocationList/ChatLocationList'
-import useChatLocation from '@/hooks/ChatRoom/useChatLocation'
+import useChatLocation, {
+	ChatLocationEntry,
+} from '@/hooks/ChatRoom/useChatLocation'
 import AddIcon from '@/svg/AddIcon'
 import GlobalIcon from '@/svg/GlobalIcon'
 import SearchIcon from '@/svg/SearchIcon'
 import { isArray } from '@/ultis/array'
-import { onPushState } from '@/ultis/route'
 
 import { ChatLocationItemProps } from '@/interface/Conversation/Conversation.interface'
 
+import DetailChatRoom from '../DetailChatRoom'
 import classes from './ChatLocation.module.scss'
 
 interface SuggestChatLocationItemProps {
-	id: string
+	id: string | null
 	title: string
+	level?: number
+	loading?: boolean
 	onClick?: () => void
 }
 
 // Render a compact suggested chat location card.
 const SuggestChatLocationItem = (props: SuggestChatLocationItemProps) => {
-	const { title, onClick } = props
+	const { title, loading, onClick } = props
 
 	return (
-		<Flex vertical className={classes.suggestItem} onClick={onClick}>
+		<Flex
+			vertical
+			className={classes.suggestItem}
+			aria-disabled={loading}
+			onClick={loading ? undefined : onClick}
+		>
 			<Flex className={classes.suggestTitle}>
 				<span className={classes.suggestIcon}>
 					<GlobalIcon fill="#0067b8" width={12} height={12} />
@@ -42,7 +52,13 @@ const SuggestChatLocationItem = (props: SuggestChatLocationItemProps) => {
 	)
 }
 
-function ChatLocation() {
+interface ChatLocationProps {
+	id?: string
+	isChatRoomDetail?: boolean
+}
+
+function ChatLocation(props: ChatLocationProps) {
+	const { id, isChatRoomDetail } = props
 	const {
 		loading,
 		listMyChatLocation,
@@ -50,7 +66,10 @@ function ChatLocation() {
 		listSuggestChatLocation,
 		listFindChatLocation,
 		findKeyword,
+		enteringLocationKey,
 		onFindChatLocation,
+		onEnterChatLocation,
+		onRefreshMyChatLocation,
 	} = useChatLocation({})
 	const [mapValue, setMapValue] = useState({
 		address: '',
@@ -59,7 +78,7 @@ function ChatLocation() {
 	})
 
 	const handleItemClick = (item: ChatLocationItemProps) => {
-		onPushState({ type: 'location', id: item.id })
+		onEnterChatLocation(item)
 	}
 
 	// Find chat locations for the place picked on the map.
@@ -95,10 +114,11 @@ function ChatLocation() {
 							key={item.id || item.title}
 							type="button"
 							className={classes.findTag}
-							disabled={!item.id}
-							onClick={() =>
-								item.id && onPushState({ type: 'location', id: item.id })
+							disabled={
+								enteringLocationKey ===
+								(item.id || `${item.title}-${item.level || ''}`)
 							}
+							onClick={() => onEnterChatLocation(item)}
 						>
 							<span className={classes.findTagIcon}>
 								<AddIcon fill="#e55a0f" />
@@ -126,18 +146,58 @@ function ChatLocation() {
 				{!isLoading && (
 					<div className={classes.suggestList}>
 						{listSuggestChatLocation.map(
-							(item: { id: string; title: string }) => (
+							(item: ChatLocationEntry) => (
 								<SuggestChatLocationItem
-									key={item.id}
+									key={item.id || `${item.title}-${item.level || ''}`}
 									id={item.id}
 									title={item.title}
-									onClick={() => onPushState({ type: 'location', id: item.id })}
+									level={item.level}
+									loading={
+										enteringLocationKey ===
+										(item.id || `${item.title}-${item.level || ''}`)
+									}
+									onClick={() => onEnterChatLocation(item)}
 								/>
 							),
 						)}
 					</div>
 				)}
 			</section>
+		)
+	}
+
+	if (isChatRoomDetail && id) {
+		return (
+			<div className={classes.detailLayout}>
+				<aside className={classes.detailSidebar}>
+					<div className={classes.detailSidebarTitle}>Your rooms</div>
+					<div className={classes.detailRoomList}>
+						{listMyChatLocation.map((item) => (
+							<div
+								key={item.id}
+								className={classes.detailRoomItem}
+								aria-current={item.id === id}
+							>
+								<ChatLocationItem
+									item={item}
+									variant="myChatLocation"
+									onClick={() => handleItemClick(item)}
+								/>
+							</div>
+						))}
+					</div>
+				</aside>
+				<div className={classes.detailChat}>
+					<DetailChatRoom
+						id={id}
+						onSuccess={({ type }) => {
+							if (type === 'join' || type === 'leave') {
+								onRefreshMyChatLocation()
+							}
+						}}
+					/>
+				</div>
+			</div>
 		)
 	}
 

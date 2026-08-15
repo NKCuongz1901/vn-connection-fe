@@ -183,7 +183,7 @@ const ChatRoom = () => {
 					</Flex>
 				)
 			case tabOpts[1].value:
-				return <ChatLocation />
+				return <ChatLocation id={id} isChatRoomDetail={isChatRoomDetail} />
 			default:
 				return <></>
 		}
