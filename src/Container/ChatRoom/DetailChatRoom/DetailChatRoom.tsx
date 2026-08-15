@@ -20,8 +20,10 @@ interface DetailChatRoomProps {
 	activeMiniChatId?: string
 	miniChatsLoading?: boolean
 	fullMiniChatsLoading?: boolean
-	onSelectMiniChat?: (item: MiniChatItemProps) => void
+	miniChatActionId?: string
+	onSelectMiniChat?: (item: Pick<MiniChatItemProps, 'id'>) => void
 	onSelectParentChat?: () => void
+	onLeaveMiniChat?: (item: FullMiniChatItemProps) => Promise<boolean>
 	onSuccess?: any
 }
 
@@ -34,8 +36,10 @@ const DetailChatRoom = (props: DetailChatRoomProps) => {
 		activeMiniChatId,
 		miniChatsLoading,
 		fullMiniChatsLoading,
+		miniChatActionId,
 		onSelectMiniChat,
 		onSelectParentChat,
+		onLeaveMiniChat,
 		onSuccess = () => null,
 	} = props
 	const { modal, setModal, onSetTimesJoin } = useDetailChatRoom(props)
@@ -88,8 +92,10 @@ const DetailChatRoom = (props: DetailChatRoomProps) => {
 				activeMiniChatId={activeMiniChatId}
 				miniChatsLoading={miniChatsLoading}
 				fullMiniChatsLoading={fullMiniChatsLoading}
+				miniChatActionId={miniChatActionId}
 				onSelectMiniChat={onSelectMiniChat}
 				onSelectParentChat={onSelectParentChat}
+				onLeaveMiniChat={onLeaveMiniChat}
 				onSuccess={onSuccess}
 				onChangeModal={setModal}
 			/>

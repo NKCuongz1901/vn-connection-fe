@@ -6,6 +6,7 @@ import {
 	getListMyChatLocation,
 	getListMyMiniChat,
 	getListSuggestChatLocation,
+	leaveConvById,
 } from '@/apis/conversationApis'
 import { useModal } from '@/context/ModalContext'
 import {
@@ -55,6 +56,7 @@ export default function useChatLocation(props: useChatLocationProps) {
 	const [enteringLocationKey, setEnteringLocationKey] = useState<string | null>(
 		null,
 	)
+	const [miniChatActionId, setMiniChatActionId] = useState<string | null>(null)
 	const [listMyMiniChat, setListMyMiniChat] = useState<MiniChatItemProps[]>([])
 	const [listFullMiniChat, setListFullMiniChat] = useState<
 		FullMiniChatItemProps[]
@@ -93,6 +95,31 @@ export default function useChatLocation(props: useChatLocationProps) {
 			openError(error.message)
 		} finally {
 			setLoading((prev) => ({ ...prev, getFullMiniChat: false }))
+		}
+	}
+
+	// Leave a mini chat and refresh both mini-chat lists.
+	const handleLeaveMiniChat = async (miniChatId: string) => {
+		if (!id || miniChatActionId) return false
+
+		setMiniChatActionId(miniChatId)
+		try {
+			const res: any = await leaveConvById({ id: miniChatId })
+			if (res?.code !== 200) {
+				openError(res)
+				return false
+			}
+
+			await Promise.all([
+				handleGetListMyMiniChat(id),
+				handleGetListFullMiniChat(id),
+			])
+			return true
+		} catch (error) {
+			openError(error)
+			return false
+		} finally {
+			setMiniChatActionId(null)
 		}
 	}
 
@@ -238,6 +265,7 @@ export default function useChatLocation(props: useChatLocationProps) {
 		listFindChatLocation,
 		findKeyword,
 		enteringLocationKey,
+		miniChatActionId,
 		listMyMiniChat,
 		listFullMiniChat,
 
@@ -246,6 +274,7 @@ export default function useChatLocation(props: useChatLocationProps) {
 		onEnterChatLocation: handleEnterChatLocation,
 		onGetListMyMiniChat: handleGetListMyMiniChat,
 		onGetListFullMiniChat: handleGetListFullMiniChat,
+		onLeaveMiniChat: handleLeaveMiniChat,
 		onRefreshMyChatLocation: handleGetListMyChatLocation,
 	}
 }

@@ -14,11 +14,12 @@ interface ModalSelectMiniChatProps {
 	items: FullMiniChatItemProps[]
 	loading?: boolean
 	onClose: () => void
+	onSelect: (item: FullMiniChatItemProps) => void
 }
 
 // Render all available mini rooms in a scrollable selection grid.
 const ModalSelectMiniChat = (props: ModalSelectMiniChatProps) => {
-	const { items, loading, onClose } = props
+	const { items, loading, onClose, onSelect } = props
 
 	return (
 		<CModal
@@ -54,6 +55,7 @@ const ModalSelectMiniChat = (props: ModalSelectMiniChatProps) => {
 									type="button"
 									className={classes.item}
 									aria-label={item.title}
+									onClick={() => onSelect(item)}
 								>
 									<span className={classes.memberCount}>
 										{formatNumberString(item.amount_of_user)}

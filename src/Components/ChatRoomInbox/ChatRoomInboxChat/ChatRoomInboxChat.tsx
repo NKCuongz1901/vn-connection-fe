@@ -8,6 +8,7 @@ import { onPushState } from '@/ultis/route'
 import { formatNumberString } from '@/ultis/string'
 
 import MiniChatTopicBar from '@/Components/ChatLocation/MiniChatTopicBar/MiniChatTopicBar'
+import ModalLeaveMiniChat from '@/Components/ChatLocation/ModalSelectMiniChat/ModalLeaveMiniChat'
 import ModalSelectMiniChat from '@/Components/ChatLocation/ModalSelectMiniChat/ModalSelectMiniChat'
 import ChatRoomChatBox from '@/Components/ChatRoomChatBox'
 import AdminDeleteMessageModal, {
@@ -44,8 +45,10 @@ interface ChatRoomInboxChatProps {
 	activeMiniChatId?: string
 	miniChatsLoading?: boolean
 	fullMiniChatsLoading?: boolean
-	onSelectMiniChat?: (item: MiniChatItemProps) => void
+	miniChatActionId?: string
+	onSelectMiniChat?: (item: Pick<MiniChatItemProps, 'id'>) => void
 	onSelectParentChat?: () => void
+	onLeaveMiniChat?: (item: FullMiniChatItemProps) => Promise<boolean>
 	onSuccess?: any
 	onChangeModal?: any
 }
@@ -59,11 +62,33 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 		activeMiniChatId,
 		miniChatsLoading,
 		fullMiniChatsLoading,
+		miniChatActionId,
 		onSelectMiniChat,
 		onSelectParentChat,
+		onLeaveMiniChat,
 		onChangeModal = () => null,
 	} = props
 	const [openSelectMiniChat, setOpenSelectMiniChat] = useState(false)
+	const [leaveMiniChatTarget, setLeaveMiniChatTarget] =
+		useState<FullMiniChatItemProps | null>(null)
+
+	// Open a mini chat or request confirmation before leaving a joined room.
+	const handleSelectFullMiniChat = (item: FullMiniChatItemProps) => {
+		setOpenSelectMiniChat(false)
+		if (item.joined) {
+			setLeaveMiniChatTarget(item)
+			return
+		}
+		onSelectMiniChat?.(item)
+	}
+
+	// Confirm leaving the selected joined mini chat.
+	const handleConfirmLeaveMiniChat = async () => {
+		if (!leaveMiniChatTarget || !onLeaveMiniChat) return
+		const success = await onLeaveMiniChat(leaveMiniChatTarget)
+		if (success) setLeaveMiniChatTarget(null)
+	}
+
 	const {
 		_scrollRef,
 
@@ -269,6 +294,14 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 					items={fullMiniChats}
 					loading={fullMiniChatsLoading}
 					onClose={() => setOpenSelectMiniChat(false)}
+					onSelect={handleSelectFullMiniChat}
+				/>
+			)}
+			{leaveMiniChatTarget && (
+				<ModalLeaveMiniChat
+					loading={miniChatActionId === leaveMiniChatTarget.id}
+					onCancel={() => setLeaveMiniChatTarget(null)}
+					onConfirm={handleConfirmLeaveMiniChat}
 				/>
 			)}
 

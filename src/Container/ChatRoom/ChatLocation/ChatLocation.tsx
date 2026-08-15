@@ -17,6 +17,7 @@ import { onPushState, useQuery } from '@/ultis/route'
 
 import {
 	ChatLocationItemProps,
+	FullMiniChatItemProps,
 	MiniChatItemProps,
 } from '@/interface/Conversation/Conversation.interface'
 
@@ -73,6 +74,7 @@ function ChatLocation(props: ChatLocationProps) {
 		listFindChatLocation,
 		findKeyword,
 		enteringLocationKey,
+		miniChatActionId,
 		onFindChatLocation,
 		onEnterChatLocation,
 		onRefreshMyChatLocation,
@@ -82,6 +84,7 @@ function ChatLocation(props: ChatLocationProps) {
 		// Actions
 		onGetListMyMiniChat,
 		onGetListFullMiniChat,
+		onLeaveMiniChat,
 	} = useChatLocation({ id })
 	const [mapValue, setMapValue] = useState({
 		address: '',
@@ -96,7 +99,7 @@ function ChatLocation(props: ChatLocationProps) {
 	}, [id])
 
 	// Open a joined mini chat while preserving its parent location in the URL.
-	const handleSelectMiniChat = (item: MiniChatItemProps) => {
+	const handleSelectMiniChat = (item: Pick<MiniChatItemProps, 'id'>) => {
 		if (!id || !item.id) return
 		onPushState({ type: 'location', id, mini_id: item.id })
 	}
@@ -105,6 +108,15 @@ function ChatLocation(props: ChatLocationProps) {
 	const handleSelectParentChat = () => {
 		if (!id) return
 		onPushState({ type: 'location', id })
+	}
+
+	// Leave a joined mini chat and return home if it is currently open.
+	const handleLeaveMiniChat = async (item: FullMiniChatItemProps) => {
+		const success = await onLeaveMiniChat(item.id)
+		if (success && activeMiniChatId === item.id) {
+			handleSelectParentChat()
+		}
+		return success
 	}
 
 	const handleItemClick = (item: ChatLocationItemProps) => {
@@ -224,11 +236,15 @@ function ChatLocation(props: ChatLocationProps) {
 						activeMiniChatId={activeMiniChatId}
 						miniChatsLoading={loading.getMyMiniChat}
 						fullMiniChatsLoading={loading.getFullMiniChat}
+						miniChatActionId={miniChatActionId}
 						onSelectMiniChat={handleSelectMiniChat}
 						onSelectParentChat={handleSelectParentChat}
+						onLeaveMiniChat={handleLeaveMiniChat}
 						onSuccess={({ type }) => {
 							if (type === 'join' || type === 'leave') {
 								onRefreshMyChatLocation()
+								onGetListMyMiniChat(id)
+								onGetListFullMiniChat(id)
 							}
 						}}
 					/>
