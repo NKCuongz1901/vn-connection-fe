@@ -1,0 +1,99 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	box-sizing: border-box;
+	width: 100%;
+	gap: 4px;
+	align-items: flex-start;
+	padding: 8px;
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+.myChatLocation {
+	background: #e7f5e9;
+}
+
+.activeChatLocation {
+	background: #fff5eb;
+}
+
+.title {
+	width: 100%;
+	min-width: 0;
+	align-items: center;
+	gap: 4px;
+}
+
+.icon {
+	display: inline-flex;
+	flex-shrink: 0;
+	width: 12px;
+	height: 12px;
+}
+
+.name {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	color: #006b35;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 20px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.members {
+	align-items: center;
+	gap: 4px;
+}
+
+.avatarStack {
+	align-items: center;
+}
+
+.avatar {
+	flex-shrink: 0;
+	margin-right: -8px;
+	overflow: hidden;
+	border-radius: 999px;
+
+	&:last-child {
+		margin-right: 0;
+	}
+}
+
+.more,
+.online,
+.time {
+	color: #48546b;
+	font-size: 10px;
+	font-weight: 400;
+	line-height: 14px;
+}
+
+.more {
+	white-space: nowrap;
+}
+
+.meta {
+	width: 100%;
+	gap: 4px;
+}
+
+.online {
+	align-items: center;
+	gap: 4px;
+	white-space: nowrap;
+}
+
+.onlineDot {
+	flex-shrink: 0;
+	width: 8px;
+	height: 8px;
+	border: 1px solid #fff;
+	border-radius: 99px;
+	background: #ff0038;
+}

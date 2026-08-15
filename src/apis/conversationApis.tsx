@@ -1,7 +1,7 @@
 import { convertParams } from '@/ultis/object'
 import axios from '../axios'
 
-import { CONVERSATION_ROUTES } from '@/routes'
+import { CHAT_LOCATION_ROUTES, CONVERSATION_ROUTES } from '@/routes'
 import { AdminDeleteMessageParams } from '@/interface/Conversation/Conversation.interface'
 
 export const sendMessageById = async (payload: any) => {
@@ -473,5 +473,37 @@ export const getListChatlocationOverview = async ({
 	const url = `${CONVERSATION_ROUTES.listChatlocationOverview}`
 	return await axios.get(url, {
 		params: convertParams({ page, limit }),
+	})
+}
+
+export const getListMyChatLocation = async (params: {
+	[key: string]: any
+} = {}) => {
+	const url = CHAT_LOCATION_ROUTES.myChatLocation
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const getListActiveChatLocation = async (params: {
+	[key: string]: any
+} = {}) => {
+	const url = CHAT_LOCATION_ROUTES.activeChatLocation
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export const getListSuggestChatLocation = async (params: {
+	latitude: number
+	longitude: number
+	[key: string]: any
+}) => {
+	const url = CHAT_LOCATION_ROUTES.suggestChatLocation
+
+	return await axios.get(url, {
+		params: convertParams(params),
 	})
 }

@@ -23,6 +23,7 @@ import { mainRoutes } from '@/routes/MainRoutes'
 import classes from './ChatRoom.module.scss'
 import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
 import BookIcon from '@/svg/BookIcon'
+import ChatLocation from './ChatLocation/ChatLocation'
 
 const tabOpts = [
 	{ value: 'language', label: 'Language' },
@@ -182,9 +183,7 @@ const ChatRoom = () => {
 					</Flex>
 				)
 			case tabOpts[1].value:
-				return (
-					<Flex className={classes.develop}>Feature is in development</Flex>
-				)
+				return <ChatLocation />
 			default:
 				return <></>
 		}
