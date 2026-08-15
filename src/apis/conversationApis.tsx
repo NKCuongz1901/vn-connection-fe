@@ -520,3 +520,29 @@ export const findChatLocation = async (payload: {
 
 	return await axios.post(url, payload)
 }
+
+export const getListMyMiniChat = async (params: {
+	parent_id: string
+	page?: number
+	limit?: number
+	[key: string]: any
+}) => {
+	const { parent_id, ..._params } = params || {}
+	const url = CHAT_LOCATION_ROUTES.getMyMiniChat(parent_id)
+
+	return await axios.get(url, {
+		params: convertParams(_params),
+	})
+}
+
+export const getListFullMiniChat = async (params: {
+	parent_id: string
+	[key: string]: any
+}) => {
+	const { parent_id, ..._params } = params || {}
+	const url = CHAT_LOCATION_ROUTES.getFullMiniChat(parent_id)
+
+	return await axios.get(url, {
+		params: convertParams(_params),
+	})
+}

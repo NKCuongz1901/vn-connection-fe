@@ -1,7 +1,7 @@
 'use client'
 
 import { Flex } from 'antd'
-import { memo, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 
 import CInputMap from '@/Components/Custom/CInputMap'
 import ChatLocationItem from '@/Components/ChatLocation/ChatLocationItem/ChatLocationItem'
@@ -70,12 +70,21 @@ function ChatLocation(props: ChatLocationProps) {
 		onFindChatLocation,
 		onEnterChatLocation,
 		onRefreshMyChatLocation,
-	} = useChatLocation({})
+		listMyMiniChat,
+
+		// Actions
+		onGetListMyMiniChat,
+	} = useChatLocation({ id })
 	const [mapValue, setMapValue] = useState({
 		address: '',
 		latitude: 0,
 		longitude: 0,
 	})
+
+	useEffect(() => {
+		if (!id) return
+		onGetListMyMiniChat(id)
+	}, [id])
 
 	const handleItemClick = (item: ChatLocationItemProps) => {
 		onEnterChatLocation(item)
@@ -145,21 +154,19 @@ function ChatLocation(props: ChatLocationProps) {
 				</div>
 				{!isLoading && (
 					<div className={classes.suggestList}>
-						{listSuggestChatLocation.map(
-							(item: ChatLocationEntry) => (
-								<SuggestChatLocationItem
-									key={item.id || `${item.title}-${item.level || ''}`}
-									id={item.id}
-									title={item.title}
-									level={item.level}
-									loading={
-										enteringLocationKey ===
-										(item.id || `${item.title}-${item.level || ''}`)
-									}
-									onClick={() => onEnterChatLocation(item)}
-								/>
-							),
-						)}
+						{listSuggestChatLocation.map((item: ChatLocationEntry) => (
+							<SuggestChatLocationItem
+								key={item.id || `${item.title}-${item.level || ''}`}
+								id={item.id}
+								title={item.title}
+								level={item.level}
+								loading={
+									enteringLocationKey ===
+									(item.id || `${item.title}-${item.level || ''}`)
+								}
+								onClick={() => onEnterChatLocation(item)}
+							/>
+						))}
 					</div>
 				)}
 			</section>
@@ -191,6 +198,8 @@ function ChatLocation(props: ChatLocationProps) {
 					<DetailChatRoom
 						id={id}
 						isChatLocation
+						miniChats={listMyMiniChat}
+						miniChatsLoading={loading.getMyMiniChat}
 						onSuccess={({ type }) => {
 							if (type === 'join' || type === 'leave') {
 								onRefreshMyChatLocation()

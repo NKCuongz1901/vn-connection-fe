@@ -95,8 +95,10 @@ export const CHAT_LOCATION_ROUTES = {
 	suggestChatLocation: 'conversation/suggest-chat-location',
 	getMemberInChatLocation: (id: string) => `conversation/${id}/members`,
 	getMemberAroundMe: (id: string) => `conversation/${id}/members-around-me`,
-	getMiniChat: (parentId: string) =>
+	getMyMiniChat: (parentId: string) =>
 		`conversation/my-chat-location/mini-chats?parent_id=${parentId}`,
+	getFullMiniChat: (parentId: string) =>
+		`conversation/my-chat-location/mini-chats-full?parent_id=${parentId}`,
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',

@@ -3,16 +3,21 @@ import {
 	findChatLocation,
 	getListActiveChatLocation,
 	getListMyChatLocation,
+	getListMyMiniChat,
 	getListSuggestChatLocation,
 } from '@/apis/conversationApis'
 import { useModal } from '@/context/ModalContext'
-import { ChatLocationItemProps } from '@/interface/Conversation/Conversation.interface'
+import {
+	ChatLocationItemProps,
+	MiniChatItemProps,
+} from '@/interface/Conversation/Conversation.interface'
 import { onPushState } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
 import { useEffect, useState } from 'react'
 
 interface useChatLocationProps {
 	tabOpts?: { value: string; label: string }[]
+	id?: string
 }
 
 export interface ChatLocationEntry {
@@ -22,13 +27,15 @@ export interface ChatLocationEntry {
 }
 
 export default function useChatLocation(props: useChatLocationProps) {
-	const { tabOpts } = props
+	const { tabOpts, id } = props
 	const { openError } = useModal()
 	const [loading, setLoading] = useState({
 		myChatLocation: false,
 		activeChatLocation: false,
 		suggestChatLocation: false,
 		findChatLocation: false,
+		getMyMiniChat: false,
+		getFullMiniChat: false,
 	})
 	const [listMyChatLocation, setListMyChatLocation] = useState<
 		ChatLocationItemProps[]
@@ -46,6 +53,27 @@ export default function useChatLocation(props: useChatLocationProps) {
 	const [enteringLocationKey, setEnteringLocationKey] = useState<string | null>(
 		null,
 	)
+	const [listMyMiniChat, setListMyMiniChat] = useState<MiniChatItemProps[]>([])
+	const [listFullMiniChat, setListFullMiniChat] = useState<any[]>([])
+
+	const handleGetListMyMiniChat = async (parentId: string) => {
+		setLoading((prev) => ({ ...prev, getMyMiniChat: true }))
+		try {
+			const res: any = await getListMyMiniChat({
+				parent_id: parentId,
+				page: 1,
+				limit: 50,
+			})
+			const { code, results } = res
+			if (code === 200) {
+				setListMyMiniChat(results.objects.rows || [])
+			}
+		} catch (error) {
+			openError(error.message)
+		} finally {
+			setLoading((prev) => ({ ...prev, getMyMiniChat: false }))
+		}
+	}
 
 	const handleGetListMyChatLocation = async () => {
 		setLoading((prev) => ({ ...prev, myChatLocation: true }))
@@ -149,7 +177,8 @@ export default function useChatLocation(props: useChatLocationProps) {
 			}
 			if (!level) {
 				openError({
-					message: 'Unable to create this location because its level is missing.',
+					message:
+						'Unable to create this location because its level is missing.',
 				})
 				return
 			}
@@ -188,10 +217,13 @@ export default function useChatLocation(props: useChatLocationProps) {
 		listFindChatLocation,
 		findKeyword,
 		enteringLocationKey,
+		listMyMiniChat,
+		listFullMiniChat,
 
 		// Actions
 		onFindChatLocation: handleFindChatLocation,
 		onEnterChatLocation: handleEnterChatLocation,
+		onGetListMyMiniChat: handleGetListMyMiniChat,
 		onRefreshMyChatLocation: handleGetListMyChatLocation,
 	}
 }

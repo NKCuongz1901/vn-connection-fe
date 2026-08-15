@@ -5,16 +5,26 @@ import useDetailChatRoom from '@/hooks/ChatRoom/useDetailChatRoom'
 import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
 import ChatRoomInboxChat from '@/Components/ChatRoomInbox/ChatRoomInboxChat'
 
+import { MiniChatItemProps } from '@/interface/Conversation/Conversation.interface'
+
 import classes from './DetailChatRoom.module.scss'
 
 interface DetailChatRoomProps {
 	id: string
 	isChatLocation?: boolean
+	miniChats?: MiniChatItemProps[]
+	miniChatsLoading?: boolean
 	onSuccess?: any
 }
 
 const DetailChatRoom = (props: DetailChatRoomProps) => {
-	const { id, isChatLocation, onSuccess = () => null } = props
+	const {
+		id,
+		isChatLocation,
+		miniChats,
+		miniChatsLoading,
+		onSuccess = () => null,
+	} = props
 	const { modal, setModal, onSetTimesJoin } = useDetailChatRoom(props)
 
 	const _renderModal = () => {
@@ -60,6 +70,8 @@ const DetailChatRoom = (props: DetailChatRoomProps) => {
 				key={id}
 				convId={id}
 				isChatLocation={isChatLocation}
+				miniChats={miniChats}
+				miniChatsLoading={miniChatsLoading}
 				onSuccess={onSuccess}
 				onChangeModal={setModal}
 			/>

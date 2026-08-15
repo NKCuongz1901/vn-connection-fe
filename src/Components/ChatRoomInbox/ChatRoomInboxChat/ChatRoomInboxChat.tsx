@@ -7,6 +7,7 @@ import useChatRoomInboxChat from '@/hooks/ChatRoomInbox/useChatRoomInboxChat'
 import { onPushState } from '@/ultis/route'
 import { formatNumberString } from '@/ultis/string'
 
+import MiniChatTopicBar from '@/Components/ChatLocation/MiniChatTopicBar/MiniChatTopicBar'
 import ChatRoomChatBox from '@/Components/ChatRoomChatBox'
 import AdminDeleteMessageModal, {
 	AdminDeleteMessageReasonModal,
@@ -22,6 +23,8 @@ import ModalViewMember from '../ModalViewMember'
 import ModelPin from '../ModelPin'
 import SettingConv from '../SettingConv'
 
+import { MiniChatItemProps } from '@/interface/Conversation/Conversation.interface'
+
 import classes from './ChatRoomInboxChat.module.scss'
 
 const mappingType = {
@@ -32,6 +35,8 @@ interface ChatRoomInboxChatProps {
 	convId: string
 	isNoHeader?: boolean
 	isChatLocation?: boolean
+	miniChats?: MiniChatItemProps[]
+	miniChatsLoading?: boolean
 	onSuccess?: any
 	onChangeModal?: any
 }
@@ -40,6 +45,8 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 		convId,
 		isNoHeader,
 		isChatLocation,
+		miniChats = [],
+		miniChatsLoading,
 		onChangeModal = () => null,
 	} = props
 	const {
@@ -204,6 +211,12 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 				vertical
 			>
 				{_renderHeader()}
+				{isChatLocation && (
+					<MiniChatTopicBar
+						items={miniChats}
+						loading={miniChatsLoading}
+					/>
+				)}
 				{/* {isArray(pinList, 1) && _renderPin()} */}
 				<Flex className={classes.chatBox}>
 					<ChatRoomChatBox

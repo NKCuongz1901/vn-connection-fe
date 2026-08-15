@@ -168,3 +168,21 @@ export interface ChatLocationItemProps {
 	amount_of_user_online: number
 	avatars: string[]
 }
+
+export interface MiniChatItemProps {
+	id: string
+	title: string
+	avatar: string
+	amount_of_user: number
+	amount_of_message: number
+	created_at: string
+	users_in_conversation: {
+		id: string
+		user_id: string
+		is_accept_notification: boolean
+	}[]
+	message_readers: ChatLocationMessageReaderProps[]
+	last_message: ChatLocationLastMessageProps | null
+	is_read: boolean
+	amount_of_user_online: number
+}
