@@ -88,6 +88,18 @@ export const CONVERSATION_ROUTES = {
 	quickMessage: 'quick-chat',
 	listChatlocationOverview: 'conversation/overview-chat-location',
 }
+export const CHAT_LOCATION_ROUTES = {
+	myChatLocation: 'conversation/my-chat-location',
+	activeChatLocation: 'conversation/active-chat-location',
+	findChatLocation: 'conversation/find-chat-location',
+	suggestChatLocation: 'conversation/suggest-chat-location',
+	getMemberInChatLocation: (id: string) => `conversation/${id}/members`,
+	getMemberAroundMe: (id: string) => `conversation/${id}/members-around-me`,
+	getMyMiniChat: (parentId: string) =>
+		`conversation/my-chat-location/mini-chats?parent_id=${parentId}`,
+	getFullMiniChat: (parentId: string) =>
+		`conversation/my-chat-location/mini-chats-full?parent_id=${parentId}`,
+}
 export const FRIEND_ROUTES = {
 	name: '/friend',
 	myFriend: 'friend/my',

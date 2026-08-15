@@ -1,12 +1,15 @@
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
-import { memo } from 'react'
+import { memo, useState } from 'react'
 
 import useChatRoomInboxChat from '@/hooks/ChatRoomInbox/useChatRoomInboxChat'
 
 import { onPushState } from '@/ultis/route'
 import { formatNumberString } from '@/ultis/string'
 
+import MiniChatTopicBar from '@/Components/ChatLocation/MiniChatTopicBar/MiniChatTopicBar'
+import ModalLeaveMiniChat from '@/Components/ChatLocation/ModalSelectMiniChat/ModalLeaveMiniChat'
+import ModalSelectMiniChat from '@/Components/ChatLocation/ModalSelectMiniChat/ModalSelectMiniChat'
 import ChatRoomChatBox from '@/Components/ChatRoomChatBox'
 import AdminDeleteMessageModal, {
 	AdminDeleteMessageReasonModal,
@@ -14,12 +17,18 @@ import AdminDeleteMessageModal, {
 import CAvatar from '@/Components/Custom/CAvatar'
 import ArrrowRightIcon from '@/svg/ArrrowRightIcon'
 import BookIcon from '@/svg/BookIcon'
+import MarkIcon from '@/svg/MarkIcon'
 import MoreIcon from '@/svg/MoreIcon'
 import People from '@/svg/People'
 import PinIcon from '@/svg/PinIcon'
 import ModalViewMember from '../ModalViewMember'
 import ModelPin from '../ModelPin'
 import SettingConv from '../SettingConv'
+
+import {
+	FullMiniChatItemProps,
+	MiniChatItemProps,
+} from '@/interface/Conversation/Conversation.interface'
 
 import classes from './ChatRoomInboxChat.module.scss'
 
@@ -30,11 +39,59 @@ const mappingType = {
 interface ChatRoomInboxChatProps {
 	convId: string
 	isNoHeader?: boolean
+	isChatLocation?: boolean
+	miniChats?: MiniChatItemProps[]
+	fullMiniChats?: FullMiniChatItemProps[]
+	activeMiniChatId?: string
+	miniChatsLoading?: boolean
+	fullMiniChatsLoading?: boolean
+	miniChatActionId?: string
+	onSelectMiniChat?: (
+		item: Pick<MiniChatItemProps, 'id'>,
+		options?: { isJoining?: boolean },
+	) => void
+	onSelectParentChat?: () => void
+	onLeaveMiniChat?: (item: FullMiniChatItemProps) => Promise<boolean>
 	onSuccess?: any
 	onChangeModal?: any
 }
 const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
-	const { convId, isNoHeader, onChangeModal = () => null } = props
+	const {
+		convId,
+		isNoHeader,
+		isChatLocation,
+		miniChats = [],
+		fullMiniChats = [],
+		activeMiniChatId,
+		miniChatsLoading,
+		fullMiniChatsLoading,
+		miniChatActionId,
+		onSelectMiniChat,
+		onSelectParentChat,
+		onLeaveMiniChat,
+		onChangeModal = () => null,
+	} = props
+	const [openSelectMiniChat, setOpenSelectMiniChat] = useState(false)
+	const [leaveMiniChatTarget, setLeaveMiniChatTarget] =
+		useState<FullMiniChatItemProps | null>(null)
+
+	// Open a mini chat or request confirmation before leaving a joined room.
+	const handleSelectFullMiniChat = (item: FullMiniChatItemProps) => {
+		setOpenSelectMiniChat(false)
+		if (item.joined) {
+			setLeaveMiniChatTarget(item)
+			return
+		}
+		onSelectMiniChat?.(item, { isJoining: true })
+	}
+
+	// Confirm leaving the selected joined mini chat.
+	const handleConfirmLeaveMiniChat = async () => {
+		if (!leaveMiniChatTarget || !onLeaveMiniChat) return
+		const success = await onLeaveMiniChat(leaveMiniChatTarget)
+		if (success) setLeaveMiniChatTarget(null)
+	}
+
 	const {
 		_scrollRef,
 
@@ -81,8 +138,14 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 				) : (
 					<>
 						<Flex className={classes.userInChat}>
-							<CAvatar src={avatar || ''} />
-							<span>{title} Chat Room</span>
+							{isChatLocation ? (
+								<span className={classes.locationIcon}>
+									<MarkIcon fill="#94A3B8" width={24} height={24} />
+								</span>
+							) : (
+								<CAvatar src={avatar || ''} />
+							)}
+							<span>{isChatLocation ? title : `${title} Chat Room`}</span>
 							<Flex
 								className={classes.totalMem}
 								onClick={() =>
@@ -191,6 +254,16 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 				vertical
 			>
 				{_renderHeader()}
+				{isChatLocation && (
+					<MiniChatTopicBar
+						items={miniChats}
+						activeId={activeMiniChatId}
+						loading={miniChatsLoading}
+						onExpand={() => setOpenSelectMiniChat(true)}
+						onSelect={onSelectMiniChat}
+						onSelectHome={onSelectParentChat}
+					/>
+				)}
 				{/* {isArray(pinList, 1) && _renderPin()} */}
 				<Flex className={classes.chatBox}>
 					<ChatRoomChatBox
@@ -219,6 +292,21 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 			)}
 
 			{modal?.type && _renderModal()}
+			{openSelectMiniChat && (
+				<ModalSelectMiniChat
+					items={fullMiniChats}
+					loading={fullMiniChatsLoading}
+					onClose={() => setOpenSelectMiniChat(false)}
+					onSelect={handleSelectFullMiniChat}
+				/>
+			)}
+			{leaveMiniChatTarget && (
+				<ModalLeaveMiniChat
+					loading={miniChatActionId === leaveMiniChatTarget.id}
+					onCancel={() => setLeaveMiniChatTarget(null)}
+					onConfirm={handleConfirmLeaveMiniChat}
+				/>
+			)}
 
 			<AdminDeleteMessageModal
 				open={!!adminDeleteTarget && !openAdminDeleteReason}

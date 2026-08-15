@@ -1,0 +1,153 @@
+.wrapper {
+	position: relative;
+	display: flex;
+	width: 100%;
+	height: 56px;
+	flex-shrink: 0;
+	align-items: center;
+	overflow: hidden;
+	border-bottom: 1px solid #eef3f6;
+	background: #fff;
+}
+
+.list {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	align-items: center;
+	gap: 12px;
+	padding: 0 72px 0 16px;
+	overflow-x: auto;
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+.home,
+.topic,
+.expand {
+	display: inline-flex;
+	box-sizing: border-box;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: 0;
+	cursor: pointer;
+}
+
+.home {
+	width: 32px;
+	height: 32px;
+	padding: 4px;
+	border: 1px solid transparent;
+	border-radius: 999px;
+	background: #f0f3f9;
+
+	svg {
+		width: 22px;
+		height: 21px;
+	}
+
+	&[aria-current='true'] {
+		border-color: #006b35;
+		background: #e7f5e9;
+	}
+}
+
+.topic,
+.skeleton {
+	position: relative;
+	width: 48px;
+	height: 40px;
+	flex-shrink: 0;
+	border-radius: 12px;
+}
+
+.topic {
+	padding: 4px 8px;
+	border: 1px solid transparent;
+	background: #f0f3f9;
+
+	&[aria-current='true'] {
+		border-color: #006b35;
+		background: #e7f5e9;
+	}
+}
+
+.avatar {
+	display: block;
+	width: 32px;
+	height: 32px;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+
+.unreadBadge {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 8px;
+	height: 8px;
+	border: 0.5px solid #fff;
+	border-radius: 999px;
+	background: #ff0038;
+}
+
+.skeleton {
+	overflow: hidden;
+	background: #f0f3f9;
+
+	&::after {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			90deg,
+			transparent,
+			rgba(255, 255, 255, 0.7),
+			transparent
+		);
+		content: '';
+		animation: shimmer 1.2s infinite;
+		transform: translateX(-100%);
+	}
+}
+
+.control {
+	position: absolute;
+	z-index: 1;
+	top: 0;
+	right: 0;
+	display: flex;
+	width: 72px;
+	height: 56px;
+	align-items: center;
+	justify-content: flex-end;
+	padding-right: 16px;
+	background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff 58%);
+	pointer-events: none;
+}
+
+.expand {
+	width: 32px;
+	height: 40px;
+	background: transparent;
+	pointer-events: auto;
+}
+
+.chevron {
+	width: 9px;
+	height: 9px;
+	border-right: 1.5px solid #48546b;
+	border-bottom: 1.5px solid #48546b;
+	transform: rotate(45deg) translate(-2px, -2px);
+}
+
+@keyframes shimmer {
+	to {
+		transform: translateX(100%);
+	}
+}

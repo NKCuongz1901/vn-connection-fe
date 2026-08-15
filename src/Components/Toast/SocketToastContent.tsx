@@ -97,6 +97,27 @@ export const showSocketToast = ({
 	)
 }
 
+export const MINI_CHAT_JOINED_TOAST_ID = 'mini-chat-joined'
+export const MINI_CHAT_LEFT_TOAST_ID = 'mini-chat-left'
+
+export const showMiniChatJoinedToast = () => {
+	showSocketToast({
+		title: 'You joined this room',
+		variant: 'success',
+		toastId: MINI_CHAT_JOINED_TOAST_ID,
+		showClose: false,
+	})
+}
+
+export const showMiniChatLeftToast = () => {
+	showSocketToast({
+		title: 'You left this room',
+		variant: 'error',
+		toastId: MINI_CHAT_LEFT_TOAST_ID,
+		showClose: false,
+	})
+}
+
 export const TALK_ROOM_SPEAKER_PROMOTE_TOAST_ID = 'talkroom-speaker-promote'
 export const TALK_ROOM_AUTO_CLOSE_TOAST_ID = 'talkroom-auto-close'
 export const TALK_ROOM_USER_KICKED_TOAST_ID = 'talkroom-user-kicked'
