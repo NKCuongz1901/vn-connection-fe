@@ -9,11 +9,12 @@ import classes from './DetailChatRoom.module.scss'
 
 interface DetailChatRoomProps {
 	id: string
+	isChatLocation?: boolean
 	onSuccess?: any
 }
 
 const DetailChatRoom = (props: DetailChatRoomProps) => {
-	const { id, onSuccess = () => null } = props
+	const { id, isChatLocation, onSuccess = () => null } = props
 	const { modal, setModal, onSetTimesJoin } = useDetailChatRoom(props)
 
 	const _renderModal = () => {
@@ -58,6 +59,7 @@ const DetailChatRoom = (props: DetailChatRoomProps) => {
 			<ChatRoomInboxChat
 				key={id}
 				convId={id}
+				isChatLocation={isChatLocation}
 				onSuccess={onSuccess}
 				onChangeModal={setModal}
 			/>

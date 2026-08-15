@@ -190,6 +190,7 @@ function ChatLocation(props: ChatLocationProps) {
 				<div className={classes.detailChat}>
 					<DetailChatRoom
 						id={id}
+						isChatLocation
 						onSuccess={({ type }) => {
 							if (type === 'join' || type === 'leave') {
 								onRefreshMyChatLocation()

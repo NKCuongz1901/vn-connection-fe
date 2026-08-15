@@ -14,6 +14,7 @@ import AdminDeleteMessageModal, {
 import CAvatar from '@/Components/Custom/CAvatar'
 import ArrrowRightIcon from '@/svg/ArrrowRightIcon'
 import BookIcon from '@/svg/BookIcon'
+import MarkIcon from '@/svg/MarkIcon'
 import MoreIcon from '@/svg/MoreIcon'
 import People from '@/svg/People'
 import PinIcon from '@/svg/PinIcon'
@@ -30,11 +31,17 @@ const mappingType = {
 interface ChatRoomInboxChatProps {
 	convId: string
 	isNoHeader?: boolean
+	isChatLocation?: boolean
 	onSuccess?: any
 	onChangeModal?: any
 }
 const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
-	const { convId, isNoHeader, onChangeModal = () => null } = props
+	const {
+		convId,
+		isNoHeader,
+		isChatLocation,
+		onChangeModal = () => null,
+	} = props
 	const {
 		_scrollRef,
 
@@ -81,8 +88,14 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 				) : (
 					<>
 						<Flex className={classes.userInChat}>
-							<CAvatar src={avatar || ''} />
-							<span>{title} Chat Room</span>
+							{isChatLocation ? (
+								<span className={classes.locationIcon}>
+									<MarkIcon fill="#94A3B8" width={24} height={24} />
+								</span>
+							) : (
+								<CAvatar src={avatar || ''} />
+							)}
+							<span>{isChatLocation ? title : `${title} Chat Room`}</span>
 							<Flex
 								className={classes.totalMem}
 								onClick={() =>
