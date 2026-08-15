@@ -476,9 +476,11 @@ export const getListChatlocationOverview = async ({
 	})
 }
 
-export const getListMyChatLocation = async (params: {
-	[key: string]: any
-} = {}) => {
+export const getListMyChatLocation = async (
+	params: {
+		[key: string]: any
+	} = {},
+) => {
 	const url = CHAT_LOCATION_ROUTES.myChatLocation
 
 	return await axios.get(url, {
@@ -486,9 +488,11 @@ export const getListMyChatLocation = async (params: {
 	})
 }
 
-export const getListActiveChatLocation = async (params: {
-	[key: string]: any
-} = {}) => {
+export const getListActiveChatLocation = async (
+	params: {
+		[key: string]: any
+	} = {},
+) => {
 	const url = CHAT_LOCATION_ROUTES.activeChatLocation
 
 	return await axios.get(url, {
@@ -506,4 +510,13 @@ export const getListSuggestChatLocation = async (params: {
 	return await axios.get(url, {
 		params: convertParams(params),
 	})
+}
+
+export const findChatLocation = async (payload: {
+	latitude: number
+	longitude: number
+}) => {
+	const url = CHAT_LOCATION_ROUTES.findChatLocation
+
+	return await axios.post(url, payload)
 }

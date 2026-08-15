@@ -1,11 +1,12 @@
 'use client'
 
 import { Flex } from 'antd'
-import { memo } from 'react'
+import { memo, useState } from 'react'
 
 import CInputMap from '@/Components/Custom/CInputMap'
 import ChatLocationList from '@/Components/ChatLocation/ChatLocationList/ChatLocationList'
 import useChatLocation from '@/hooks/ChatRoom/useChatLocation'
+import AddIcon from '@/svg/AddIcon'
 import GlobalIcon from '@/svg/GlobalIcon'
 import SearchIcon from '@/svg/SearchIcon'
 import { isArray } from '@/ultis/array'
@@ -47,10 +48,67 @@ function ChatLocation() {
 		listMyChatLocation,
 		listActiveChatLocation,
 		listSuggestChatLocation,
+		listFindChatLocation,
+		findKeyword,
+		onFindChatLocation,
 	} = useChatLocation({})
+	const [mapValue, setMapValue] = useState({
+		address: '',
+		latitude: 0,
+		longitude: 0,
+	})
 
 	const handleItemClick = (item: ChatLocationItemProps) => {
 		onPushState({ type: 'location', id: item.id })
+	}
+
+	// Find chat locations for the place picked on the map.
+	const handleSubmitMap = (value: {
+		display_name?: string
+		lat?: number
+		lng?: number
+	}) => {
+		const { display_name = '', lat, lng } = value || {}
+		const latitude = Number(lat) || 0
+		const longitude = Number(lng) || 0
+
+		setMapValue({ address: display_name, latitude, longitude })
+		onFindChatLocation({ latitude, longitude, keyword: display_name })
+	}
+
+	const _renderFindSection = () => {
+		if (!isArray(listFindChatLocation, 1)) return null
+
+		return (
+			<section className={classes.findSection}>
+				<div className={classes.findHeading}>
+					<span className={classes.findHeadingTitle}>
+						Result for “{findKeyword}”
+					</span>
+					<span className={classes.findCounter}>
+						{listFindChatLocation.length}
+					</span>
+				</div>
+				<div className={classes.findTags}>
+					{listFindChatLocation.map((item) => (
+						<button
+							key={item.id || item.title}
+							type="button"
+							className={classes.findTag}
+							disabled={!item.id}
+							onClick={() =>
+								item.id && onPushState({ type: 'location', id: item.id })
+							}
+						>
+							<span className={classes.findTagIcon}>
+								<AddIcon fill="#e55a0f" />
+							</span>
+							<span className={classes.findTagText}>{item.title}</span>
+						</button>
+					))}
+				</div>
+			</section>
+		)
 	}
 
 	const _renderSuggestSection = () => {
@@ -88,11 +146,15 @@ function ChatLocation() {
 			<div className={classes.search}>
 				<CInputMap
 					placeholder="Search by city or country"
-					longitude={0}
-					latitude={0}
+					value={mapValue.address}
+					longitude={mapValue.longitude}
+					latitude={mapValue.latitude}
 					prefix={<SearchIcon />}
+					onSubmitModal={handleSubmitMap}
 				/>
 			</div>
+
+			{_renderFindSection()}
 
 			<ChatLocationList
 				title="Your rooms"

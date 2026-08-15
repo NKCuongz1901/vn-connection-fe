@@ -13,6 +13,91 @@
 	padding: 0 16px;
 }
 
+.findSection {
+	width: 100%;
+}
+
+.findHeading {
+	display: flex;
+	width: 100%;
+	align-items: center;
+	gap: 8px;
+	padding: 16px 16px 12px;
+}
+
+.findHeadingTitle {
+	color: #0f1729;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+}
+
+.findCounter {
+	display: inline-flex;
+	flex-shrink: 0;
+	height: 20px;
+	align-items: center;
+	justify-content: center;
+	padding: 0 8px;
+	border-radius: 99px;
+	background: #f0f3f9;
+	color: #006b35;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 16px;
+	white-space: nowrap;
+}
+
+.findTags {
+	display: flex;
+	width: 100%;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 0 16px 12px;
+}
+
+.findTag {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 4px;
+	border: 0;
+	border-radius: 40px;
+	background: #fff6f0;
+	cursor: pointer;
+
+	&:disabled {
+		cursor: default;
+	}
+}
+
+.findTagIcon {
+	display: inline-flex;
+	padding-left: 4px;
+	flex-shrink: 0;
+	width: 20px;
+	height: 20px;
+	align-items: center;
+	justify-content: center;
+
+	svg {
+		width: 20px;
+		height: 20px;
+	}
+}
+
+.findTagText {
+	color: var(--text-brand-primary, #e55a0f);
+	text-align: center;
+
+	font-size: var(--body-base-size, 14px);
+	font-style: normal;
+	font-weight: 600;
+	line-height: var(--body-base-line-height, 20px); /* 142.857% */
+	letter-spacing: var(--body-base-tracking, 0);
+}
+
 .suggestSection {
 	width: 100%;
 }
