@@ -10,14 +10,16 @@ import classes from './MiniChatTopicBar.module.scss'
 
 interface MiniChatTopicBarProps {
 	items: MiniChatItemProps[]
+	activeId?: string
 	loading?: boolean
 	onExpand?: () => void
+	onSelectHome?: () => void
 	onSelect?: (item: MiniChatItemProps) => void
 }
 
 // Render joined mini chats below a chat-location header.
 const MiniChatTopicBar = (props: MiniChatTopicBarProps) => {
-	const { items, loading, onExpand, onSelect } = props
+	const { items, activeId, loading, onExpand, onSelectHome, onSelect } = props
 
 	return (
 		<div className={classes.wrapper}>
@@ -26,6 +28,8 @@ const MiniChatTopicBar = (props: MiniChatTopicBarProps) => {
 					type="button"
 					className={classes.home}
 					aria-label="Chat location"
+					aria-current={!activeId}
+					onClick={onSelectHome}
 				>
 					<HouseIcon fill="#006B35" />
 				</button>
@@ -41,6 +45,7 @@ const MiniChatTopicBar = (props: MiniChatTopicBarProps) => {
 								className={classes.topic}
 								title={item.title}
 								aria-label={item.title}
+								aria-current={item.id === activeId}
 								onClick={() => onSelect?.(item)}
 							>
 								<span

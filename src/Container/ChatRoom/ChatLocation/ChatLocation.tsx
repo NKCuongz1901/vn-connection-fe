@@ -13,8 +13,12 @@ import AddIcon from '@/svg/AddIcon'
 import GlobalIcon from '@/svg/GlobalIcon'
 import SearchIcon from '@/svg/SearchIcon'
 import { isArray } from '@/ultis/array'
+import { onPushState, useQuery } from '@/ultis/route'
 
-import { ChatLocationItemProps } from '@/interface/Conversation/Conversation.interface'
+import {
+	ChatLocationItemProps,
+	MiniChatItemProps,
+} from '@/interface/Conversation/Conversation.interface'
 
 import DetailChatRoom from '../DetailChatRoom'
 import classes from './ChatLocation.module.scss'
@@ -59,6 +63,8 @@ interface ChatLocationProps {
 
 function ChatLocation(props: ChatLocationProps) {
 	const { id, isChatRoomDetail } = props
+	const { onGetQuerry } = useQuery()
+	const { mini_id: activeMiniChatId } = onGetQuerry()
 	const {
 		loading,
 		listMyChatLocation,
@@ -85,6 +91,18 @@ function ChatLocation(props: ChatLocationProps) {
 		if (!id) return
 		onGetListMyMiniChat(id)
 	}, [id])
+
+	// Open a joined mini chat while preserving its parent location in the URL.
+	const handleSelectMiniChat = (item: MiniChatItemProps) => {
+		if (!id || !item.id) return
+		onPushState({ type: 'location', id, mini_id: item.id })
+	}
+
+	// Return from a mini chat to the parent chat-location room.
+	const handleSelectParentChat = () => {
+		if (!id) return
+		onPushState({ type: 'location', id })
+	}
 
 	const handleItemClick = (item: ChatLocationItemProps) => {
 		onEnterChatLocation(item)
@@ -196,10 +214,13 @@ function ChatLocation(props: ChatLocationProps) {
 				</aside>
 				<div className={classes.detailChat}>
 					<DetailChatRoom
-						id={id}
+						id={activeMiniChatId || id}
 						isChatLocation
 						miniChats={listMyMiniChat}
+						activeMiniChatId={activeMiniChatId}
 						miniChatsLoading={loading.getMyMiniChat}
+						onSelectMiniChat={handleSelectMiniChat}
+						onSelectParentChat={handleSelectParentChat}
 						onSuccess={({ type }) => {
 							if (type === 'join' || type === 'leave') {
 								onRefreshMyChatLocation()

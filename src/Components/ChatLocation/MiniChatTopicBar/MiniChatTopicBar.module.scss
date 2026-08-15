@@ -29,6 +29,7 @@
 .topic,
 .expand {
 	display: inline-flex;
+	box-sizing: border-box;
 	flex-shrink: 0;
 	align-items: center;
 	justify-content: center;
@@ -41,13 +42,18 @@
 	width: 32px;
 	height: 32px;
 	padding: 4px;
-	border: 1px solid #006b35;
+	border: 1px solid transparent;
 	border-radius: 999px;
-	background: #e7f5e9;
+	background: #f0f3f9;
 
 	svg {
 		width: 22px;
 		height: 21px;
+	}
+
+	&[aria-current='true'] {
+		border-color: #006b35;
+		background: #e7f5e9;
 	}
 }
 
@@ -62,7 +68,13 @@
 
 .topic {
 	padding: 4px 8px;
+	border: 1px solid transparent;
 	background: #f0f3f9;
+
+	&[aria-current='true'] {
+		border-color: #006b35;
+		background: #e7f5e9;
+	}
 }
 
 .avatar {

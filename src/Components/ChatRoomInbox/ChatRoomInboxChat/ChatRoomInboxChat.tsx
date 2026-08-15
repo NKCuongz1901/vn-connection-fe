@@ -36,7 +36,10 @@ interface ChatRoomInboxChatProps {
 	isNoHeader?: boolean
 	isChatLocation?: boolean
 	miniChats?: MiniChatItemProps[]
+	activeMiniChatId?: string
 	miniChatsLoading?: boolean
+	onSelectMiniChat?: (item: MiniChatItemProps) => void
+	onSelectParentChat?: () => void
 	onSuccess?: any
 	onChangeModal?: any
 }
@@ -46,7 +49,10 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 		isNoHeader,
 		isChatLocation,
 		miniChats = [],
+		activeMiniChatId,
 		miniChatsLoading,
+		onSelectMiniChat,
+		onSelectParentChat,
 		onChangeModal = () => null,
 	} = props
 	const {
@@ -214,7 +220,10 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 				{isChatLocation && (
 					<MiniChatTopicBar
 						items={miniChats}
+						activeId={activeMiniChatId}
 						loading={miniChatsLoading}
+						onSelect={onSelectMiniChat}
+						onSelectHome={onSelectParentChat}
 					/>
 				)}
 				{/* {isArray(pinList, 1) && _renderPin()} */}
