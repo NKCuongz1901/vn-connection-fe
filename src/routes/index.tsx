@@ -35,6 +35,8 @@ export const USER_ROUTES = {
 	block: '/user/block',
 	report: '/feedback',
 	appeal: '/user/appeal',
+	securityAlerts: '/user/security-alerts',
+	logoutOtherDevices: '/user/logout_other_devices',
 }
 export const POST_ROUTES = {
 	name: 'post',

@@ -66,6 +66,23 @@ export const appealAccountSuspended = async (payload: { phone: string }) => {
 	return await axios.post(USER_ROUTES.appeal, payload)
 }
 
+/** Gets security alerts that the current user has not acknowledged. */
+export const getPendingSecurityAlerts = async () => {
+	return await axios.get(`${USER_ROUTES.securityAlerts}/pending`)
+}
+
+/** Marks a security alert as handled by the current user. */
+export const acknowledgeSecurityAlert = async (alertId: string) => {
+	return await axios.post(
+		`${USER_ROUTES.securityAlerts}/${encodeURIComponent(alertId)}/acknowledge`,
+	)
+}
+
+/** Revokes every active session except the current device session. */
+export const logoutOtherDevices = async () => {
+	return await axios.post(USER_ROUTES.logoutOtherDevices)
+}
+
 export const requestFeature = async (payload: {
 	title: string
 	content: string
