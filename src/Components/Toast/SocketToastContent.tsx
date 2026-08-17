@@ -144,7 +144,7 @@ export const showTalkRoomInviteSentToast = () => {
 }
 
 export const showTalkRoomListenerRejectInviteToast = (userName?: string) => {
-	const name = userName?.trim() || 'This user'
+	const name = userName?.trim() || 'This person'
 	showSocketToast({
 		title: `${name} chose not to speak`,
 		variant: 'error',
