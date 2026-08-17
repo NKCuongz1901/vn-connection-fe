@@ -697,6 +697,9 @@ const Overview = () => {
 											key={room.id}
 											room={room}
 											onClick={() => handleOpenTalkRoomJoinModal(room.id)}
+											onAvatarClick={(userId) =>
+												onChangeRoute(`${mainRoutes.profile}/${userId}`)
+											}
 										/>
 									))}
 						</Flex>
