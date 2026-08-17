@@ -38,6 +38,7 @@ import VolumeMuteIcon from '@/svg/Talkroom/VolumeMuteIcon'
 import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { getUserInfo } from '@/ultis/storage'
+import { playTalkRoomSound } from '@/ultis/talkRoomSound'
 import {
 	excludeTalkRoomStageUsersFromListeners,
 	formatTalkRoomLevelLabel,
@@ -281,6 +282,20 @@ function DetailTalkroom({ id }: { id: string }) {
 		[connect],
 	)
 
+	/** Broadcasts own mic state so other clients can sync the mic icon. */
+	const handleEmitMicState = useCallback(
+		(isOn: boolean) => {
+			if (!currentUserId) return
+
+			emitRoomEvent(
+				currentUserId,
+				isOn ? 'speaker_on_mic' : 'speaker_off_mic',
+				{ is_on: isOn },
+			)
+		},
+		[currentUserId, emitRoomEvent],
+	)
+
 	const handleReconnectWhep = useCallback(async () => {
 		await disconnectWhep()
 		await connectWhep()
@@ -317,6 +332,7 @@ function DetailTalkroom({ id }: { id: string }) {
 							is_talking: false,
 						})
 					}
+					handleEmitMicState(true)
 					showTalkRoomSpeakerPromoteToast()
 				} else {
 					setSpeakerMicOptimisticOn(false)
@@ -326,6 +342,7 @@ function DetailTalkroom({ id }: { id: string }) {
 							is_talking: false,
 						})
 					}
+					handleEmitMicState(false)
 				}
 
 				await Promise.all([onGetDetailTalkRoom(id), onGetListenerInRoom(id)])
@@ -506,6 +523,7 @@ function DetailTalkroom({ id }: { id: string }) {
 			}
 
 			if (nextStatus === 'sessionEnd') {
+				playTalkRoomSound('endRoom')
 				setSessionEndStartedAtMs(Date.now())
 				setSessionEndModalOpen(true)
 			}
@@ -639,9 +657,16 @@ function DetailTalkroom({ id }: { id: string }) {
 
 	const handleHostLeaveClick = useCallback(() => {
 		if (!isHost) return
+
+		// Chat time: live session ended — no host transfer / assign speaker.
+		if (isTalkRoomCountSessionEndVisible(roomEndStatus)) {
+			setListenerLeaveModalOpen(true)
+			return
+		}
+
 		setTransferHostModalMode('leave')
 		setTransferHostModalOpen(true)
-	}, [isHost])
+	}, [isHost, roomEndStatus])
 
 	const handleListenerLeaveClick = useCallback(() => {
 		if (!isListener || isHost || isSpeaker) return
@@ -885,14 +910,15 @@ function DetailTalkroom({ id }: { id: string }) {
 			: isListener && !isSpeaker
 				? handleListenerLeaveClick
 				: undefined,
-		onMicOn: () => {
-			handleConnectAgora()
+		onMicOn: async () => {
+			await handleConnectAgora()
 			if (currentUserId) {
 				onUpdateSpeakerLiveStatus(currentUserId, {
 					is_open_mic: true,
 					is_talking: false,
 				})
 			}
+			handleEmitMicState(true)
 		},
 		onMicOff: () => {
 			setMic(false)
@@ -902,6 +928,7 @@ function DetailTalkroom({ id }: { id: string }) {
 					is_talking: false,
 				})
 			}
+			handleEmitMicState(false)
 		},
 	})
 

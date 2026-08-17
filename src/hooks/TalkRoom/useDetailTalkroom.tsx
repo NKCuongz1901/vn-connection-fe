@@ -77,6 +77,7 @@ import {
 	TalkRoomSpeakerStatusMap,
 	TalkRoomSlotRaiseHandMap,
 } from '@/ultis/talkRoom'
+import { playTalkRoomSound } from '@/ultis/talkRoomSound'
 import useTalkRoomSocket from './useTalkRoomSocket'
 
 export type ValidatePreJoinRoomResult = TalkRoomPreJoinValidation
@@ -1123,10 +1124,18 @@ export default function useDetailTalkroom(
 	const handleRoomSocketEvent = useCallback(
 		(event: string, data?: unknown) => {
 			switch (event) {
-				case 'user_joined_room':
+				case 'user_joined_room': {
+					const joinedUserId = getTalkRoomSocketTargetUserId(data)
+					const currentUserId = getUserInfo('id') as string | undefined
+
+					if (joinedUserId && joinedUserId !== currentUserId) {
+						playTalkRoomSound('newListener')
+					}
+
 					handleGetDetailTalkRoom(id)
 					handleGetListenerInRoom(id)
 					break
+				}
 				case 'user_left_room': {
 					const leftUserId = getTalkRoomSocketTargetUserId(data)
 					const leaveReason = getTalkRoomSocketLeaveReason(data)
@@ -1188,6 +1197,7 @@ export default function useDetailTalkroom(
 
 					if (userId) {
 						handleAddRaiseHandUser(userId, slotId)
+						playTalkRoomSound('raiseHand')
 
 						if (currentUserId && userId === currentUserId) {
 							showTalkRoomRaiseHandToast()

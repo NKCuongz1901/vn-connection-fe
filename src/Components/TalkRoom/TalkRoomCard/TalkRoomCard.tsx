@@ -14,16 +14,17 @@ import classes from './TalkRoomCard.module.scss'
 type TalkRoomCardProps = {
 	room: TalkRoomRoom
 	onClick?: () => void
+	onAvatarClick?: (userId: string) => void
 }
 
-function TalkRoomCard({ room, onClick }: TalkRoomCardProps) {
+function TalkRoomCard({ room, onClick, onAvatarClick }: TalkRoomCardProps) {
 	const isLive = isTalkRoomLive(room?.status)
 	const { language, total_participants, max_participants, next_schedule_at } =
 		room || {}
 
 	return (
 		<Flex vertical className={classes.card} onClick={onClick}>
-			<TalkRoomAvatarGroup room={room} />
+			<TalkRoomAvatarGroup room={room} onAvatarClick={onAvatarClick} />
 
 			<Flex className={classes.tag} align="center">
 				{isLive && (

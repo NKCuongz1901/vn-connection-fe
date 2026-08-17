@@ -268,6 +268,11 @@ function TalkRoom() {
 		onChangeRoute(`${mainRoutes.talkroom}/${room.id}`)
 	}
 
+	const handleAvatarClick = (userId: string) => {
+		if (!userId) return
+		onChangeRoute(`${mainRoutes.profile}/${userId}`)
+	}
+
 	const handleMessageCmiUser = async (userId: string) => {
 		if (!userId || userId === currentUserId) return
 
@@ -335,6 +340,7 @@ function TalkRoom() {
 								onCancelRoom={setCancelRoom}
 								onStart={handleStartTalkroom}
 								onJoin={handleStartTalkroom}
+								onAvatarClick={handleAvatarClick}
 							/>
 						))
 					)}
@@ -394,6 +400,7 @@ function TalkRoom() {
 									onNotifyMe={handleNotifyMe}
 									onViewCmiPeople={handleViewCmiPeople}
 									onStart={handleStartTalkroom}
+									onAvatarClick={handleAvatarClick}
 								/>
 							))}
 				</Flex>

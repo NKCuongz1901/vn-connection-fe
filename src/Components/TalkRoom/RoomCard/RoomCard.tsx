@@ -51,6 +51,7 @@ export type RoomCardProps = {
 	onCancelRoom?: (room: TalkRoomRoom) => void
 	onClick?: (room: TalkRoomRoom) => void
 	onViewCmiPeople?: (room: TalkRoomRoom) => void
+	onAvatarClick?: (userId: string) => void
 }
 
 function RoomCard({
@@ -66,6 +67,7 @@ function RoomCard({
 	onCancelRoom,
 	onClick,
 	onViewCmiPeople,
+	onAvatarClick,
 }: RoomCardProps) {
 	const isFriendVariant = variant === 'friend'
 	const isLive = isTalkRoomLive(room?.status)
@@ -233,7 +235,7 @@ function RoomCard({
 					>
 						<ShareIconSvg fill="#E55A0F" />
 					</button>
-					<TalkRoomAvatarGroup room={room} />
+					<TalkRoomAvatarGroup room={room} onAvatarClick={onAvatarClick} />
 				</div>
 			</div>
 
