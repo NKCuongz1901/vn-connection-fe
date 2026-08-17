@@ -657,9 +657,16 @@ function DetailTalkroom({ id }: { id: string }) {
 
 	const handleHostLeaveClick = useCallback(() => {
 		if (!isHost) return
+
+		// Chat time: live session ended — no host transfer / assign speaker.
+		if (isTalkRoomCountSessionEndVisible(roomEndStatus)) {
+			setListenerLeaveModalOpen(true)
+			return
+		}
+
 		setTransferHostModalMode('leave')
 		setTransferHostModalOpen(true)
-	}, [isHost])
+	}, [isHost, roomEndStatus])
 
 	const handleListenerLeaveClick = useCallback(() => {
 		if (!isListener || isHost || isSpeaker) return
