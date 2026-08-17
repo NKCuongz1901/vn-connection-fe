@@ -38,6 +38,7 @@ import VolumeMuteIcon from '@/svg/Talkroom/VolumeMuteIcon'
 import { useLocalePath } from '@/ultis/route'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { getUserInfo } from '@/ultis/storage'
+import { playTalkRoomSound } from '@/ultis/talkRoomSound'
 import {
 	excludeTalkRoomStageUsersFromListeners,
 	formatTalkRoomLevelLabel,
@@ -506,6 +507,7 @@ function DetailTalkroom({ id }: { id: string }) {
 			}
 
 			if (nextStatus === 'sessionEnd') {
+				playTalkRoomSound('endRoom')
 				setSessionEndStartedAtMs(Date.now())
 				setSessionEndModalOpen(true)
 			}
