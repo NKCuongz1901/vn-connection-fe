@@ -9,7 +9,6 @@ export type TalkRoomSoundKind = keyof typeof TALK_ROOM_SOUNDS
 const talkRoomSoundCache: Partial<Record<TalkRoomSoundKind, HTMLAudioElement>> =
 	{}
 
-/** Plays a short in-room SFX once; swallows autoplay / mute failures. */
 export const playTalkRoomSound = (kind: TalkRoomSoundKind) => {
 	if (typeof window === 'undefined') return
 
