@@ -756,6 +756,19 @@ export default function useChatRoomInboxChat({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[convId],
 	)
+	const handleDeleteMessageAll = useCallback(
+		(data: any) => {
+			const { user_id } = data || {}
+			if (!user_id) return
+
+			setMessList((prev) => {
+				const filtered = prev.filter((i) => i.user_id !== user_id)
+				return mappingMessageChat(filtered)
+			})
+		},
+		[],
+	)
+
 	const handleParseDataSocketReact = useCallback((data) => {
 		setMessList((prev) => {
 			const _prev = cloneDeep(prev)
@@ -820,11 +833,13 @@ export default function useChatRoomInboxChat({
 
 		socket.on('message', handleParseDataSocket)
 		socket.on('message_reaction', handleParseDataSocketReact)
+		socket.on('delete_message_all', handleDeleteMessageAll)
 		return () => {
 			socket.off('message', handleParseDataSocket)
 			socket.off('message_reaction', handleParseDataSocketReact)
+			socket.off('delete_message_all', handleDeleteMessageAll)
 		}
-	}, [convId, handleParseDataSocket, handleParseDataSocketReact, socket])
+	}, [convId, handleParseDataSocket, handleParseDataSocketReact, handleDeleteMessageAll, socket])
 
 	useEffect(() => {
 		messListRef.current = messList
