@@ -1,0 +1,50 @@
+.page {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.back,
+.more {
+	align-self: flex-start;
+	border: none;
+	background: none;
+	color: #006b35;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	padding: 0;
+}
+
+.title {
+	color: #0f1729;
+	font-size: 24px;
+	font-weight: 700;
+	line-height: 32px;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	gap: 20px 16px;
+}
+
+.rows {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.more {
+	margin-top: 8px;
+	height: 40px;
+	padding: 0 16px;
+	border: 1px solid #006b35;
+	border-radius: 8px;
+}
+
+.empty {
+	color: #94a3b8;
+	font-size: 14px;
+	padding: 24px 0;
+}

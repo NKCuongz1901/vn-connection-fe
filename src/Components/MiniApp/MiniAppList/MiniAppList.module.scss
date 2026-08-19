@@ -1,5 +1,13 @@
 .list {
 	display: flex;
-	align-items: center;
-	gap: 24px;
+	flex-wrap: wrap;
+	align-items: flex-start;
+}
+
+.sm {
+	gap: 12px;
+}
+
+.lg {
+	gap: 25px;
 }

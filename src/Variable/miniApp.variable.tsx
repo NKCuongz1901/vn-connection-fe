@@ -26,6 +26,7 @@ export type MiniAppItem = {
 	variant: MiniAppVariant
 	Icon: React.ComponentType<{ fill?: string }>
 	route?: string
+	availableOnWeb?: boolean
 }
 
 export const MINI_APP_ITEMS: MiniAppItem[] = [
@@ -35,6 +36,7 @@ export const MINI_APP_ITEMS: MiniAppItem[] = [
 		variant: MINI_APP_VARIANT.BOOK,
 		Icon: BookIcon,
 		route: 'mini-apps/books-audio',
+		availableOnWeb: true,
 	},
 	{
 		id: 'tutor',

@@ -167,6 +167,24 @@ export const CONFIG_BOOTSTRAP = {
 	getListLanguage: 'language',
 	getTalkRoomCategories: 'talkroom/categories',
 }
+export const BOOK_ROUTES = {
+	bookListV2: 'book/v2',
+	continueReading: 'book/continue-reading',
+	topPick: 'book/top-pick',
+	recentlyAdded: 'book/recently-added',
+	popularNow: 'book/popular-now',
+	book: 'book',
+	audioList: 'book/audio/list',
+	updateReadingProgress: 'book/reading-progress',
+	readingProgress: 'reading-progress',
+	chapter: 'chapter',
+	category: 'category',
+	readerProfile: 'reader/profile',
+	lastSelectedLevel: 'reader/profile/last-selected-level',
+	bookLanguageLearning: 'reader/profile/book-language-learning',
+	bookLanguageNative: 'reader/profile/book-language-native',
+	languagesVariant: 'book/languages-variant',
+}
 export const TALKROOM_ROUTES = {
 	talkRoomOverview: 'talkroom/overview',
 	myTalkRoomAnalysis: 'talkroom/my-status',
