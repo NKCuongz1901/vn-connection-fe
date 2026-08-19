@@ -68,25 +68,15 @@ export const NewDeviceSecurityProvider = ({
 	const [loading, setLoading] = useState(false)
 
 	const currentAlertRef = useRef<NewDeviceAlert | null>(null)
-	const queuedAlertsRef = useRef<NewDeviceAlert[]>([])
 	const handledAlertIdsRef = useRef(new Set<string>())
 	const isSessionRevokedRef = useRef(false)
 
-	/** Opens the next queued alert after the current alert is handled. */
-	const handleShowNextAlert = useCallback(() => {
-		const nextAlert = queuedAlertsRef.current.shift() ?? null
-		currentAlertRef.current = nextAlert
-		setCurrentAlert(nextAlert)
-		setStep('notice')
-	}, [])
-
-	/** Closes the current alert and continues with any queued alert. */
+	/** Closes the current alert modal. */
 	const handleCompleteCurrentAlert = useCallback(() => {
 		currentAlertRef.current = null
 		setCurrentAlert(null)
 		setStep('notice')
-		handleShowNextAlert()
-	}, [handleShowNextAlert])
+	}, [])
 
 	/** Validates, deduplicates, and displays an incoming new-device alert. */
 	const handleNewDeviceAlert = useCallback(async (payload: unknown) => {
@@ -97,10 +87,7 @@ export const NewDeviceSecurityProvider = ({
 		if (!ownDeviceId || ownDeviceId === alert.new_device_id) return
 
 		handledAlertIdsRef.current.add(alert.id)
-		if (currentAlertRef.current) {
-			queuedAlertsRef.current.push(alert)
-			return
-		}
+		if (currentAlertRef.current) return
 
 		currentAlertRef.current = alert
 		setCurrentAlert(alert)
@@ -195,7 +182,6 @@ export const NewDeviceSecurityProvider = ({
 	/** Closes the alert and opens the account password screen. */
 	const handleChangePassword = useCallback(() => {
 		currentAlertRef.current = null
-		queuedAlertsRef.current = []
 		setCurrentAlert(null)
 		setStep('notice')
 		onChangeRoute(`${mainRoutes.accountSetting}/manage-account/change`)
@@ -207,9 +193,10 @@ export const NewDeviceSecurityProvider = ({
 
 		try {
 			const response = await getPendingSecurityAlerts()
-			getAlertsFromResponse(response).forEach((alert) => {
-				void handleNewDeviceAlert(alert)
-			})
+			const alerts = getAlertsFromResponse(response)
+			if (alerts[0]) {
+				void handleNewDeviceAlert(alerts[0])
+			}
 		} catch (error) {
 			console.error('Unable to fetch pending security alerts', error)
 		}
