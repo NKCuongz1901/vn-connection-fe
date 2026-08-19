@@ -1,7 +1,10 @@
 import clsx from 'clsx'
-import classes from './MiniAppButton.module.scss'
 import { memo } from 'react'
 import { Tooltip } from 'antd'
+
+import classes from './MiniAppButton.module.scss'
+
+export type MiniAppButtonSize = 'sm' | 'lg'
 
 type MiniAppButtonProps = {
 	label: string
@@ -10,6 +13,8 @@ type MiniAppButtonProps = {
 	onClick?: () => void
 	className?: string
 	disabled?: boolean
+	size?: MiniAppButtonSize
+	badge?: string
 }
 
 function MiniAppButton({
@@ -19,23 +24,34 @@ function MiniAppButton({
 	onClick,
 	className,
 	disabled,
+	size = 'sm',
+	badge,
 }: MiniAppButtonProps) {
+	const button = (
+		<button
+			type="button"
+			className={clsx(classes.wrapper, classes[size], className)}
+			onClick={onClick}
+			disabled={disabled}
+		>
+			<span className={classes.iconWrap}>
+				<span className={classes.iconBox} style={{ background }}>
+					<span className={classes.icon}>{icon}</span>
+				</span>
+				{badge ? <span className={classes.badge}>{badge}</span> : null}
+			</span>
+			<span className={classes.label}>{label}</span>
+		</button>
+	)
+
+	if (!disabled) return button
+
 	return (
 		<Tooltip
 			title={<div>This mini app is available in the UniVini app</div>}
 			color="green"
 		>
-			<button
-				type="button"
-				className={clsx(classes.wrapper, className)}
-				onClick={onClick}
-				disabled={disabled}
-			>
-				<div className={classes.iconBox} style={{ background }}>
-					<span className={classes.icon}>{icon}</span>
-				</div>
-				<span className={classes.label}>{label}</span>
-			</button>
+			<span className={classes.tooltipWrap}>{button}</span>
 		</Tooltip>
 	)
 }

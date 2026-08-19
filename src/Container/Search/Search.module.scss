@@ -10,6 +10,9 @@
 		border-radius: 16px;
 		background: #fff;
 		gap: 16px;
+		.miniApps {
+			flex-shrink: 0;
+		}
 		.userContainer {
 			gap: 24px;
 			.titleUser {

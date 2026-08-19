@@ -1,18 +1,9 @@
-import React from 'react'
+'use client'
+
+import MiniAppsHub from '@/Container/MiniApps/MiniAppsHub'
 
 function page() {
-	return (
-		<div
-			style={{
-				display: 'flex',
-				justifyContent: 'center',
-				alignItems: 'center',
-				height: '100vh',
-			}}
-		>
-			Coming soon
-		</div>
-	)
+	return <MiniAppsHub />
 }
 
 export default page

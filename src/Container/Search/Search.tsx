@@ -184,7 +184,7 @@ const Search = () => {
 	return (
 		<div className={clsx(classes.wrapper)}>
 			<Flex className={clsx(classes.container)} vertical>
-				<MiniAppList />
+				<MiniAppList size="sm" className={classes.miniApps} />
 				{_renderUser()}
 				{_renderEvent()}
 				{_renderClub()}
