@@ -183,7 +183,7 @@ const MainLayout = (props: MainLayoutProps) => {
 				<Flex vertical className="contentMainLayout">
 					<div className="contentMainLayoutBody">{children}</div>
 					<footer className="mainLayoutLegalFooter">
-						<TermPolicy />
+						<TermPolicy layout="inline" />
 					</footer>
 				</Flex>
 			</Flex>
