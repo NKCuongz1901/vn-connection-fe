@@ -1,35 +1,111 @@
+.tooltipWrap {
+	display: inline-flex;
+}
+
 .wrapper {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	width: 77px;
 	gap: 4px;
+	padding: 0;
 	border: none;
 	background: none;
+	cursor: pointer;
+
+	&:disabled {
+		cursor: not-allowed;
+	}
+}
+
+.iconWrap {
+	position: relative;
+	display: flex;
+	flex-shrink: 0;
+}
+
+.iconBox {
+	display: flex;
+	width: 52px;
+	height: 52px;
+	padding: 4px;
+	justify-content: center;
+	align-items: center;
+	aspect-ratio: 1 / 1;
+	border-radius: var(--radius-4, 16px);
+}
+
+.icon {
+	display: flex;
+	width: 32px;
+	height: 32px;
+	align-items: center;
+	justify-content: center;
+
+	svg,
+	img {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+}
+
+.badge {
+	position: absolute;
+	top: 42px;
+	left: 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 4px;
+	border-radius: var(--radius-1, 4px);
+	background: #ec4a55;
+	color: var(--text-primary-inverse, #fff);
+	font-size: var(--body-xsmall-size, 10px);
+	font-weight: 600;
+	line-height: var(--body-xsmall-line-height, 14px);
+	letter-spacing: var(--body-xsmall-tracking, 0);
+	white-space: nowrap;
+	pointer-events: none;
+}
+
+.label {
+	width: 100%;
+	color: var(--text-primary, #0f1729);
+	text-align: center;
+	font-size: var(--body-xsmall-size, 10px);
+	font-style: normal;
+	font-weight: 600;
+	line-height: var(--body-xsmall-line-height, 14px);
+	letter-spacing: var(--body-xsmall-tracking, 0);
+	word-break: break-word;
+}
+
+.lg {
+	width: 120px;
+	gap: 8px;
 
 	.iconBox {
-		cursor: pointer;
-		display: flex;
+		width: 76px;
+		height: 76px;
+		padding: var(--spacing-3, 12px);
+	}
+
+	.icon {
 		width: 52px;
 		height: 52px;
-		padding: 4px;
-		justify-content: center;
-		align-items: center;
-		aspect-ratio: 1/1;
-		border-radius: var(--radius-4, 16px);
 	}
-	svg {
-		width: 32px;
-		height: 32px;
+
+	.badge {
+		top: 64px;
+		left: 45px;
 	}
 
 	.label {
-		color: var(--text-primary, #0f1729);
-		text-align: center;
-
-		font-size: var(--body-xsmall-size, 10px);
-		font-style: normal;
-		font-weight: 600;
-		line-height: var(--body-xsmall-line-height, 14px);
-		letter-spacing: var(--body-xsmall-tracking, 0);
+		font-size: var(--body-base-size, 14px);
+		line-height: var(--body-base-line-height, 20px);
+		letter-spacing: var(--body-base-tracking, 0);
+		white-space: nowrap;
 	}
 }

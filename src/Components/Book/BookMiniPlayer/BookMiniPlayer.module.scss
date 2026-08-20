@@ -1,0 +1,189 @@
+.bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+	min-height: 90px;
+	padding: 12px 32px;
+	background: #b4e9bf;
+	box-shadow: -2px 0 12px rgba(0, 13, 25, 0.1);
+	flex-shrink: 0;
+}
+
+.book {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	min-width: 0;
+	max-width: 360px;
+	padding: 0;
+	border: none;
+	background: none;
+	text-align: left;
+	cursor: pointer;
+}
+
+.cover {
+	width: 41px;
+	height: 66px;
+	border-radius: 4px;
+	background: #fefefe;
+	overflow: hidden;
+	flex-shrink: 0;
+	box-shadow: 0.4px 0.04px 0.9px rgba(0, 0, 0, 0.03);
+
+	:global(.ant-flex),
+	:global(.ant-image),
+	:global(.ant-image img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}
+
+.copy {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.title {
+	color: #0f1729;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.meta {
+	color: #48546b;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.center {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	max-width: 450px;
+	margin: 0 auto;
+}
+
+.controls {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 28px;
+}
+
+.iconBtn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: none;
+	background: none;
+	color: #0f1729;
+	cursor: pointer;
+}
+
+.play {
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: none;
+	border-radius: 99px;
+	background: #f0f3f9;
+	color: #006b35;
+	cursor: pointer;
+}
+
+.seek {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	color: #48546b;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+}
+
+.slider {
+	position: relative;
+	flex: 1;
+	height: 16px;
+	display: flex;
+	align-items: center;
+}
+
+.sliderFill {
+	position: absolute;
+	left: 0;
+	height: 6px;
+	border-radius: 21px;
+	background: #006b35;
+	pointer-events: none;
+}
+
+.slider::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 6px;
+	border-radius: 99px;
+	background: rgba(0, 8, 25, 0.16);
+	pointer-events: none;
+}
+
+.slider input {
+	position: relative;
+	z-index: 1;
+	width: 100%;
+	height: 16px;
+	margin: 0;
+	background: transparent;
+	appearance: none;
+	cursor: pointer;
+}
+
+.slider input::-webkit-slider-thumb {
+	appearance: none;
+	width: 12px;
+	height: 12px;
+	border-radius: 99px;
+	background: #006b35;
+}
+
+.slider input::-moz-range-thumb {
+	width: 12px;
+	height: 12px;
+	border: none;
+	border-radius: 99px;
+	background: #006b35;
+}
+
+.speed {
+	flex-shrink: 0;
+	min-width: 40px;
+	height: 40px;
+	padding: 0 10px;
+	border: none;
+	border-radius: 99px;
+	background: rgba(255, 255, 255, 0.48);
+	color: #006b35;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+}

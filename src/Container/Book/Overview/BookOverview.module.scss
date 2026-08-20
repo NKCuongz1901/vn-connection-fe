@@ -1,0 +1,19 @@
+.page {
+	display: flex;
+	flex-direction: column;
+	gap: 32px;
+}
+
+.greeting {
+	color: #0f1729;
+	font-size: 24px;
+	font-weight: 700;
+	line-height: 32px;
+}
+
+.hint {
+	margin-top: 4px;
+	color: #64748b;
+	font-size: 14px;
+	line-height: 20px;
+}
