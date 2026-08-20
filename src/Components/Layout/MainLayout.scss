@@ -96,14 +96,23 @@
 
 		.contentMainLayout {
 			// padding: 24px 32px;
-			overflow: auto;
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
 			height: 100%;
 			flex: 1;
 			min-width: 0;
 
+			.contentMainLayoutBody {
+				flex: 1 1 auto;
+				min-height: 0;
+				overflow: auto;
+			}
+
 			.mainLayoutLegalFooter {
 				flex-shrink: 0;
-				padding: 24px 32px;
+				margin-top: auto;
+				padding: 8px 24px;
 				border-top: 1px solid #eef3f6;
 				background: #fff;
 			}
