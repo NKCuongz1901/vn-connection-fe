@@ -1,0 +1,46 @@
+.section {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.sectionHead {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.sectionTitle {
+	color: #0f1729;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+}
+
+.seeAll {
+	border: none;
+	background: none;
+	color: #006b35;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+}
+
+.rail {
+	display: flex;
+	gap: 16px;
+	overflow-x: auto;
+	padding-bottom: 4px;
+}
+
+.list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.empty {
+	color: #94a3b8;
+	font-size: 14px;
+	padding: 24px 0;
+}

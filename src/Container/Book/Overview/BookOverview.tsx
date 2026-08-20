@@ -2,9 +2,8 @@
 
 import { memo } from 'react'
 
-import BookCard from '@/Components/Book/BookCard/BookCard'
+import BookRail from '@/Components/Book/BookRail'
 import { useBookLibrary } from '@/context/BookLibraryContext'
-import { BookCardItem } from '@/interface/Book/book.interface'
 import { getUserInfo } from '@/ultis/storage'
 import { useLocalePath } from '@/ultis/route'
 import {
@@ -15,57 +14,7 @@ import {
 
 import classes from './BookOverview.module.scss'
 
-type RailProps = {
-	title: string
-	seeAllPath: string
-	books: BookCardItem[]
-	loading: boolean
-	emptyText: string
-	onSeeAll: (path: string) => void
-	onOpen: (id: string) => void
-}
-
-function BookRail({
-	title,
-	seeAllPath,
-	books,
-	loading,
-	emptyText,
-	onSeeAll,
-	onOpen,
-}: RailProps) {
-	return (
-		<section className={classes.section}>
-			<div className={classes.sectionHead}>
-				<div className={classes.sectionTitle}>{title}</div>
-				<button
-					type="button"
-					className={classes.seeAll}
-					onClick={() => onSeeAll(seeAllPath)}
-				>
-					See all
-				</button>
-			</div>
-			{books.length ? (
-				<div className={classes.rail}>
-					{books.map((book) => (
-						<BookCard
-							key={book.id}
-							book={book}
-							variant="rail"
-							onClick={() => onOpen(book.id)}
-						/>
-					))}
-				</div>
-			) : (
-				<div className={classes.empty}>
-					{loading ? 'Loading…' : emptyText}
-				</div>
-			)}
-		</section>
-	)
-}
-
+/** Library home: greeting + book rails from BookLibraryContext. */
 function BookOverview() {
 	const { onChangeRoute } = useLocalePath()
 	const {
@@ -135,35 +84,16 @@ function BookOverview() {
 				onSeeAll={onChangeRoute}
 				onOpen={(id) => onChangeRoute(bookDetailPath(id))}
 			/>
-
-			<section className={classes.section}>
-				<div className={classes.sectionHead}>
-					<div className={classes.sectionTitle}>Popular now</div>
-					<button
-						type="button"
-						className={classes.seeAll}
-						onClick={() => onChangeRoute(BOOK_SEE_ALL.popular.path)}
-					>
-						See all
-					</button>
-				</div>
-				{popularNow.length ? (
-					<div className={classes.popularList}>
-						{popularNow.map((book) => (
-							<BookCard
-								key={book.id}
-								book={book}
-								variant="row"
-								onClick={() => onChangeRoute(bookDetailPath(book.id))}
-							/>
-						))}
-					</div>
-				) : (
-					<div className={classes.empty}>
-						{loading ? 'Loading…' : 'No popular books yet'}
-					</div>
-				)}
-			</section>
+			<BookRail
+				title="Popular now"
+				seeAllPath={BOOK_SEE_ALL.popular.path}
+				books={popularNow}
+				loading={loading}
+				emptyText="No popular books yet"
+				layout="list"
+				onSeeAll={onChangeRoute}
+				onOpen={(id) => onChangeRoute(bookDetailPath(id))}
+			/>
 		</div>
 	)
 }

@@ -3,7 +3,7 @@
 import { memo } from 'react'
 import clsx from 'clsx'
 
-import { BookLanguageButton } from '@/Components/Book/BookLanguageModal/BookLanguageModal'
+import { BookLanguageButton } from '@/Components/Book'
 import { useBookPlayer } from '@/context/BookPlayerContext'
 import useBookReader from '@/hooks/Book/useBookReader'
 import { useLocalePath } from '@/ultis/route'

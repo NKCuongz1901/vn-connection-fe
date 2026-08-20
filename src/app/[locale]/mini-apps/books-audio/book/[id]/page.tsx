@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation'
 
-import BookDetail from '@/Container/Book/BookDetail/BookDetail'
+import BookDetail from '@/Container/Book/BookDetail'
 
 export default function BookDetailPage() {
 	const params = useParams()

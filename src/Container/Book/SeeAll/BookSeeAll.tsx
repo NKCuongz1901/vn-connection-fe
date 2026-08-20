@@ -2,7 +2,7 @@
 
 import { memo } from 'react'
 
-import BookCard from '@/Components/Book/BookCard/BookCard'
+import { BookCard } from '@/Components/Book'
 import useBookSeeAll from '@/hooks/Book/useBookSeeAll'
 import { useLocalePath } from '@/ultis/route'
 import {
