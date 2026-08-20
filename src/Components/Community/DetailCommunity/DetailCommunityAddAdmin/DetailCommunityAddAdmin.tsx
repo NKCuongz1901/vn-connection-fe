@@ -115,7 +115,8 @@ const DetailCommunityAddAdmin = ({
 								<div>Loading</div>
 							) : (
 								members.map((member) => {
-									const { user_id, user } = member
+									const { user_id, user } = member || {}
+									if (!user) return null
 									const { avatar, name } = user
 									return (
 										<Flex key={user_id} className={classes.memberWrapper}>
