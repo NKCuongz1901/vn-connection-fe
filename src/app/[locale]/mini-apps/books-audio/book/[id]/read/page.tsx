@@ -3,7 +3,7 @@
 import { Suspense } from 'react'
 import { useParams } from 'next/navigation'
 
-import BookReader from '@/Container/Book/ReadBook/BookReader'
+import BookReader from '@/Container/Book/BookReader'
 
 export default function BookReadPage() {
 	const params = useParams()

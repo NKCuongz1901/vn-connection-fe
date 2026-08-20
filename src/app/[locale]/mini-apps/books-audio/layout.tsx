@@ -1,6 +1,6 @@
 'use client'
 
-import BookShell from '@/Container/Book/BookShell/BookShell'
+import BookShell from '@/Container/Book/BookShell'
 import { BookLibraryProvider } from '@/context/BookLibraryContext'
 import { BookPlayerProvider } from '@/context/BookPlayerContext'
 

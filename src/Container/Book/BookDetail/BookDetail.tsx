@@ -3,7 +3,7 @@
 import { memo } from 'react'
 import clsx from 'clsx'
 
-import { BookLanguageButton } from '@/Components/Book/BookLanguageModal/BookLanguageModal'
+import { BookLanguageButton } from '@/Components/Book'
 import CImage from '@/Components/Custom/CImage/CImage'
 import useBookDetail from '@/hooks/Book/useBookDetail'
 import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
