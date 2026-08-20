@@ -58,13 +58,12 @@ export default function AudioRecorder(props: AudioRecorderProps) {
 		mediaRecorderRef.current.onstop = () => {
 			clearTimeout(timerRef.current)
 
-			// 1. Đổi type thành audio/mp4 (định dạng container cho .m4a)
-			const mimeType = 'audio/mp4'
+			const mimeType = mediaRecorderRef.current.mimeType || 'audio/webm'
+			const extension = mimeType.includes('ogg') ? 'ogg' : 'webm'
 
 			const blob = new Blob(audioChunksRef.current, { type: mimeType })
 
-			// 2. Đổi đuôi file thành .m4a
-			const file = new File([blob], `recording_${Date.now()}.m4a`, {
+			const file = new File([blob], `recording_${Date.now()}.${extension}`, {
 				type: mimeType,
 			})
 
