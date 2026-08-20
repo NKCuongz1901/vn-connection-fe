@@ -28,6 +28,7 @@ interface CommentItemProps {
 	item: any
 	onAction?: any
 	isLoading?: boolean
+	isPublic?: boolean
 }
 
 const CCommentItem = (props: CommentItemProps) => {

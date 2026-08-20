@@ -8,6 +8,7 @@ import {
 	deleteCommentPost,
 	editComment,
 	getListCommentById,
+	getPublicListCommentById,
 	likeComment,
 	sendCommentPost,
 } from '@/apis/postApis'
@@ -24,13 +25,15 @@ import { paginationCommon } from '@/Variable/common.variable'
 interface useCommentItemProps {
 	item: any
 	onAction?: any
+	isPublic?: boolean
 }
 
 export default function useCCommentItem(props: useCommentItemProps) {
-	const { item, onAction = () => null } = props
+	const { item, onAction = () => null, isPublic } = props
 	const { post_id, id: parent_id, amount_of_replies } = item || {}
 	const { openError, openConfirm, closeModal } = useModal()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
+	const fetchComments = isPublic ? getPublicListCommentById : getListCommentById
 
 	const _loadmore = useRef<boolean>(
 		amount_of_replies > _paginationRefs.current.limit,
@@ -76,7 +79,7 @@ export default function useCCommentItem(props: useCommentItemProps) {
 					setCommentList([])
 				}
 			}
-			const res: any = await getListCommentById({
+			const res: any = await fetchComments({
 				fields: [
 					'$all',
 					{ user: ['name', 'avatar', 'id'] },
