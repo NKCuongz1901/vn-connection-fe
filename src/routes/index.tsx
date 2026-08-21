@@ -159,6 +159,7 @@ export const REFERRAL_ROUTES = {
 	walletHistoryGroupByMonth: 'wallet-history/grouped-by-month',
 	walletHistory: 'wallet-history',
 	walletHistoryOverview: 'wallet-history/referral-overview',
+	addBankAccount: 'redeem-request/bank-account',
 }
 export const MAP_ROUTES = {
 	name: 'map/google/place/textsearch/json',

@@ -1,7 +1,9 @@
 import {
+	addBankAccount,
 	getLeaderBoard,
 	getWalletHistoryandInvite,
 	getWalletHistoryOverview,
+	type AddBankAccountPayload,
 	type ReferralLeaderboardPeriod,
 } from '@/apis/referralApis'
 import {
@@ -23,11 +25,12 @@ const EMPTY_OVERVIEW: ReferralOverviewData = {
 }
 
 export default function useReferral() {
-	const { openError } = useModal()
+	const { openError, openSuccess } = useModal()
 	const [loading, setLoading] = useState<boolean>(false)
 	const [loadingLeaderBoard, setLoadingLeaderBoard] = useState<boolean>(false)
 	const [loadingOverview, setLoadingOverview] = useState<boolean>(false)
 	const [loadingHistory, setLoadingHistory] = useState<boolean>(false)
+	const [loadingBankAccount, setLoadingBankAccount] = useState<boolean>(false)
 	const [myPosition, setMyPosition] = useState<number>(0)
 	const [myTotalPoints, setMyTotalPoints] = useState<number>(0)
 	const [leaderBoard, setLeaderBoard] = useState<any[]>([])
@@ -165,6 +168,28 @@ export default function useReferral() {
 		[handleLoadMoreHistory],
 	)
 
+	/** Saves bank account details for referral redeem payouts. */
+	const handleAddBankAccount = useCallback(
+		async (payload: AddBankAccountPayload) => {
+			setLoadingBankAccount(true)
+			try {
+				const res: any = await addBankAccount(payload)
+				const { code } = res || {}
+				if (code === 200) {
+					openSuccess({ message: 'Bank account saved successfully' })
+					return true
+				}
+				return false
+			} catch (error) {
+				openError(error)
+				return false
+			} finally {
+				setLoadingBankAccount(false)
+			}
+		},
+		[openError, openSuccess],
+	)
+
 	useEffect(() => {
 		handleGetLeaderBoard('monthly', { isInitial: true })
 		handleGetReferralOverview()
@@ -177,6 +202,7 @@ export default function useReferral() {
 		loadingLeaderBoard,
 		loadingOverview,
 		loadingHistory,
+		loadingBankAccount,
 		myPosition,
 		myTotalPoints,
 		leaderBoard,
@@ -187,5 +213,6 @@ export default function useReferral() {
 		onChangePeriod: handleChangePeriod,
 		onLoadMoreHistory: handleLoadMoreHistory,
 		onScrollHistory: handleScrollHistory,
+		onAddBankAccount: handleAddBankAccount,
 	}
 }

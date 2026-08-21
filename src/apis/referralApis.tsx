@@ -39,3 +39,18 @@ export const getWalletHistoryOverview = async () => {
 	const url = REFERRAL_ROUTES.walletHistoryOverview
 	return await axios.get(url)
 }
+
+
+export type AddBankAccountPayload = {
+	bank_name: string
+	account_holder_name: string
+	account_number: string
+	email: string
+	phone: string
+}
+
+/** Saves bank account details for referral redeem. */
+export const addBankAccount = async (payload: AddBankAccountPayload) => {
+	const url = REFERRAL_ROUTES.addBankAccount
+	return await axios.put(url, payload)
+}
