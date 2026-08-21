@@ -12,39 +12,61 @@ import classes from './ReferralHistory.module.scss'
 import {
 	buildAllYearsModalData,
 	buildRefByMonthStats,
+	type ReferralOverviewData,
 	type ReferralWalletHistoryItem,
-	type ReferralWalletHistoryYearGroup,
 } from './referralHistory.utils'
 
 export interface ReferralHistoryProps {
 	loading?: boolean
 	loadingHistory?: boolean
+	referralOverview?: ReferralOverviewData
 	walletHistory?: ReferralWalletHistoryItem[]
-	walletHistoryGroupByMonth?: ReferralWalletHistoryYearGroup[]
-	onLoadMore?: () => void
 	onScroll?: (e: React.UIEvent<HTMLDivElement>) => void
 }
 
 function ReferralHistory({
 	loading,
 	loadingHistory,
+	referralOverview,
 	walletHistory = [],
-	walletHistoryGroupByMonth = [],
 	onScroll,
 }: ReferralHistoryProps) {
 	const [openAllYearsModal, setOpenAllYearsModal] = useState(false)
+	const [selectedYear, setSelectedYear] = useState<number | null>(null)
+
+	const years = referralOverview?.years ?? []
+	const allTimePoints = referralOverview?.all_time_points ?? 0
 
 	const refByMonthStats = useMemo(
-		() => buildRefByMonthStats(walletHistoryGroupByMonth),
-		[walletHistoryGroupByMonth],
+		() =>
+			buildRefByMonthStats(years, {
+				selectedYear,
+				allTimePoints,
+			}),
+		[years, selectedYear, allTimePoints],
 	)
 
 	const allYearsModalData = useMemo(
-		() => buildAllYearsModalData(walletHistoryGroupByMonth),
-		[walletHistoryGroupByMonth],
+		() => buildAllYearsModalData(years, allTimePoints),
+		[years, allTimePoints],
 	)
 
 	const _renderRefByMonth = () => {
+		if (loading) {
+			return (
+				<div className={classes.refByMonthWrapper}>
+					{Array.from({ length: 3 }).map((_, index) => (
+						<div key={index} className={classes.refByMonthItemWrap}>
+							{index > 0 && <div className={classes.refByMonthDivider} />}
+							<div className={classes.refByMonthCard}>
+								<Skeleton active paragraph={{ rows: 2 }} title={false} />
+							</div>
+						</div>
+					))}
+				</div>
+			)
+		}
+
 		return (
 			<div className={classes.refByMonthWrapper}>
 				{refByMonthStats.map((item, index) => (
@@ -76,14 +98,12 @@ function ReferralHistory({
 	}
 
 	const _renderLatestReferralList = () => {
-		if (loading && !walletHistory.length) {
-			return _renderLatestReferralSkeleton()
-		}
-
 		if (!walletHistory.length) {
-			return !loading ? (
+			return loadingHistory ? (
+				_renderLatestReferralSkeleton()
+			) : (
 				<div className={classes.empty}>No history yet</div>
-			) : null
+			)
 		}
 
 		return walletHistory.map((item) => (
@@ -99,7 +119,7 @@ function ReferralHistory({
 				</div>
 				<div className={classes.listScroll} onScroll={onScroll}>
 					<div className={classes.listContent}>{_renderLatestReferralList()}</div>
-					{loadingHistory && (
+					{loadingHistory && walletHistory.length > 0 && (
 						<div className={classes.loadingMore}>Loading more...</div>
 					)}
 				</div>
@@ -137,6 +157,11 @@ function ReferralHistory({
 					onClose={() => setOpenAllYearsModal(false)}
 					years={allYearsModalData.years}
 					total={allYearsModalData.total}
+					selectedYear={selectedYear}
+					onSelectYear={(year) => {
+						setSelectedYear(year)
+						setOpenAllYearsModal(false)
+					}}
 				/>
 			)}
 		</div>

@@ -158,6 +158,7 @@ export const REFERRAL_ROUTES = {
 	leaderBoard: 'user/leader-board/list',
 	walletHistoryGroupByMonth: 'wallet-history/grouped-by-month',
 	walletHistory: 'wallet-history',
+	walletHistoryOverview: 'wallet-history/referral-overview',
 }
 export const MAP_ROUTES = {
 	name: 'map/google/place/textsearch/json',

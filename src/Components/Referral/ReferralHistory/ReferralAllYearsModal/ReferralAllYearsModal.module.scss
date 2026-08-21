@@ -25,6 +25,18 @@
 	border-radius: 8px;
 	border: 1px solid var(--border-primary, #f0f3f9);
 	background: var(--background-primary, #fff);
+	cursor: pointer;
+	font: inherit;
+	text-align: left;
+
+	&:hover {
+		border-color: #e55a0f;
+	}
+}
+
+.yearRowActive {
+	border-color: #e55a0f;
+	background: #fffaf7;
 }
 
 .iconWrap {

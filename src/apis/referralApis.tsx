@@ -34,3 +34,8 @@ export const getWalletHistoryandInvite = async (params: {
 		params: convertParams(params),
 	})
 }
+
+export const getWalletHistoryOverview = async () => {
+	const url = REFERRAL_ROUTES.walletHistoryOverview
+	return await axios.get(url)
+}

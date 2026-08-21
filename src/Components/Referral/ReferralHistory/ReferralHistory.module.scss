@@ -20,22 +20,31 @@
 		cursor: pointer;
 		display: flex;
 		min-height: 24px;
-		max-height: 30px;
-		padding: 0 8px;
+		max-height: 24px;
+		padding: 0;
 		justify-content: center;
 		align-items: center;
-		gap: var(--spacing-spacer-0, 4px);
+		gap: 0;
 		border-radius: var(--radius-2, 8px);
 		background: var(--component-button-secondary-bg-default, #f0f3f9);
 
-		.allYearsText {
-			color: var(--component-button-secondary-fg-default, #0f1729);
+		svg {
+			display: block;
+			width: 16px;
+			height: 16px;
+			margin-left: 4px;
+			flex-shrink: 0;
+		}
 
+		.allYearsText {
+			padding: 0 4px;
+			color: var(--component-button-secondary-fg-default, #0f1729);
 			font-size: var(--body-small-size, 12px);
 			font-style: normal;
 			font-weight: 600;
 			line-height: var(--body-small-line-height, 16px);
 			letter-spacing: var(--body-small-tracking, 0);
+			white-space: nowrap;
 		}
 	}
 

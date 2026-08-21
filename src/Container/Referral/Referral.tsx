@@ -34,16 +34,16 @@ function Referral() {
 	const {
 		loading,
 		loadingLeaderBoard,
+		loadingOverview,
 		loadingHistory,
 		myPosition,
 		myTotalPoints,
 		leaderBoard,
 		period,
+		referralOverview,
 		walletHistory,
-		walletHistoryGroupByMonth,
 		topInvitees,
 		onChangePeriod,
-		onLoadMoreHistory,
 		onScrollHistory,
 	} = useReferral()
 	const { userData } = useProfile({})
@@ -305,8 +305,8 @@ function Referral() {
 				<div className={classes.contentLeft}>
 					{_renderMyTotalRef()}
 					<ReferralTabPanel
-						loading={loading}
 						loadingLeaderBoard={loadingLeaderBoard}
+						loadingOverview={loadingOverview}
 						loadingHistory={loadingHistory}
 						leaderBoard={leaderBoard}
 						topInvitees={topInvitees}
@@ -315,9 +315,8 @@ function Referral() {
 						userData={userData}
 						period={period}
 						onChangePeriod={onChangePeriod}
+						referralOverview={referralOverview}
 						walletHistory={walletHistory}
-						walletHistoryGroupByMonth={walletHistoryGroupByMonth}
-						onLoadMoreHistory={onLoadMoreHistory}
 						onScrollHistory={onScrollHistory}
 					/>
 				</div>

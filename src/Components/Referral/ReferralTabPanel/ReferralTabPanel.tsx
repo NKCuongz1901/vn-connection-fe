@@ -5,9 +5,12 @@ import { useState } from 'react'
 
 import ReferralHistory from '@/Components/Referral/ReferralHistory/ReferralHistory'
 import ReferralLeaderboard from '@/Components/Referral/ReferralLeaderboard/ReferralLeaderboard'
+import type {
+	ReferralOverviewData,
+	ReferralWalletHistoryItem,
+} from '@/Components/Referral/ReferralHistory/referralHistory.utils'
 
 import classes from './ReferralTabPanel.module.scss'
-import { Divider } from 'antd'
 
 const TABS = [
 	{ key: 'leaderboard', label: 'Leaderboard' },
@@ -17,37 +20,35 @@ const TABS = [
 type ReferralTab = (typeof TABS)[number]['key']
 
 export interface ReferralTabPanelProps {
-	loading?: boolean
 	loadingLeaderBoard?: boolean
+	loadingOverview?: boolean
+	loadingHistory?: boolean
 	leaderBoard?: any[]
 	topInvitees?: any[]
 	myPosition?: number
 	myTotalPoints?: number
 	userData?: any
-	walletHistory?: any[]
-	walletHistoryGroupByMonth?: any[]
+	referralOverview?: ReferralOverviewData
+	walletHistory?: ReferralWalletHistoryItem[]
 	period?: 'monthly' | 'yearly' | 'all_time'
 	onChangePeriod?: (period: 'monthly' | 'yearly' | 'all_time') => void
-	onLoadMoreHistory?: () => void
 	onScrollHistory?: (e: React.UIEvent<HTMLDivElement>) => void
-	loadingHistory?: boolean
 }
 
 function ReferralTabPanel({
-	loading,
 	loadingLeaderBoard,
+	loadingOverview,
+	loadingHistory,
 	leaderBoard = [],
 	topInvitees = [],
 	myPosition = 0,
 	myTotalPoints = 0,
 	userData = {},
+	referralOverview,
 	walletHistory = [],
-	walletHistoryGroupByMonth = [],
 	period,
 	onChangePeriod,
-	onLoadMoreHistory,
 	onScrollHistory,
-	loadingHistory,
 }: ReferralTabPanelProps) {
 	const [activeTab, setActiveTab] = useState<ReferralTab>('leaderboard')
 
@@ -84,11 +85,10 @@ function ReferralTabPanel({
 				)}
 				{activeTab === 'history' && (
 					<ReferralHistory
-						loading={loading}
+						loading={loadingOverview}
 						loadingHistory={loadingHistory}
+						referralOverview={referralOverview}
 						walletHistory={walletHistory}
-						walletHistoryGroupByMonth={walletHistoryGroupByMonth}
-						onLoadMore={onLoadMoreHistory}
 						onScroll={onScrollHistory}
 					/>
 				)}
