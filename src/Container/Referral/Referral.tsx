@@ -33,12 +33,16 @@ const skeletonItems = [
 function Referral() {
 	const {
 		loading,
+		loadingLeaderBoard,
 		loadingHistory,
 		myPosition,
+		myTotalPoints,
 		leaderBoard,
+		period,
 		walletHistory,
 		walletHistoryGroupByMonth,
 		topInvitees,
+		onChangePeriod,
 		onLoadMoreHistory,
 		onScrollHistory,
 	} = useReferral()
@@ -302,11 +306,15 @@ function Referral() {
 					{_renderMyTotalRef()}
 					<ReferralTabPanel
 						loading={loading}
+						loadingLeaderBoard={loadingLeaderBoard}
 						loadingHistory={loadingHistory}
 						leaderBoard={leaderBoard}
 						topInvitees={topInvitees}
 						myPosition={myPosition}
+						myTotalPoints={myTotalPoints}
 						userData={userData}
+						period={period}
+						onChangePeriod={onChangePeriod}
 						walletHistory={walletHistory}
 						walletHistoryGroupByMonth={walletHistoryGroupByMonth}
 						onLoadMoreHistory={onLoadMoreHistory}

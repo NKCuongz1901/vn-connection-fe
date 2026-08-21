@@ -2,9 +2,21 @@ import { convertParams } from '@/ultis/object'
 import axios from '../axios'
 import { REFERRAL_ROUTES } from '@/routes'
 
-export const getLeaderBoard = async () => {
+export type ReferralLeaderboardPeriod = 'monthly' | 'yearly' | 'all_time'
+
+export const getLeaderBoard = async (params?: {
+	period?: ReferralLeaderboardPeriod
+	page?: number
+	limit?: number
+}) => {
 	const url = REFERRAL_ROUTES.leaderBoard
-	return await axios.get(url)
+	return await axios.get(url, {
+		params: convertParams({
+			period: params?.period || 'monthly',
+			page: params?.page || 1,
+			limit: params?.limit || 30,
+		}),
+	})
 }
 
 export const getWalletHistoryGroupByMonth = async () => {

@@ -155,7 +155,7 @@ export const SEARCH_ROUTES = {
 }
 
 export const REFERRAL_ROUTES = {
-	leaderBoard: 'user/leader-board',
+	leaderBoard: 'user/leader-board/list',
 	walletHistoryGroupByMonth: 'wallet-history/grouped-by-month',
 	walletHistory: 'wallet-history',
 }

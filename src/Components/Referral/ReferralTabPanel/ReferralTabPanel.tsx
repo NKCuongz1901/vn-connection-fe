@@ -18,12 +18,16 @@ type ReferralTab = (typeof TABS)[number]['key']
 
 export interface ReferralTabPanelProps {
 	loading?: boolean
+	loadingLeaderBoard?: boolean
 	leaderBoard?: any[]
 	topInvitees?: any[]
 	myPosition?: number
+	myTotalPoints?: number
 	userData?: any
 	walletHistory?: any[]
 	walletHistoryGroupByMonth?: any[]
+	period?: 'monthly' | 'yearly' | 'all_time'
+	onChangePeriod?: (period: 'monthly' | 'yearly' | 'all_time') => void
 	onLoadMoreHistory?: () => void
 	onScrollHistory?: (e: React.UIEvent<HTMLDivElement>) => void
 	loadingHistory?: boolean
@@ -31,12 +35,16 @@ export interface ReferralTabPanelProps {
 
 function ReferralTabPanel({
 	loading,
+	loadingLeaderBoard,
 	leaderBoard = [],
 	topInvitees = [],
 	myPosition = 0,
+	myTotalPoints = 0,
 	userData = {},
 	walletHistory = [],
 	walletHistoryGroupByMonth = [],
+	period,
+	onChangePeriod,
 	onLoadMoreHistory,
 	onScrollHistory,
 	loadingHistory,
@@ -64,11 +72,14 @@ function ReferralTabPanel({
 			<div className={classes.tabContent}>
 				{activeTab === 'leaderboard' && (
 					<ReferralLeaderboard
-						loading={loading}
+						loading={loadingLeaderBoard}
 						leaderBoard={leaderBoard}
 						topInvitees={topInvitees}
 						myPosition={myPosition}
+						myTotalPoints={myTotalPoints}
 						userData={userData}
+						period={period}
+						onChangePeriod={onChangePeriod}
 					/>
 				)}
 				{activeTab === 'history' && (
