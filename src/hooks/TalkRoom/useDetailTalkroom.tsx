@@ -89,6 +89,8 @@ const TALK_ROOM_NEW_LISTENER_SOUND_GRACE_MS = 2500
 export type ValidatePreJoinRoomResult = TalkRoomPreJoinValidation
 
 type UseDetailTalkroomOptions = {
+	/** Chat-time (sessionEnd): skip room refetch on leave — room may already be gone. */
+	isChatTime?: boolean
 	onRoomSocketEvent?: (event: string, data?: unknown) => void
 	onRoomTimeUp?: (data?: unknown) => void
 	onRoomForceClosed?: () => void
@@ -189,6 +191,8 @@ export default function useDetailTalkroom(
 		useState(false)
 	const isInviteToSpeakerInFlightRef = useRef(false)
 	const suppressNewListenerUntilRef = useRef(0)
+	const isChatTimeRef = useRef(false)
+	isChatTimeRef.current = Boolean(options?.isChatTime)
 
 	const applySlotRaiseHandMap = useCallback(
 		(slotMap: TalkRoomSlotRaiseHandMap) => {
@@ -222,6 +226,46 @@ export default function useDetailTalkroom(
 			return next
 		})
 	}, [])
+
+	/** Drop left user from local lists during chat time (room API may already 404). */
+	const handleRemoveParticipantLocally = useCallback((userId: string) => {
+		if (!userId) return
+
+		setListenersInRoom((prev) => {
+			const next = prev.filter((row) => row.user_id !== userId)
+			if (next.length !== prev.length) {
+				setTotalListenersInRoom((count) => Math.max(0, count - 1))
+			}
+			return next
+		})
+
+		handleRemoveRaiseHandUser(userId)
+
+		setTalkRoomDetail((prev) => {
+			if (!prev?.speakers?.length) return prev
+
+			const speakers = prev.speakers.filter(
+				(entry) => resolveSpeakerUserId(entry) !== userId,
+			)
+			if (speakers.length === prev.speakers.length) return prev
+
+			return {
+				...prev,
+				speakers,
+				total_participants: Math.max(
+					0,
+					(prev.total_participants ?? 1) - 1,
+				),
+			}
+		})
+
+		setSpeakerStatusMap((prev) => {
+			if (!(userId in prev)) return prev
+			const next = { ...prev }
+			delete next[userId]
+			return next
+		})
+	}, [handleRemoveRaiseHandUser])
 
 	const handleSwitchToFilterRaiseHand = useCallback((slot?: number | null) => {
 		setFilterRaiseHandSlot(slot ?? null)
@@ -1166,6 +1210,14 @@ export default function useDetailTalkroom(
 						options?.onRoomUserKicked?.(leftUserId)
 					}
 
+					// Chat time: room may already be deleted — optimistic local remove only.
+					if (isChatTimeRef.current) {
+						if (leftUserId) {
+							handleRemoveParticipantLocally(leftUserId)
+						}
+						break
+					}
+
 					handleGetDetailTalkRoom(id)
 					handleGetListenerInRoom(id)
 					break
@@ -1344,6 +1396,7 @@ export default function useDetailTalkroom(
 			handleUpdateSpeakerLiveStatus,
 			handleAddRaiseHandUser,
 			handleRemoveRaiseHandUser,
+			handleRemoveParticipantLocally,
 			onChangeRoute,
 			options?.onRoomSocketEvent,
 			options?.onRoomTimeUp,

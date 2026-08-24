@@ -175,6 +175,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		onSwitchToFilterRaiseHand,
 		onCloseFilterRaiseHand,
 	} = useDetailTalkroom(id, {
+		isChatTime: roomEndStatus === 'sessionEnd',
 		onRoomSocketEvent: (event, data) =>
 			onRoomSocketEventRef.current?.(event, data),
 		onRoomTimeUp: (data) => onRoomTimeUpRef.current?.(data),
