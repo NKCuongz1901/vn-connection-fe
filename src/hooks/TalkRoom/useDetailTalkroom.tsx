@@ -71,8 +71,11 @@ import {
 	buildTalkRoomSlotRaiseHandFromRows,
 	flattenTalkRoomSlotRaiseHand,
 	getTalkRoomSocketSlotId,
+	getTalkRoomSocketSpeakerUser,
 	isTalkRoomGuestSpeakerSlotsFull,
+	placeTalkRoomGuestSpeakerInSlot,
 	removeTalkRoomSlotRaiseHand,
+	resolveSpeakerUserId,
 	TalkRoomPreJoinValidation,
 	TalkRoomSpeakerStatusMap,
 	TalkRoomSlotRaiseHandMap,
@@ -1226,19 +1229,47 @@ export default function useDetailTalkroom(
 					break
 				}
 				case 'room_start_countdown':
+					handleGetDetailTalkRoom(id)
+					break
 				case 'raise_hand_accepted':
 				case 'promote_to_speaker':
-				case 'listener_accept_to_speaker_success':
-					handleGetDetailTalkRoom(id)
-					if (
-						event === 'raise_hand_accepted' ||
-						event === 'promote_to_speaker' ||
-						event === 'listener_accept_to_speaker_success'
-					) {
-						handleGetListenerInRoom(id)
-						handleGetRaiseHandUsers()
+				case 'listener_accept_to_speaker_success': {
+					const promotedUserId = getTalkRoomSocketTargetUserId(data)
+					const slotId = getTalkRoomSocketSlotId(data, 1) as 1 | 2
+					const socketSpeaker = getTalkRoomSocketSpeakerUser(data)
+
+					if (promotedUserId) {
+						handleRemoveRaiseHandUser(promotedUserId)
+						setTalkRoomDetail((prev) => {
+							if (!prev) return prev
+
+							const speaker =
+								socketSpeaker ??
+								prev.speakers?.find(
+									(entry) => resolveSpeakerUserId(entry) === promotedUserId,
+								) ??
+								({
+									id: promotedUserId,
+									role: 'speaker',
+									is_open_mic: false,
+								} as const)
+
+							return {
+								...prev,
+								speakers: placeTalkRoomGuestSpeakerInSlot(
+									prev,
+									speaker,
+									slotId,
+								),
+							}
+						})
 					}
+
+					handleGetDetailTalkRoom(id)
+					handleGetListenerInRoom(id)
+					handleGetRaiseHandUsers()
 					break
+				}
 				case 'host_invite_to_speaker': {
 					const invitePayload = parseTalkRoomSocketSpeakerInvite(data)
 					if (invitePayload) {
