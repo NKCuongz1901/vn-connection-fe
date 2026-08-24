@@ -71,8 +71,11 @@ import {
 	buildTalkRoomSlotRaiseHandFromRows,
 	flattenTalkRoomSlotRaiseHand,
 	getTalkRoomSocketSlotId,
+	getTalkRoomSocketSpeakerUser,
 	isTalkRoomGuestSpeakerSlotsFull,
+	placeTalkRoomGuestSpeakerInSlot,
 	removeTalkRoomSlotRaiseHand,
+	resolveSpeakerUserId,
 	TalkRoomPreJoinValidation,
 	TalkRoomSpeakerStatusMap,
 	TalkRoomSlotRaiseHandMap,
@@ -80,9 +83,14 @@ import {
 import { playTalkRoomSound } from '@/ultis/talkRoomSound'
 import useTalkRoomSocket from './useTalkRoomSocket'
 
+/** Skip new-listener SFX right after own join/rejoin (F5) so we don't hear ourselves. */
+const TALK_ROOM_NEW_LISTENER_SOUND_GRACE_MS = 2500
+
 export type ValidatePreJoinRoomResult = TalkRoomPreJoinValidation
 
 type UseDetailTalkroomOptions = {
+	/** Chat-time (sessionEnd): skip room refetch on leave — room may already be gone. */
+	isChatTime?: boolean
 	onRoomSocketEvent?: (event: string, data?: unknown) => void
 	onRoomTimeUp?: (data?: unknown) => void
 	onRoomForceClosed?: () => void
@@ -182,6 +190,9 @@ export default function useDetailTalkroom(
 	const [speakerInvitationLoading, setSpeakerInvitationLoading] =
 		useState(false)
 	const isInviteToSpeakerInFlightRef = useRef(false)
+	const suppressNewListenerUntilRef = useRef(0)
+	const isChatTimeRef = useRef(false)
+	isChatTimeRef.current = Boolean(options?.isChatTime)
 
 	const applySlotRaiseHandMap = useCallback(
 		(slotMap: TalkRoomSlotRaiseHandMap) => {
@@ -215,6 +226,46 @@ export default function useDetailTalkroom(
 			return next
 		})
 	}, [])
+
+	/** Drop left user from local lists during chat time (room API may already 404). */
+	const handleRemoveParticipantLocally = useCallback((userId: string) => {
+		if (!userId) return
+
+		setListenersInRoom((prev) => {
+			const next = prev.filter((row) => row.user_id !== userId)
+			if (next.length !== prev.length) {
+				setTotalListenersInRoom((count) => Math.max(0, count - 1))
+			}
+			return next
+		})
+
+		handleRemoveRaiseHandUser(userId)
+
+		setTalkRoomDetail((prev) => {
+			if (!prev?.speakers?.length) return prev
+
+			const speakers = prev.speakers.filter(
+				(entry) => resolveSpeakerUserId(entry) !== userId,
+			)
+			if (speakers.length === prev.speakers.length) return prev
+
+			return {
+				...prev,
+				speakers,
+				total_participants: Math.max(
+					0,
+					(prev.total_participants ?? 1) - 1,
+				),
+			}
+		})
+
+		setSpeakerStatusMap((prev) => {
+			if (!(userId in prev)) return prev
+			const next = { ...prev }
+			delete next[userId]
+			return next
+		})
+	}, [handleRemoveRaiseHandUser])
 
 	const handleSwitchToFilterRaiseHand = useCallback((slot?: number | null) => {
 		setFilterRaiseHandSlot(slot ?? null)
@@ -439,6 +490,8 @@ export default function useDetailTalkroom(
 					const data: JoinTalkroomModel = results?.object ?? null
 
 					if (data?.success) {
+						suppressNewListenerUntilRef.current =
+							Date.now() + TALK_ROOM_NEW_LISTENER_SOUND_GRACE_MS
 						setJoinTalkRoomResult(data)
 						setRoomUserRole(data.data?.role ?? null)
 						setRoleIntegration(data.data?.agora ?? null)
@@ -1127,8 +1180,14 @@ export default function useDetailTalkroom(
 				case 'user_joined_room': {
 					const joinedUserId = getTalkRoomSocketTargetUserId(data)
 					const currentUserId = getUserInfo('id') as string | undefined
+					const isSelf =
+						Boolean(currentUserId) &&
+						Boolean(joinedUserId) &&
+						String(joinedUserId) === String(currentUserId)
+					const inJoinGrace =
+						Date.now() < suppressNewListenerUntilRef.current
 
-					if (joinedUserId && joinedUserId !== currentUserId) {
+					if (joinedUserId && !isSelf && !inJoinGrace) {
 						playTalkRoomSound('newListener')
 					}
 
@@ -1149,6 +1208,14 @@ export default function useDetailTalkroom(
 						isTalkRoomSocketLeaveReasonKicked(leaveReason)
 					) {
 						options?.onRoomUserKicked?.(leftUserId)
+					}
+
+					// Chat time: room may already be deleted — optimistic local remove only.
+					if (isChatTimeRef.current) {
+						if (leftUserId) {
+							handleRemoveParticipantLocally(leftUserId)
+						}
+						break
 					}
 
 					handleGetDetailTalkRoom(id)
@@ -1214,19 +1281,47 @@ export default function useDetailTalkroom(
 					break
 				}
 				case 'room_start_countdown':
+					handleGetDetailTalkRoom(id)
+					break
 				case 'raise_hand_accepted':
 				case 'promote_to_speaker':
-				case 'listener_accept_to_speaker_success':
-					handleGetDetailTalkRoom(id)
-					if (
-						event === 'raise_hand_accepted' ||
-						event === 'promote_to_speaker' ||
-						event === 'listener_accept_to_speaker_success'
-					) {
-						handleGetListenerInRoom(id)
-						handleGetRaiseHandUsers()
+				case 'listener_accept_to_speaker_success': {
+					const promotedUserId = getTalkRoomSocketTargetUserId(data)
+					const slotId = getTalkRoomSocketSlotId(data, 1) as 1 | 2
+					const socketSpeaker = getTalkRoomSocketSpeakerUser(data)
+
+					if (promotedUserId) {
+						handleRemoveRaiseHandUser(promotedUserId)
+						setTalkRoomDetail((prev) => {
+							if (!prev) return prev
+
+							const speaker =
+								socketSpeaker ??
+								prev.speakers?.find(
+									(entry) => resolveSpeakerUserId(entry) === promotedUserId,
+								) ??
+								({
+									id: promotedUserId,
+									role: 'speaker',
+									is_open_mic: false,
+								} as const)
+
+							return {
+								...prev,
+								speakers: placeTalkRoomGuestSpeakerInSlot(
+									prev,
+									speaker,
+									slotId,
+								),
+							}
+						})
 					}
+
+					handleGetDetailTalkRoom(id)
+					handleGetListenerInRoom(id)
+					handleGetRaiseHandUsers()
 					break
+				}
 				case 'host_invite_to_speaker': {
 					const invitePayload = parseTalkRoomSocketSpeakerInvite(data)
 					if (invitePayload) {
@@ -1301,6 +1396,7 @@ export default function useDetailTalkroom(
 			handleUpdateSpeakerLiveStatus,
 			handleAddRaiseHandUser,
 			handleRemoveRaiseHandUser,
+			handleRemoveParticipantLocally,
 			onChangeRoute,
 			options?.onRoomSocketEvent,
 			options?.onRoomTimeUp,

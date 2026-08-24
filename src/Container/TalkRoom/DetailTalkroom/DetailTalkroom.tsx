@@ -60,7 +60,7 @@ import {
 	isTalkRoomSocketEventForCurrentUser,
 	parseTalkRoomSocketRoomTimeUp,
 	resolveRaiseHandSlotId,
-	sortTalkRoomListenersByRaiseHand,
+	sortTalkRoomListenersForDisplay,
 	RoomEndStatus,
 } from '@/ultis/talkRoom'
 
@@ -175,6 +175,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		onSwitchToFilterRaiseHand,
 		onCloseFilterRaiseHand,
 	} = useDetailTalkroom(id, {
+		isChatTime: roomEndStatus === 'sessionEnd',
 		onRoomSocketEvent: (event, data) =>
 			onRoomSocketEventRef.current?.(event, data),
 		onRoomTimeUp: (data) => onRoomTimeUpRef.current?.(data),
@@ -922,6 +923,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		},
 		onMicOff: () => {
 			setMic(false)
+			setSpeakerMicOptimisticOn(false)
 			if (currentUserId) {
 				onUpdateSpeakerLiveStatus(currentUserId, {
 					is_open_mic: false,
@@ -967,13 +969,21 @@ function DetailTalkroom({ id }: { id: string }) {
 			? getTalkRoomFilterRaiseHandIds(slotUserRaiseHand, filterRaiseHandSlot)
 			: raiseHandUserIds
 
-		return sortTalkRoomListenersByRaiseHand(listenerRows, filterIds)
+		return sortTalkRoomListenersForDisplay(listenerRows, {
+			currentUserId,
+			raiseHandUserIds: filterIds,
+			pinCurrentUser: isListener && !isSpeaker && !isHost,
+		})
 	}, [
 		listenerRows,
 		isFilterRaiseHand,
 		slotUserRaiseHand,
 		filterRaiseHandSlot,
 		raiseHandUserIds,
+		currentUserId,
+		isListener,
+		isSpeaker,
+		isHost,
 	])
 
 	/** Toggles raise hand; preferred slot falls back to the other free slot. */
