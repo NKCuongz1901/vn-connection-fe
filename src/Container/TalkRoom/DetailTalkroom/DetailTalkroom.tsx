@@ -922,6 +922,7 @@ function DetailTalkroom({ id }: { id: string }) {
 		},
 		onMicOff: () => {
 			setMic(false)
+			setSpeakerMicOptimisticOn(false)
 			if (currentUserId) {
 				onUpdateSpeakerLiveStatus(currentUserId, {
 					is_open_mic: false,
