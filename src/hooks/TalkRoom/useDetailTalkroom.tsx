@@ -80,6 +80,9 @@ import {
 import { playTalkRoomSound } from '@/ultis/talkRoomSound'
 import useTalkRoomSocket from './useTalkRoomSocket'
 
+/** Skip new-listener SFX right after own join/rejoin (F5) so we don't hear ourselves. */
+const TALK_ROOM_NEW_LISTENER_SOUND_GRACE_MS = 2500
+
 export type ValidatePreJoinRoomResult = TalkRoomPreJoinValidation
 
 type UseDetailTalkroomOptions = {
@@ -182,6 +185,7 @@ export default function useDetailTalkroom(
 	const [speakerInvitationLoading, setSpeakerInvitationLoading] =
 		useState(false)
 	const isInviteToSpeakerInFlightRef = useRef(false)
+	const suppressNewListenerUntilRef = useRef(0)
 
 	const applySlotRaiseHandMap = useCallback(
 		(slotMap: TalkRoomSlotRaiseHandMap) => {
@@ -439,6 +443,8 @@ export default function useDetailTalkroom(
 					const data: JoinTalkroomModel = results?.object ?? null
 
 					if (data?.success) {
+						suppressNewListenerUntilRef.current =
+							Date.now() + TALK_ROOM_NEW_LISTENER_SOUND_GRACE_MS
 						setJoinTalkRoomResult(data)
 						setRoomUserRole(data.data?.role ?? null)
 						setRoleIntegration(data.data?.agora ?? null)
@@ -1127,8 +1133,14 @@ export default function useDetailTalkroom(
 				case 'user_joined_room': {
 					const joinedUserId = getTalkRoomSocketTargetUserId(data)
 					const currentUserId = getUserInfo('id') as string | undefined
+					const isSelf =
+						Boolean(currentUserId) &&
+						Boolean(joinedUserId) &&
+						String(joinedUserId) === String(currentUserId)
+					const inJoinGrace =
+						Date.now() < suppressNewListenerUntilRef.current
 
-					if (joinedUserId && joinedUserId !== currentUserId) {
+					if (joinedUserId && !isSelf && !inJoinGrace) {
 						playTalkRoomSound('newListener')
 					}
 
