@@ -1325,6 +1325,42 @@ export const sortTalkRoomListenersByRaiseHand = <
 	})
 }
 
+/**
+ * Display order for the listener list (mirrors mobile):
+ * raise-hand users first, then current user (when still a listener), then the rest.
+ */
+export const sortTalkRoomListenersForDisplay = <
+	T extends { user_id?: string },
+>(
+	listeners: T[],
+	options: {
+		currentUserId?: string
+		raiseHandUserIds?: string[]
+		pinCurrentUser?: boolean
+	} = {},
+): T[] => {
+	const raiseHandUserIds = options.raiseHandUserIds ?? []
+	const raised = sortTalkRoomListenersByRaiseHand(listeners, raiseHandUserIds)
+
+	if (!options.pinCurrentUser || !options.currentUserId) return raised
+
+	const myId = options.currentUserId
+	const raiseSet = new Set(raiseHandUserIds)
+
+	// Raise-hand users stay ahead of "me" (mobile can push raisers to index 0).
+	if (raiseSet.has(myId)) return raised
+
+	const myIndex = raised.findIndex((row) => row.user_id === myId)
+	if (myIndex < 0) return raised
+
+	const next = [...raised]
+	const [me] = next.splice(myIndex, 1)
+	const insertAt = next.findIndex((row) => !raiseSet.has(row.user_id ?? ''))
+	next.splice(insertAt === -1 ? next.length : insertAt, 0, me)
+
+	return next
+}
+
 /** Parses guest speaker slot index from talk room socket payloads. */
 export const getTalkRoomSocketSlotId = (
 	data?: unknown,

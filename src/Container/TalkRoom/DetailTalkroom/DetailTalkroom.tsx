@@ -60,7 +60,7 @@ import {
 	isTalkRoomSocketEventForCurrentUser,
 	parseTalkRoomSocketRoomTimeUp,
 	resolveRaiseHandSlotId,
-	sortTalkRoomListenersByRaiseHand,
+	sortTalkRoomListenersForDisplay,
 	RoomEndStatus,
 } from '@/ultis/talkRoom'
 
@@ -968,13 +968,21 @@ function DetailTalkroom({ id }: { id: string }) {
 			? getTalkRoomFilterRaiseHandIds(slotUserRaiseHand, filterRaiseHandSlot)
 			: raiseHandUserIds
 
-		return sortTalkRoomListenersByRaiseHand(listenerRows, filterIds)
+		return sortTalkRoomListenersForDisplay(listenerRows, {
+			currentUserId,
+			raiseHandUserIds: filterIds,
+			pinCurrentUser: isListener && !isSpeaker && !isHost,
+		})
 	}, [
 		listenerRows,
 		isFilterRaiseHand,
 		slotUserRaiseHand,
 		filterRaiseHandSlot,
 		raiseHandUserIds,
+		currentUserId,
+		isListener,
+		isSpeaker,
+		isHost,
 	])
 
 	/** Toggles raise hand; preferred slot falls back to the other free slot. */
