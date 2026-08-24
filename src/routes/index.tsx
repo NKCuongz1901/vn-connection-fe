@@ -160,6 +160,8 @@ export const REFERRAL_ROUTES = {
 	walletHistory: 'wallet-history',
 	walletHistoryOverview: 'wallet-history/referral-overview',
 	addBankAccount: 'redeem-request/bank-account',
+	myRedeemRequests: 'redeem-request/my',
+	createRedeemRequest: 'redeem-request',
 }
 export const MAP_ROUTES = {
 	name: 'map/google/place/textsearch/json',

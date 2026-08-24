@@ -6,11 +6,12 @@ import { memo } from 'react'
 import { toast } from 'react-toastify'
 
 import type { ToastModel } from '@/interface/Toast/Toast.interface'
+import InfoCircleIcon from '@/svg/InfoCircleIcon'
 import TickCircleIcon from '@/svg/TickCircleIcon'
 
 import classes from './SocketToastContent.module.scss'
 
-export type SocketToastVariant = 'error' | 'success'
+export type SocketToastVariant = 'error' | 'success' | 'info'
 
 type SocketToastContentProps = {
 	title?: string
@@ -32,11 +33,14 @@ function SocketToastContent({
 			className={clsx(classes.toast, {
 				[classes.toastError]: variant === 'error',
 				[classes.toastSuccess]: variant === 'success',
+				[classes.toastInfo]: variant === 'info',
 			})}
 		>
 			<div className={classes.statusIcon}>
 				{variant === 'success' ? (
 					<TickCircleIcon fill="#1B8024" width={32} height={32} />
+				) : variant === 'info' ? (
+					<InfoCircleIcon width={32} height={32} />
 				) : (
 					<IconCircleXFilled size={32} color="#CD3031" />
 				)}
@@ -54,7 +58,9 @@ function SocketToastContent({
 				>
 					<IconX size={24} color="#48546b" />
 				</button>
-			) : null}
+			) : (
+				<div className={classes.spacer} aria-hidden />
+			)}
 		</div>
 	)
 }
@@ -198,5 +204,17 @@ export const showMessageDeleteToast = (data: ToastModel) => {
 		content,
 		variant: 'error',
 		toastId: id,
+	})
+}
+
+export const REDEEM_MIN_POINTS_TOAST_ID = 'redeem-min-points'
+
+/** Shows toast when user has fewer than the minimum redeem points. */
+export const showRedeemMinPointsToast = (minimumPoints = 200) => {
+	showSocketToast({
+		title: `Minimum ${minimumPoints} points to redeem`,
+		variant: 'info',
+		toastId: REDEEM_MIN_POINTS_TOAST_ID,
+		showClose: false,
 	})
 }

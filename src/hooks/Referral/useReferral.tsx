@@ -1,5 +1,6 @@
 import {
 	addBankAccount,
+	createRedeemRequest,
 	getLeaderBoard,
 	getWalletHistoryandInvite,
 	getWalletHistoryOverview,
@@ -31,6 +32,7 @@ export default function useReferral() {
 	const [loadingOverview, setLoadingOverview] = useState<boolean>(false)
 	const [loadingHistory, setLoadingHistory] = useState<boolean>(false)
 	const [loadingBankAccount, setLoadingBankAccount] = useState<boolean>(false)
+	const [loadingRedeem, setLoadingRedeem] = useState<boolean>(false)
 	const [myPosition, setMyPosition] = useState<number>(0)
 	const [myTotalPoints, setMyTotalPoints] = useState<number>(0)
 	const [leaderBoard, setLeaderBoard] = useState<any[]>([])
@@ -190,6 +192,30 @@ export default function useReferral() {
 		[openError, openSuccess],
 	)
 
+	/** Submits a redeem request for the given points. */
+	const handleCreateRedeemRequest = useCallback(
+		async (points: number) => {
+			if (!points || loadingRedeem) return false
+
+			setLoadingRedeem(true)
+			try {
+				const res: any = await createRedeemRequest({ points })
+				const { code } = res || {}
+				if (code === 200) {
+					openSuccess({ message: 'Redeem request submitted successfully' })
+					return true
+				}
+				return false
+			} catch (error) {
+				openError(error)
+				return false
+			} finally {
+				setLoadingRedeem(false)
+			}
+		},
+		[loadingRedeem, openError, openSuccess],
+	)
+
 	useEffect(() => {
 		handleGetLeaderBoard('monthly', { isInitial: true })
 		handleGetReferralOverview()
@@ -203,6 +229,7 @@ export default function useReferral() {
 		loadingOverview,
 		loadingHistory,
 		loadingBankAccount,
+		loadingRedeem,
 		myPosition,
 		myTotalPoints,
 		leaderBoard,
@@ -214,5 +241,6 @@ export default function useReferral() {
 		onLoadMoreHistory: handleLoadMoreHistory,
 		onScrollHistory: handleScrollHistory,
 		onAddBankAccount: handleAddBankAccount,
+		onCreateRedeemRequest: handleCreateRedeemRequest,
 	}
 }
