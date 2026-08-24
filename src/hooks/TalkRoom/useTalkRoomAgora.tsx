@@ -56,7 +56,7 @@ export default function useTalkRoomAgora({
 		isAgoraActive,
 	)
 
-	// Keep the mic track while joined; on/off only mutes via setEnabled (mobile muteLocalAudioStream).
+	// Keep the mic track while joined; on/off = setMuted (mobile muteLocalAudioStream).
 	const { localMicrophoneTrack, error } = useLocalMicrophoneTrack(isAgoraActive)
 
 	const remoteUsers = useRemoteUsers()
@@ -67,7 +67,23 @@ export default function useTalkRoomAgora({
 	useEffect(() => {
 		if (!localMicrophoneTrack) return
 
-		void localMicrophoneTrack.setEnabled(micEnabled)
+		let cancelled = false
+
+		const applyMute = async () => {
+			try {
+				await localMicrophoneTrack.setMuted(!micEnabled)
+			} catch (muteError) {
+				if (!cancelled) {
+					console.error('Failed to mute local mic', muteError)
+				}
+			}
+		}
+
+		void applyMute()
+
+		return () => {
+			cancelled = true
+		}
 	}, [localMicrophoneTrack, micEnabled])
 
 	useEffect(() => {
@@ -112,13 +128,12 @@ export default function useTalkRoomAgora({
 
 	const disconnect = useCallback(async () => {
 		setMicEnabled(false)
-		try {
-			await localMicrophoneTrack?.setEnabled(false)
-		} catch {
-			// Track may already be closed.
-		}
 		setIsJoined(false)
-		localMicrophoneTrack?.close()
+		try {
+			localMicrophoneTrack?.close()
+		} catch {
+			// Track may already be closed by useLocalMicrophoneTrack.
+		}
 	}, [localMicrophoneTrack])
 
 	return { connect, setMic, disconnect, isAgoraJoined: isJoined, micEnabled }
