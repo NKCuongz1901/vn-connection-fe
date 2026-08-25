@@ -1,28 +1,60 @@
 import md5 from 'md5'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import type { OtpSendMethod } from '@/Components/Auth/SelectOtpMethod'
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
-import { checkPhoneExists, loginByPhone } from '@/apis/authApis'
+import {
+	checkOTP,
+	checkPhoneExists,
+	loginByPhone,
+	sendOTP,
+	sendToWhatsapp,
+	sendToZalo,
+} from '@/apis/authApis'
 
 import { delay, formatPhone, toJson } from '@/ultis/common'
 import { useLocalePath } from '@/ultis/route'
-import { handleStorageCookie, isLogin } from '@/ultis/storage'
+import { handleStorageCookie, isLogin, setSessionStorage } from '@/ultis/storage'
 import { randomString } from '@/ultis/string'
 
 import { mainRoutes } from '@/routes/MainRoutes'
+import { REGISTER_FROM_LOGIN_SESSION_KEY } from '@/Variable/common.variable'
+
+type LoginStep = 'phone' | 'password' | 'registerOtp'
 
 type UseLoginOptions = {
 	onAccountNotFound?: (displayPhone: string) => void
+}
+
+/** Sends register OTP via the selected channel. */
+const sendRegisterOtpByMethod = async ({
+	method,
+	phone,
+	language,
+}: {
+	method: OtpSendMethod
+	phone: string
+	language: string
+}) => {
+	if (method === 'zalo') {
+		return sendToZalo({ phone, language })
+	}
+	if (method === 'whatsapp') {
+		return sendToWhatsapp({ phone, language })
+	}
+	return sendOTP({ phone })
 }
 
 export default function useLogin(options?: UseLoginOptions) {
 	const { onAccountNotFound } = options || {}
 	const { toggleLoadingContext } = useLoading()
 	const { openError } = useModal()
-	const { onChangeRoute } = useLocalePath()
-	const [loginStep, setLoginStep] = useState<'phone' | 'password'>('phone')
+	const { onChangeRoute, locale } = useLocalePath()
+	const [loginStep, setLoginStep] = useState<LoginStep>('phone')
+	const [otpMethod, setOtpMethod] = useState<OtpSendMethod>('sms')
+	const [isVnPhone, setIsVnPhone] = useState(false)
 	const [account, setAccount] = useState({
 		phone: '',
 		password: '',
@@ -48,7 +80,7 @@ export default function useLogin(options?: UseLoginOptions) {
 					value = _value.replace(/[^0-9]/g, '')
 					break
 				case 'prefix':
-					if (loginStep === 'password') {
+					if (loginStep === 'password' || loginStep === 'registerOtp') {
 						setLoginStep('phone')
 						setAccount((pre) => ({
 							...pre,
@@ -62,7 +94,10 @@ export default function useLogin(options?: UseLoginOptions) {
 					break
 			}
 
-			if (key === 'phone' && loginStep === 'password') {
+			if (
+				key === 'phone' &&
+				(loginStep === 'password' || loginStep === 'registerOtp')
+			) {
 				setLoginStep('phone')
 				setAccount((pre) => ({
 					...pre,
@@ -187,6 +222,78 @@ export default function useLogin(options?: UseLoginOptions) {
 		}
 	}
 
+	/** Opens register OTP method selection after account-not-found. */
+	const handleStartRegister = useCallback(async () => {
+		const { phone, prefix } = account
+		if (phone.length < 9) return
+
+		setLoginStep('registerOtp')
+		setOtpMethod('sms')
+		toggleLoadingContext(true)
+		try {
+			const checkRes: any = await checkOTP({
+				phone: formatPhone(prefix, phone),
+				prefix_phone: prefix,
+			})
+			const vnPhone = Boolean(checkRes?.results?.object?.status)
+			setIsVnPhone(vnPhone)
+			if (!vnPhone) {
+				setOtpMethod('sms')
+			}
+		} catch (error: any) {
+			setIsVnPhone(false)
+			setOtpMethod('sms')
+			openError(error)
+		} finally {
+			toggleLoadingContext(false)
+		}
+	}, [account, openError, toggleLoadingContext])
+
+	const handleChangeOtpMethod = useCallback((method: OtpSendMethod) => {
+		setOtpMethod(method)
+	}, [])
+
+	/** Sends register OTP then continues to Register OTP verify step. */
+	const handleSendRegisterOtp = useCallback(async () => {
+		const { phone, prefix } = account
+		const formattedPhone = formatPhone(prefix, phone)
+		const language = String(locale || 'en')
+
+		toggleLoadingContext(true)
+		try {
+			const res: any = await sendRegisterOtpByMethod({
+				method: otpMethod,
+				phone: formattedPhone,
+				language,
+			})
+			if (res?.results?.object?.sid !== 'success') {
+				throw new Error('Failed to send OTP')
+			}
+
+			setSessionStorage({
+				key: REGISTER_FROM_LOGIN_SESSION_KEY,
+				data: {
+					phone,
+					prefix,
+					otpSent: true,
+					otpMethod,
+				},
+			})
+			onChangeRoute(mainRoutes.register)
+		} catch (error: any) {
+			openError(error)
+		} finally {
+			toggleLoadingContext(false)
+		}
+	}, [
+		account,
+		locale,
+		onChangeRoute,
+		openError,
+		otpMethod,
+		toggleLoadingContext,
+	])
+
 	useEffect(() => {
 		if (isLogin()) return onChangeRoute(mainRoutes.overview)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -197,8 +304,13 @@ export default function useLogin(options?: UseLoginOptions) {
 		isPhoneValid,
 		isValidate,
 		account,
+		otpMethod,
+		isVnPhone,
 		onChange: handleChange,
 		onContinuePhone: handleContinuePhone,
 		onLogin: handleLogin,
+		onStartRegister: handleStartRegister,
+		onChangeOtpMethod: handleChangeOtpMethod,
+		onSendRegisterOtp: handleSendRegisterOtp,
 	}
 }

@@ -22,6 +22,8 @@ export const AUTH_ROUTES = {
 	forgetPassword: '/auth/forget_password',
 	registerByPhone: '/auth/register_by_phone',
 	sendToMail: 'auth/otp/send-to-mail',
+	sendToZalo: 'auth/otp/send-to-zalo',
+	sendToWhatsapp: 'auth/otp/send-otp-whatsapp',
 	logout: '/auth/logout',
 	requestFeature: '/inquiries',
 }
