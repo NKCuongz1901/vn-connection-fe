@@ -6,6 +6,7 @@ import { useModal } from '@/context/ModalContext'
 
 import type { OtpSendMethod } from '@/Components/Auth/SelectOtpMethod'
 import {
+	checkOTP,
 	checkPhoneExists,
 	forgetPasswordByPhone,
 	registerByPhone,
@@ -44,8 +45,8 @@ type ForgetPasswordFromAccountInit = {
 
 type OtpChannel = 'email' | OtpSendMethod
 
-/** Sends register OTP via the selected channel. */
-const sendRegisterOtpByMethod = async ({
+/** Sends OTP via WhatsApp, Zalo, or SMS. */
+const sendOtpByMethod = async ({
 	method,
 	phone,
 	language,
@@ -167,10 +168,10 @@ export default function useRegisterAndReset({
 		loginInit ? loginInit.otpMethod || 'sms' : 'email',
 	)
 	const [otpDestination, setOtpDestination] = useState(() =>
-		loginInit
-			? formatPhone(loginInit.prefix, loginInit.phone)
-			: '',
+		loginInit ? formatPhone(loginInit.prefix, loginInit.phone) : '',
 	)
+	const [isVnPhone, setIsVnPhone] = useState(false)
+	const [showAlternateMethods, setShowAlternateMethods] = useState(false)
 	const [accountInfo, setAccountInfo] = useState(() =>
 		createInitialAccountInfo(type, steps, loginInit, forgetInit),
 	)
@@ -182,8 +183,24 @@ export default function useRegisterAndReset({
 		[accountInfo.phone, accountInfo.prefix],
 	)
 
+	/** Checks whether Zalo OTP is available for this phone. */
+	const resolveVnPhone = useCallback(async (prefix: string, phone: string) => {
+		try {
+			const checkRes: any = await checkOTP({
+				phone: formatPhone(prefix, phone),
+				prefix_phone: prefix,
+			})
+			return Boolean(checkRes?.results?.object?.status)
+		} catch {
+			return false
+		}
+	}, [])
+
 	const handleChangeStep = useCallback((value: number) => {
 		setStep(value)
+		if (value === 0) {
+			setShowAlternateMethods(false)
+		}
 	}, [])
 
 	const handleChangeAccountInfo = useCallback(
@@ -238,6 +255,7 @@ export default function useRegisterAndReset({
 					setOtpDestination(email_masked)
 					setAccountInfo((pre) => ({ ...pre, email: email_masked }))
 				}
+				setShowAlternateMethods(false)
 				setStep(1)
 				return
 			}
@@ -278,21 +296,12 @@ export default function useRegisterAndReset({
 		}
 	}, [accountInfo, locale])
 
-	const handleResendSmsOtp = useCallback(async () => {
-		const { prefix, phone } = accountInfo
-		const res: any = await sendOTP({ phone: formatPhone(prefix, phone) })
-		if (res?.results?.object?.sid !== 'success') {
-			throw res
-		}
-		setOtpDestination(formatPhone(prefix, phone))
-	}, [accountInfo])
-
 	const handleResendRegisterOtp = useCallback(async () => {
 		const { prefix, phone } = accountInfo
 		const method: OtpSendMethod =
 			otpChannel === 'email' ? 'sms' : (otpChannel as OtpSendMethod)
 		const formatted = formatPhone(prefix, phone)
-		const res: any = await sendRegisterOtpByMethod({
+		const res: any = await sendOtpByMethod({
 			method,
 			phone: formatted,
 			language: String(locale || 'en'),
@@ -308,10 +317,8 @@ export default function useRegisterAndReset({
 		try {
 			if (otpChannel === 'email') {
 				await handleResendEmailOtp()
-			} else if (type === OTP_TYPE.REGISTER) {
-				await handleResendRegisterOtp()
 			} else {
-				await handleResendSmsOtp()
+				await handleResendRegisterOtp()
 			}
 		} catch (error) {
 			openError(error)
@@ -321,13 +328,12 @@ export default function useRegisterAndReset({
 	}, [
 		handleResendEmailOtp,
 		handleResendRegisterOtp,
-		handleResendSmsOtp,
 		openError,
 		otpChannel,
 		toggleLoadingContext,
-		type,
 	])
 
+	/** Reveals WhatsApp / Zalo / SMS options after Get OTP via phone. */
 	const handleSwitchToSms = useCallback(async () => {
 		if (!accountInfo.phone) {
 			openError({ message: 'No phone number found' })
@@ -336,14 +342,56 @@ export default function useRegisterAndReset({
 
 		toggleLoadingContext(true)
 		try {
-			await handleResendSmsOtp()
-			setOtpChannel('sms')
+			const vnPhone = await resolveVnPhone(
+				accountInfo.prefix,
+				accountInfo.phone,
+			)
+			setIsVnPhone(vnPhone)
+			setShowAlternateMethods(true)
 		} catch (error) {
 			openError(error)
 		} finally {
 			toggleLoadingContext(false)
 		}
-	}, [accountInfo.phone, handleResendSmsOtp, openError, toggleLoadingContext])
+	}, [
+		accountInfo.phone,
+		accountInfo.prefix,
+		openError,
+		resolveVnPhone,
+		toggleLoadingContext,
+	])
+
+	/** Sends OTP via a phone channel chosen on the email OTP screen. */
+	const handleSelectAlternateMethod = useCallback(
+		async (method: OtpSendMethod) => {
+			const { prefix, phone } = accountInfo
+			if (!phone) {
+				openError({ message: 'No phone number found' })
+				return
+			}
+			const formatted = formatPhone(prefix, phone)
+			toggleLoadingContext(true)
+			try {
+				const res: any = await sendOtpByMethod({
+					method,
+					phone: formatted,
+					language: String(locale || 'en'),
+				})
+				if (res?.results?.object?.sid !== 'success') {
+					throw new Error('Failed to send OTP')
+				}
+				setOtpChannel(method)
+				setOtpDestination(formatted)
+				setShowAlternateMethods(false)
+				setAccountInfo((pre) => ({ ...pre, otp: '' }))
+			} catch (error) {
+				openError(error)
+			} finally {
+				toggleLoadingContext(false)
+			}
+		},
+		[accountInfo, locale, openError, toggleLoadingContext],
+	)
 
 	const handleSubmitOtp = useCallback(async () => {
 		toggleLoadingContext(true)
@@ -551,6 +599,8 @@ export default function useRegisterAndReset({
 		fromAccount,
 		otpChannel,
 		otpDestination,
+		isVnPhone,
+		showAlternateMethods,
 		formattedPhone,
 		onChangeStep: handleChangeStep,
 		onChangeData: handleChangeAccountInfo,
@@ -559,6 +609,7 @@ export default function useRegisterAndReset({
 		onSubmitPass: handleSubmitPass,
 		onResendOtp: handleResendOtp,
 		onSwitchToSms: handleSwitchToSms,
+		onSelectAlternateMethod: handleSelectAlternateMethod,
 		onClearForgetSession: clearForgetPasswordFromAccount,
 	}
 }
