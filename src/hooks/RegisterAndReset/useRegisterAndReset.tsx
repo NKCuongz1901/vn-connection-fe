@@ -4,12 +4,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 
+import type { OtpSendMethod } from '@/Components/Auth/SelectOtpMethod'
 import {
 	checkPhoneExists,
 	forgetPasswordByPhone,
 	registerByPhone,
 	sendOTP,
 	sendToMail,
+	sendToWhatsapp,
+	sendToZalo,
 	verifyOTP,
 } from '@/apis/authApis'
 
@@ -31,13 +34,34 @@ import { mainRoutes } from '@/routes/MainRoutes'
 type RegisterFromLoginInit = {
 	phone: string
 	prefix: string
+	otpSent?: boolean
+	otpMethod?: OtpSendMethod
 }
 
 type ForgetPasswordFromAccountInit = {
 	fromAccount: true
 }
 
-type OtpChannel = 'email' | 'sms'
+type OtpChannel = 'email' | OtpSendMethod
+
+/** Sends register OTP via the selected channel. */
+const sendRegisterOtpByMethod = async ({
+	method,
+	phone,
+	language,
+}: {
+	method: OtpSendMethod
+	phone: string
+	language: string
+}) => {
+	if (method === 'zalo') {
+		return sendToZalo({ phone, language })
+	}
+	if (method === 'whatsapp') {
+		return sendToWhatsapp({ phone, language })
+	}
+	return sendOTP({ phone })
+}
 
 let forgetPasswordFromAccountCache:
 	| ForgetPasswordFromAccountInit
@@ -73,6 +97,8 @@ const readRegisterFromLogin = (type: OTPType): RegisterFromLoginInit | null => {
 	return {
 		phone: init.phone,
 		prefix: init.prefix || '+84',
+		otpSent: Boolean(init.otpSent),
+		otpMethod: init.otpMethod || 'sms',
 	}
 }
 
@@ -137,8 +163,14 @@ export default function useRegisterAndReset({
 	const [forgetInit] = useState(() => readForgetPasswordFromAccount(type))
 	const [fromAccount] = useState(() => Boolean(forgetInit?.fromAccount))
 	const [step, setStep] = useState(() => (loginInit ? 1 : 0))
-	const [otpChannel, setOtpChannel] = useState<OtpChannel>('email')
-	const [otpDestination, setOtpDestination] = useState('')
+	const [otpChannel, setOtpChannel] = useState<OtpChannel>(() =>
+		loginInit ? loginInit.otpMethod || 'sms' : 'email',
+	)
+	const [otpDestination, setOtpDestination] = useState(() =>
+		loginInit
+			? formatPhone(loginInit.prefix, loginInit.phone)
+			: '',
+	)
 	const [accountInfo, setAccountInfo] = useState(() =>
 		createInitialAccountInfo(type, steps, loginInit, forgetInit),
 	)
@@ -255,11 +287,29 @@ export default function useRegisterAndReset({
 		setOtpDestination(formatPhone(prefix, phone))
 	}, [accountInfo])
 
+	const handleResendRegisterOtp = useCallback(async () => {
+		const { prefix, phone } = accountInfo
+		const method: OtpSendMethod =
+			otpChannel === 'email' ? 'sms' : (otpChannel as OtpSendMethod)
+		const formatted = formatPhone(prefix, phone)
+		const res: any = await sendRegisterOtpByMethod({
+			method,
+			phone: formatted,
+			language: String(locale || 'en'),
+		})
+		if (res?.results?.object?.sid !== 'success') {
+			throw res
+		}
+		setOtpDestination(formatted)
+	}, [accountInfo, locale, otpChannel])
+
 	const handleResendOtp = useCallback(async () => {
 		toggleLoadingContext(true)
 		try {
 			if (otpChannel === 'email') {
 				await handleResendEmailOtp()
+			} else if (type === OTP_TYPE.REGISTER) {
+				await handleResendRegisterOtp()
 			} else {
 				await handleResendSmsOtp()
 			}
@@ -270,10 +320,12 @@ export default function useRegisterAndReset({
 		}
 	}, [
 		handleResendEmailOtp,
+		handleResendRegisterOtp,
 		handleResendSmsOtp,
 		openError,
 		otpChannel,
 		toggleLoadingContext,
+		type,
 	])
 
 	const handleSwitchToSms = useCallback(async () => {
@@ -460,7 +512,13 @@ export default function useRegisterAndReset({
 		if (!loginInit || otpFromLoginSentRef.current) return
 
 		otpFromLoginSentRef.current = true
-		const { prefix, phone } = loginInit
+		const { prefix, phone, otpSent, otpMethod } = loginInit
+
+		if (otpSent) {
+			setOtpChannel(otpMethod || 'sms')
+			setOtpDestination(formatPhone(prefix, phone))
+			return
+		}
 
 		const sendOtpFromLogin = async () => {
 			toggleLoadingContext(true)

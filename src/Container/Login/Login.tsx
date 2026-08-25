@@ -7,6 +7,7 @@ import useLogin from '@/hooks/Login/useLogin'
 import { useLoading } from '@/context/LoadingContext'
 import { useLocalePath } from '@/ultis/route'
 
+import OtpMethodList from '@/Components/Auth/SelectOtpMethod'
 import CButton from '@/Components/Custom/CButton'
 import CInputPassword from '@/Components/Custom/CInputPassword'
 import CInputPhone from '@/Components/Custom/CInputPhone'
@@ -19,12 +20,8 @@ import MainLogo from './MainLogo'
 
 import classes from './Login.module.scss'
 
-import {
-	REGISTER_FROM_LOGIN_SESSION_KEY,
-	REPORT_ISSUE_TYPE,
-} from '@/Variable/common.variable'
+import { REPORT_ISSUE_TYPE } from '@/Variable/common.variable'
 import { mainRoutes } from '@/routes/MainRoutes'
-import { setSessionStorage } from '@/ultis/storage'
 import ModalReport from '@/Components/Custom/ModalReport'
 import NotFound from '@/svg/NotFound'
 import ModalNotFoundAccount from '@/Components/Notification/ModalNotFoundAccount/ModalNotFoundAccount'
@@ -32,7 +29,7 @@ import ModalNotFoundAccount from '@/Components/Notification/ModalNotFoundAccount
 const { forgetPassword } = mainRoutes
 
 const Login = () => {
-	const { onGetPath, onChangeRoute } = useLocalePath()
+	const { onGetPath } = useLocalePath()
 	const { loadingContext } = useLoading()
 	const [openModalReport, setOpenModalReport] = useState(false)
 	const [openModalNotFoundAccount, setOpenModalNotFoundAccount] =
@@ -45,8 +42,13 @@ const Login = () => {
 		onChange,
 		isPhoneValid,
 		isValidate,
+		otpMethod,
+		isVnPhone,
 		onContinuePhone,
 		onLogin,
+		onStartRegister,
+		onChangeOtpMethod,
+		onSendRegisterOtp,
 	} = useLogin({
 		onAccountNotFound: (displayPhone) => {
 			setNotFoundPhone(displayPhone)
@@ -84,8 +86,65 @@ const Login = () => {
 	const _renderRight = () => {
 		const { phone, password, isRemember, prefix } = account
 		const isPasswordStep = loginStep === 'password'
+		const isRegisterOtpStep = loginStep === 'registerOtp'
 		const disable =
-			loadingContext || (isPasswordStep ? !isValidate : !isPhoneValid)
+			loadingContext ||
+			(isRegisterOtpStep
+				? !isPhoneValid
+				: isPasswordStep
+					? !isValidate
+					: !isPhoneValid)
+
+		if (isRegisterOtpStep) {
+			return (
+				<Flex className={classes.right} vertical>
+					<Flex
+						className={classes.rightHeader}
+						justify="flex-end"
+						align="center"
+					>
+						<Logo />
+						<span className={classes.brandSmall}>UniVini</span>
+					</Flex>
+
+					<Flex
+						className={classes.rightCenter}
+						vertical
+						justify="center"
+						align="center"
+						flex={1}
+					>
+						<Flex vertical gap={24} className={classes.form}>
+							<Flex vertical gap={8} align="center">
+								<div className={classes.rightTop3}>
+									Verify your phone number
+								</div>
+								<p className={classes.otpSubtitle}>
+									Choose how you want to receive your OTP code.
+								</p>
+							</Flex>
+							<OtpMethodList
+								value={otpMethod}
+								isVnPhone={isVnPhone}
+								onChange={onChangeOtpMethod}
+							/>
+							<CButton
+								disabled={disable}
+								ctype={!disable ? 'oranger' : null}
+								onClick={onSendRegisterOtp}
+							>
+								Send OTP
+							</CButton>
+						</Flex>
+					</Flex>
+
+					<div className={classes.footer}>
+						<TermPolicy />
+					</div>
+				</Flex>
+			)
+		}
+
 		return (
 			<Flex className={classes.right} vertical>
 				<Flex className={classes.rightHeader} justify="flex-end" align="center">
@@ -217,14 +276,7 @@ const Login = () => {
 				}}
 				onRegister={() => {
 					setOpenModalNotFoundAccount(false)
-					setSessionStorage({
-						key: REGISTER_FROM_LOGIN_SESSION_KEY,
-						data: {
-							phone: account.phone,
-							prefix: account.prefix,
-						},
-					})
-					onChangeRoute(mainRoutes.register)
+					onStartRegister()
 				}}
 			/>
 		</div>

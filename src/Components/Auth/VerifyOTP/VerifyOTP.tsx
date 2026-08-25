@@ -12,7 +12,7 @@ interface VerifyOTPProps {
 	title?: string
 	phone?: string
 	destination?: string
-	channel?: 'email' | 'sms'
+	channel?: 'email' | 'sms' | 'zalo' | 'whatsapp'
 	value: string
 	length?: number
 	onChage?: (value: string) => void
@@ -87,7 +87,9 @@ const VerifyOTP = ({
 					/>
 				</div>
 				<Flex gap={4} align="center" className={classes.resendRow}>
-					<span className={classes.resendLabel}>Didn&apos;t receive the code?</span>
+					<span className={classes.resendLabel}>
+						Didn&apos;t receive the code?
+					</span>
 					{isSendAgain ? (
 						<button
 							type="button"
