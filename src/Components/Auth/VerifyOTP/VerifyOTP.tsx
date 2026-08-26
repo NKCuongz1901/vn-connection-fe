@@ -2,6 +2,10 @@ import { Flex, Input } from 'antd'
 import clsx from 'clsx'
 import { memo, useState } from 'react'
 
+import {
+	OtpAlternateMethods,
+	type OtpSendMethod,
+} from '@/Components/Auth/SelectOtpMethod'
 import CButton from '@/Components/Custom/CButton'
 import CCountDown from '@/Components/Custom/CCountDown/CCountDown'
 import ImageVerifyOTP from './ImageVerifyOTP'
@@ -12,7 +16,7 @@ interface VerifyOTPProps {
 	title?: string
 	phone?: string
 	destination?: string
-	channel?: 'email' | 'sms'
+	channel?: 'email' | 'sms' | 'zalo' | 'whatsapp'
 	value: string
 	length?: number
 	onChage?: (value: string) => void
@@ -21,8 +25,11 @@ interface VerifyOTPProps {
 	onSendAgain?: any
 	onChangeStep?: any
 	onSwitchToSms?: any
+	onSelectAlternateMethod?: (method: OtpSendMethod) => void
 	hiddenChangeStep?: boolean
 	showSwitchToPhone?: boolean
+	showAlternateMethods?: boolean
+	isVnPhone?: boolean
 	className?: any
 	disabled?: boolean
 	[key: string]: any
@@ -42,13 +49,22 @@ const VerifyOTP = ({
 	hiddenChangeStep,
 	onChangeStep,
 	onSwitchToSms,
+	onSelectAlternateMethod,
 	showSwitchToPhone = false,
+	showAlternateMethods = false,
+	isVnPhone = false,
 	className,
 	disabled: _disabled,
 }: VerifyOTPProps) => {
 	const disabled = value.length < length || _disabled
 	const [isSendAgain, setIsSendAgain] = useState(false)
 	const displayDestination = destination || phone || ''
+	const canShowPhoneSwitch =
+		showSwitchToPhone && channel === 'email' && !showAlternateMethods
+	const canShowAlternates =
+		showAlternateMethods &&
+		channel === 'email' &&
+		Boolean(onSelectAlternateMethod)
 
 	return (
 		<div className={clsx(classes.wrapper, { [className]: !!className })}>
@@ -86,31 +102,42 @@ const VerifyOTP = ({
 						onInput={onInput}
 					/>
 				</div>
-				<Flex gap={4} align="center" className={classes.resendRow}>
-					<span className={classes.resendLabel}>Didn&apos;t receive the code?</span>
-					{isSendAgain ? (
-						<button
-							type="button"
-							className={classes.send}
-							onClick={() => {
-								onSendAgain?.()
-								setIsSendAgain(false)
-							}}
-						>
-							Send again
-						</button>
-					) : (
-						<span className={classes.sendCountDown}>
-							Send again{' '}
-							<CCountDown
-								start={120}
-								onCountSuccess={() => setIsSendAgain(true)}
-							/>{' '}
-							second(s)
+				<Flex vertical gap={4} align="center" className={classes.resendSection}>
+					<Flex gap={4} align="center" className={classes.resendRow}>
+						<span className={classes.resendLabel}>
+							Didn&apos;t receive the code?
 						</span>
+						{isSendAgain ? (
+							<button
+								type="button"
+								className={classes.send}
+								onClick={() => {
+									onSendAgain?.()
+									setIsSendAgain(false)
+								}}
+							>
+								Send again
+							</button>
+						) : (
+							<span className={classes.sendCountDown}>
+								Send again{' '}
+								<CCountDown
+									start={120}
+									onCountSuccess={() => setIsSendAgain(true)}
+								/>{' '}
+								second(s)
+							</span>
+						)}
+					</Flex>
+					{canShowAlternates && (
+						<OtpAlternateMethods
+							isVnPhone={isVnPhone}
+							disabled={_disabled}
+							onSelect={onSelectAlternateMethod!}
+						/>
 					)}
 				</Flex>
-				{showSwitchToPhone && channel === 'email' && (
+				{canShowPhoneSwitch && (
 					<button
 						type="button"
 						className={classes.switchChannelLink}
@@ -119,15 +146,18 @@ const VerifyOTP = ({
 						Get OTP via phone
 					</button>
 				)}
-				{!hiddenChangeStep && channel === 'sms' && (
-					<button
-						type="button"
-						className={classes.switchChannelLink}
-						onClick={() => onChangeStep?.(0)}
-					>
-						Change your phone number
-					</button>
-				)}
+				{!hiddenChangeStep &&
+					(channel === 'sms' ||
+						channel === 'zalo' ||
+						channel === 'whatsapp') && (
+						<button
+							type="button"
+							className={classes.switchChannelLink}
+							onClick={() => onChangeStep?.(0)}
+						>
+							Change your phone number
+						</button>
+					)}
 				<Flex className={classes.buttonWrapper}>
 					<CButton
 						disabled={disabled}

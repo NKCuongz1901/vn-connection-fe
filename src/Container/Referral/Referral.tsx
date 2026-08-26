@@ -7,6 +7,8 @@ import CInput from '@/Components/Custom/CInput'
 import ModalMyFriend from '@/Components/Friend/ModalMyFriend'
 import ReferralTabPanel from '@/Components/Referral/ReferralTabPanel/ReferralTabPanel'
 import ReferralTutorialSteps from '@/Components/Referral/ReferralTutorialSteps/ReferralTutorialSteps'
+import RedeemPointsModal from '@/Components/Referral/RedeemPointsModal/RedeemPointsModal'
+import { showRedeemMinPointsToast } from '@/Components/Toast/SocketToastContent'
 import { useModal } from '@/context/ModalContext'
 import useReferral from '@/hooks/Referral/useReferral'
 import useProfile from '@/hooks/Profile/useProfile'
@@ -36,6 +38,7 @@ function Referral() {
 		loadingLeaderBoard,
 		loadingOverview,
 		loadingHistory,
+		loadingRedeem,
 		myPosition,
 		myTotalPoints,
 		leaderBoard,
@@ -45,12 +48,14 @@ function Referral() {
 		topInvitees,
 		onChangePeriod,
 		onScrollHistory,
+		onCreateRedeemRequest,
 	} = useReferral()
 	const { userData } = useProfile({})
 	const { openSuccess, openError } = useModal()
 	const { onChangeRoute } = useLocalePath()
 	const { wallet, invite_code, share_link } = userData || {}
 	const [shareModalOpen, setShareModalOpen] = useState(false)
+	const [redeemModalOpen, setRedeemModalOpen] = useState(false)
 	const [loadingShare, setLoadingShare] = useState<Record<string, boolean>>({})
 	const [shareList, setShareList] = useState<Record<string, boolean>>({})
 
@@ -94,6 +99,19 @@ function Referral() {
 		setShareModalOpen(false)
 		setShareList({})
 	}, [])
+
+	/** Opens redeem modal when points meet minimum; otherwise shows info toast. */
+	const handleOpenRedeem = useCallback(() => {
+		const minimumPoints = referralOverview?.minimum_redeem_points || 200
+		const currentPoints = Number(wallet) || 0
+
+		if (currentPoints < minimumPoints) {
+			showRedeemMinPointsToast(minimumPoints)
+			return
+		}
+
+		setRedeemModalOpen(true)
+	}, [referralOverview?.minimum_redeem_points, wallet])
 
 	const handleShareFriend = useCallback(
 		async (friendId: string) => {
@@ -154,6 +172,32 @@ function Referral() {
 		)
 	}
 
+	const _renderRedeemModal = () => {
+		if (!redeemModalOpen) return null
+
+		const {
+			minimum_redeem_points = 200,
+			point_value_vnd = 5000,
+		} = referralOverview || {}
+		const redeemPoints = minimum_redeem_points || 200
+
+		/** Submits redeem request then closes modal on success. */
+		const handleConfirmRedeem = async () => {
+			const ok = await onCreateRedeemRequest(redeemPoints)
+			if (ok) setRedeemModalOpen(false)
+		}
+
+		return (
+			<RedeemPointsModal
+				onClose={() => setRedeemModalOpen(false)}
+				onConfirm={handleConfirmRedeem}
+				minimumRedeemPoints={redeemPoints}
+				pointValueVnd={point_value_vnd || 5000}
+				loading={loadingRedeem}
+			/>
+		)
+	}
+
 	const _renderMyTotalRef = useCallback(() => {
 		return (
 			<div className={classes.myTotalRefContainer}>
@@ -209,14 +253,18 @@ function Referral() {
 							<ReceiptIcon />
 							<span className={classes.normalText}>Redeem history</span>
 						</button>
-						<button type="button" className={classes.redeemBtn}>
+						<button
+							type="button"
+							className={classes.redeemBtn}
+							onClick={handleOpenRedeem}
+						>
 							<span className={classes.redeemText}>Redeem</span>
 						</button>
 					</div>
 				</div>
 			</div>
 		)
-	}, [wallet, handleShare, onChangeRoute])
+	}, [wallet, handleShare, handleOpenRedeem, onChangeRoute])
 
 	const _renderContentRightTop = () => {
 		return (
@@ -300,6 +348,7 @@ function Referral() {
 	return (
 		<div className={classes.wrapper}>
 			{_renderShareModal()}
+			{_renderRedeemModal()}
 			<h3 className={classes.title}>Referral</h3>
 			<div className={classes.content}>
 				<div className={classes.contentLeft}>
