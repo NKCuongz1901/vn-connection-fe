@@ -227,8 +227,8 @@ export default function OpenApp() {
 			<footer className={styles.footer}>
 				<p>VN CONNECTIONS COMPANY LIMITED</p>
 				<p>
-					Address: 2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh
-					City, Viet Nam, 700000
+					Address: 55/4B Phan Đăng Lưu Street, Cầu Kiệu Ward, Hồ Chí Minh
+					City
 				</p>
 				<p>
 					Contact:{' '}

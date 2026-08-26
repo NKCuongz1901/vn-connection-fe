@@ -65,8 +65,8 @@ function TermPolicy({
 				</span>
 				<span className={classes.inlineRow}>
 					<span className={classes.address}>
-						Address: 2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi
-						Minh City, Viet Nam, 700000
+						Address: 55/4B Phan Đăng Lưu Street, Cầu Kiệu Ward, Hồ
+						Chí Minh City
 					</span>
 					<span className={classes.item}>
 						© 2026 VN CONNECTIONS COMPANY LIMITED. All rights reserved.
@@ -92,8 +92,8 @@ function TermPolicy({
 					maxWidth: 360,
 				}}
 			>
-				Address: 2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh
-				City, Viet Nam, 700000
+				Address: 55/4B Phan Đăng Lưu Street, Cầu Kiệu Ward, Hồ Chí Minh
+				City
 			</span>
 			<span>Contact: {contact}</span>
 			<span>
