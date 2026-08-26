@@ -7,7 +7,7 @@ Hệ thống kiểm duyệt sẽ truy cập website để đối chiếu thông 
 ```text
 VN CONNECTIONS COMPANY LIMITED
 
-Address: 2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh City, Viet Nam, 700000
+Address: 55/4B Phan Đăng Lưu Street, Cầu Kiệu Ward, Hồ Chí Minh City
 
 Contact: support@univini.com
 
@@ -28,7 +28,7 @@ Contact: support@univini.com
 - [ ] Cuộn xuống Footer trên trang Login, Open App, Terms, Privacy Policy và Overview (`/overview`)
 - [ ] Thấy tên pháp lý `VN CONNECTIONS COMPANY LIMITED`
 - [ ] Thấy dòng bản quyền `© 2026 VN CONNECTIONS COMPANY LIMITED. All rights reserved.`
-- [ ] Thấy địa chỉ `2A Phan Tay Ho, Ward 7, Phu Nhuan District, Ho Chi Minh City, Viet Nam, 700000`
+- [ ] Thấy địa chỉ `55/4B Phan Đăng Lưu Street, Cầu Kiệu Ward, Hồ Chí Minh City`
 - [ ] Thấy email liên hệ `support@univini.com`
 - [ ] Website load bình thường, không phải trang trống
 - [ ] Deploy bản mới lên môi trường production trước khi gửi kiểm duyệt
