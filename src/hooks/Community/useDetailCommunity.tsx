@@ -11,6 +11,7 @@ import {
 	leaveConversation,
 	likeAnnoun,
 	sendMessageById,
+	transferHost,
 	updateConvMember,
 } from '@/apis/conversationApis'
 
@@ -77,6 +78,8 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	const [annouList, setAnnouList] = useState<AnnouncementProps[]>([])
 	const [loadIds, setLoadingIds] = useState<string[]>([])
 	const [shareList, setShareList] = useState([]) as any
+	const [transferHostModalOpen, setTransferHostModalOpen] = useState(false)
+	const [transferHostLoading, setTransferHostLoading] = useState(false)
 
 	const [tabTop, setTabTop] = useState<string>('')
 
@@ -436,21 +439,19 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		try {
 			setLoadingApi((prev) => ({ ...prev, join: true }))
 			await leaveConversation({ id })
-			handleGetInfoConv(true)
 			openSuccess({ message: 'You leave community successfull' })
-			if (memberRef.current?.onGetMember) {
-				memberRef.current.onGetMember()
-			}
+			onChangeRoute(mainRoutes.community)
 		} catch (error) {
 			openError(error)
 		} finally {
 			setLoadingApi((prev) => ({ ...prev, join: false }))
 		}
 	}
-	const handleDeleteConv = async (id) => {
+
+	const handleDeleteConv = async (convId) => {
 		toggleLoadingContext(true)
 		try {
-			const res: any = await deleteConvById({ id })
+			const res: any = await deleteConvById({ id: convId })
 			await delay(500)
 			if (res?.code === 200) {
 				openConfirm({
@@ -464,15 +465,67 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 			toggleLoadingContext()
 		}
 	}
+
 	const handleConfirmDelete = () => {
-		const { id } = convInfo || {}
+		const { id: convId } = convInfo || {}
 
 		openConfirm({
 			message: 'Are you sure want to remove this conversation?',
 			titleLabel: 'Delete this conversation',
-			onAccept: () => handleDeleteConv(id),
+			onAccept: () => handleDeleteConv(convId),
 			ctype: 'error',
 		})
+	}
+
+	/** Owner leave: delete if alone, otherwise open transfer-host modal. */
+	const handleOwnerLeaveFlow = () => {
+		const amount = Number(convInfo?.amount_of_user || 0)
+		const convId = convInfo?.id || id
+		if (amount <= 1) {
+			handleDeleteConv(convId)
+			return
+		}
+		setTransferHostModalOpen(true)
+	}
+
+	/** Confirms leave; Owner must transfer host when others remain. */
+	const handleConfirmLeave = () => {
+		const joinType = convInfo?.join?.type
+		const isOwner =
+			joinType === 'OWNER' || getUserInfo('id') === convInfo?.host_id
+
+		openConfirm({
+			message: 'Are you sure you want to leave this community?',
+			titleLabel: 'Leave community',
+			ctype: 'error',
+			onAccept: () => {
+				if (isOwner) {
+					handleOwnerLeaveFlow()
+					return
+				}
+				handleLeaveConv()
+			},
+		})
+	}
+
+	/** Transfers host then leaves the community. */
+	const handleTransferHostAndLeave = async (memberId: string) => {
+		if (!memberId) {
+			openError({ message: 'Please select a member to leave' })
+			return
+		}
+		setTransferHostLoading(true)
+		try {
+			await transferHost({ id, member_id: memberId })
+			await leaveConversation({ id })
+			setTransferHostModalOpen(false)
+			openSuccess({ message: 'You leave community successfull' })
+			onChangeRoute(mainRoutes.community)
+		} catch (error) {
+			openError(error)
+		} finally {
+			setTransferHostLoading(false)
+		}
 	}
 	const menus: ItemType[] = useMemo(() => {
 		if (isPublic && !isLogin()) {
@@ -558,13 +611,13 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 						},
 				  ]
 				: []),
-			...(!!join && !isMe
+			...(!!join
 				? [
 						{
 							key: 'leave',
 							style: { color: '#F80024' },
 							label: 'Leave community',
-							onClick: handleLeaveConv,
+							onClick: handleConfirmLeave,
 						},
 				  ]
 				: []),
@@ -601,6 +654,8 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		loadingShare,
 		shareList,
 		tabTop,
+		transferHostModalOpen,
+		transferHostLoading,
 
 		menus,
 
@@ -608,6 +663,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		setModal,
 		setShareList,
 		setTabMiddle,
+		setTransferHostModalOpen,
 		onScroll: handleScroll,
 		onAction: handleAction,
 		onCopy: handleCopy,
@@ -615,6 +671,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		onGetMenus: handleGetMenus,
 		onBack: handleBack,
 		onJoinConv: handleJoinConv,
-		onLeaveConv: handleLeaveConv,
+		onLeaveConv: handleConfirmLeave,
+		onTransferHostAndLeave: handleTransferHostAndLeave,
 	}
 }

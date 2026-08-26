@@ -74,6 +74,7 @@ export const CONVERSATION_ROUTES = {
 	convSuggest: 'conversation/suggest',
 	joinConversation: 'request-join-conversation',
 	leave: 'leave',
+	transferHost: 'transfer-host',
 	anouncement: 'anouncement',
 	anouncementPublic: 'anouncement/public',
 	anouncementLike: 'anouncement/like',

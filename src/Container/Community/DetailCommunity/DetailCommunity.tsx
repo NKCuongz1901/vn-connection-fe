@@ -9,6 +9,7 @@ import DetailCommunityDiscussion from '@/Components/Community/DetailCommunity/De
 import DetailCommunityMember from '@/Components/Community/DetailCommunity/DetailCommunityMember'
 import ModalCRUDAnnoun from '@/Components/Community/DetailCommunity/ModalCRUDAnnoun'
 import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
+import TransferHostLeaveModal from '@/Components/Community/TransferHostLeaveModal'
 import CAvatar from '@/Components/Custom/CAvatar'
 import CButton from '@/Components/Custom/CButton'
 import CImage from '@/Components/Custom/CImage'
@@ -81,6 +82,7 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		setModal,
 		setShareList,
 		setTabMiddle,
+		setTransferHostModalOpen,
 		onAction,
 		onScroll,
 		onCopy,
@@ -88,6 +90,9 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 		onGetMenus,
 		onBack,
 		onJoinConv,
+		onTransferHostAndLeave,
+		transferHostModalOpen,
+		transferHostLoading,
 	} = useDetailCommunity({ id, isPublic, onRequireLogin })
 
 	const handleTabTopClick = (value: string) => {
@@ -476,6 +481,13 @@ const DetailCommunity = (props: DetailCommunityProps) => {
 				{_renderTab()}
 				{_renderModal()}
 			</Flex>
+			<TransferHostLeaveModal
+				open={transferHostModalOpen}
+				conversationId={id}
+				loading={transferHostLoading}
+				onClose={() => setTransferHostModalOpen(false)}
+				onContinue={onTransferHostAndLeave}
+			/>
 		</div>
 	)
 }
