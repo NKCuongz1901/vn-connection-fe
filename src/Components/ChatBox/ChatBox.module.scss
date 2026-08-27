@@ -338,6 +338,12 @@
 
 								&:not(:has(.mediaCaption)) {
 									width: 280px;
+									padding-bottom: 36px;
+
+									.reactView {
+										bottom: 4px;
+										transform: none;
+									}
 								}
 
 								&:has(.mediaCaption) .reactView {
