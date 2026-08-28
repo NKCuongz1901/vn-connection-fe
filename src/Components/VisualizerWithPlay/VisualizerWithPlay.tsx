@@ -42,12 +42,13 @@ const VisualizerWithPlay = ({ src, item }: { src: string; item?: any }) => {
 
 	return (
 		<div className={classes.wrapper}>
-			<Flex className={clsx(classes.container, { [classes.right]: isMe })}>
+			<Flex
+				align="center"
+				className={clsx(classes.container, { [classes.right]: isMe })}
+			>
 				<div ref={containerRef} className={classes.audio} />
 				<Flex
-					className={clsx(classes.playAudioContainer, {
-						[classes.isMe]: isMe,
-					})}
+					className={classes.playAudioContainer}
 					align="center"
 					onClick={handleTogglePlayPause}
 				>
@@ -59,9 +60,7 @@ const VisualizerWithPlay = ({ src, item }: { src: string; item?: any }) => {
 						)}
 					</Flex>
 				</Flex>
-				<span style={{ minWidth: '40px', fontSize: '0.8em' }}>
-					{formatTime(currentTime)}
-				</span>
+				<span className={classes.duration}>{formatTime(currentTime)}</span>
 			</Flex>
 		</div>
 	)
