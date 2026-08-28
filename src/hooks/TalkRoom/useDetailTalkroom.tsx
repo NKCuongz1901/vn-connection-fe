@@ -194,6 +194,15 @@ export default function useDetailTalkroom(
 	const isChatTimeRef = useRef(false)
 	isChatTimeRef.current = Boolean(options?.isChatTime)
 
+	/** Skip error modal for room refetch failures during post-live chat time. */
+	const handleRoomApiError = useCallback(
+		(error: unknown) => {
+			if (isJoined && isChatTimeRef.current) return
+			openError(error)
+		},
+		[isJoined, openError],
+	)
+
 	const applySlotRaiseHandMap = useCallback(
 		(slotMap: TalkRoomSlotRaiseHandMap) => {
 			setSlotUserRaiseHand(slotMap)
@@ -397,14 +406,14 @@ export default function useDetailTalkroom(
 					return room
 				}
 			} catch (error) {
-				openError(error)
+				handleRoomApiError(error)
 			} finally {
 				setLoadingTalkRoomDetail(false)
 			}
 
 			return null
 		},
-		[id, openError, syncRoomUserRoleFromDetail],
+		[id, handleRoomApiError, syncRoomUserRoleFromDetail],
 	)
 
 	const handleValidatePreJoinRoom = useCallback(
@@ -671,14 +680,14 @@ export default function useDetailTalkroom(
 					return { rows, count, pagination }
 				}
 			} catch (error) {
-				openError(error)
+				handleRoomApiError(error)
 			} finally {
 				setLoadingListenersInRoom(false)
 			}
 
 			return null
 		},
-		[id, openError],
+		[id, handleRoomApiError],
 	)
 
 	const handleGetRaiseHandUsers = useCallback(
@@ -1375,6 +1384,7 @@ export default function useDetailTalkroom(
 					// openSuccess({ message: '...' }) hoặc toast sau
 					break
 				case 'room_time_up':
+					isChatTimeRef.current = true
 					options?.onRoomTimeUp?.(data)
 					break
 				case 'room_force_closed':
