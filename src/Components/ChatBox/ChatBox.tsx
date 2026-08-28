@@ -513,7 +513,7 @@ const ChatBox = ({
 
 				return (
 					<Flex className={classes.medias} vertical>
-						<Flex>
+						<Flex align="center" className={classes.mediaRow}>
 							{!(isTemp || isMemberAction) && isAudioMedia && !isMe && (
 								<Flex
 									className={classes.moreIconWrapper}
