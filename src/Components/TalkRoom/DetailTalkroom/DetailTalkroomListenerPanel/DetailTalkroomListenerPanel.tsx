@@ -73,7 +73,7 @@ function DetailTalkroomListenerPanel({
 			<div className={classes.body}>
 				{showEmpty ? (
 					<DetailTalkroomListenerEmpty onInvite={onInvite} />
-				) : noListener && !awaitingListeners ? null : (
+				) : (
 					<DetailTalkroomListenerList
 						listeners={listeners}
 						raiseHandUserIds={raiseHandUserIds}
