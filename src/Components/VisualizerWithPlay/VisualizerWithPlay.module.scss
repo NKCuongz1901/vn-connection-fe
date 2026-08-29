@@ -1,12 +1,15 @@
 .wrapper {
-	width: 100%;
+	width: fit-content;
+	max-width: 100%;
 
 	.container {
 		align-items: center;
 		gap: 8px;
+		width: fit-content;
 		background: #f4f8fc;
 		border-radius: 50px;
 		padding: 0 4px;
+
 		.playAudioContainer {
 			.playAudio {
 				align-items: center;
@@ -25,12 +28,21 @@
 
 		.audio {
 			width: 104px;
-			flex: 1;
+			flex: 0 0 104px;
+			min-width: 104px;
+			max-width: 104px;
+
+			:global(wave),
+			:global(canvas) {
+				width: 104px !important;
+			}
+
 			:global(.cursor) {
 				height: 40%;
 			}
 		}
 	}
+
 	.right {
 		background: #e7f5e9;
 	}
