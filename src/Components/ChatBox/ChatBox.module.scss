@@ -336,8 +336,12 @@
 									}
 								}
 
-								&:not(:has(.mediaCaption)) {
+								&:not(:has(.mediaCaption)):has(.multiMediaContent) {
 									width: 280px;
+								}
+
+								&:not(:has(.mediaCaption)):has(.mediaContent) {
+									width: fit-content;
 								}
 
 								&:has(.mediaCaption) .reactView {

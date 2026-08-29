@@ -15,6 +15,10 @@ export type TalkRoomSpeaker = {
 	i_am_from?: string
 	is_open_mic?: boolean
 	is_talking?: boolean
+	slot_id?: number
+	slotId?: number
+	slotIndex?: number
+	slot_index?: number
 }
 
 export type TalkRoomSpeakerLiveStatus = {
@@ -1003,6 +1007,30 @@ export type TalkRoomFilledSpeaker = {
 	is_open_mic?: boolean
 	is_talking?: boolean
 	role?: string
+	slot_id?: number
+	slotId?: number
+	slotIndex?: number
+	slot_index?: number
+}
+
+/** Guest speaker stage slot (1 or 2) from API / socket speaker payload. */
+export const getTalkRoomSpeakerSlotId = (
+	speaker?: {
+		slot_id?: number
+		slotId?: number
+		slotIndex?: number
+		slot_index?: number
+	} | null,
+): 1 | 2 | null => {
+	if (!speaker) return null
+
+	const slot = Number(
+		speaker.slot_id ?? speaker.slotId ?? speaker.slotIndex ?? speaker.slot_index,
+	)
+
+	if (slot === 1 || slot === 2) return slot
+
+	return null
 }
 
 /** Resolves speaker user id from room detail speaker entry. */
@@ -1099,6 +1127,28 @@ export const buildTalkRoomSpeakerSlots = (
 		return mergeSpeakerLiveStatus(speaker, speakerStatusMap?.[userId])
 	}
 
+	// Mobile: speakers map keyed by slot 1/2 — never pack left when slot_id is known.
+	const guestBySlot = new Map<number, TalkRoomFilledSpeaker>()
+	const unassignedGuests: TalkRoomFilledSpeaker[] = []
+
+	for (const speaker of guestSpeakers) {
+		const slotId = getTalkRoomSpeakerSlotId(speaker)
+		if (slotId) {
+			guestBySlot.set(slotId, speaker)
+		} else {
+			unassignedGuests.push(speaker)
+		}
+	}
+
+	for (const speaker of unassignedGuests) {
+		for (let slot = 1; slot <= maxSpeakers; slot++) {
+			if (!guestBySlot.has(slot)) {
+				guestBySlot.set(slot, speaker)
+				break
+			}
+		}
+	}
+
 	const slots: TalkRoomSpeakerSlot[] = [
 		{
 			key: 'host',
@@ -1110,14 +1160,15 @@ export const buildTalkRoomSpeakerSlots = (
 	]
 
 	for (let i = 0; i < maxSpeakers; i++) {
-		const speaker = guestSpeakers[i]
+		const slotId = (i + 1) as 1 | 2
+		const speaker = guestBySlot.get(slotId)
 
 		slots.push({
-			key: `speaker-${i + 1}`,
+			key: `speaker-${slotId}`,
 			type: speaker ? 'filled' : 'empty',
 			isHost: false,
-			label: `Speaker ${i + 1}`,
-			slotId: (i + 1) as 1 | 2,
+			label: `Speaker ${slotId}`,
+			slotId,
 			speaker: withLiveStatus(speaker),
 		})
 	}
@@ -1274,6 +1325,42 @@ export const sortTalkRoomListenersByRaiseHand = <
 	})
 }
 
+/**
+ * Display order for the listener list (mirrors mobile):
+ * raise-hand users first, then current user (when still a listener), then the rest.
+ */
+export const sortTalkRoomListenersForDisplay = <
+	T extends { user_id?: string },
+>(
+	listeners: T[],
+	options: {
+		currentUserId?: string
+		raiseHandUserIds?: string[]
+		pinCurrentUser?: boolean
+	} = {},
+): T[] => {
+	const raiseHandUserIds = options.raiseHandUserIds ?? []
+	const raised = sortTalkRoomListenersByRaiseHand(listeners, raiseHandUserIds)
+
+	if (!options.pinCurrentUser || !options.currentUserId) return raised
+
+	const myId = options.currentUserId
+	const raiseSet = new Set(raiseHandUserIds)
+
+	// Raise-hand users stay ahead of "me" (mobile can push raisers to index 0).
+	if (raiseSet.has(myId)) return raised
+
+	const myIndex = raised.findIndex((row) => row.user_id === myId)
+	if (myIndex < 0) return raised
+
+	const next = [...raised]
+	const [me] = next.splice(myIndex, 1)
+	const insertAt = next.findIndex((row) => !raiseSet.has(row.user_id ?? ''))
+	next.splice(insertAt === -1 ? next.length : insertAt, 0, me)
+
+	return next
+}
+
 /** Parses guest speaker slot index from talk room socket payloads. */
 export const getTalkRoomSocketSlotId = (
 	data?: unknown,
@@ -1356,6 +1443,70 @@ export const getTalkRoomSocketUserName = (
 	const userInfo = payload.user_info as Record<string, unknown> | undefined
 
 	return (userInfo?.name as string | undefined) ?? undefined
+}
+
+/** Reads speaker profile fields from promote / raise-hand-accepted socket payloads. */
+export const getTalkRoomSocketSpeakerUser = (
+	data?: unknown,
+): TalkRoomFilledSpeaker | null => {
+	if (!data || typeof data !== 'object') return null
+
+	const payload = data as Record<string, unknown>
+	const userInfo = (payload.user_info ??
+		(payload.action_details as Record<string, unknown> | undefined)
+			?.user_info) as Record<string, unknown> | undefined
+
+	const userId =
+		getTalkRoomSocketTargetUserId(data) ??
+		(userInfo?.id as string | undefined) ??
+		(userInfo?.user_id as string | undefined)
+
+	if (!userId) return null
+
+	return {
+		id: userId,
+		name: (userInfo?.name as string | undefined) ?? undefined,
+		avatar: (userInfo?.avatar as string | undefined) ?? undefined,
+		i_am_from: (userInfo?.i_am_from as string | undefined) ?? undefined,
+		role: 'speaker',
+		is_open_mic:
+			typeof userInfo?.is_open_mic === 'boolean'
+				? userInfo.is_open_mic
+				: false,
+	}
+}
+
+/**
+ * Places (or moves) a guest speaker into stage slot 1 or 2 — mirrors mobile moveListenerToSpeaker.
+ */
+export const placeTalkRoomGuestSpeakerInSlot = (
+	room: TalkRoomRoom | null | undefined,
+	speaker: TalkRoomFilledSpeaker,
+	slotId: 1 | 2,
+): TalkRoomSpeaker[] => {
+	const userId = resolveSpeakerUserId(speaker)
+	const current = room?.speakers ?? []
+	if (!userId) return current
+
+	const nextSpeaker: TalkRoomSpeaker = {
+		...speaker,
+		id: userId,
+		role: 'speaker',
+		slot_id: slotId,
+		slotId,
+		slotIndex: slotId,
+	}
+
+	const withoutUser = current.filter((entry) => {
+		const entryId = resolveSpeakerUserId(entry)
+		if (entryId === userId) return false
+		if (entry?.role !== 'speaker') return true
+
+		const entrySlot = getTalkRoomSpeakerSlotId(entry)
+		return entrySlot !== slotId
+	})
+
+	return [...withoutUser, nextSpeaker]
 }
 
 /** Guest speaker user id for stage slot 1 or 2 (1-indexed). */

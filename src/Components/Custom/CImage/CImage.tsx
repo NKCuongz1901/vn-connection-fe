@@ -37,10 +37,22 @@ const CImage = (_props: CImageProps) => {
 		}
 	}, [src, sizeType])
 
+	const originSrc = convertImageUrl(src, TYPE_SIZE_IMAGE.origin)
+
 	const handleError = () => {
-		// quá retry → fallback về URL GỐC
+		// The sized webp rendition is generated a moment after upload, so a
+		// fresh image 404s briefly while the original at images/<name>.jpg is
+		// already there. Try the original before burning timed retries.
+		if (retry === 0 && originSrc && imgSrc !== originSrc) {
+			setRetry(1)
+			setImgSrc(originSrc)
+			return
+		}
+
 		if (retry >= MAX_RETRY) {
-			setImgSrc(src)
+			if (originSrc && imgSrc !== originSrc) {
+				setImgSrc(originSrc)
+			}
 			return
 		}
 

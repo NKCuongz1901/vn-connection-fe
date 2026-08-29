@@ -369,8 +369,12 @@
 									}
 								}
 
-								&:not(:has(.mediaCaption)) {
+								&:not(:has(.mediaCaption)):has(.multiMediaContent) {
 									width: 280px;
+								}
+
+								&:not(:has(.mediaCaption)):has(.mediaContent) {
+									width: fit-content;
 								}
 
 								&:has(.mediaCaption) .reactView {
@@ -1106,9 +1110,14 @@
 										width: 100%;
 									}
 
-									&:not(:has(.mediaCaption)) {
+									&:not(:has(.mediaCaption)):has(.multiMediaContent) {
 										width: 100%;
 										max-width: 280px;
+									}
+
+									&:not(:has(.mediaCaption)):has(.mediaContent) {
+										width: fit-content;
+										max-width: 320px;
 									}
 								}
 							}
