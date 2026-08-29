@@ -23,7 +23,7 @@ import { blockUser } from '@/apis/userApis'
 import { isArray, uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay, handleScrollCallback } from '@/ultis/common'
 import { useLocalePath, useSafeBack } from '@/ultis/route'
-import { getUserInfo } from '@/ultis/storage'
+import { getUserInfo, isLogin } from '@/ultis/storage'
 import { copyToClipboard } from '@/ultis/string'
 
 import { paginationCommon } from '@/Variable/common.variable'
@@ -190,7 +190,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	}
 
 	const handleLike = async (annouId: string) => {
-		if (isPublic) {
+		if (isPublic && !isLogin()) {
 			onRequireLogin?.()
 			return
 		}
@@ -223,16 +223,20 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	}
 
 	const handleShareFriend = async (friendId) => {
-		if (isPublic) {
+		if (isPublic && !isLogin()) {
 			onRequireLogin?.()
 			return
 		}
+		if (!friendId) return
+
+		const { share_link } = modal?.data?.props || {}
+		if (!share_link) return
+
 		setLoadingShare((prev: any) => ({ ...prev, [friendId]: true }))
 
 		try {
-			const { share_link } = modal?.data?.props || {}
 			const payload = {
-				receiver_id: id,
+				receiver_id: friendId,
 				message: {
 					content: share_link,
 					type: 'TEXT',
@@ -271,6 +275,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	const handleAction = ({ key, value }) => {
 		if (
 			isPublic &&
+			!isLogin() &&
 			['like', 'share', 'block', 'report', 'addNewAnnou', 'editAnnou'].includes(
 				key,
 			)
@@ -328,7 +333,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		id: string
 		user_id: string
 	}) => {
-		if (isPublic) {
+		if (isPublic && !isLogin()) {
 			return [
 				{
 					key: 'share',
@@ -348,6 +353,9 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 					handleAction({ key: 'share', value: { ...props, id, user_id } }),
 			},
 		]
+		if (isPublic) {
+			return menus
+		}
 		if (isMe) {
 			menus.push(
 				{
@@ -406,7 +414,7 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 	}
 
 	const handleJoinConv = async (convId) => {
-		if (isPublic) {
+		if (isPublic && !isLogin()) {
 			onRequireLogin?.()
 			return
 		}
@@ -467,12 +475,22 @@ export default function useDetailCommunity(props: useDetailCommunityProps) {
 		})
 	}
 	const menus: ItemType[] = useMemo(() => {
-		if (isPublic) {
+		if (isPublic && !isLogin()) {
 			return [
 				{
 					key: 'share',
 					label: 'Share community',
 					onClick: () => onRequireLogin?.(),
+				},
+			]
+		}
+
+		if (isPublic) {
+			return [
+				{
+					key: 'share',
+					label: 'Share community',
+					onClick: () => handleAction({ key: 'share', value: convInfo }),
 				},
 			]
 		}

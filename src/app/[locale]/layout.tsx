@@ -9,6 +9,7 @@ import { ModalProvider } from '@/context/ModalContext'
 import { SocketProvider } from '@/context/SocketContext'
 import { SocketToastProvider } from '@/context/SocketToastContext'
 import { NewInboxProvider } from '@/context/NewInboxContext'
+import { NewDeviceSecurityProvider } from '@/context/NewDeviceSecurityContext'
 import { SearchLocationProvider } from '@/context/SearchLocationContext'
 
 import MainLayout from '@/Components/Layout/MainLayout'
@@ -39,13 +40,15 @@ export default async function LocaleLayout({
 				<ModalProvider>
 					<ToastProvider>
 						<SocketProvider>
-							<SocketToastProvider>
-								<NewInboxProvider>
-									<SearchLocationProvider>
-										<MainLayout>{children}</MainLayout>
-									</SearchLocationProvider>
-								</NewInboxProvider>
-							</SocketToastProvider>
+							<NewDeviceSecurityProvider>
+								<SocketToastProvider>
+									<NewInboxProvider>
+										<SearchLocationProvider>
+											<MainLayout>{children}</MainLayout>
+										</SearchLocationProvider>
+									</NewInboxProvider>
+								</SocketToastProvider>
+							</NewDeviceSecurityProvider>
 						</SocketProvider>
 					</ToastProvider>
 				</ModalProvider>

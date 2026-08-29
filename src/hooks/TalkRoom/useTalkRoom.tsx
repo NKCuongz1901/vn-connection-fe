@@ -231,8 +231,7 @@ export default function useTalkRoom() {
 				const { code, results, pagination } = res || {}
 
 				if (code === 200) {
-					const rows: TalkRoomCountMeInListItem[] =
-						results?.objects?.rows ?? []
+					const rows: TalkRoomCountMeInListItem[] = results?.objects?.rows ?? []
 					const count =
 						results?.objects?.count ?? pagination?.total ?? rows.length
 
@@ -784,28 +783,33 @@ export default function useTalkRoom() {
 				const { code, results } = res || {}
 				if (code === 200) {
 					const room = results?.object
-					openSuccess({
-						titleLabel: 'Create successfully!',
-						message:
-							'Your talk room is ready and will start at the time you set',
-						autoCloseMs: 2000,
-						styles: {
-							content: {
-								width: '380px',
-								maxWidth: 'calc(100vw - 32px)',
-								minHeight: 'unset',
-								padding: '20px 24px',
+					const hasSchedule = isArray(schedules, 1)
+
+					if (hasSchedule) {
+						openSuccess({
+							titleLabel: 'Create successfully!',
+							message:
+								'Your talk room is ready and will start at the time you set',
+							autoCloseMs: 2000,
+							styles: {
+								content: {
+									width: '380px',
+									maxWidth: 'calc(100vw - 32px)',
+									minHeight: 'unset',
+									padding: '20px 24px',
+								},
+								body: {
+									flex: 'unset',
+									padding: 0,
+								},
 							},
-							body: {
-								flex: 'unset',
-								padding: 0,
+							hideFooter: true,
+							onAccept: () => {
+								handleGetMyTalkRoomAnalysis()
 							},
-						},
-						hideFooter: true,
-						onAccept: () => {
-							handleGetMyTalkRoomAnalysis()
-						},
-					})
+						})
+					}
+
 					return room
 				}
 			} catch (error) {

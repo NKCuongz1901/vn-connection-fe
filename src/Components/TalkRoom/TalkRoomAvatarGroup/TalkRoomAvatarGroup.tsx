@@ -1,4 +1,5 @@
-import { memo } from 'react'
+import { memo, type KeyboardEvent, type MouseEvent } from 'react'
+import clsx from 'clsx'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import BgIcon1 from '@/svg/Talkroom/BgIcon1'
@@ -9,19 +10,73 @@ import {
 	getSpeakerCount,
 	getTalkRoomAvatarLayout,
 	getVisibleSpeakers,
+	resolveSpeakerUserId,
 	TalkRoomRoom,
+	TalkRoomSpeaker,
 } from '@/ultis/talkRoom'
 
 import classes from './TalkRoomAvatarGroup.module.scss'
 
 type TalkRoomAvatarGroupProps = {
 	room: TalkRoomRoom
+	onAvatarClick?: (userId: string) => void
 }
 
-function TalkRoomAvatarGroup({ room }: TalkRoomAvatarGroupProps) {
+function TalkRoomAvatarGroup({ room, onAvatarClick }: TalkRoomAvatarGroupProps) {
 	const count = getSpeakerCount(room)
 	const layout = getTalkRoomAvatarLayout(count)
 	const visibleSpeakers = getVisibleSpeakers(room, layout)
+
+	const handleAvatarClick = (
+		event: MouseEvent,
+		speaker?: TalkRoomSpeaker,
+	) => {
+		event.stopPropagation()
+		const userId = resolveSpeakerUserId(speaker)
+		if (!userId) return
+		onAvatarClick?.(userId)
+	}
+
+	const renderAvatarSlot = (
+		speaker: TalkRoomSpeaker | undefined,
+		slotClassName: string,
+		size: number,
+	) => {
+		const userId = resolveSpeakerUserId(speaker)
+		const canClick = Boolean(onAvatarClick && userId)
+
+		return (
+			<div
+				className={clsx(classes.avatarSlot, slotClassName, {
+					[classes.avatarSlotClickable]: canClick,
+				})}
+				role={canClick ? 'button' : undefined}
+				tabIndex={canClick ? 0 : undefined}
+				onClick={
+					canClick ? (event) => handleAvatarClick(event, speaker) : undefined
+				}
+				onKeyDown={
+					canClick
+						? (event: KeyboardEvent) => {
+								if (event.key === 'Enter' || event.key === ' ') {
+									event.preventDefault()
+									event.stopPropagation()
+									onAvatarClick?.(userId as string)
+								}
+							}
+						: undefined
+				}
+			>
+				{speaker ? (
+					<CAvatar
+						src={getSpeakerAvatar(speaker)}
+						size={size}
+						className={classes.avatar}
+					/>
+				) : null}
+			</div>
+		)
+	}
 
 	const renderBackground = () => {
 		switch (layout) {
@@ -39,68 +94,44 @@ function TalkRoomAvatarGroup({ room }: TalkRoomAvatarGroupProps) {
 			case 'double':
 				return (
 					<>
-						<div
-							className={`${classes.avatarSlot} ${classes.avatarBottomLeft}`}
-						>
-							<CAvatar
-								src={getSpeakerAvatar(visibleSpeakers[0])}
-								size={36}
-								className={classes.avatar}
-							/>
-						</div>
-						<div className={`${classes.avatarSlot} ${classes.avatarTopRight}`}>
-							<CAvatar
-								src={getSpeakerAvatar(visibleSpeakers[1])}
-								size={36}
-								className={classes.avatar}
-							/>
-						</div>
+						{renderAvatarSlot(
+							visibleSpeakers[0],
+							classes.avatarBottomLeft,
+							36,
+						)}
+						{renderAvatarSlot(
+							visibleSpeakers[1],
+							classes.avatarTopRight,
+							36,
+						)}
 					</>
 				)
 			case 'triple':
 				return (
 					<>
-						<div className={`${classes.avatarSlot} ${classes.avatarTripleTop}`}>
-							<CAvatar
-								src={getSpeakerAvatar(visibleSpeakers[0])}
-								size={32}
-								className={classes.avatar}
-							/>
-						</div>
-						<div
-							className={`${classes.avatarSlot} ${classes.avatarTripleBottomLeft}`}
-						>
-							<CAvatar
-								src={getSpeakerAvatar(visibleSpeakers[1])}
-								size={32}
-								className={classes.avatar}
-							/>
-						</div>
-						<div
-							className={`${classes.avatarSlot} ${classes.avatarTripleBottomRight}`}
-						>
-							<CAvatar
-								src={getSpeakerAvatar(visibleSpeakers[2])}
-								size={32}
-								className={classes.avatar}
-							/>
-						</div>
+						{renderAvatarSlot(
+							visibleSpeakers[0],
+							classes.avatarTripleTop,
+							32,
+						)}
+						{renderAvatarSlot(
+							visibleSpeakers[1],
+							classes.avatarTripleBottomLeft,
+							32,
+						)}
+						{renderAvatarSlot(
+							visibleSpeakers[2],
+							classes.avatarTripleBottomRight,
+							32,
+						)}
 					</>
 				)
-			default: {
-				const speaker = visibleSpeakers[0]
-				return (
-					<div className={`${classes.avatarSlot} ${classes.avatarSingle}`}>
-						{speaker && (
-							<CAvatar
-								src={getSpeakerAvatar(speaker)}
-								size={40}
-								className={classes.avatar}
-							/>
-						)}
-					</div>
+			default:
+				return renderAvatarSlot(
+					visibleSpeakers[0],
+					classes.avatarSingle,
+					40,
 				)
-			}
 		}
 	}
 

@@ -60,6 +60,12 @@ export const getDetailPost = async ({
 	})
 }
 
+export const getPublicListPost = async (params: any) => {
+	return await axios.get(POST_ROUTES.publicEventDetail, {
+		params: convertParams(params),
+	})
+}
+
 export const getPublicEventDetail = async ({
 	id,
 	params,

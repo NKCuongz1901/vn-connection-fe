@@ -1,0 +1,265 @@
+.wrapper {
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+	align-items: flex-start;
+	padding: 12px 0;
+	height: auto;
+	overflow-y: auto;
+}
+
+.search {
+	width: 100%;
+	padding: 0 16px;
+}
+
+.detailLayout {
+	display: flex;
+	width: 100%;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.detailSidebar {
+	display: flex;
+	width: 198px;
+	min-width: 198px;
+	flex-direction: column;
+	align-self: stretch;
+	padding: 16px 0;
+	overflow: hidden;
+	border-right: 1px solid #eef3f6;
+	background: #fff;
+}
+
+.detailSidebarTitle {
+	padding: 16px 16px 12px;
+	color: #0f1729;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+}
+
+.detailRoomList {
+	display: flex;
+	min-height: 0;
+	flex: 1;
+	flex-direction: column;
+	gap: 12px;
+	padding: 0 12px;
+	overflow-y: auto;
+}
+
+.detailRoomItem {
+	width: 100%;
+	flex-shrink: 0;
+}
+
+.detailChat {
+	display: flex;
+	min-width: 0;
+	min-height: 0;
+	flex: 1;
+	padding: 24px 32px;
+	overflow: hidden;
+}
+
+.findSection {
+	width: 100%;
+}
+
+.findHeading {
+	display: flex;
+	width: 100%;
+	align-items: center;
+	gap: 8px;
+	padding: 16px 16px 12px;
+}
+
+.findHeadingTitle {
+	color: #0f1729;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+}
+
+.findCounter {
+	display: inline-flex;
+	flex-shrink: 0;
+	height: 20px;
+	align-items: center;
+	justify-content: center;
+	padding: 0 8px;
+	border-radius: 99px;
+	background: #f0f3f9;
+	color: #006b35;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 16px;
+	white-space: nowrap;
+}
+
+.findTags {
+	display: flex;
+	width: 100%;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 0 16px 12px;
+}
+
+.findTag {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 4px;
+	border: 0;
+	border-radius: 40px;
+	background: #fff6f0;
+	cursor: pointer;
+
+	&:disabled {
+		cursor: default;
+	}
+}
+
+.findTagIcon {
+	display: inline-flex;
+	padding-left: 4px;
+	flex-shrink: 0;
+	width: 20px;
+	height: 20px;
+	align-items: center;
+	justify-content: center;
+
+	svg {
+		width: 20px;
+		height: 20px;
+	}
+}
+
+.findTagText {
+	color: var(--text-brand-primary, #e55a0f);
+	text-align: center;
+
+	font-size: var(--body-base-size, 14px);
+	font-style: normal;
+	font-weight: 600;
+	line-height: var(--body-base-line-height, 20px); /* 142.857% */
+	letter-spacing: var(--body-base-tracking, 0);
+}
+
+.suggestSection {
+	width: 100%;
+}
+
+.suggestHeading {
+	display: flex;
+	width: 100%;
+	align-items: center;
+	gap: 8px;
+	padding: 16px 16px 12px;
+}
+
+.suggestHeadingTitle {
+	color: #0f1729;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	white-space: nowrap;
+}
+
+.suggestCounter {
+	display: inline-flex;
+	flex-shrink: 0;
+	height: 20px;
+	align-items: center;
+	justify-content: center;
+	padding: 0 8px;
+	border-radius: 99px;
+	background: #f0f3f9;
+	color: #006b35;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 16px;
+	white-space: nowrap;
+}
+
+.suggestList {
+	display: grid;
+	width: 100%;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	gap: 12px;
+	padding: 0 16px;
+}
+
+.suggestItem {
+	box-sizing: border-box;
+	width: 100%;
+	gap: 4px;
+	align-items: flex-start;
+	padding: 8px;
+	border-radius: 8px;
+	background: #e1f5fe;
+	cursor: pointer;
+}
+
+.suggestTitle {
+	width: 100%;
+	min-width: 0;
+	align-items: center;
+	gap: 4px;
+}
+
+.suggestIcon {
+	display: inline-flex;
+	flex-shrink: 0;
+	width: 12px;
+	height: 12px;
+}
+
+.suggestName {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	color: #0067b8;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 20px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.suggestOnline {
+	align-items: center;
+	gap: 4px;
+	color: #48546b;
+	font-size: 10px;
+	font-weight: 400;
+	line-height: 14px;
+	white-space: nowrap;
+}
+
+.suggestOnlineDot {
+	flex-shrink: 0;
+	width: 8px;
+	height: 8px;
+	border: 1px solid #fff;
+	border-radius: 99px;
+	background: #ff0038;
+}
+
+@media (max-width: 769px) {
+	.detailSidebar {
+		display: none;
+	}
+
+	.detailChat {
+		padding: 12px;
+	}
+
+	.suggestList {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}

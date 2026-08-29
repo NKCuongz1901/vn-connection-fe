@@ -1,0 +1,115 @@
+.wrapper {
+	width: 100%;
+}
+
+.heading {
+	display: flex;
+	width: 100%;
+	align-items: center;
+	gap: 8px;
+	padding: 16px 16px 12px;
+	border: 0;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.title {
+	color: #0f1729;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	white-space: nowrap;
+}
+
+.counter {
+	display: inline-flex;
+	flex-shrink: 0;
+	height: 20px;
+	align-items: center;
+	justify-content: center;
+	padding: 0 8px;
+	border-radius: 99px;
+	background: #f0f3f9;
+	color: #006b35;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 16px;
+	white-space: nowrap;
+}
+
+.chevron {
+	flex-shrink: 0;
+	color: #0f1729;
+	transition: transform 0.2s ease;
+}
+
+.chevronCollapsed {
+	transform: rotate(-90deg);
+}
+
+.list {
+	display: grid;
+	width: 100%;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	gap: 12px;
+	padding: 0 8px;
+}
+
+.skeletonItem {
+	box-sizing: border-box;
+	width: 100%;
+	height: 100px;
+	gap: 4px;
+	align-items: flex-start;
+	padding: 8px;
+	border-radius: 8px;
+}
+
+.myChatLocation {
+	background: #e7f5e9;
+}
+
+.activeChatLocation {
+	background: #fff5eb;
+}
+
+.skeletonTitle {
+	width: 100%;
+	min-width: 0;
+
+	span {
+		width: 100%;
+		min-width: 0;
+		height: 16px;
+	}
+}
+
+.skeletonAvatar {
+	width: 24px;
+	height: 24px;
+
+	span {
+		width: 24px !important;
+		height: 24px !important;
+	}
+}
+
+.skeletonMeta {
+	width: 100%;
+	min-width: 0;
+
+	span {
+		width: 70%;
+		min-width: 0;
+		height: 12px;
+	}
+}
+
+@media (max-width: 769px) {
+	.list {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}

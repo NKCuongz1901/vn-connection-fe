@@ -53,7 +53,8 @@ function TalkRoomFilterBar({
 				/>
 				<CCheckboxSelect
 					variant="chip"
-					immediateSelect
+					confirmOnly
+					confirmLabel="Confirm"
 					placeholder="Level"
 					options={levelOptions}
 					value={levelValues}

@@ -51,14 +51,15 @@ export const clearForgetPasswordFromAccount = () => {
 	}
 }
 
-const readForgetPasswordFromQuery = (): ForgetPasswordFromAccountInit | null => {
-	if (typeof window === 'undefined') return null
+const readForgetPasswordFromQuery =
+	(): ForgetPasswordFromAccountInit | null => {
+		if (typeof window === 'undefined') return null
 
-	const params = new URLSearchParams(window.location.search)
-	if (params.get('fromAccount') !== '1') return null
+		const params = new URLSearchParams(window.location.search)
+		if (params.get('fromAccount') !== '1') return null
 
-	return { fromAccount: true }
-}
+		return { fromAccount: true }
+	}
 
 const readRegisterFromLogin = (type: OTPType): RegisterFromLoginInit | null => {
 	if (typeof window === 'undefined') return null
@@ -290,12 +291,7 @@ export default function useRegisterAndReset({
 		} finally {
 			toggleLoadingContext(false)
 		}
-	}, [
-		accountInfo.phone,
-		handleResendSmsOtp,
-		openError,
-		toggleLoadingContext,
-	])
+	}, [accountInfo.phone, handleResendSmsOtp, openError, toggleLoadingContext])
 
 	const handleSubmitOtp = useCallback(async () => {
 		toggleLoadingContext(true)
@@ -387,6 +383,7 @@ export default function useRegisterAndReset({
 				break
 			case 2:
 				error.confirmPassword = null
+				error.password = null
 				error.name = null
 				error.email = null
 				error.invite_code = null
@@ -401,6 +398,10 @@ export default function useRegisterAndReset({
 				) {
 					value = true
 					break
+				}
+				if (password && !passwordRegex.test(password)) {
+					error.password =
+						'Password must be at least 8 characters with letters, numbers and symbols'
 				}
 
 				if (password !== confirmPassword && confirmPassword) {

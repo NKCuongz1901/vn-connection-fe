@@ -31,6 +31,8 @@ export type CCheckboxSelectProps = {
 	disabled?: boolean
 	cancelLabel?: string
 	confirmLabel?: string
+	/** Only show Confirm button (hide Cancel) */
+	confirmOnly?: boolean
 	className?: string
 	/** Chọn xong áp dụng ngay, không cần bấm Select */
 	immediateSelect?: boolean
@@ -51,6 +53,7 @@ const CCheckboxSelect = ({
 	disabled,
 	cancelLabel = 'Cancel',
 	confirmLabel = 'Select',
+	confirmOnly = false,
 	className,
 	immediateSelect = false,
 	variant = 'default',
@@ -136,11 +139,13 @@ const CCheckboxSelect = ({
 			</div>
 			{!immediateSelect && (
 				<div className={classes.footer}>
-					<div className={classes.footerBtn}>
-						<CButton ctype="disabled" onClick={handleCancel}>
-							{cancelLabel}
-						</CButton>
-					</div>
+					{!confirmOnly && (
+						<div className={classes.footerBtn}>
+							<CButton ctype="disabled" onClick={handleCancel}>
+								{cancelLabel}
+							</CButton>
+						</div>
+					)}
 					<div className={classes.footerBtn}>
 						<CButton ctype="oranger" onClick={handleConfirm}>
 							{confirmLabel}

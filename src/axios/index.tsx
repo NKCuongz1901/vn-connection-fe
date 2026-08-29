@@ -45,6 +45,14 @@ axios.interceptors.request.use(
 		if (!cachedFid) cachedFid = await getFid()
 		if (cachedFid) config.headers['firebase-device-id'] = cachedFid
 
+		if (typeof window !== 'undefined') {
+			config.headers['device-info'] = JSON.stringify({
+				deviceName: navigator.userAgent,
+				deviceModel: 'Web Browser',
+				brand: 'Web',
+			})
+		}
+
 		// Authorization token
 		const accessToken = getStorageCookie('token')
 		if (accessToken && !config.headers['Authorization']) {
@@ -69,12 +77,15 @@ const refreshToken = async () => {
 		isRefreshing = true
 		try {
 			const refreshToken = getStorageCookie('refresh_token')
+			const deviceId = cachedFid || (await getFid())
 			const response: any = await axios.post('/auth/refresh', {
 				refresh_token: refreshToken,
+				...(deviceId ? { device_id: deviceId } : {}),
 			})
 			if (response?.code === 200) {
 				const newAccessToken = response.results?.object?.access_token
 				const newRefreshToken = response.results?.object?.refresh_token
+				console.log('Check refresh token:', response)
 				if (isPersistCookie()) {
 					handleStorageCookie({
 						key: 'token',

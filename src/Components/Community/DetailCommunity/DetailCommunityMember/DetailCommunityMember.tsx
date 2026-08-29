@@ -124,6 +124,7 @@ const DetailCommunityMember = (props: DetailCommunityMemberProp, ref) => {
 				<Flex className={classes.adminList} onScroll={onScroll}>
 					{members.map((member) => {
 						const { type, user } = member
+						if (!user) return null
 						const { id, name, avatar, visibility, online_time } = user
 						const isOwner = type === 'OWNER'
 						const isMember = type === 'MEMBER'

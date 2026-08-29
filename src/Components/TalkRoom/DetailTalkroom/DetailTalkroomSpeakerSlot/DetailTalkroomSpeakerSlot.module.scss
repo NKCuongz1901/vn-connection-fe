@@ -1,0 +1,145 @@
+.slot {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+	min-width: 0;
+}
+
+.slotClickable {
+	cursor: pointer;
+}
+
+.emptyAvatar {
+	width: 80px;
+	height: 80px;
+	border: 1px dashed #fff;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.08);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.emptyAvatarWaiting {
+	border-style: solid;
+	border-color: rgba(255, 255, 255, 0.48);
+	background: rgba(255, 255, 255, 0.12);
+	flex-direction: column;
+	gap: 4px;
+	padding: 8px 4px;
+}
+
+.emptyWaitingCount {
+	color: #fff;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 20px;
+}
+
+.emptyWaitingLabel {
+	color: rgba(255, 255, 255, 0.88);
+	font-size: 12px;
+	line-height: 16px;
+}
+
+.emptySlotClickable {
+	cursor: pointer;
+}
+
+.avatarWrap {
+	position: relative;
+	width: 80px;
+	height: 80px;
+	flex-shrink: 0;
+}
+
+.filledAvatar {
+	width: 80px;
+	height: 80px;
+	border: none;
+}
+
+.flagWrapper {
+	position: absolute;
+	right: 0;
+	bottom: -4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	overflow: hidden;
+	border: 1px solid #fff;
+	border-radius: 999px;
+	background: #fff;
+	z-index: 2;
+
+	.flag {
+		transform: translateX(-4px);
+		min-width: 28px;
+		min-height: 24px;
+	}
+}
+
+.crownBadge {
+	position: absolute;
+	top: 60px;
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.48);
+	z-index: 2;
+}
+
+.userInfo {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	width: 100%;
+	min-width: 0;
+}
+
+.micPill {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	padding: 4px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.16);
+}
+
+.micPillTalking {
+	background: #006b35;
+}
+
+.userName {
+	overflow: hidden;
+	color: var(--text-primary-inverse, #fff);
+	font-size: var(--body-large-size, 16px);
+	font-style: normal;
+	font-weight: 400;
+	line-height: var(--body-large-line-height, 24px);
+	letter-spacing: var(--body-large-tracking, 0);
+	text-align: center;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.label {
+	max-width: 100%;
+	overflow: hidden;
+	color: #fff;
+	font-size: 16px;
+	line-height: 24px;
+	text-align: center;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

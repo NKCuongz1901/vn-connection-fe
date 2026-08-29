@@ -35,6 +35,8 @@ export const USER_ROUTES = {
 	block: '/user/block',
 	report: '/feedback',
 	appeal: '/user/appeal',
+	securityAlerts: '/user/security-alerts',
+	logoutOtherDevices: '/user/logout_other_devices',
 }
 export const POST_ROUTES = {
 	name: 'post',
@@ -86,6 +88,19 @@ export const CONVERSATION_ROUTES = {
 	language: 'language',
 	readMessage: 'message/read_message',
 	quickMessage: 'quick-chat',
+	listChatlocationOverview: 'conversation/overview-chat-location',
+}
+export const CHAT_LOCATION_ROUTES = {
+	myChatLocation: 'conversation/my-chat-location',
+	activeChatLocation: 'conversation/active-chat-location',
+	findChatLocation: 'conversation/find-chat-location',
+	suggestChatLocation: 'conversation/suggest-chat-location',
+	getMemberInChatLocation: (id: string) => `conversation/${id}/members`,
+	getMemberAroundMe: (id: string) => `conversation/${id}/members-around-me`,
+	getMyMiniChat: (parentId: string) =>
+		`conversation/my-chat-location/mini-chats?parent_id=${parentId}`,
+	getFullMiniChat: (parentId: string) =>
+		`conversation/my-chat-location/mini-chats-full?parent_id=${parentId}`,
 }
 export const FRIEND_ROUTES = {
 	name: '/friend',
@@ -184,6 +199,13 @@ export const TALKROOM_ROUTES = {
 	getTalkRoomLeaderBoard: 'talkroom/leaderboard',
 	getTalkRoomLeaderBoardMy: 'talkroom/leaderboard/position',
 	getTalkRoomCountMeInList: 'talkroom',
+	getTalkRoomUserProfile: 'talkroom/user/profile',
+
+	// Detail talkroom
+	validatePreTalkroom: 'talkroom/validation/can-join',
+	baseTalkroomRoute: 'talkroom',
+	// Get token socket
+	getTokenSocket: 'auth/socket_token',
 }
 export const Menus = [
 	{

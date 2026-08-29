@@ -10,10 +10,12 @@ export interface UserProps {
 	i_can_offer: string
 	i_am_interested_in: string
 	i_am_from: string
+	country?: string
 	category_list: string[]
 	country_visited: string
-	country_lived: string
-	country_lived_array: string[]
+	country_visited_array?: string[]
+	country_lived: string | null
+	country_lived_array?: string[] | null
 	languages_can_speak: string
 	languages_can_speak_array: string[]
 	about_me: string
@@ -122,4 +124,9 @@ export interface UserProps {
 		language_name: string
 		proficiency_level: string
 	}[]
+	is_friend?: {
+		id?: string
+		friend_id?: string
+		state?: string
+	} | null
 }

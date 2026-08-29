@@ -19,12 +19,18 @@ import TalkRoomListEmpty from '@/Components/TalkRoom/TalkRoomListEmpty'
 import TalkRoomProfileInfo from '@/Components/TalkRoom/TalkRoomProfileInfo/TalkRoomProfileInfo'
 import TalkRoomStats from '@/Components/TalkRoom/TalkRoomStats/TalkRoomStats'
 import { createConversation } from '@/apis/conversationApis'
+import { canCreateTalkRoom } from '@/apis/talkRoomApis'
 import useTalkRoom from '@/hooks/TalkRoom/useTalkRoom'
 import useProfile from '@/hooks/Profile/useProfile'
 import { useModal } from '@/context/ModalContext'
 import { mainRoutes } from '@/routes/MainRoutes'
 import BookIcon from '@/svg/BookIcon'
-import { TalkRoomRoom, formatHostMinutes, isTalkRoomUserNotified } from '@/ultis/talkRoom'
+import {
+	setTalkRoomAutoJoinFlag,
+	TalkRoomRoom,
+	formatHostMinutes,
+	isTalkRoomUserNotified,
+} from '@/ultis/talkRoom'
 import { useLocalePath } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
 
@@ -66,6 +72,7 @@ function TalkRoom() {
 		onDeleteTalkRoom,
 		onCountMeInTalkRoom,
 		onNotificationMeInTalkRoom,
+		talkRoomDetail,
 		loadingUpdate,
 		loadingDelete,
 		loadingListMyFriendTalkRooms,
@@ -94,7 +101,7 @@ function TalkRoom() {
 	const hasActiveSearch = Boolean(searchKeyword?.trim())
 	const hasActiveFilters = Boolean(
 		listTalkRoomFilters.languageIds?.length ||
-			listTalkRoomFilters.levels?.length,
+		listTalkRoomFilters.levels?.length,
 	)
 
 	const topHosts = useMemo(
@@ -138,7 +145,34 @@ function TalkRoom() {
 		onGetConnectedCountry()
 	}
 
-	const handleOpenCreateTalkRoomWarning = () => {
+	const ensureCanCreateTalkRoom = async () => {
+		try {
+			const res: any = await canCreateTalkRoom()
+			const payload = res?.results?.object
+			const canCreate = payload?.can_create ?? payload?.canCreate
+
+			if (canCreate === false) {
+				const denyReason =
+					payload?.deny_reason ?? payload?.denyReason ?? payload?.reason
+				openError(
+					typeof denyReason === 'string'
+						? denyReason
+						: 'You cannot create a talk room right now',
+				)
+				return false
+			}
+
+			return true
+		} catch (error) {
+			openError(error)
+			return false
+		}
+	}
+
+	const handleOpenCreateTalkRoomWarning = async () => {
+		const canCreate = await ensureCanCreateTalkRoom()
+		if (!canCreate) return
+
 		setCreateTalkRoomWarningOpen(true)
 	}
 
@@ -147,7 +181,10 @@ function TalkRoom() {
 		setCreateRoomModalOpen(true)
 	}
 
-	const handleCreateRoomFromConnected = () => {
+	const handleCreateRoomFromConnected = async () => {
+		const canCreate = await ensureCanCreateTalkRoom()
+		if (!canCreate) return
+
 		setConnectedUsersModalOpen(false)
 		setConnectedCountriesModalOpen(false)
 		setCreateRoomModalOpen(true)
@@ -157,6 +194,31 @@ function TalkRoom() {
 		setCreateRoomModalOpen(false)
 		onGetMyTalkRoomAnalysis()
 		onGetListTalkRoom(true)
+	}
+
+	const requestMicrophonePermission = async () => {
+		if (!navigator.mediaDevices?.getUserMedia) return
+
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+			stream.getTracks().forEach((track) => track.stop())
+		} catch {
+			// Host can still enter the room and enable mic later.
+		}
+	}
+
+	const handleInstantRoomCreated = (room: TalkRoomRoom) => {
+		if (!room?.id) return
+
+		setCreateRoomModalOpen(false)
+		onGetMyTalkRoomAnalysis()
+		onGetListTalkRoom(true)
+		setTalkRoomAutoJoinFlag(room.id)
+
+		window.setTimeout(async () => {
+			await requestMicrophonePermission()
+			onChangeRoute(`${mainRoutes.talkroom}/${room.id}`)
+		}, 500)
 	}
 
 	const _renderProfile = () => {
@@ -198,6 +260,17 @@ function TalkRoom() {
 		if (!room?.id) return
 		setCmiPeopleModalOpen(true)
 		onGetCountMeInList(room.id, false, true)
+	}
+
+	const handleStartTalkroom = (room: TalkRoomRoom) => {
+		if (!room?.id) return
+		onGetDetailTalkRoom(room.id)
+		onChangeRoute(`${mainRoutes.talkroom}/${room.id}`)
+	}
+
+	const handleAvatarClick = (userId: string) => {
+		if (!userId) return
+		onChangeRoute(`${mainRoutes.profile}/${userId}`)
 	}
 
 	const handleMessageCmiUser = async (userId: string) => {
@@ -255,17 +328,20 @@ function TalkRoom() {
 						<TalkRoomListEmpty variant="search" />
 					) : (
 						displayTalkRooms.map((room) => (
-								<RoomCard
-									key={room.id}
-									room={room}
-									onShare={handleShareRoom}
-									onCountMeIn={handleCountMeIn}
-									onNotJoining={handleNotJoining}
-									onNotifyMe={handleNotifyMe}
-									onViewCmiPeople={handleViewCmiPeople}
-									onEditRoom={setEditRoom}
-									onCancelRoom={setCancelRoom}
-								/>
+							<RoomCard
+								key={room.id}
+								room={room}
+								onShare={handleShareRoom}
+								onCountMeIn={handleCountMeIn}
+								onNotJoining={handleNotJoining}
+								onNotifyMe={handleNotifyMe}
+								onViewCmiPeople={handleViewCmiPeople}
+								onEditRoom={setEditRoom}
+								onCancelRoom={setCancelRoom}
+								onStart={handleStartTalkroom}
+								onJoin={handleStartTalkroom}
+								onAvatarClick={handleAvatarClick}
+							/>
 						))
 					)}
 				</Flex>
@@ -277,7 +353,11 @@ function TalkRoom() {
 			<div className={classes.leaderBoardContainer}>
 				<Flex align="center" gap={4}>
 					<div className={classes.leaderBoardTitle}>Top 3 hosts</div>
-					<IconChevronRight size={16} className={classes.leaderBoardIcon} />
+					<IconChevronRight
+						size={16}
+						className={classes.leaderBoardIcon}
+						onClick={() => onChangeRoute(mainRoutes.talkroomLeaderBoard)}
+					/>
 				</Flex>
 				<div className={classes.topLeaderBoardContainer}>
 					<ReferralLeaderboardPodium
@@ -319,6 +399,8 @@ function TalkRoom() {
 									onNotJoining={handleNotJoining}
 									onNotifyMe={handleNotifyMe}
 									onViewCmiPeople={handleViewCmiPeople}
+									onStart={handleStartTalkroom}
+									onAvatarClick={handleAvatarClick}
 								/>
 							))}
 				</Flex>
@@ -429,6 +511,7 @@ function TalkRoom() {
 					open
 					onClose={() => setCreateRoomModalOpen(false)}
 					onSuccess={handleCreateRoomSuccess}
+					onInstantRoomCreated={handleInstantRoomCreated}
 				/>
 			)}
 

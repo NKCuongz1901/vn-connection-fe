@@ -1,0 +1,1428 @@
+'use client'
+
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+import {
+	acceptInviteToSpeaker,
+	getDetailTalkRoom,
+	getListenerInRoom,
+	getRaiseHandUser,
+	getTalkRoomUserConnectedCountries,
+	getTalkRoomUserConnectedPeople,
+	getTalkRoomUserProfile,
+	hostApproveRaiseHand,
+	inviteToSpeaker,
+	joinTalkroom,
+	JoinTalkroomAgora,
+	JoinTalkroomModel,
+	kickUserFromTalkRoom,
+	leaveTalkroom,
+	postRaiseHand,
+	RaiseHandPayload,
+	rejectInviteToSpeaker,
+	stepDownToListener,
+	stopHosting,
+	TalkRoomDetail,
+	TalkRoomConnectedUser,
+	TalkRoomListenerInRoom,
+	TalkRoomUserProfileStats,
+	transitionRole,
+	validatePreTalkroom,
+	ValidatePreTalkroomModel,
+} from '@/apis/talkRoomApis'
+import { joinConversation, leaveConversation } from '@/apis/conversationApis'
+import { addFriend } from '@/apis/friendApis'
+import { blockUser, getUserProfile } from '@/apis/userApis'
+import type {
+	TalkRoomParticipantProfileAction,
+	TalkRoomParticipantProfileRole,
+} from '@/Components/Modal/TalkRoomParticipantProfileModal'
+import {
+	showTalkRoomInviteSentToast,
+	showTalkRoomListenerRejectInviteToast,
+	showTalkRoomNoSpeakerSlotToast,
+	showTalkRoomRaiseHandToast,
+	showTalkRoomUserKickedToast,
+} from '@/Components/Toast/SocketToastContent'
+import { useModal } from '@/context/ModalContext'
+import { UserProps } from '@/interface/User/User.interface'
+import {
+	TALK_ROOM_CONNECTION_TYPE,
+	TALK_ROOM_ROLE,
+} from '@/Variable/talkRoom.variable'
+import { useLocalePath } from '@/ultis/route'
+import { mainRoutes } from '@/routes/MainRoutes'
+import { getUserInfo } from '@/ultis/storage'
+import { uniqueArray } from '@/ultis/array'
+import {
+	consumeTalkRoomAutoJoinFlag,
+	getTalkRoomConversationId,
+	getTalkRoomSocketLeaveReason,
+	getTalkRoomSocketTalkingStatus,
+	getTalkRoomSocketTargetUserId,
+	isTalkRoomPreJoinBlockedByKick,
+	isTalkRoomSocketLeaveReasonKicked,
+	canProceedTalkRoomJoin,
+	parseTalkRoomValidatePreJoin,
+	parseTalkRoomSocketHostTransferred,
+	parseTalkRoomSocketSpeakerInvite,
+	getTalkRoomSocketUserName,
+	addTalkRoomSlotRaiseHand,
+	buildTalkRoomSlotRaiseHandFromRows,
+	flattenTalkRoomSlotRaiseHand,
+	getTalkRoomSocketSlotId,
+	isTalkRoomGuestSpeakerSlotsFull,
+	removeTalkRoomSlotRaiseHand,
+	TalkRoomPreJoinValidation,
+	TalkRoomSpeakerStatusMap,
+	TalkRoomSlotRaiseHandMap,
+} from '@/ultis/talkRoom'
+import { playTalkRoomSound } from '@/ultis/talkRoomSound'
+import useTalkRoomSocket from './useTalkRoomSocket'
+
+export type ValidatePreJoinRoomResult = TalkRoomPreJoinValidation
+
+type UseDetailTalkroomOptions = {
+	onRoomSocketEvent?: (event: string, data?: unknown) => void
+	onRoomTimeUp?: (data?: unknown) => void
+	onRoomForceClosed?: () => void
+	onStopHosting?: () => void
+	onHostTransferred?: (payload: {
+		previousUserId?: string
+		newHostId?: string
+	}) => void
+	onRoomUserKicked?: (kickedUserId: string) => void
+	onRoomSpeakerSteppedDown?: (targetUserId: string) => void
+	onHostInviteToSpeaker?: (payload: {
+		inviteId: string
+		targetUserId: string
+	}) => void
+	onListenerRejectInvite?: (payload: {
+		targetUserId?: string
+		userName?: string
+	}) => void
+}
+
+export type TalkRoomParticipantProfileModalState = {
+	open: boolean
+	userId?: string
+	role?: TalkRoomParticipantProfileRole
+}
+
+export default function useDetailTalkroom(
+	id: string,
+	options?: UseDetailTalkroomOptions,
+) {
+	const { openError, openConfirm, openSuccess, closeModal } = useModal()
+	const { onChangeRoute } = useLocalePath()
+	const [talkRoomDetail, setTalkRoomDetail] = useState<TalkRoomDetail | null>(
+		null,
+	)
+	const [loadingTalkRoomDetail, setLoadingTalkRoomDetail] = useState(false)
+	const [validatePreJoin, setValidatePreJoin] =
+		useState<ValidatePreTalkroomModel | null>(null)
+	const [loadingValidatePreJoin, setLoadingValidatePreJoin] = useState(false)
+	const [joinTalkRoomResult, setJoinTalkRoomResult] =
+		useState<JoinTalkroomModel | null>(null)
+	const isJoined = joinTalkRoomResult?.success === true
+	const [loadingJoinTalkRoom, setLoadingJoinTalkRoom] = useState(false)
+	const [listenersInRoom, setListenersInRoom] = useState<
+		TalkRoomListenerInRoom[]
+	>([])
+	const [totalListenersInRoom, setTotalListenersInRoom] = useState(0)
+	const [loadingListenersInRoom, setLoadingListenersInRoom] = useState(false)
+	const [roomUserRole, setRoomUserRole] = useState<string | null>(null)
+	const [roleIntegration, setRoleIntegration] =
+		useState<JoinTalkroomAgora | null>(null)
+	const [speakerStatusMap, setSpeakerStatusMap] =
+		useState<TalkRoomSpeakerStatusMap>({})
+	const [participantProfileModal, setParticipantProfileModal] =
+		useState<TalkRoomParticipantProfileModalState>({ open: false })
+	const [participantUserProfile, setParticipantUserProfile] =
+		useState<UserProps | null>(null)
+	const [participantTalkRoomStats, setParticipantTalkRoomStats] =
+		useState<TalkRoomUserProfileStats | null>(null)
+	const [loadingParticipantProfile, setLoadingParticipantProfile] =
+		useState(false)
+	const [participantActionLoading, setParticipantActionLoading] =
+		useState(false)
+	const [participantReportOpen, setParticipantReportOpen] = useState(false)
+	const [participantConnectedModal, setParticipantConnectedModal] = useState<
+		'people' | 'countries' | null
+	>(null)
+	const [participantConnectedUsers, setParticipantConnectedUsers] = useState<
+		TalkRoomConnectedUser[]
+	>([])
+	const [participantConnectedCountries, setParticipantConnectedCountries] =
+		useState<string[]>([])
+	const [totalParticipantConnectedUsers, setTotalParticipantConnectedUsers] =
+		useState(0)
+	const [loadingParticipantConnectedPeople, setLoadingParticipantConnectedPeople] =
+		useState(false)
+	const [
+		loadingParticipantConnectedCountries,
+		setLoadingParticipantConnectedCountries,
+	] = useState(false)
+	const participantConnectedPeoplePaginationRef = useRef({
+		page: 1,
+		limit: 30,
+		totalPage: 0,
+		userId: '',
+	})
+	const [raiseHandUserIds, setRaiseHandUserIds] = useState<string[]>([])
+	const [slotUserRaiseHand, setSlotUserRaiseHand] =
+		useState<TalkRoomSlotRaiseHandMap>({ 1: [], 2: [] })
+	const [isFilterRaiseHand, setIsFilterRaiseHand] = useState(false)
+	const [filterRaiseHandSlot, setFilterRaiseHandSlot] = useState<number | null>(
+		null,
+	)
+	const [speakerInvitation, setSpeakerInvitation] = useState<{
+		inviteId: string
+	} | null>(null)
+	const [speakerInvitationLoading, setSpeakerInvitationLoading] =
+		useState(false)
+	const isInviteToSpeakerInFlightRef = useRef(false)
+
+	const applySlotRaiseHandMap = useCallback(
+		(slotMap: TalkRoomSlotRaiseHandMap) => {
+			setSlotUserRaiseHand(slotMap)
+			setRaiseHandUserIds(flattenTalkRoomSlotRaiseHand(slotMap))
+		},
+		[],
+	)
+
+	const handleAddRaiseHandUser = useCallback(
+		(userId: string, slotIndex = 1) => {
+			if (!userId) return
+
+			setSlotUserRaiseHand((prev) => {
+				const next = addTalkRoomSlotRaiseHand(prev, userId, slotIndex)
+				setRaiseHandUserIds(flattenTalkRoomSlotRaiseHand(next))
+
+				return next
+			})
+		},
+		[],
+	)
+
+	const handleRemoveRaiseHandUser = useCallback((userId: string) => {
+		if (!userId) return
+
+		setSlotUserRaiseHand((prev) => {
+			const next = removeTalkRoomSlotRaiseHand(prev, userId)
+			setRaiseHandUserIds(flattenTalkRoomSlotRaiseHand(next))
+
+			return next
+		})
+	}, [])
+
+	const handleSwitchToFilterRaiseHand = useCallback((slot?: number | null) => {
+		setFilterRaiseHandSlot(slot ?? null)
+		setIsFilterRaiseHand(true)
+	}, [])
+
+	const handleCloseFilterRaiseHand = useCallback(() => {
+		setIsFilterRaiseHand(false)
+		setFilterRaiseHandSlot(null)
+	}, [])
+
+	const handleApproveRaiseHand = useCallback(
+		async (userId: string) => {
+			if (!id || !userId) return false
+
+			if (isTalkRoomGuestSpeakerSlotsFull(talkRoomDetail ?? undefined)) {
+				showTalkRoomNoSpeakerSlotToast()
+
+				return false
+			}
+
+			try {
+				const res: any = await hostApproveRaiseHand({
+					id,
+					payload: {
+						userId,
+						isAccepted: true,
+					},
+				})
+
+				if (res?.code === 200) {
+					handleRemoveRaiseHandUser(userId)
+					handleCloseFilterRaiseHand()
+
+					return true
+				}
+			} catch (error) {
+				openError(error)
+			}
+
+			return false
+		},
+		[
+			id,
+			talkRoomDetail,
+			openError,
+			handleRemoveRaiseHandUser,
+			handleCloseFilterRaiseHand,
+		],
+	)
+
+	const handleUpdateSpeakerLiveStatus = useCallback(
+		(
+			userId: string,
+			patch: { is_open_mic?: boolean; is_talking?: boolean },
+		) => {
+			if (!userId) return
+
+			setSpeakerStatusMap((prev) => ({
+				...prev,
+				[userId]: {
+					...prev[userId],
+					...patch,
+				},
+			}))
+		},
+		[],
+	)
+
+	const syncRoomUserRoleFromDetail = useCallback(
+		(room?: TalkRoomDetail | null) => {
+			if (!room) return
+
+			if (room.yourAreHost === true) {
+				setRoomUserRole(TALK_ROOM_ROLE.HOST)
+				return
+			}
+
+			if (room.isUserSpeaker === true) {
+				setRoomUserRole(TALK_ROOM_ROLE.SPEAKER)
+				return
+			}
+
+			if (room.youAreListener === true) {
+				setRoomUserRole(TALK_ROOM_ROLE.LISTENER)
+
+				const streamWssUrl = room.stream_wss_url_https
+				if (streamWssUrl) {
+					const listenerIntegration: JoinTalkroomAgora = {
+						connection_type: TALK_ROOM_CONNECTION_TYPE.MEDIA_SERVER,
+						stream_wss_url: streamWssUrl,
+						user_role: TALK_ROOM_ROLE.LISTENER,
+					}
+					setRoleIntegration(listenerIntegration)
+					setJoinTalkRoomResult((prev) => {
+						if (!prev?.data) return prev
+
+						return {
+							...prev,
+							data: {
+								...prev.data,
+								role: TALK_ROOM_ROLE.LISTENER,
+								agora: listenerIntegration,
+							},
+						}
+					})
+				}
+			}
+		},
+		[],
+	)
+
+	const handleGetDetailTalkRoom = useCallback(
+		async (
+			roomId: string = id,
+			params: { [key: string]: any } = { fields: ['$all'] },
+		) => {
+			if (!roomId) return null
+
+			setLoadingTalkRoomDetail(true)
+			try {
+				const res: any = await getDetailTalkRoom({ id: roomId, params })
+				const { code, results } = res || {}
+
+				if (code === 200) {
+					const room: TalkRoomDetail = results?.object ?? null
+					setTalkRoomDetail(room)
+					syncRoomUserRoleFromDetail(room)
+					return room
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingTalkRoomDetail(false)
+			}
+
+			return null
+		},
+		[id, openError, syncRoomUserRoleFromDetail],
+	)
+
+	const handleValidatePreJoinRoom = useCallback(
+		async (
+			roomId: string = id,
+			params: { [key: string]: any } = { fields: ['$all'] },
+		): Promise<ValidatePreJoinRoomResult | null> => {
+			if (!roomId) return null
+
+			setLoadingValidatePreJoin(true)
+			try {
+				const res: any = await validatePreTalkroom({ id: roomId, params })
+				const { code, results } = res || {}
+
+				if (code === 200) {
+					const data: ValidatePreTalkroomModel = results?.object ?? null
+					setValidatePreJoin(data)
+
+					if (isTalkRoomPreJoinBlockedByKick(data)) {
+						showTalkRoomUserKickedToast()
+						return null
+					}
+
+					return parseTalkRoomValidatePreJoin(data)
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingValidatePreJoin(false)
+			}
+
+			return null
+		},
+		[id, openError],
+	)
+
+	const handlePostRaiseHand = useCallback(
+		async ({
+			roomId = id,
+			isRaiseHand,
+			slotId,
+		}: {
+			roomId?: string
+			isRaiseHand: boolean
+			slotId?: number
+		}) => {
+			if (!roomId) return null
+
+			const payload: RaiseHandPayload = { isRaiseHand }
+			if (isRaiseHand && slotId != null) {
+				payload.slotId = slotId
+			}
+
+			try {
+				const res: any = await postRaiseHand({ id: roomId, payload })
+				const { code } = res || {}
+
+				if (code === 200) {
+					return res
+				}
+			} catch (error) {
+				openError(error)
+			}
+
+			return null
+		},
+		[id, openError],
+	)
+
+	const handleJoinTalkRoom = useCallback(
+		async (
+			roomId: string = id,
+			payload: { [key: string]: any } = { fields: ['$all'] },
+		): Promise<JoinTalkroomModel | null> => {
+			if (!roomId) return null
+
+			setLoadingJoinTalkRoom(true)
+			try {
+				const res: any = await joinTalkroom({ id: roomId, payload })
+				const { code, results } = res || {}
+
+				if (code === 200) {
+					const data: JoinTalkroomModel = results?.object ?? null
+
+					if (data?.success) {
+						setJoinTalkRoomResult(data)
+						setRoomUserRole(data.data?.role ?? null)
+						setRoleIntegration(data.data?.agora ?? null)
+						return data
+					}
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingJoinTalkRoom(false)
+			}
+
+			return null
+		},
+		[id, openError],
+	)
+
+	const applySpeakerRole = useCallback(
+		(newConnection?: JoinTalkroomAgora | null) => {
+			if (!newConnection) return
+
+			setRoomUserRole(TALK_ROOM_ROLE.SPEAKER)
+			setRoleIntegration(newConnection)
+			setJoinTalkRoomResult((prev) => {
+				if (!prev?.data) return prev
+
+				return {
+					...prev,
+					data: {
+						...prev.data,
+						role: TALK_ROOM_ROLE.SPEAKER,
+						agora: newConnection,
+					},
+				}
+			})
+		},
+		[],
+	)
+
+	const applyListenerRole = useCallback(
+		(newConnection?: JoinTalkroomAgora | null) => {
+			setRoomUserRole(TALK_ROOM_ROLE.LISTENER)
+			if (!newConnection) return
+
+			setRoleIntegration(newConnection)
+			setJoinTalkRoomResult((prev) => {
+				if (!prev?.data) return prev
+
+				return {
+					...prev,
+					data: {
+						...prev.data,
+						role: TALK_ROOM_ROLE.LISTENER,
+						agora: newConnection,
+					},
+				}
+			})
+		},
+		[],
+	)
+
+	const applyHostRole = useCallback(
+		(newConnection?: JoinTalkroomAgora | null) => {
+			setRoomUserRole(TALK_ROOM_ROLE.HOST)
+			if (!newConnection) return
+
+			setRoleIntegration(newConnection)
+			setJoinTalkRoomResult((prev) => {
+				if (!prev?.data) return prev
+
+				return {
+					...prev,
+					data: {
+						...prev.data,
+						role: TALK_ROOM_ROLE.HOST,
+						agora: newConnection,
+					},
+				}
+			})
+		},
+		[],
+	)
+
+	const handleTransitionRole = useCallback(
+		async (fromRole: string, toRole: string) => {
+			if (!id) return null
+
+			try {
+				const res: any = await transitionRole({
+					id,
+					payload: {
+						from_role: fromRole,
+						to_role: toRole,
+					},
+				})
+				const { code, results } = res || {}
+
+				if (code !== 200) return null
+
+				const transitionData =
+					results?.object?.data ?? results?.object ?? results ?? null
+				const newConnection = transitionData?.new_connection ?? null
+
+				if (toRole === TALK_ROOM_ROLE.SPEAKER) {
+					applySpeakerRole(newConnection)
+				} else if (toRole === TALK_ROOM_ROLE.LISTENER) {
+					applyListenerRole(newConnection)
+				} else if (toRole === TALK_ROOM_ROLE.HOST) {
+					applyHostRole(newConnection)
+				}
+
+				return { newConnection }
+			} catch (error) {
+				openError(error)
+			}
+
+			return null
+		},
+		[id, applySpeakerRole, applyListenerRole, applyHostRole, openError],
+	)
+
+	const handleTransitionToSpeaker = useCallback(async () => {
+		if (!id) return null
+
+		try {
+			const res: any = await transitionRole({
+				id,
+				payload: {
+					from_role: TALK_ROOM_ROLE.LISTENER,
+					to_role: TALK_ROOM_ROLE.SPEAKER,
+				},
+			})
+			const { code, results } = res || {}
+
+			if (code !== 200) return null
+
+			const transitionData =
+				results?.object?.data ?? results?.object ?? results ?? null
+			const newConnection = transitionData?.new_connection ?? null
+
+			if (!newConnection) return null
+
+			applySpeakerRole(newConnection)
+
+			return { newConnection }
+		} catch (error) {
+			openError(error)
+		}
+
+		return null
+	}, [id, applySpeakerRole, openError])
+
+	const handleGetListenerInRoom = useCallback(
+		async (
+			roomId: string = id,
+			params: { [key: string]: any } = {
+				fields: ['$all'],
+				page: 1,
+				limit: 30,
+			},
+		) => {
+			if (!roomId) return null
+
+			setLoadingListenersInRoom(true)
+			try {
+				const res: any = await getListenerInRoom({ id: roomId, params })
+				const { code, results, pagination } = res || {}
+
+				if (code === 200) {
+					const rows: TalkRoomListenerInRoom[] = results?.objects?.rows ?? []
+					const count =
+						results?.objects?.count ?? pagination?.total ?? rows.length
+
+					setListenersInRoom(rows)
+					setTotalListenersInRoom(count)
+
+					return { rows, count, pagination }
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingListenersInRoom(false)
+			}
+
+			return null
+		},
+		[id, openError],
+	)
+
+	const handleGetRaiseHandUsers = useCallback(
+		async (roomId: string = id): Promise<string[]> => {
+			if (!roomId) return []
+
+			try {
+				const res: any = await getRaiseHandUser({ id: roomId })
+				const { code, results } = res || {}
+
+				if (code === 200) {
+					const rows =
+						results?.objects?.rows ??
+						results?.object?.rows ??
+						results?.object ??
+						[]
+					const slotMap = buildTalkRoomSlotRaiseHandFromRows(
+						Array.isArray(rows) ? rows : [],
+					)
+					const ids = flattenTalkRoomSlotRaiseHand(slotMap)
+
+					applySlotRaiseHandMap(slotMap)
+
+					return ids
+				}
+			} catch (error) {
+				openError(error)
+			}
+
+			return []
+		},
+		[id, openError, applySlotRaiseHandMap],
+	)
+
+	const handleCloseSpeakerInvitation = useCallback(() => {
+		setSpeakerInvitation(null)
+	}, [])
+
+	const handleAcceptSpeakerInvitation = useCallback(async () => {
+		if (!id || !speakerInvitation?.inviteId) return
+
+		setSpeakerInvitationLoading(true)
+		try {
+			const res: any = await acceptInviteToSpeaker({
+				id,
+				payload: { invite_id: speakerInvitation.inviteId },
+			})
+			if (res?.code === 200) {
+				handleCloseSpeakerInvitation()
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setSpeakerInvitationLoading(false)
+		}
+	}, [
+		id,
+		speakerInvitation?.inviteId,
+		handleCloseSpeakerInvitation,
+		openError,
+	])
+
+	const handleRejectSpeakerInvitation = useCallback(async () => {
+		if (!id || !speakerInvitation?.inviteId) return
+
+		setSpeakerInvitationLoading(true)
+		try {
+			const res: any = await rejectInviteToSpeaker({
+				id,
+				payload: { invite_id: speakerInvitation.inviteId },
+			})
+			if (res?.code === 200) {
+				handleCloseSpeakerInvitation()
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setSpeakerInvitationLoading(false)
+		}
+	}, [
+		id,
+		speakerInvitation?.inviteId,
+		handleCloseSpeakerInvitation,
+		openError,
+	])
+
+	const handleCloseParticipantProfile = useCallback(() => {
+		setParticipantProfileModal({ open: false })
+		setParticipantUserProfile(null)
+		setParticipantTalkRoomStats(null)
+		setParticipantReportOpen(false)
+		setParticipantConnectedModal(null)
+	}, [])
+
+	/** Loads connected people for the selected participant profile. */
+	const handleGetParticipantConnectedPeople = useCallback(
+		async (userId: string, reset = false) => {
+			if (!userId || loadingParticipantConnectedPeople) return
+
+			const pagination = participantConnectedPeoplePaginationRef.current
+			if (reset || pagination.userId !== userId) {
+				pagination.page = 1
+				pagination.totalPage = 0
+				pagination.userId = userId
+				setParticipantConnectedUsers([])
+				setTotalParticipantConnectedUsers(0)
+			}
+
+			setLoadingParticipantConnectedPeople(true)
+			try {
+				const { page, limit } = pagination
+				const res: any = await getTalkRoomUserConnectedPeople({
+					userId,
+					params: {
+						fields: ['$all'],
+						page,
+						limit,
+					},
+				})
+				const { code, results, pagination: responsePagination } = res || {}
+
+				if (code === 200) {
+					const rows: TalkRoomConnectedUser[] =
+						results?.objects?.rows ?? []
+					const count =
+						results?.objects?.count ??
+						responsePagination?.total ??
+						rows.length
+
+					pagination.totalPage = Math.ceil(count / limit) || 0
+					setParticipantConnectedUsers((prev) =>
+						uniqueArray(
+							page === 1 ? rows : [...prev, ...rows],
+							'id',
+						) as TalkRoomConnectedUser[],
+					)
+					setTotalParticipantConnectedUsers(count)
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingParticipantConnectedPeople(false)
+			}
+		},
+		[loadingParticipantConnectedPeople, openError],
+	)
+
+	/** Opens the selected participant's connected-people modal. */
+	const handleOpenParticipantConnectedPeople = useCallback(() => {
+		const userId = participantProfileModal.userId
+		if (!userId) return
+
+		setParticipantConnectedModal('people')
+		handleGetParticipantConnectedPeople(userId, true)
+	}, [
+		handleGetParticipantConnectedPeople,
+		participantProfileModal.userId,
+	])
+
+	/** Loads the next page of the selected participant's connected people. */
+	const handleLoadMoreParticipantConnectedPeople = useCallback(() => {
+		const pagination = participantConnectedPeoplePaginationRef.current
+		if (
+			loadingParticipantConnectedPeople ||
+			pagination.page >= pagination.totalPage
+		) {
+			return
+		}
+
+		pagination.page += 1
+		handleGetParticipantConnectedPeople(pagination.userId)
+	}, [
+		handleGetParticipantConnectedPeople,
+		loadingParticipantConnectedPeople,
+	])
+
+	/** Opens and loads the selected participant's connected countries. */
+	const handleOpenParticipantConnectedCountries = useCallback(async () => {
+		const userId = participantProfileModal.userId
+		if (!userId || loadingParticipantConnectedCountries) return
+
+		setParticipantConnectedModal('countries')
+		setParticipantConnectedCountries([])
+		setLoadingParticipantConnectedCountries(true)
+		try {
+			const res: any = await getTalkRoomUserConnectedCountries({ userId })
+			if (res?.code === 200) {
+				setParticipantConnectedCountries(res?.results?.object ?? [])
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setLoadingParticipantConnectedCountries(false)
+		}
+	}, [
+		loadingParticipantConnectedCountries,
+		openError,
+		participantProfileModal.userId,
+	])
+
+	/** Closes a connected-list modal and returns to the profile modal. */
+	const handleCloseParticipantConnectedModal = useCallback(() => {
+		setParticipantConnectedModal(null)
+	}, [])
+
+	const handleFetchParticipantProfile = useCallback(
+		async (userId: string) => {
+			if (!userId) return
+
+			setLoadingParticipantProfile(true)
+			try {
+				const [userRes, statsRes]: any[] = await Promise.all([
+					getUserProfile({ id: userId, params: { fields: ['$all'] } }),
+					getTalkRoomUserProfile({
+						userId,
+						params: { fields: ['$all'] },
+					}),
+				])
+
+				if (userRes?.code === 200) {
+					setParticipantUserProfile(userRes?.results?.object ?? null)
+				}
+				if (statsRes?.code === 200) {
+					setParticipantTalkRoomStats(statsRes?.results?.object ?? null)
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setLoadingParticipantProfile(false)
+			}
+		},
+		[openError],
+	)
+
+	const handleOpenParticipantProfile = useCallback(
+		(userId: string, role: TalkRoomParticipantProfileRole) => {
+			if (!userId) return
+
+			setParticipantProfileModal({ open: true, userId, role })
+			setParticipantUserProfile(null)
+			setParticipantTalkRoomStats(null)
+			setParticipantReportOpen(false)
+			handleFetchParticipantProfile(userId)
+		},
+		[handleFetchParticipantProfile],
+	)
+
+	const refreshRoomAfterParticipantAction = useCallback(async () => {
+		await Promise.all([
+			handleGetDetailTalkRoom(id),
+			handleGetListenerInRoom(id),
+		])
+	}, [id, handleGetDetailTalkRoom, handleGetListenerInRoom])
+
+	const runParticipantRoomAction = useCallback(
+		async (
+			action: () => Promise<unknown>,
+			successMessage?: string,
+			options?: { skipRefresh?: boolean },
+		) => {
+			setParticipantActionLoading(true)
+			try {
+				const res: any = await action()
+				if (res?.code === 200) {
+					if (successMessage) {
+						openSuccess({ message: successMessage })
+					}
+					handleCloseParticipantProfile()
+					if (!options?.skipRefresh) {
+						await refreshRoomAfterParticipantAction()
+					}
+					return true
+				}
+			} catch (error) {
+				openError(error)
+			} finally {
+				setParticipantActionLoading(false)
+			}
+			return false
+		},
+		[
+			handleCloseParticipantProfile,
+			openError,
+			openSuccess,
+			refreshRoomAfterParticipantAction,
+		],
+	)
+
+	const handleParticipantProfileAction = useCallback(
+		(action: TalkRoomParticipantProfileAction) => {
+			const targetUserId = participantProfileModal.userId
+			if (!id || !targetUserId) return
+
+			switch (action) {
+				case 'stop_hosting':
+					handleCloseParticipantProfile()
+					options?.onStopHosting?.()
+					break
+				case 'invite_to_speaker':
+					if (isInviteToSpeakerInFlightRef.current) return
+
+					isInviteToSpeakerInFlightRef.current = true
+					setParticipantActionLoading(true)
+					;(async () => {
+						try {
+							const raisedHandIds = await handleGetRaiseHandUsers()
+							const hasRaiseHand = raisedHandIds.includes(targetUserId)
+
+							if (
+								hasRaiseHand &&
+								isTalkRoomGuestSpeakerSlotsFull(
+									talkRoomDetail ?? undefined,
+								)
+							) {
+								showTalkRoomNoSpeakerSlotToast()
+								return
+							}
+
+							const res: any = hasRaiseHand
+								? await hostApproveRaiseHand({
+										id,
+										payload: {
+											userId: targetUserId,
+											isAccepted: true,
+										},
+									})
+								: await inviteToSpeaker({
+										id,
+										payload: { user_id: targetUserId },
+									})
+
+							if (res?.code === 200) {
+								showTalkRoomInviteSentToast()
+								handleCloseParticipantProfile()
+							}
+						} catch (error) {
+							openError(error)
+						} finally {
+							isInviteToSpeakerInFlightRef.current = false
+							setParticipantActionLoading(false)
+						}
+					})()
+					break
+				case 'remove_from_room':
+					openConfirm({
+						message: 'Remove this user from the room?',
+						onAccept: async () => {
+							const ok = await runParticipantRoomAction(
+								() =>
+									kickUserFromTalkRoom({
+										id,
+										payload: { userId: targetUserId },
+									}),
+								undefined,
+								{ skipRefresh: true },
+							)
+							if (ok) closeModal()
+						},
+					})
+					break
+				case 'stepdown_to_listener': {
+					const isSpeakerSelf =
+						participantProfileModal.role === 'speaker-self'
+					const stepDownPayload = {
+						currentRole: TALK_ROOM_ROLE.SPEAKER,
+						targetId: targetUserId,
+					}
+
+					if (isSpeakerSelf) {
+						runParticipantRoomAction(
+							() =>
+								stepDownToListener({
+									id,
+									payload: stepDownPayload,
+								}),
+							undefined,
+							{ skipRefresh: true },
+						)
+						break
+					}
+
+					openConfirm({
+						message: 'Make this speaker become a listener?',
+						onAccept: async () => {
+							const ok = await runParticipantRoomAction(
+								() =>
+									stepDownToListener({
+										id,
+										payload: stepDownPayload,
+									}),
+								undefined,
+								{ skipRefresh: true },
+							)
+							if (ok) closeModal()
+						},
+					})
+					break
+				}
+				case 'assign_as_host':
+					openConfirm({
+						titleLabel: 'Assign as Host',
+						message:
+							"Your host role will pass to another member. You'll stay as a listener and can leave anytime.",
+						confirmLabel: 'Assign as Host',
+						onAccept: async () => {
+							const ok = await runParticipantRoomAction(
+								() =>
+									stopHosting({
+										id,
+										payload: { newHostId: targetUserId },
+									}),
+								undefined,
+								{ skipRefresh: true },
+							)
+							if (ok) closeModal()
+						},
+					})
+					break
+				case 'add_friend':
+					setParticipantActionLoading(true)
+					addFriend({ friend_id: targetUserId })
+						.then((res: any) => {
+							if (res?.code === 200) {
+								openSuccess({ message: 'Friend request sent successfully' })
+								handleFetchParticipantProfile(targetUserId)
+							}
+						})
+						.catch(openError)
+						.finally(() => setParticipantActionLoading(false))
+					break
+				case 'report':
+					setParticipantReportOpen(true)
+					break
+				case 'block':
+					openConfirm({
+						message: 'Do you want to block this user?',
+						onAccept: () => {
+							setParticipantActionLoading(true)
+							blockUser(targetUserId)
+								.then((res) => {
+									if (res) {
+										openSuccess({
+											message: 'You have successfully blocked this user',
+										})
+										handleCloseParticipantProfile()
+									}
+								})
+								.catch(openError)
+								.finally(() => setParticipantActionLoading(false))
+						},
+					})
+					break
+				default:
+					break
+			}
+		},
+		[
+			id,
+			talkRoomDetail,
+			participantProfileModal.userId,
+			participantProfileModal.role,
+			openConfirm,
+			runParticipantRoomAction,
+			handleCloseParticipantProfile,
+			options?.onStopHosting,
+			openSuccess,
+			handleFetchParticipantProfile,
+			openError,
+			closeModal,
+			handleGetRaiseHandUsers,
+		],
+	)
+
+	const handleCloseParticipantReport = useCallback(() => {
+		setParticipantReportOpen(false)
+	}, [])
+
+	const handleLeaveRoom = useCallback(async () => {
+		if (!id) return
+
+		const conversationId = getTalkRoomConversationId(talkRoomDetail)
+
+		try {
+			if (conversationId) {
+				await leaveConversation({ id: conversationId, status: false }).catch(
+					() => undefined,
+				)
+			}
+
+			await leaveTalkroom({ id })
+		} catch (error) {
+			openError(error)
+		}
+	}, [id, talkRoomDetail, openError])
+
+	const handleRoomSocketEvent = useCallback(
+		(event: string, data?: unknown) => {
+			switch (event) {
+				case 'user_joined_room': {
+					const joinedUserId = getTalkRoomSocketTargetUserId(data)
+					const currentUserId = getUserInfo('id') as string | undefined
+
+					if (joinedUserId && joinedUserId !== currentUserId) {
+						playTalkRoomSound('newListener')
+					}
+
+					handleGetDetailTalkRoom(id)
+					handleGetListenerInRoom(id)
+					break
+				}
+				case 'user_left_room': {
+					const leftUserId = getTalkRoomSocketTargetUserId(data)
+					const leaveReason = getTalkRoomSocketLeaveReason(data)
+
+					if (leftUserId) {
+						handleRemoveRaiseHandUser(leftUserId)
+					}
+
+					if (
+						leftUserId &&
+						isTalkRoomSocketLeaveReasonKicked(leaveReason)
+					) {
+						options?.onRoomUserKicked?.(leftUserId)
+					}
+
+					handleGetDetailTalkRoom(id)
+					handleGetListenerInRoom(id)
+					break
+				}
+				case 'room_went_live':
+					handleGetDetailTalkRoom(id)
+					break
+				case 'speaker_on_mic': {
+					const userId = getTalkRoomSocketTargetUserId(data)
+					if (userId) {
+						handleUpdateSpeakerLiveStatus(userId, {
+							is_open_mic: true,
+							is_talking: false,
+						})
+					} else {
+						handleGetDetailTalkRoom(id)
+					}
+					break
+				}
+				case 'speaker_off_mic': {
+					const userId = getTalkRoomSocketTargetUserId(data)
+					if (userId) {
+						handleUpdateSpeakerLiveStatus(userId, {
+							is_open_mic: false,
+							is_talking: false,
+						})
+					} else {
+						handleGetDetailTalkRoom(id)
+					}
+					break
+				}
+				case 'on_talking': {
+					const userId = getTalkRoomSocketTargetUserId(data)
+					const isTalking = getTalkRoomSocketTalkingStatus(data)
+					if (userId && typeof isTalking === 'boolean') {
+						handleUpdateSpeakerLiveStatus(userId, { is_talking: isTalking })
+					}
+					break
+				}
+				case 'listener_raise_hand': {
+					const userId = getTalkRoomSocketTargetUserId(data)
+					const slotId = getTalkRoomSocketSlotId(data, 1)
+					const currentUserId = getUserInfo('id') as string | undefined
+
+					if (userId) {
+						handleAddRaiseHandUser(userId, slotId)
+						playTalkRoomSound('raiseHand')
+
+						if (currentUserId && userId === currentUserId) {
+							showTalkRoomRaiseHandToast()
+						}
+					}
+					break
+				}
+				case 'listener_lower_hand': {
+					const userId = getTalkRoomSocketTargetUserId(data)
+
+					if (userId) {
+						handleRemoveRaiseHandUser(userId)
+					}
+					break
+				}
+				case 'room_start_countdown':
+				case 'raise_hand_accepted':
+				case 'promote_to_speaker':
+				case 'listener_accept_to_speaker_success':
+					handleGetDetailTalkRoom(id)
+					if (
+						event === 'raise_hand_accepted' ||
+						event === 'promote_to_speaker' ||
+						event === 'listener_accept_to_speaker_success'
+					) {
+						handleGetListenerInRoom(id)
+						handleGetRaiseHandUsers()
+					}
+					break
+				case 'host_invite_to_speaker': {
+					const invitePayload = parseTalkRoomSocketSpeakerInvite(data)
+					if (invitePayload) {
+						const currentUserId = getUserInfo('id') as string | undefined
+						const isInvitedListener =
+							currentUserId &&
+							invitePayload.targetUserId === currentUserId &&
+							talkRoomDetail?.yourAreHost !== true
+
+						if (isInvitedListener) {
+							setSpeakerInvitation({
+								inviteId: invitePayload.inviteId,
+							})
+						}
+						options?.onHostInviteToSpeaker?.(invitePayload)
+					}
+					break
+				}
+				case 'listener_reject_to_speaker_success': {
+					const rejectUserId = getTalkRoomSocketTargetUserId(data)
+					options?.onListenerRejectInvite?.({
+						targetUserId: rejectUserId,
+						userName: getTalkRoomSocketUserName(data),
+					})
+					handleGetRaiseHandUsers()
+					break
+				}
+				case 'host_transferred':
+				case 'speaker_auto_pushed_to_host': {
+					const transferPayload = parseTalkRoomSocketHostTransferred(data)
+					handleGetDetailTalkRoom(id)
+					handleGetListenerInRoom(id)
+					if (transferPayload) {
+						options?.onHostTransferred?.(transferPayload)
+					}
+					break
+				}
+				case 'speaker_stepped_down':
+				case 'speaker_removed': {
+					const steppedDownUserId = getTalkRoomSocketTargetUserId(data)
+					handleGetDetailTalkRoom(id)
+					handleGetListenerInRoom(id)
+					// The listener rows can still be stale right after the role change.
+					window.setTimeout(() => handleGetListenerInRoom(id), 800)
+					if (steppedDownUserId) {
+						options?.onRoomSpeakerSteppedDown?.(steppedDownUserId)
+					}
+					break
+				}
+				case 'room_inactive_warning':
+					// openSuccess({ message: '...' }) hoặc toast sau
+					break
+				case 'room_time_up':
+					options?.onRoomTimeUp?.(data)
+					break
+				case 'room_force_closed':
+				case 'room_inactive_force_closed':
+					options?.onRoomForceClosed?.()
+					break
+				default:
+					break
+			}
+
+			options?.onRoomSocketEvent?.(event, data)
+		},
+		[
+			id,
+			talkRoomDetail?.yourAreHost,
+			handleGetDetailTalkRoom,
+			handleGetListenerInRoom,
+			handleLeaveRoom,
+			handleUpdateSpeakerLiveStatus,
+			handleAddRaiseHandUser,
+			handleRemoveRaiseHandUser,
+			onChangeRoute,
+			options?.onRoomSocketEvent,
+			options?.onRoomTimeUp,
+			options?.onRoomForceClosed,
+			options?.onHostTransferred,
+			options?.onRoomSpeakerSteppedDown,
+			options?.onHostInviteToSpeaker,
+			options?.onListenerRejectInvite,
+			handleGetRaiseHandUsers,
+		],
+	)
+
+	const { isConnected, emitRoomEvent } = useTalkRoomSocket({
+		roomId: id,
+		enabled: isJoined,
+		onRoomEvent: handleRoomSocketEvent,
+	})
+
+	const handleEnterRoom = useCallback(async () => {
+		if (!id) return
+
+		const shouldSkipValidate = consumeTalkRoomAutoJoinFlag(id)
+		const room = await handleGetDetailTalkRoom(id)
+
+		if (!room) {
+			onChangeRoute(mainRoutes.talkroom)
+			return
+		}
+
+		if (!shouldSkipValidate) {
+			const validation = await handleValidatePreJoinRoom(id)
+			if (!validation || !canProceedTalkRoomJoin(validation)) {
+				onChangeRoute(mainRoutes.talkroom)
+				return
+			}
+		}
+
+		const joinResult = await handleJoinTalkRoom(id)
+		if (!joinResult?.success) return
+
+		await handleGetListenerInRoom(id)
+		await handleGetRaiseHandUsers(id)
+
+		const conversationId = getTalkRoomConversationId(room)
+		if (conversationId) {
+			await joinConversation({ id: conversationId, status: true }).catch(
+				() => undefined,
+			)
+		}
+	}, [
+		id,
+		handleValidatePreJoinRoom,
+		handleJoinTalkRoom,
+		handleGetDetailTalkRoom,
+		handleGetListenerInRoom,
+		handleGetRaiseHandUsers,
+		onChangeRoute,
+	])
+
+	useEffect(() => {
+		if (!id) return
+		handleEnterRoom()
+	}, [id, handleEnterRoom])
+
+	return {
+		talkRoomDetail,
+		loadingTalkRoomDetail,
+		validatePreJoin,
+		loadingValidatePreJoin,
+		joinTalkRoomResult,
+		loadingJoinTalkRoom,
+		roomUserRole,
+		roleIntegration,
+		listenersInRoom,
+		totalListenersInRoom,
+		loadingListenersInRoom,
+		speakerStatusMap,
+		participantProfileModal,
+		participantUserProfile,
+		participantTalkRoomStats,
+		loadingParticipantProfile,
+		participantActionLoading,
+		participantReportOpen,
+		participantConnectedModal,
+		participantConnectedUsers,
+		participantConnectedCountries,
+		totalParticipantConnectedUsers,
+		loadingParticipantConnectedPeople,
+		loadingParticipantConnectedCountries,
+		raiseHandUserIds,
+		slotUserRaiseHand,
+		isFilterRaiseHand,
+		filterRaiseHandSlot,
+		speakerInvitationOpen: Boolean(speakerInvitation),
+		speakerInvitationLoading,
+
+		onGetDetailTalkRoom: handleGetDetailTalkRoom,
+		onGetListenerInRoom: handleGetListenerInRoom,
+		onValidatePreJoinRoom: handleValidatePreJoinRoom,
+		onJoinTalkRoom: handleJoinTalkRoom,
+		onLeaveRoom: handleLeaveRoom,
+		onPostRaiseHand: handlePostRaiseHand,
+		onTransitionToSpeaker: handleTransitionToSpeaker,
+		onTransitionRole: handleTransitionRole,
+		onUpdateSpeakerLiveStatus: handleUpdateSpeakerLiveStatus,
+		onOpenParticipantProfile: handleOpenParticipantProfile,
+		onCloseParticipantProfile: handleCloseParticipantProfile,
+		onParticipantProfileAction: handleParticipantProfileAction,
+		onCloseParticipantReport: handleCloseParticipantReport,
+		onOpenParticipantConnectedPeople: handleOpenParticipantConnectedPeople,
+		onLoadMoreParticipantConnectedPeople:
+			handleLoadMoreParticipantConnectedPeople,
+		onOpenParticipantConnectedCountries:
+			handleOpenParticipantConnectedCountries,
+		onCloseParticipantConnectedModal:
+			handleCloseParticipantConnectedModal,
+		onAcceptSpeakerInvitation: handleAcceptSpeakerInvitation,
+		onRejectSpeakerInvitation: handleRejectSpeakerInvitation,
+		onCloseSpeakerInvitation: handleCloseSpeakerInvitation,
+		onApproveRaiseHand: handleApproveRaiseHand,
+		onSwitchToFilterRaiseHand: handleSwitchToFilterRaiseHand,
+		onCloseFilterRaiseHand: handleCloseFilterRaiseHand,
+		emitRoomEvent,
+	}
+}

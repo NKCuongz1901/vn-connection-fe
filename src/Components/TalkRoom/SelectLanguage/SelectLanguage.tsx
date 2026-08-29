@@ -13,6 +13,7 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 
+import CButton from '@/Components/Custom/CButton'
 import { isArray } from '@/ultis/array'
 import TickCircleIcon from '@/svg/TickCircleIcon'
 
@@ -31,6 +32,7 @@ export type SelectLanguageProps = {
 	value?: string[]
 	onChange?: (languageIds: string[]) => void
 	disabled?: boolean
+	confirmLabel?: string
 }
 
 const DROPDOWN_WIDTH = 343
@@ -44,8 +46,10 @@ const SelectLanguage = ({
 	value = [],
 	onChange,
 	disabled,
+	confirmLabel = 'Confirm',
 }: SelectLanguageProps) => {
 	const [open, setOpen] = useState(false)
+	const [draft, setDraft] = useState<string[]>(value)
 	const [dropdownStyle, setDropdownStyle] = useState<CSSProperties>({})
 	const triggerRef = useRef<HTMLDivElement>(null)
 	const dropdownRef = useRef<HTMLDivElement>(null)
@@ -102,20 +106,38 @@ const SelectLanguage = ({
 		}
 	}, [open, updateDropdownPosition])
 
+	/** Sync draft from applied value when opening or when parent value changes while closed */
+	useEffect(() => {
+		if (!open) {
+			setDraft(value)
+		}
+	}, [open, value])
+
 	const handleToggleOpen = useCallback(() => {
 		if (disabled) return
-		setOpen((prev) => !prev)
-	}, [disabled])
+		setOpen((prev) => {
+			const next = !prev
+			if (next) {
+				setDraft(value)
+			}
+			return next
+		})
+	}, [disabled, value])
 
-	const handleToggle = useCallback(
-		(optionValue: string) => {
-			const next = value.includes(optionValue)
-				? value.filter((item) => item !== optionValue)
-				: [...value, optionValue]
-			onChange?.(next)
-		},
-		[value, onChange],
-	)
+	/** Toggle selection in draft only; filter applies on Confirm */
+	const handleToggle = useCallback((optionValue: string) => {
+		setDraft((prev) =>
+			prev.includes(optionValue)
+				? prev.filter((item) => item !== optionValue)
+				: [...prev, optionValue],
+		)
+	}, [])
+
+	/** Apply draft selection and close dropdown */
+	const handleConfirm = useCallback(() => {
+		onChange?.(draft)
+		setOpen(false)
+	}, [draft, onChange])
 
 	const dropdownContent = (
 		<div ref={dropdownRef} className={classes.dropdown} style={dropdownStyle}>
@@ -126,7 +148,7 @@ const SelectLanguage = ({
 				</div>
 				<div className={classes.list}>
 					{options.map((item) => {
-						const checked = value.includes(item.value)
+						const checked = draft.includes(item.value)
 						return (
 							<div
 								key={item.value}
@@ -164,6 +186,11 @@ const SelectLanguage = ({
 							</div>
 						)
 					})}
+				</div>
+				<div className={classes.footer}>
+					<CButton ctype="oranger" onClick={handleConfirm}>
+						{confirmLabel}
+					</CButton>
 				</div>
 			</div>
 		</div>

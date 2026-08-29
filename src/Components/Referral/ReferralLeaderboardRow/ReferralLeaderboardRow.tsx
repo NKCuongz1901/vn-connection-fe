@@ -13,6 +13,7 @@ export interface ReferralLeaderboardRowProps {
 	name?: string
 	avatar?: string
 	points?: number
+	scoreLabel?: string
 	variant?: 'default' | 'myPosition'
 }
 
@@ -21,6 +22,7 @@ function ReferralLeaderboardRow({
 	name,
 	avatar,
 	points = 0,
+	scoreLabel,
 	variant = 'default',
 }: ReferralLeaderboardRowProps) {
 	return (
@@ -39,8 +41,14 @@ function ReferralLeaderboardRow({
 				</div>
 			</div>
 			<div className={classes.points}>
-				<span className={classes.pointsValue}>{points}</span>
-				<CoinIcon />
+				{scoreLabel ? (
+					<span className={classes.pointsValue}>{scoreLabel}</span>
+				) : (
+					<>
+						<span className={classes.pointsValue}>{points}</span>
+						<CoinIcon />
+					</>
+				)}
 			</div>
 		</div>
 	)

@@ -228,6 +228,35 @@
 				background: #fff;
 				min-height: 138px;
 
+				.chatRoomTabs {
+					align-items: center;
+					width: 100%;
+					gap: 8px;
+					padding: 0 16px;
+					border-bottom: 1px solid #edf0f5;
+
+					.chatRoomTab {
+						flex: 1;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						padding: 12px 8px;
+						cursor: pointer;
+						color: #48546b;
+						font-size: 16px;
+						font-weight: 600;
+						line-height: 24px;
+						white-space: nowrap;
+						border-bottom: 2px solid transparent;
+						margin-bottom: -1px;
+					}
+
+					.chatRoomTabActive {
+						color: #006b35;
+						border-bottom-color: #006b35;
+					}
+				}
+
 				.chatRoomText {
 					padding: 8px 16px;
 					font-size: 12px;
@@ -322,6 +351,133 @@
 								justify-content: center;
 								align-items: center;
 								border: 1px solid #fff;
+							}
+						}
+					}
+				}
+
+				.chatLocationList {
+					margin: 16px;
+					overflow-x: auto;
+					gap: 8px;
+
+					.chatLocationItem {
+						flex-shrink: 0;
+						width: 106px;
+						gap: 4px;
+						align-items: flex-start;
+						cursor: pointer;
+						border-radius: 8px;
+						background: #e7f5e9;
+						padding: 8px;
+
+						.chatLocationSkeletonTitle {
+							width: 100%;
+							min-width: 0;
+							span {
+								height: 16px;
+								width: 100%;
+								min-width: 0;
+							}
+						}
+
+						.chatLocationSkeletonAva {
+							width: 24px;
+							height: 24px;
+							span {
+								width: 24px !important;
+								height: 24px !important;
+							}
+						}
+
+						.chatLocationSkeletonMeta {
+							width: 100%;
+							min-width: 0;
+							span {
+								height: 12px;
+								width: 70%;
+								min-width: 0;
+							}
+						}
+
+						.chatLocationTitle {
+							align-items: center;
+							gap: 4px;
+							width: 100%;
+							min-width: 0;
+
+							.chatLocationGlobe {
+								display: inline-flex;
+								flex-shrink: 0;
+								width: 12px;
+								height: 12px;
+							}
+
+							.chatLocationName {
+								flex: 1;
+								min-width: 0;
+								color: #006b35;
+								font-size: 14px;
+								font-weight: 600;
+								line-height: 20px;
+								white-space: nowrap;
+								overflow: hidden;
+								text-overflow: ellipsis;
+							}
+						}
+
+						.chatLocationAvatars {
+							align-items: center;
+							gap: 4px;
+
+							.chatLocationAvatarStack {
+								align-items: center;
+
+								.chatLocationAvatar {
+									flex-shrink: 0;
+									margin-right: -8px;
+									border-radius: 999px;
+									overflow: hidden;
+
+									&:last-child {
+										margin-right: 0;
+									}
+								}
+							}
+
+							.chatLocationMore {
+								color: #48546b;
+								font-size: 10px;
+								line-height: 14px;
+								white-space: nowrap;
+							}
+						}
+
+						.chatLocationMeta {
+							gap: 4px;
+							width: 100%;
+
+							.chatLocationOnline {
+								align-items: center;
+								gap: 4px;
+								color: #48546b;
+								font-size: 10px;
+								line-height: 14px;
+
+								.chatLocationOnlineDot {
+									width: 8px;
+									height: 8px;
+									border-radius: 99px;
+									background: #ff0038;
+									border: 1px solid #fff;
+									flex-shrink: 0;
+								}
+							}
+
+							.chatLocationTime {
+								color: #48546b;
+								font-size: 10px;
+								line-height: 14px;
 							}
 						}
 					}

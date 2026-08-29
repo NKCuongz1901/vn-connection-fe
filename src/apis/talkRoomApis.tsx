@@ -32,6 +32,10 @@ export type CreateTalkRoomInput = {
 export type TalkRoomDetail = TalkRoomListItem & {
 	schedule_at?: string | null
 	started_at?: string | null
+	time_left_in_seconds?: number
+	max_duration_seconds?: number
+	count_down_at?: string | null
+	created_at?: string
 	host_joined?: boolean
 	host_user?: {
 		id?: string
@@ -56,6 +60,9 @@ export type TalkRoomDetail = TalkRoomListItem & {
 			name?: string
 		}
 	}[]
+	yourAreHost?: boolean
+	youAreListener?: boolean
+	isUserSpeaker?: boolean
 }
 
 export type TalkRoomListFilters = {
@@ -79,6 +86,8 @@ export type TalkRoomListItem = {
 		role?: string
 		talking_time?: number
 		i_am_from?: string
+		is_open_mic?: boolean
+		is_talking?: boolean
 	}[]
 	created_by_user?: {
 		id?: string
@@ -441,6 +450,30 @@ export const getTalkRoomConnectedPeople = async ({
 	})
 }
 
+export const getTalkRoomUserConnectedCountries = async ({
+	userId,
+}: {
+	userId: string
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomUserProfile}/${userId}/connected-countries`
+
+	return await axios.get(url)
+}
+
+export const getTalkRoomUserConnectedPeople = async ({
+	userId,
+	params = {},
+}: {
+	userId: string
+	params?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomUserProfile}/${userId}/connected-people`
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
 export const getTalkRoomLeaderBoard = async ({
 	params = {},
 }: {
@@ -463,4 +496,354 @@ export const getTalkRoomLeaderBoardMy = async ({
 	return await axios.get(url, {
 		params: convertParams(params),
 	})
+}
+
+export type ValidatePreTalkroomModel = {
+	canJoin: boolean
+	reason: string
+	message?: string
+}
+
+export const validatePreTalkroom = async ({
+	id,
+	params = { fields: ['$all'] },
+}: {
+	id: string
+	params?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.validatePreTalkroom}/${id}`
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export type TalkRoomListenerInRoomUser = {
+	id: string
+	name: string
+	avatar?: string
+	i_am_from?: string
+	country_code?: string
+	gender?: string
+	age?: number | null
+}
+
+export type TalkRoomListenerInRoom = {
+	id: string
+	talkroom_id: string
+	user_id: string
+	status: string
+	role: string
+	talking_time?: number
+	joined_at?: string
+	left_at?: string | null
+	created_at?: string
+	updated_at?: string
+	user: TalkRoomListenerInRoomUser
+}
+
+export const getListenerInRoom = async ({
+	id,
+	params = { fields: ['$all'] },
+}: {
+	id: string
+	params?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/details/listeners`
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export type JoinTalkroomRoomate = {
+	id: string
+	talkroom_id: string
+	user_id: string
+	status: string
+	role: string
+	talking_time?: number
+	joined_at?: string
+	left_at?: string | null
+}
+
+export type JoinTalkroomAgora = {
+	session_id?: string
+	connection_type?: string
+	user_role?: string
+	role?: string
+	is_rejoin?: boolean
+	agora_token?: string
+	channel_name?: string
+	agora_uid?: number
+	expires_at?: number
+	stream_wss_url?: string
+	stream_hls_url?: string
+	stream_wss_url_https?: string
+	stream_hls_url_https?: string
+}
+
+export type JoinTalkroomData = {
+	roomate: JoinTalkroomRoomate
+	role: string
+	isRejoining: boolean
+	room_info?: {
+		id: string
+		name: string
+		status: string
+	}
+	socket_integration?: {
+		room_subscribed?: boolean
+		event_broadcasted?: boolean
+		participants_notified?: number
+		socket_event_details?: string
+	}
+	agora?: JoinTalkroomAgora
+}
+
+export type JoinTalkroomModel = {
+	success: boolean
+	message?: string
+	data?: JoinTalkroomData
+}
+
+export const joinTalkroom = async ({
+	id,
+	payload = { fields: ['$all'] },
+}: {
+	id: string
+	payload?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/join`
+
+	return await axios.post(url, convertParams(payload))
+}
+
+export const leaveTalkroom = async ({
+	id,
+	payload = { fields: ['$all'] },
+}: {
+	id: string
+	payload?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/leave`
+
+	return await axios.post(url, convertParams(payload))
+}
+
+// Action in room
+
+export const getRaiseHandUser = async ({
+	id,
+	params = { fields: ['$all'] },
+}: {
+	id: string
+	params?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/raised-hands`
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export type RaiseHandPayload = {
+	isRaiseHand: boolean
+	slotId?: number
+}
+
+export const postRaiseHand = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: RaiseHandPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/raise_hand`
+
+	return await axios.post(url, payload)
+}
+
+export type TransitionRolePayload = {
+	from_role: string
+	to_role: string
+}
+
+export type ChangeRoleResponse = {
+	previous_session_id?: string
+	new_session_id?: string
+	previous_role?: string
+	new_role?: string
+	previous_connection_type?: string
+	new_connection_type?: string
+	transition_completed_at?: string
+	new_connection?: JoinTalkroomAgora
+}
+
+export const transitionRole = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: TransitionRolePayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/transition_role`
+
+	return await axios.post(url, payload)
+}
+
+export type ToggleMicPayload = {
+	is_on: boolean
+}
+
+export const toogleMic = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: ToggleMicPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.baseTalkroomRoute}/socket/${id}/toggle_mic`
+
+	return await axios.post(url, payload)
+}
+
+export type TalkRoomUserProfileStats = {
+	countriesConnected?: number
+	peopleTalked?: number
+	totalTalkedTimeInMinutes?: number
+	totalHostTimeInMinutes?: number
+	todaySecondsUsed?: number
+	todayRemainingSeconds?: number
+	totalTalkedSeconds?: number
+}
+
+export const getTalkRoomUserProfile = async ({
+	userId,
+	params = { fields: ['$all'] },
+}: {
+	userId: string
+	params?: { [key: string]: any }
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomUserProfile}/${userId}`
+
+	return await axios.get(url, {
+		params: convertParams(params),
+	})
+}
+
+export type TalkRoomTargetUserPayload = {
+	user_id: string
+}
+
+export const inviteToSpeaker = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: TalkRoomTargetUserPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/invite_to_speaker`
+
+	return await axios.post(url, payload)
+}
+
+export type TalkRoomKickUserPayload = {
+	userId: string
+}
+
+export const kickUserFromTalkRoom = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: TalkRoomKickUserPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/kick_user`
+
+	return await axios.post(url, payload)
+}
+
+export type TalkRoomStepDownToListenerPayload = {
+	currentRole: string
+	targetId: string
+}
+
+export const stepDownToListener = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: TalkRoomStepDownToListenerPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/stepdown_to_listener`
+
+	return await axios.post(url, payload)
+}
+
+export type StopHostingPayload = {
+	newHostId?: string
+	isLeave?: boolean
+}
+
+export const stopHosting = async ({
+	id,
+	payload = {},
+}: {
+	id: string
+	payload?: StopHostingPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/stop_hosting`
+
+	return await axios.post(url, payload)
+}
+
+export type HostApproveRaiseHandPayload = {
+	userId: string
+	isAccepted: boolean
+}
+
+export const hostApproveRaiseHand = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: HostApproveRaiseHandPayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/host_approve_raise_hand`
+
+	return await axios.post(url, payload)
+}
+
+export type TalkRoomSpeakerInvitePayload = {
+	invite_id: string
+}
+
+export const acceptInviteToSpeaker = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: TalkRoomSpeakerInvitePayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/accept_invite_to_speaker`
+
+	return await axios.post(url, payload)
+}
+
+export const rejectInviteToSpeaker = async ({
+	id,
+	payload,
+}: {
+	id: string
+	payload: TalkRoomSpeakerInvitePayload
+}) => {
+	const url = `${TALKROOM_ROUTES.getTalkRoomDetail}/${id}/action/reject_invite_to_speaker`
+
+	return await axios.post(url, payload)
+}
+
+export const getTokenSocket = async () => {
+	const url = TALKROOM_ROUTES.getTokenSocket
+	return await axios.post(url, {})
 }

@@ -1,0 +1,159 @@
+.wrapper {
+	display: flex;
+	padding: 24px var(--spacing-spacer-8, 32px);
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 16px;
+	flex: 1 0 0;
+	align-self: stretch;
+
+	.header {
+		align-items: center;
+		gap: var(--spacing-spacer-12, 12px);
+		.title {
+			color: var(--color-grey-700-p-text, #0f1729);
+
+			font-size: 18px;
+			font-style: normal;
+			font-weight: 600;
+			line-height: 28px; /* 155.556% */
+		}
+		.iconBack {
+			color: #94a3b8;
+			cursor: pointer;
+		}
+	}
+	.content {
+		width: 100%;
+		height: 100%;
+		min-width: 0;
+		display: flex;
+		gap: 12px;
+
+		.leftContent {
+			flex: 2;
+			min-width: 0;
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+
+			.hostContent {
+				flex: 1;
+				display: flex;
+				padding: 24px 32px;
+				flex-direction: column;
+				align-items: flex-start;
+				border-radius: 12px;
+				background:
+					linear-gradient(
+						180deg,
+						rgba(0, 4, 18, 0.8) -1.6%,
+						rgba(0, 4, 18, 0) 41.33%
+					),
+					url('/images/hostBG.png') lightgray 50% / cover no-repeat;
+
+				.textNormal {
+					color: var(--text-secondary-inverse, #edf0f5);
+					text-align: right;
+
+					font-size: var(--body-base-size, 14px);
+					font-style: normal;
+					font-weight: 400;
+					line-height: var(--body-base-line-height, 20px); /* 142.857% */
+					letter-spacing: var(--body-base-tracking, 0);
+				}
+
+				.talkroomInfoContainer {
+					width: 100%;
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					.talkroomInfo {
+						display: flex;
+						flex-direction: column;
+						align-items: flex-start;
+						gap: 4px;
+
+						.talkroomTitle {
+							color: var(--text-primary-inverse, #fff);
+
+							font-size: var(--title-large-size, 20px);
+							font-style: normal;
+							font-weight: 600;
+							line-height: var(--title-large-line-height, 28px); /* 140% */
+							letter-spacing: var(--title-large-tracking, 0);
+						}
+					}
+					.ctaButtons {
+						display: flex;
+						gap: 8px;
+						.ctaButtonWrapper {
+							width: 40px;
+							height: 40px;
+							border-radius: var(--radius-component-button, 999px);
+							background: var(
+								--component-button-alpha-bg-default,
+								rgba(255, 255, 255, 0.16)
+							);
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							cursor: pointer;
+						}
+					}
+				}
+			}
+
+			.listenerContent {
+				flex: 3;
+				display: flex;
+				flex-direction: column;
+				min-height: 0;
+			}
+		}
+		.rightContent {
+			flex: 0 0 360px;
+			width: 360px;
+			max-width: 360px;
+			min-width: 0;
+			min-height: 0;
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+			overflow: hidden;
+
+			.timerContent {
+				display: flex;
+				flex-direction: column;
+				flex-shrink: 0;
+			}
+
+			.chatContent {
+				flex: 1;
+				min-height: 0;
+				min-width: 0;
+				width: 100%;
+				max-width: 100%;
+				display: flex;
+				flex-direction: column;
+				max-height: calc(100vh - 280px);
+				border-radius: 8px;
+				overflow: hidden;
+			}
+
+			.chatEmpty {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 100%;
+				height: 100%;
+				padding: 16px;
+				border-radius: 8px;
+				background: #fff;
+				color: var(--text-secondary, #48546b);
+				font-size: 14px;
+				text-align: center;
+			}
+		}
+	}
+}
