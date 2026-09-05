@@ -112,6 +112,7 @@ function ChatLocation(props: ChatLocationProps) {
 	}
 
 	// Refresh location lists after a join/leave and confirm intentional joins.
+	// `remind` is persisted in useDetailChatRoom; ignore it here.
 	const handleSuccessDetailChat = ({
 		type,
 		id: convId,
@@ -119,6 +120,7 @@ function ChatLocation(props: ChatLocationProps) {
 		type?: string
 		id?: string
 	}) => {
+		if (type === 'remind') return
 		if (type !== 'join' && type !== 'leave') return
 
 		onRefreshMyChatLocation()

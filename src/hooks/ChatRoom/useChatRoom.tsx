@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useModal } from '@/context/ModalContext'
 
-import { getChatRoomList, updateConvMember } from '@/apis/conversationApis'
+import { getChatRoomList } from '@/apis/conversationApis'
 import { getUserProfile } from '@/apis/userApis'
 
 import { isArray, uniqueArray } from '@/ultis/array'
@@ -105,42 +105,27 @@ export default function useChatRoom(props: useChatRoomProps) {
 		}
 	}
 
-	const handleUpdateUserInConv = async (convInfo) => {
-		try {
-			const { id, users_in_conversation } = convInfo || {}
-			const { id: memberId, amount_of_remind } = users_in_conversation[0] || {}
-			if (!memberId || !id) {
-				return
-			}
-			const res: any = await updateConvMember({
-				id,
-				memberId,
-				payload: { amount_of_remind: (amount_of_remind || 0) + 1 },
-			})
-			setListChatRoom((prev) => {
-				const newData = cloneDeep(prev).map((i) => {
-					if (i.id !== id) return i
-					const { users_in_conversation } = i || {}
-					users_in_conversation[0].amount_of_remind =
-						res?.results?.object?.amount_of_remind || 1
-					return i
-				})
-				return newData
-			})
-		} catch {
-		} finally {
-		}
-	}
-
-	const handleSuccess = ({ type, id }) => {
+	const handleSuccess = ({ type, id, data }: { type?: string; id?: string; data?: any }) => {
 		switch (type) {
 			case 'join':
 			case 'leave':
 				handleRefreshListChatRoom()
 				break
 			case 'remind': {
-				const convInfo = listChatRoom.find((i) => i.id === id)
-				handleUpdateUserInConv(convInfo)
+				// amount_of_remind is already persisted in useDetailChatRoom
+				if (data?.amount_of_remind == null) break
+
+				setListChatRoom((prev) => {
+					const newData = cloneDeep(prev).map((item) => {
+						if (item.id !== id) return item
+						const { users_in_conversation } = item || {}
+						if (users_in_conversation?.[0]) {
+							users_in_conversation[0].amount_of_remind = data.amount_of_remind
+						}
+						return item
+					})
+					return newData
+				})
 				break
 			}
 			default:
