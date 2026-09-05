@@ -16,13 +16,9 @@
 	height: 100%;
 	align-items: center;
 	gap: 12px;
-	padding: 0 72px 0 16px;
+	padding: 0 72px 8px 16px;
 	overflow-x: auto;
-	scrollbar-width: none;
-
-	&::-webkit-scrollbar {
-		display: none;
-	}
+	scrollbar-width: thin;
 }
 
 .home,
