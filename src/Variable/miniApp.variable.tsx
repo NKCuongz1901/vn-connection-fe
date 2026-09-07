@@ -2,12 +2,14 @@ import BookIcon from '@/svg/BookIcon'
 import TutorIcon from '@/svg/TutorIcon'
 import ShopIcon from '@/svg/ShopIcon'
 import HeartIcon from '@/svg/Heart'
+import CourseMiniAppIcon from '@/svg/Course/CourseMiniAppIcon'
 
 export const MINI_APP_VARIANT = {
 	BOOK: 'book',
 	TUTOR: 'tutor',
 	BIZ: 'biz',
 	DATING: 'dating',
+	COURSE: 'course',
 } as const
 
 export type MiniAppVariant =
@@ -18,6 +20,7 @@ export const MINI_APP_GRADIENT: Record<MiniAppVariant, string> = {
 	tutor: 'linear-gradient(264deg, #C796FF -21.91%, #9036F7 98.53%)',
 	biz: 'linear-gradient(264deg, #FCA66A -21.91%, #FC5D00 98.53%)',
 	dating: 'linear-gradient(266deg, #FF7557 4.7%, #F23C3C 98.91%)',
+	course: 'linear-gradient(266deg, #FE7288 0%, #FED76D 100%)',
 }
 
 export type MiniAppItem = {
@@ -58,5 +61,13 @@ export const MINI_APP_ITEMS: MiniAppItem[] = [
 		variant: MINI_APP_VARIANT.DATING,
 		Icon: HeartIcon,
 		route: 'dating',
+	},
+	{
+		id: 'course',
+		label: 'Course',
+		variant: MINI_APP_VARIANT.COURSE,
+		Icon: CourseMiniAppIcon,
+		route: '/course',
+		availableOnWeb: true,
 	},
 ]
