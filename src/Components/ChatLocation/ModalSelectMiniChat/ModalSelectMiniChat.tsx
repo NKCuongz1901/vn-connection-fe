@@ -68,7 +68,9 @@ const ModalSelectMiniChat = (props: ModalSelectMiniChatProps) => {
 										style={{ backgroundImage: `url(${item.avatar})` }}
 									/>
 									<span className={classes.info}>
-										{!item.is_read && <span className={classes.unreadDot} />}
+										{!item.is_read && item.last_message ? (
+											<span className={classes.unreadDot} />
+										) : null}
 										<span className={classes.title}>{item.title}</span>
 									</span>
 								</button>

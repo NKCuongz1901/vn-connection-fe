@@ -54,7 +54,9 @@ const MiniChatTopicBar = (props: MiniChatTopicBarProps) => {
 									aria-label={item.title}
 									style={{ backgroundImage: `url(${item.avatar})` }}
 								/>
-								{!item.is_read && <span className={classes.unreadBadge} />}
+								{!item.is_read && item.last_message ? (
+									<span className={classes.unreadBadge} />
+								) : null}
 							</button>
 						))}
 			</div>
