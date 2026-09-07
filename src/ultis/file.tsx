@@ -211,15 +211,15 @@ export const convertImageUrl = (url?: any, sizeType?: TYPE_SIZE_IMAGE) => {
 
 	const target = sizeType ?? TYPE_SIZE_IMAGE.medium
 
-	let converted = url.replace(/(small|medium|large)\//, `${target}/`)
-
 	if (target === TYPE_SIZE_IMAGE.origin) {
-		converted = converted
-			.replace(/(small|medium|large)\//, 'images/')
+		// The original is stored at images/<name>.jpg with no size segment;
+		// replacing only the size word would leave images/images/.
+		return url
+			.replace(/(small|medium|large)\/images\//, 'images/')
 			.replace(WEBP_REGEX, '.jpg$1')
 	}
 
-	return converted
+	return url.replace(/(small|medium|large)\//, `${target}/`)
 }
 
 export const mergeChatMediaFileList = (
