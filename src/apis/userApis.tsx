@@ -1,3 +1,4 @@
+import { getFid } from '@/config/firebase'
 import { convertParams } from '@/ultis/object'
 import md5 from 'md5'
 import axios from '../axios'
@@ -30,10 +31,14 @@ export const changeUserPassword = async (payload: {
 	new_password: string
 }) => {
 	const fcm_token = getStorageCookie('last_token_web')
+	// The backend keeps this device signed in by its FID, the same id sent in the
+	// firebase-device-id header, not by the push token.
+	const device_id = await getFid()
 	return await axios.post(`${USER_ROUTES.user}/change_password`, {
 		old_password: md5(payload.old_password),
 		new_password: md5(payload.new_password),
 		...(fcm_token ? { fcm_token } : {}),
+		...(device_id ? { device_id } : {}),
 	})
 }
 

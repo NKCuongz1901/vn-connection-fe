@@ -1,18 +1,38 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { changeUserPassword } from '@/apis/userApis'
+import { acknowledgeSecurityAlert, changeUserPassword } from '@/apis/userApis'
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { useLocalePath } from '@/ultis/route'
-import { setSessionStorage } from '@/ultis/storage'
-import { FORGET_PASSWORD_FROM_ACCOUNT_SESSION_KEY } from '@/Variable/common.variable'
+import {
+	getSessionStorage,
+	removeSessionStorage,
+	setSessionStorage,
+} from '@/ultis/storage'
+import {
+	FORGET_PASSWORD_FROM_ACCOUNT_SESSION_KEY,
+	SECURITY_ALERT_ACK_SESSION_KEY,
+} from '@/Variable/common.variable'
 import { passwordRegex } from '@/Variable/regex.variable'
 
 type FormErrors = {
 	oldPassword?: string
 	newPassword?: string
 	confirmPassword?: string
+}
+
+/** Acknowledges the security alert that sent the user to this screen. */
+const acknowledgePendingSecurityAlert = async () => {
+	const alertId = getSessionStorage(SECURITY_ALERT_ACK_SESSION_KEY)?.alertId
+	if (!alertId) return
+
+	try {
+		await acknowledgeSecurityAlert(alertId)
+		removeSessionStorage(SECURITY_ALERT_ACK_SESSION_KEY)
+	} catch (error) {
+		console.error('Unable to acknowledge security alert', error)
+	}
 }
 
 export default function useChangePasswordAccount() {
@@ -61,6 +81,7 @@ export default function useChangePasswordAccount() {
 				new_password: newPassword,
 			})
 			if (res?.code === 200) {
+				await acknowledgePendingSecurityAlert()
 				openSuccess({
 					message: 'Password changed successfully',
 					onAccept: () =>
