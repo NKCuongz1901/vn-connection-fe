@@ -23,6 +23,54 @@ export type SessionRevokedPayload = {
 	reason?: 'security_action' | 'password_changed' | string
 }
 
+export type LegacyDeviceEvent = 'change_device' | 'change_password'
+
+/** Reads a socket payload that may arrive as an object or a JSON string. */
+const toPayloadObject = (payload: unknown): Record<string, unknown> | null => {
+	if (!payload) return null
+
+	if (typeof payload === 'string') {
+		try {
+			const parsed = JSON.parse(payload)
+			return typeof parsed === 'object' && parsed
+				? (parsed as Record<string, unknown>)
+				: null
+		} catch {
+			return null
+		}
+	}
+
+	return typeof payload === 'object'
+		? (payload as Record<string, unknown>)
+		: null
+}
+
+const getTrimmedString = (value: unknown) =>
+	typeof value === 'string' && value.trim() ? value.trim() : ''
+
+/** Extracts the device the legacy change_device / change_password event keeps valid. */
+export const getLegacyEventDeviceId = (payload: unknown): string => {
+	const data = toPayloadObject(payload)
+	if (!data) return ''
+
+	return (
+		getTrimmedString(data.fcm_token_valid) ||
+		getTrimmedString(data.device_id) ||
+		getTrimmedString(data.fcm_token)
+	)
+}
+
+/** Extracts the server message of a legacy event, ignoring raw event names. */
+export const getLegacyEventMessage = (
+	payload: unknown,
+	event: LegacyDeviceEvent,
+): string => {
+	const data = toPayloadObject(payload)
+	const message = getTrimmedString(data?.message)
+
+	return message === event ? '' : message
+}
+
 /** Parses device metadata sent as either an object or an FCM JSON string. */
 const parseDevice = (device: unknown): NewDeviceInfo | undefined => {
 	if (!device) return undefined
@@ -42,15 +90,15 @@ const parseDevice = (device: unknown): NewDeviceInfo | undefined => {
 }
 
 /** Normalizes socket, FCM, and pending API payloads into one alert shape. */
-export const parseNewDeviceAlert = (payload: unknown): NewDeviceAlert | null => {
+export const parseNewDeviceAlert = (
+	payload: unknown,
+): NewDeviceAlert | null => {
 	if (!payload || typeof payload !== 'object') return null
 
 	const alert = payload as Record<string, unknown>
 	const id = typeof alert.id === 'string' ? alert.id.trim() : ''
 	const newDeviceId =
-		typeof alert.new_device_id === 'string'
-			? alert.new_device_id.trim()
-			: ''
+		typeof alert.new_device_id === 'string' ? alert.new_device_id.trim() : ''
 
 	if (!id || !newDeviceId) return null
 

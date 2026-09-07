@@ -1,19 +1,40 @@
 'use client'
 
 import {
-	IconDeviceMobile,
+	IconDeviceMobileFilled,
 	IconKey,
+	IconLogin2,
 	IconLogout,
 	IconShieldLock,
+	IconX,
 } from '@tabler/icons-react'
 import { memo } from 'react'
 
 import CModal from '@/Components/Custom/CModal/CModal'
-import type { NewDeviceAlert } from '@/interface/Security/NewDeviceAlert.interface'
+import type {
+	NewDeviceAlert,
+	NewDeviceInfo,
+} from '@/interface/Security/NewDeviceAlert.interface'
 
 import classes from './NewDeviceSecurityModal.module.scss'
 
 type NewDeviceSecurityStep = 'notice' | 'secure'
+
+const PLATFORM_LABELS: Record<string, string> = {
+	ios: 'iPhone',
+	android: 'Android',
+	mobile: 'Mobile app',
+	web: 'Web browser',
+}
+
+/** Builds a human label for the device that triggered the alert. */
+const getDeviceLabel = (device?: NewDeviceInfo) => {
+	const name = device?.name?.trim()
+	const model = device?.model?.trim()
+	const platform = device?.platform?.trim().toLowerCase()
+
+	return name || model || PLATFORM_LABELS[platform || ''] || ''
+}
 
 type NewDeviceSecurityModalProps = {
 	alert: NewDeviceAlert
@@ -27,6 +48,7 @@ type NewDeviceSecurityModalProps = {
 
 /** Displays the two-step new-device security flow. */
 function NewDeviceSecurityModal({
+	alert,
 	step,
 	loading,
 	onConfirmLogin,
@@ -34,6 +56,10 @@ function NewDeviceSecurityModal({
 	onLogoutOtherDevices,
 	onChangePassword,
 }: NewDeviceSecurityModalProps) {
+	const deviceLabel = getDeviceLabel(alert?.device)
+	const location =
+		alert?.location && alert.location !== 'Unknown' ? alert.location : ''
+
 	return (
 		<CModal
 			open
@@ -48,7 +74,7 @@ function NewDeviceSecurityModal({
 					maxWidth: 'calc(100vw - 32px)',
 					minHeight: 0,
 					padding: 0,
-					borderRadius: 16,
+					borderRadius: 24,
 					overflow: 'hidden',
 				},
 				body: {
@@ -58,12 +84,23 @@ function NewDeviceSecurityModal({
 			}}
 		>
 			<div className={classes.wrapper}>
-				<div className={classes.iconFrame}>
-					{step === 'notice' ? (
-						<IconDeviceMobile size={32} stroke={1.8} />
-					) : (
-						<IconShieldLock size={32} stroke={1.8} />
-					)}
+				<div className={classes.header}>
+					<div className={classes.iconFrame}>
+						{step === 'notice' ? (
+							<IconLogin2 size={26} stroke={2.2} />
+						) : (
+							<IconShieldLock size={26} stroke={2.2} />
+						)}
+					</div>
+					<button
+						type="button"
+						className={classes.closeButton}
+						aria-label="Close"
+						disabled={loading}
+						onClick={onConfirmLogin}
+					>
+						<IconX size={24} stroke={2} />
+					</button>
 				</div>
 
 				<h2 className={classes.title}>
@@ -75,6 +112,24 @@ function NewDeviceSecurityModal({
 						<p className={classes.description}>
 							Your account was signed in on another device.
 						</p>
+
+						{deviceLabel || location ? (
+							<div className={classes.device}>
+								<span className={classes.deviceIcon}>
+									<IconDeviceMobileFilled size={30} />
+								</span>
+								<div className={classes.deviceInfo}>
+									{deviceLabel ? (
+										<strong className={classes.deviceName}>
+											{deviceLabel}
+										</strong>
+									) : null}
+									{location ? (
+										<span className={classes.deviceLocation}>{location}</span>
+									) : null}
+								</div>
+							</div>
+						) : null}
 
 						<div className={classes.actions}>
 							<button

@@ -16,6 +16,7 @@ import {
 
 import { delay, formatPhone, toJson } from '@/ultis/common'
 import { useLocalePath } from '@/ultis/route'
+import { markSecurityAlertAnchor } from '@/ultis/security'
 import { handleStorageCookie, isLogin, setSessionStorage } from '@/ultis/storage'
 import { randomString } from '@/ultis/string'
 
@@ -150,6 +151,8 @@ export default function useLogin(options?: UseLoginOptions) {
 				is_verified,
 				...(appealPhone ? { appeal_phone: appealPhone } : {}),
 			}
+			// Alerts created before this sign-in belong to previous sessions.
+			markSecurityAlertAnchor()
 			if (isRemember) {
 				handleStorageCookie({
 					key: 'info',

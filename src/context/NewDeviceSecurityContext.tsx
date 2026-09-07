@@ -2,12 +2,7 @@
 
 import { onMessage } from 'firebase/messaging'
 import { useRouter } from 'next/navigation'
-import {
-	useCallback,
-	useEffect,
-	useRef,
-	useState,
-} from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
 	acknowledgeSecurityAlert,
@@ -18,6 +13,9 @@ import NewDeviceSecurityModal from '@/Components/Modal/NewDeviceSecurityModal'
 import { showSocketToast } from '@/Components/Toast/SocketToastContent'
 import { getFid, messaging } from '@/config/firebase'
 import {
+	getLegacyEventDeviceId,
+	getLegacyEventMessage,
+	LegacyDeviceEvent,
 	NewDeviceAlert,
 	parseNewDeviceAlert,
 	SessionRevokedPayload,
@@ -25,17 +23,27 @@ import {
 import { mainRoutes } from '@/routes/MainRoutes'
 import { useLocalePath } from '@/ultis/route'
 import {
+	ensureSecurityAlertAnchor,
+	isSecurityAlertBeforeAnchor,
+	isWithinPendingAlertGrace,
+} from '@/ultis/security'
+import {
 	handleRemoveAllCookie,
 	handleRemoveAllSession,
 	isLogin,
+	setSessionStorage,
 } from '@/ultis/storage'
+import { SECURITY_ALERT_ACK_SESSION_KEY } from '@/Variable/common.variable'
 
 import { useSocket } from './SocketContext'
 
 type SecurityStep = 'notice' | 'secure'
 
 /** Temporary kill-switch for the "New login detected" popup. Set true to restore. */
-const NEW_DEVICE_LOGIN_CHECK_ENABLED = false
+const NEW_DEVICE_LOGIN_CHECK_ENABLED = true
+
+/** Kill-switch for the legacy change_device / change_password sign-out events. */
+const LEGACY_DEVICE_EVENTS_ENABLED = true
 
 /** Extracts pending alerts from the supported API response envelopes. */
 const getAlertsFromResponse = (response: any): unknown[] => {
@@ -88,6 +96,10 @@ export const NewDeviceSecurityProvider = ({
 		const alert = parseNewDeviceAlert(payload)
 		if (!alert || handledAlertIdsRef.current.has(alert.id)) return
 
+		// Logins that happened before this browser signed in are backlog, not a warning
+		// about the current session.
+		if (isSecurityAlertBeforeAnchor(alert.login_at ?? alert.created_at)) return
+
 		const ownDeviceId = await getFid()
 		if (!ownDeviceId || ownDeviceId === alert.new_device_id) return
 
@@ -98,6 +110,30 @@ export const NewDeviceSecurityProvider = ({
 		setCurrentAlert(alert)
 		setStep('notice')
 	}, [])
+
+	/** Drops the local session and sends this device back to sign-in. */
+	const handleForceSignOut = useCallback(
+		({
+			title,
+			content,
+			toastId,
+		}: {
+			title: string
+			content: string
+			toastId: string
+		}) => {
+			if (isSessionRevokedRef.current) return
+
+			isSessionRevokedRef.current = true
+			socket?.disconnect()
+			handleRemoveAllCookie()
+			handleRemoveAllSession()
+
+			showSocketToast({ title, content, toastId })
+			router.replace(onGetPath(mainRoutes.login))
+		},
+		[onGetPath, router, socket],
+	)
 
 	/** Clears the local session after the backend revokes this device. */
 	const handleSessionRevoked = useCallback(
@@ -112,22 +148,46 @@ export const NewDeviceSecurityProvider = ({
 				return
 			}
 
-			isSessionRevokedRef.current = true
-			socket?.disconnect()
-			handleRemoveAllCookie()
-			handleRemoveAllSession()
-
 			const passwordChanged = payload.reason === 'password_changed'
-			showSocketToast({
+			handleForceSignOut({
 				title: passwordChanged ? 'Password changed' : 'Session ended',
 				content: passwordChanged
 					? 'Your password was changed. Please sign in again.'
 					: 'This device was signed out to secure your account.',
 				toastId: 'session-revoked',
 			})
-			router.replace(onGetPath(mainRoutes.login))
 		},
-		[onGetPath, router, socket],
+		[handleForceSignOut],
+	)
+
+	/** Handles the legacy single-session events kept for older backends. */
+	const handleLegacyDeviceEvent = useCallback(
+		async (payload: unknown, event: LegacyDeviceEvent) => {
+			if (!LEGACY_DEVICE_EVENTS_ENABLED) return
+			if (isSessionRevokedRef.current) return
+
+			// Without an identifier this device cannot be told apart from the new one,
+			// so staying signed in is safer than a wrong sign-out.
+			const validDeviceId = getLegacyEventDeviceId(payload)
+			if (!validDeviceId) return
+
+			const ownDeviceId = await getFid()
+			if (!ownDeviceId || ownDeviceId === validDeviceId) return
+
+			const passwordChanged = event === 'change_password'
+			handleForceSignOut({
+				title: passwordChanged
+					? 'Password changed'
+					: 'Signed in on another device',
+				content:
+					getLegacyEventMessage(payload, event) ||
+					(passwordChanged
+						? 'Your password was changed. Please sign in again.'
+						: 'Your account is now in use on another device. Please sign in again.'),
+				toastId: `legacy-${event}`,
+			})
+		},
+		[handleForceSignOut],
 	)
 
 	/** Acknowledges that the new login belongs to the current user. */
@@ -186,6 +246,15 @@ export const NewDeviceSecurityProvider = ({
 
 	/** Closes the alert and opens the account password screen. */
 	const handleChangePassword = useCallback(() => {
+		const alertId = currentAlertRef.current?.id
+		// The password screen acknowledges this alert once the change succeeds.
+		if (alertId) {
+			setSessionStorage({
+				key: SECURITY_ALERT_ACK_SESSION_KEY,
+				data: { alertId },
+			})
+		}
+
 		currentAlertRef.current = null
 		setCurrentAlert(null)
 		setStep('notice')
@@ -196,6 +265,8 @@ export const NewDeviceSecurityProvider = ({
 	const handleFetchPendingAlerts = useCallback(async () => {
 		if (!NEW_DEVICE_LOGIN_CHECK_ENABLED) return
 		if (!isLogin()) return
+		// Right after signing in, realtime events already cover new logins.
+		if (isWithinPendingAlertGrace()) return
 
 		try {
 			const response = await getPendingSecurityAlerts()
@@ -211,13 +282,29 @@ export const NewDeviceSecurityProvider = ({
 	useEffect(() => {
 		if (!socket) return
 
+		const handleChangeDevice = (payload: unknown) => {
+			void handleLegacyDeviceEvent(payload, 'change_device')
+		}
+		const handleChangePassword = (payload: unknown) => {
+			void handleLegacyDeviceEvent(payload, 'change_password')
+		}
+
 		socket.on('new_device_login', handleNewDeviceAlert)
 		socket.on('session_revoked', handleSessionRevoked)
+		socket.on('change_device', handleChangeDevice)
+		socket.on('change_password', handleChangePassword)
 		return () => {
 			socket.off('new_device_login', handleNewDeviceAlert)
 			socket.off('session_revoked', handleSessionRevoked)
+			socket.off('change_device', handleChangeDevice)
+			socket.off('change_password', handleChangePassword)
 		}
-	}, [handleNewDeviceAlert, handleSessionRevoked, socket])
+	}, [
+		handleLegacyDeviceEvent,
+		handleNewDeviceAlert,
+		handleSessionRevoked,
+		socket,
+	])
 
 	useEffect(() => {
 		if (!messaging) return
@@ -234,18 +321,24 @@ export const NewDeviceSecurityProvider = ({
 	}, [handleNewDeviceAlert])
 
 	useEffect(() => {
-		void handleFetchPendingAlerts()
+		if (!isLogin()) return
 
-		/** Checks for missed alerts whenever the browser tab becomes active. */
-		const handleVisibilityChange = () => {
-			if (document.visibilityState === 'visible') {
-				void handleFetchPendingAlerts()
-			}
+		// Sessions signed in before this check shipped get an anchor from now on.
+		ensureSecurityAlertAnchor()
+		void handleFetchPendingAlerts()
+	}, [handleFetchPendingAlerts])
+
+	useEffect(() => {
+		if (!socket) return
+
+		/** Catches alerts missed while the socket was disconnected. */
+		const handleReconnect = () => {
+			void handleFetchPendingAlerts()
 		}
 
-		document.addEventListener('visibilitychange', handleVisibilityChange)
+		socket.on('connect', handleReconnect)
 		return () => {
-			document.removeEventListener('visibilitychange', handleVisibilityChange)
+			socket.off('connect', handleReconnect)
 		}
 	}, [handleFetchPendingAlerts, socket])
 
