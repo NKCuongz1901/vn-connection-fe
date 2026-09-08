@@ -29,6 +29,7 @@
 		"country-flag-icons": "^1.6.1",
 		"dayjs": "^1.11.13",
 		"firebase": "^12.11.0",
+		"framer-motion": "^13.2.0",
 		"lodash": "^4.17.21",
 		"lottie-react": "^2.4.1",
 		"md5": "^2.3.0",
