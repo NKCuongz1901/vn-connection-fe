@@ -1,6 +1,7 @@
-import React from 'react'
+'use client'
 
-function page() {
-	return <div>page</div>
+import CourseIntro from '@/Container/Course/CourseIntro'
+
+export default function CoursePage() {
+	return <CourseIntro />
 }
-export default page

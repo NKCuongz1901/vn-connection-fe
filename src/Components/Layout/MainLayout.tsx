@@ -216,7 +216,11 @@ const MainLayout = (props: MainLayoutProps) => {
 			setContent(_renderAppShell())
 			return
 		}
-		if (pathname.startsWith(mainRoutes.course)) {
+		if (pathname === mainRoutes.course) {
+			setContent(<AuthLayout>{children}</AuthLayout>)
+			return
+		}
+		if (pathname.startsWith(`${mainRoutes.course}/`)) {
 			setContent(_renderCourseLayout())
 			return
 		}

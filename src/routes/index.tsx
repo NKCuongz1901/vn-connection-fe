@@ -298,31 +298,31 @@ export const CourseMenus = [
 	{
 		title: 'Overview',
 		Icon: OverviewIcon,
-		path: mainRoutes.overview,
+		path: mainRoutes.courseOverview,
 		child: [],
 	},
 	{
 		title: 'Track progress',
 		Icon: FriendAcceptIcon,
-		path: mainRoutes.overview,
+		path: mainRoutes.courseTrackProgress,
 		child: [],
 	},
 	{
 		title: 'Leader board',
 		Icon: LeaderBoardCourseIcon,
-		path: mainRoutes.overview,
+		path: mainRoutes.courseLeaderBoard,
 		child: [],
 	},
 	{
 		title: 'Classroom',
 		Icon: ClassroomIcon,
-		path: mainRoutes.overview,
+		path: mainRoutes.courseClassroom,
 		child: [],
 	},
 	{
 		title: 'Chat support',
 		Icon: ChatSupportIcon,
-		path: mainRoutes.overview,
+		path: mainRoutes.courseChatSupport,
 		child: [],
 	},
 ]
