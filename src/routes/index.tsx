@@ -9,7 +9,10 @@ import People from '@/svg/People'
 import ProfileIcon from '@/svg/ProfileIcon'
 import SquareIcon from '@/svg/SquareIcon'
 import TwoUser from '@/svg/TwoUser'
-
+import LeaderBoardCourseIcon from '@/svg/Course/LeaderBoardCourseIcon'
+import ClassroomIcon from '@/svg/Course/ClassroomIcon'
+import ChatSupportIcon from '@/svg/Course/ChatSupportIcon'
+import FriendAcceptIcon from '@/svg/FriendAcceptIcon'
 import { mainRoutes } from './MainRoutes'
 import MiniApp from '@/svg/MiniApp'
 
@@ -289,4 +292,37 @@ export const Menus = [
 	// 	path: mainRoutes.dating,
 	// 	child: [],
 	// },
+]
+
+export const CourseMenus = [
+	{
+		title: 'Overview',
+		Icon: OverviewIcon,
+		path: mainRoutes.overview,
+		child: [],
+	},
+	{
+		title: 'Track progress',
+		Icon: FriendAcceptIcon,
+		path: mainRoutes.overview,
+		child: [],
+	},
+	{
+		title: 'Leader board',
+		Icon: LeaderBoardCourseIcon,
+		path: mainRoutes.overview,
+		child: [],
+	},
+	{
+		title: 'Classroom',
+		Icon: ClassroomIcon,
+		path: mainRoutes.overview,
+		child: [],
+	},
+	{
+		title: 'Chat support',
+		Icon: ChatSupportIcon,
+		path: mainRoutes.overview,
+		child: [],
+	},
 ]

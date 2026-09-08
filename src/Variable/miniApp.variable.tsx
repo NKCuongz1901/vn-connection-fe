@@ -67,7 +67,7 @@ export const MINI_APP_ITEMS: MiniAppItem[] = [
 		label: 'Course',
 		variant: MINI_APP_VARIANT.COURSE,
 		Icon: CourseMiniAppIcon,
-		route: '/course',
+		route: 'course',
 		availableOnWeb: true,
 	},
 ]
