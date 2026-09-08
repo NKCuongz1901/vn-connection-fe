@@ -1,6 +1,6 @@
 'use client'
 
-import { IconChevronLeft } from '@tabler/icons-react'
+import { IconChevronLeft, IconCircleXFilled } from '@tabler/icons-react'
 import { Skeleton } from 'antd'
 import clsx from 'clsx'
 
@@ -24,7 +24,7 @@ function RedeemHistory() {
 
 	const renderRedeemItem = (item: RedeemHistoryItem) => {
 		const isPending = item.status === 'pending'
-
+		const isRejected = item.status === 'rejected'
 		return (
 			<div key={item.id} className={classes.card}>
 				<div className={classes.cardHeader}>
@@ -33,17 +33,22 @@ function RedeemHistory() {
 						<span className={classes.date}>{item.date}</span>
 					</div>
 					<div
-						className={clsx(
-							classes.statusTag,
-							isPending ? classes.statusPending : classes.statusPaid,
-						)}
+						className={clsx(classes.statusTag, {
+							[classes.statusPending]: isPending,
+							[classes.statusRejected]: isRejected,
+							[classes.statusPaid]: !isPending && !isRejected,
+						})}
 					>
 						{isPending ? (
 							<ClockIcon fill="#E55A0F" />
+						) : isRejected ? (
+							<IconCircleXFilled size={16} color="#CD3031" />
 						) : (
 							<TickCircleIcon fill="#1B8024" width={16} height={16} />
 						)}
-						<span>{isPending ? 'Pending' : 'Paid'}</span>
+						<span>
+							{isPending ? 'Pending' : isRejected ? 'Rejected' : 'Paid'}
+						</span>
 					</div>
 				</div>
 
@@ -57,10 +62,19 @@ function RedeemHistory() {
 						</div>
 						<div className={classes.pointsWrap}>
 							<CoinIcon />
-							<span>{item.points} points</span>
+							<span>{formatNumberString(item.points)} points</span>
 						</div>
 					</div>
 				</div>
+
+				{isRejected && item.rejectionReason && (
+					<>
+						<div className={classes.divider} />
+						<p className={classes.rejectionReason}>
+							Rejection reason: {item.rejectionReason}
+						</p>
+					</>
+				)}
 
 				{!isPending && item.paidAt && (
 					<>

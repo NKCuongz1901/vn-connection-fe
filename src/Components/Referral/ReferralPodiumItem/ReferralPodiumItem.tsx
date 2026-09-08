@@ -9,6 +9,7 @@ import CrownIcon from '@/svg/Referral/CrownIcon'
 import Top1Icon from '@/svg/Referral/Top1Icon'
 import Top2Icon from '@/svg/Referral/Top2Icon'
 import Top3Icon from '@/svg/Referral/Top3Icon'
+import { formatNumberString } from '@/ultis/string'
 
 import classes from './ReferralPodiumItem.module.scss'
 
@@ -71,7 +72,7 @@ function ReferralPodiumItem({ rank, user }: ReferralPodiumItemProps) {
 					) : (
 						<>
 							<span className={classes.pointsValue}>
-								{user?.total_points ?? 0}
+								{formatNumberString(user?.total_points ?? 0)}
 							</span>
 							<CoinIcon />
 						</>

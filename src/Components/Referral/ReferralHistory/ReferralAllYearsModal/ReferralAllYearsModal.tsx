@@ -7,6 +7,7 @@ import CModal from '@/Components/Custom/CModal/CModal'
 import CalenderIcon from '@/svg/CalenderIcon'
 import CoinIcon from '@/svg/CoinIcon'
 import TropyIcon from '@/svg/Referral/TropyIcon'
+import { formatNumberString } from '@/ultis/string'
 
 import type { ReferralYearStat } from '../referralHistory.utils'
 
@@ -72,7 +73,7 @@ function ReferralAllYearsModal({
 									</div>
 									<span className={classes.yearLabel}>{year}</span>
 									<div className={classes.points}>
-										<span>{yearTotal}</span>
+										<span>{formatNumberString(yearTotal)}</span>
 										<CoinIcon />
 									</div>
 								</button>
@@ -91,9 +92,9 @@ function ReferralAllYearsModal({
 						<div className={classes.iconWrap}>
 							<TropyIcon />
 						</div>
-						<span className={classes.totalLabel}>All years</span>
+						<span className={classes.totalLabel}>Total points</span>
 						<div className={classes.points}>
-							<span>{total}</span>
+							<span>{formatNumberString(total)}</span>
 							<CoinIcon />
 						</div>
 					</button>

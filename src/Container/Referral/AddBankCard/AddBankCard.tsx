@@ -16,20 +16,12 @@ const INPUT_STYLE = {
 
 function AddBankCard() {
 	const {
-		cardHolderName,
-		cardNumber,
-		bankName,
-		phone,
-		email,
+		form,
 		issuedInVietnam,
 		agreeTerms,
 		isValid,
 		loading,
-		setCardHolderName,
-		setCardNumber,
-		setBankName,
-		setPhone,
-		setEmail,
+		handleChangeField,
 		setIssuedInVietnam,
 		setAgreeTerms,
 		onGoBack,
@@ -39,11 +31,7 @@ function AddBankCard() {
 	return (
 		<div className={classes.wrapper}>
 			<div className={classes.header}>
-				<button
-					type="button"
-					className={classes.titleRow}
-					onClick={onGoBack}
-				>
+				<button type="button" className={classes.titleRow} onClick={onGoBack}>
 					<IconChevronLeft size={20} color="#0F1729" />
 					<span className={classes.title}>Add bank card</span>
 				</button>
@@ -57,12 +45,12 @@ function AddBankCard() {
 					<CInput
 						label="Card holder name"
 						isRequired
-						value={cardHolderName}
+						value={form.cardHolderName}
 						placeholder="Card holder name"
 						allowClear={false}
 						bordered={false}
 						style={INPUT_STYLE}
-						onChange={(e) => setCardHolderName(e.target.value)}
+						onChange={handleChangeField('cardHolderName')}
 					/>
 				</div>
 
@@ -70,12 +58,12 @@ function AddBankCard() {
 					<CInput
 						label="Card number"
 						isRequired
-						value={cardNumber}
+						value={form.cardNumber}
 						placeholder="Card number"
 						allowClear={false}
 						bordered={false}
 						style={INPUT_STYLE}
-						onChange={(e) => setCardNumber(e.target.value)}
+						onChange={handleChangeField('cardNumber')}
 					/>
 				</div>
 
@@ -83,24 +71,25 @@ function AddBankCard() {
 					<CInput
 						label="Bank name"
 						isRequired
-						value={bankName}
+						value={form.bankName}
 						placeholder="Bank name"
 						allowClear={false}
 						bordered={false}
 						style={INPUT_STYLE}
-						onChange={(e) => setBankName(e.target.value)}
+						onChange={handleChangeField('bankName')}
 					/>
 				</div>
 
 				<div className={classes.formField}>
 					<CInput
+						isRequired
 						label="Phone number"
-						value={phone}
+						value={form.phone}
 						placeholder="Phone number"
 						allowClear={false}
 						bordered={false}
 						style={INPUT_STYLE}
-						onChange={(e) => setPhone(e.target.value)}
+						onChange={handleChangeField('phone')}
 					/>
 				</div>
 
@@ -109,12 +98,12 @@ function AddBankCard() {
 						label="Email"
 						isRequired
 						subLabel="For international banks, UniVini sends money via Wise using your email. Please enter it carefully."
-						value={email}
+						value={form.email}
 						placeholder="Email"
 						allowClear={false}
 						bordered={false}
 						style={INPUT_STYLE}
-						onChange={(e) => setEmail(e.target.value)}
+						onChange={handleChangeField('email')}
 					/>
 				</div>
 
@@ -133,9 +122,7 @@ function AddBankCard() {
 							onChange={(e) => setAgreeTerms(e.target.checked)}
 						>
 							By adding a new card, you agree to the{' '}
-							<span className={classes.termsLink}>
-								credit/debit card terms
-							</span>
+							<span className={classes.termsLink}>credit/debit card terms</span>
 						</CCheckbox>
 					</div>
 				</div>

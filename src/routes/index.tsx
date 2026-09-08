@@ -165,6 +165,7 @@ export const REFERRAL_ROUTES = {
 	addBankAccount: 'redeem-request/bank-account',
 	myRedeemRequests: 'redeem-request/my',
 	createRedeemRequest: 'redeem-request',
+	summaryRedeemRequest: 'redeem-request/summary',
 }
 export const MAP_ROUTES = {
 	name: 'map/google/place/textsearch/json',
