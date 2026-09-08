@@ -131,6 +131,14 @@
 	}
 }
 
+.statusRejected {
+	background: #e7f5e9;
+
+	span {
+		color: #cd3031;
+	}
+}
+
 .cardContent {
 	display: flex;
 	align-items: center;
@@ -195,6 +203,13 @@
 
 .paidAt {
 	color: #48546b;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+}
+
+.rejectionReason {
+	color: #e55a0f;
 	font-size: 12px;
 	font-weight: 400;
 	line-height: 16px;

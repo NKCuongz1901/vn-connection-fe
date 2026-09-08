@@ -40,7 +40,6 @@ export const getWalletHistoryOverview = async () => {
 	return await axios.get(url)
 }
 
-
 export type AddBankAccountPayload = {
 	bank_name: string
 	account_holder_name: string
@@ -73,4 +72,9 @@ export const getMyRedeemRequests = async (params?: {
 export const createRedeemRequest = async (payload: { points: number }) => {
 	const url = REFERRAL_ROUTES.createRedeemRequest
 	return await axios.post(url, payload)
+}
+
+export const getSummaryRedeemRequest = async () => {
+	const url = REFERRAL_ROUTES.summaryRedeemRequest
+	return await axios.get(url)
 }

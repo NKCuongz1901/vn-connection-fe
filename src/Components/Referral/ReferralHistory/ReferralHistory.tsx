@@ -7,6 +7,7 @@ import ReferralAllYearsModal from '@/Components/Referral/ReferralHistory/Referra
 import ReferralHistoryItem from '@/Components/Referral/ReferralHistory/ReferralHistoryItem/ReferralHistoryItem'
 import CalenderIcon from '@/svg/CalenderIcon'
 import CoinIcon from '@/svg/CoinIcon'
+import { formatNumberString } from '@/ultis/string'
 
 import classes from './ReferralHistory.module.scss'
 import {
@@ -74,7 +75,9 @@ function ReferralHistory({
 						{index > 0 && <div className={classes.refByMonthDivider} />}
 						<div className={classes.refByMonthCard}>
 							<span className={classes.refByMonthLabel}>{item.label}</span>
-							<span className={classes.refByMonthValue}>{item.value}</span>
+							<span className={classes.refByMonthValue}>
+								{formatNumberString(item.value)}
+							</span>
 							<div className={classes.refByMonthCaption}>
 								<span>points</span>
 								<div className={classes.refByMonthCoin}>

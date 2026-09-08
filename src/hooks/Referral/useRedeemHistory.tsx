@@ -6,7 +6,7 @@ import { useModal } from '@/context/ModalContext'
 import { isArray } from '@/ultis/array'
 import { handleScrollCallback } from '@/ultis/common'
 
-export type RedeemStatus = 'pending' | 'paid'
+export type RedeemStatus = 'pending' | 'paid' | 'rejected'
 
 export type RedeemHistoryItem = {
 	id: string
@@ -15,11 +15,13 @@ export type RedeemHistoryItem = {
 	amount: number
 	points: number
 	paidAt?: string
+	rejectionReason?: string
 }
 
 /** Maps API redeem status to UI status. */
 const mapRedeemStatus = (status?: string): RedeemStatus => {
 	if (status === 'PENDING') return 'pending'
+	if (status === 'REJECTED') return 'rejected'
 	return 'paid'
 }
 
@@ -29,9 +31,7 @@ const normalizeRedeemItem = (row: any): RedeemHistoryItem => {
 	const processedAt = row?.processed_at
 	return {
 		id: row?.id,
-		date: row?.created_at
-			? dayjs(row.created_at).format('MMM D, YYYY')
-			: '',
+		date: row?.created_at ? dayjs(row.created_at).format('MMM D, YYYY') : '',
 		status,
 		amount: Number(row?.amount_vnd) || 0,
 		points: Number(row?.points) || 0,
@@ -39,6 +39,7 @@ const normalizeRedeemItem = (row: any): RedeemHistoryItem => {
 			status === 'paid' && processedAt
 				? `Paid on ${dayjs(processedAt).format('MMM D, YYYY [at] hh:mm A')}`
 				: undefined,
+		rejectionReason: status === 'rejected' ? row?.rejection_reason : undefined,
 	}
 }
 
@@ -73,12 +74,9 @@ export default function useRedeemHistory() {
 				if (code === 200) {
 					const { rows = [], count = 0 } = results?.objects || {}
 					paginationRef.current.page = page
-					canLoadMoreRef.current =
-						isArray(rows, limit) && page * limit < count
+					canLoadMoreRef.current = isArray(rows, limit) && page * limit < count
 					const nextItems = rows.map(normalizeRedeemItem)
-					setItems((prev) =>
-						page === 1 ? nextItems : [...prev, ...nextItems],
-					)
+					setItems((prev) => (page === 1 ? nextItems : [...prev, ...nextItems]))
 				}
 			} catch (error) {
 				openError(error)

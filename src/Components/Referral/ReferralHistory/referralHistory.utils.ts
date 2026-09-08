@@ -158,11 +158,18 @@ export interface ReferralHistoryStatusResult {
 	amount?: number
 }
 
+export const INVITEE_PLACEHOLDER_NAME = 'The user of Univini'
+
 export function getInviteeDisplayName(item: ReferralWalletHistoryItem): string {
 	const name = item.invitee?.name?.trim()
 	if (name) return name
 	if (item.phone) return item.phone
-	return '—'
+	return INVITEE_PLACEHOLDER_NAME
+}
+
+/** True when invitee profile is missing (shows placeholder name). */
+export function isInviteePlaceholder(item: ReferralWalletHistoryItem): boolean {
+	return !item.invitee?.name?.trim() && !item.phone
 }
 
 export function getInviteeAvatar(item: ReferralWalletHistoryItem): string {

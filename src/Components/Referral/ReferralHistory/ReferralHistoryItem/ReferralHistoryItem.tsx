@@ -1,5 +1,6 @@
 'use client'
 
+import clsx from 'clsx'
 import { memo } from 'react'
 
 import CAvatar from '@/Components/Custom/CAvatar'
@@ -10,6 +11,7 @@ import {
 	getInviteeAvatar,
 	getInviteeDisplayName,
 	getReferralHistoryStatus,
+	isInviteePlaceholder,
 	type ReferralWalletHistoryItem,
 } from '../referralHistory.utils'
 import classes from './ReferralHistoryItem.module.scss'
@@ -23,6 +25,7 @@ function ReferralHistoryItem({ item }: ReferralHistoryItemProps) {
 	const avatar = getInviteeAvatar(item)
 	const date = formatReferralDate(item.created_at)
 	const status = getReferralHistoryStatus(item)
+	const isPlaceholder = isInviteePlaceholder(item)
 
 	return (
 		<div className={classes.row}>
@@ -31,7 +34,13 @@ function ReferralHistoryItem({ item }: ReferralHistoryItemProps) {
 					<CAvatar src={avatar} size={40} />
 				</div>
 				<div className={classes.info}>
-					<span className={classes.name}>{displayName}</span>
+					<span
+						className={clsx(classes.name, {
+							[classes.namePlaceholder]: isPlaceholder,
+						})}
+					>
+						{displayName}
+					</span>
 					<span className={classes.date}>{date}</span>
 				</div>
 			</div>
