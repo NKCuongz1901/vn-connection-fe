@@ -42,6 +42,9 @@ export const BOOK_CATEGORIES = [
 
 export const BOOK_ROOT = 'mini-apps/books-audio'
 
+/** Temporary kill switch for Books & Audio on web (main). Flip to true to ship. */
+export const BOOK_WEB_ENABLED = false
+
 export const DEFAULT_LEARNING_LANG = 'en-gb'
 export const DEFAULT_NATIVE_LANG = 'vi-south'
 

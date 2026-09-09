@@ -2,6 +2,7 @@ import BookIcon from '@/svg/BookIcon'
 import TutorIcon from '@/svg/TutorIcon'
 import ShopIcon from '@/svg/ShopIcon'
 import HeartIcon from '@/svg/Heart'
+import { BOOK_WEB_ENABLED } from '@/Variable/book.variable'
 
 export const MINI_APP_VARIANT = {
 	BOOK: 'book',
@@ -27,6 +28,7 @@ export type MiniAppItem = {
 	Icon: React.ComponentType<{ fill?: string }>
 	route?: string
 	availableOnWeb?: boolean
+	hidden?: boolean
 }
 
 export const MINI_APP_ITEMS: MiniAppItem[] = [
@@ -36,7 +38,8 @@ export const MINI_APP_ITEMS: MiniAppItem[] = [
 		variant: MINI_APP_VARIANT.BOOK,
 		Icon: BookIcon,
 		route: 'mini-apps/books-audio',
-		availableOnWeb: true,
+		availableOnWeb: BOOK_WEB_ENABLED,
+		hidden: !BOOK_WEB_ENABLED,
 	},
 	{
 		id: 'tutor',

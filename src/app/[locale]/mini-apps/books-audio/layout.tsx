@@ -1,14 +1,11 @@
-'use client'
+import { redirect } from 'next/navigation'
 
 import BookShell from '@/Container/Book/BookShell'
 import { BookLibraryProvider } from '@/context/BookLibraryContext'
 import { BookPlayerProvider } from '@/context/BookPlayerContext'
+import { BOOK_WEB_ENABLED } from '@/Variable/book.variable'
 
-export default function BookAudioLayout({
-	children,
-}: {
-	children: React.ReactNode
-}) {
+function BookAudioProviders({ children }: { children: React.ReactNode }) {
 	return (
 		<BookLibraryProvider>
 			<BookPlayerProvider>
@@ -16,4 +13,18 @@ export default function BookAudioLayout({
 			</BookPlayerProvider>
 		</BookLibraryProvider>
 	)
+}
+
+export default function BookAudioLayout({
+	children,
+	params,
+}: {
+	children: React.ReactNode
+	params: { locale: string }
+}) {
+	if (!BOOK_WEB_ENABLED) {
+		redirect(`/${params.locale}/mini-apps`)
+	}
+
+	return <BookAudioProviders>{children}</BookAudioProviders>
 }

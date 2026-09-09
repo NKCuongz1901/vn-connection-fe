@@ -11,8 +11,7 @@ function MiniAppsHub() {
 		<div className={classes.page}>
 			<div className={classes.title}>Mini apps</div>
 			<div className={classes.desc}>
-				Books & Audio is available on web. Other mini apps stay in the
-				UniVini app.
+				These mini apps are available in the UniVini app.
 			</div>
 			<MiniAppList />
 		</div>
