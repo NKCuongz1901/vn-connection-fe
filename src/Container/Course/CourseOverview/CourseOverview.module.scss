@@ -1,0 +1,34 @@
+.container {
+	display: flex;
+	height: 100%;
+	padding: 24px 32px;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 24px;
+	flex: 1 0 0;
+	align-self: stretch;
+
+	.topSection {
+		flex: 1;
+		width: 100%;
+		height: 100%;
+
+		.bannerWrapper {
+			width: 100%;
+			height: 100%;
+			align-self: stretch;
+			aspect-ratio: 142/55;
+			border-radius: 16px;
+			background: url('/images/course/bannerCourse.png') lightgray 50% / contain
+				no-repeat;
+		}
+	}
+
+	.bottomSection {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: 16px;
+		width: 100%;
+	}
+}

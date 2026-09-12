@@ -217,6 +217,10 @@ export const TALKROOM_ROUTES = {
 	// Get token socket
 	getTokenSocket: 'auth/socket_token',
 }
+
+export const COURSE_ROUTES = {
+	baseUrl: 'course-ai',
+}
 export const Menus = [
 	{
 		title: 'Overview',
