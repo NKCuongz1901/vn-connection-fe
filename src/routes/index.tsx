@@ -221,6 +221,7 @@ export const TALKROOM_ROUTES = {
 export const COURSE_ROUTES = {
 	baseUrl: 'course-ai',
 	trackingCourse: 'course-ai/overview',
+	referralGlobal: 'course-ai/referral/global/share',
 }
 export const Menus = [
 	{

@@ -58,6 +58,7 @@
 		justify-content: center;
 		align-items: center;
 		gap: var(--spacing-spacer-0, 10px);
+		border: none;
 		border-radius: var(--radius-component-button, 999px);
 		background: var(--component-button-secondary-bg-default, #f0f3f9);
 		cursor: pointer;

@@ -1,4 +1,8 @@
-import { getCourseList, getTrackingCourse } from '@/apis/courseApis'
+import {
+	getCourseList,
+	getReferralGlobal,
+	getTrackingCourse,
+} from '@/apis/courseApis'
 import { useModal } from '@/context/ModalContext'
 import {
 	Course,
@@ -6,6 +10,7 @@ import {
 	TrackingCourse,
 	TrackingCourseRes,
 } from '@/interface/Course/Course.interface'
+import { getReferralCode } from '@/ultis/string'
 import { useEffect, useState } from 'react'
 
 export default function useCourse() {
@@ -13,10 +18,13 @@ export default function useCourse() {
 	const [listCourse, setListCourse] = useState<Course[]>([])
 	const [myPurchasedCourse, setMyPurchasedCourse] = useState<Course[]>([])
 	const [trackingCourse, setTrackingCourse] = useState<TrackingCourse[]>([])
+	const [referralGlobalLink, setReferralGlobalLink] = useState<string>('')
+	const [referralGlobalCode, setReferralGlobalCode] = useState<string>('')
 	const [loading, setloading] = useState({
 		listCourse: true,
 		myPurchasedCourse: true,
 		trackingCourse: true,
+		referralGlobal: true,
 	})
 
 	const handleGetListCourse = async () => {
@@ -77,10 +85,29 @@ export default function useCourse() {
 		}
 	}
 
+	const handleGetReferralGlobal = async () => {
+		try {
+			setloading((prev) => ({ ...prev, referralGlobal: true }))
+			const res: any = await getReferralGlobal()
+			const { code, results } = res || {}
+			if (code === 200) {
+				setReferralGlobalLink(results?.object?.share_link || '')
+				setReferralGlobalCode(
+					getReferralCode(results?.object?.share_link || ''),
+				)
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setloading((prev) => ({ ...prev, referralGlobal: false }))
+		}
+	}
+
 	useEffect(() => {
 		handleGetListCourse()
 		handleGetMyPurchasedCourse()
 		handleGetTrackingCourse()
+		handleGetReferralGlobal()
 	}, [])
 
 	return {
@@ -88,5 +115,7 @@ export default function useCourse() {
 		listCourse,
 		myPurchasedCourse,
 		trackingCourse,
+		referralGlobalLink,
+		referralGlobalCode,
 	}
 }

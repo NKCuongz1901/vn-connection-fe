@@ -4,7 +4,11 @@ import classes from './ShareCourse.module.scss'
 import ShopIcon from '@/svg/ShopIcon'
 import ShareIcon from '@/svg/FriendSvg/ShareIcon'
 
-function ShareCourse() {
+type ShareCourseProps = {
+	onShare?: () => void
+}
+
+function ShareCourse({ onShare }: ShareCourseProps) {
 	return (
 		<div className={classes.container}>
 			<div className={classes.leftSection}>
@@ -18,10 +22,14 @@ function ShareCourse() {
 					</p>
 				</div>
 			</div>
-			<div className={classes.rightSection}>
+			<button
+				type="button"
+				className={classes.rightSection}
+				onClick={onShare}
+			>
 				<ShareIcon fill="#000" />
 				<p className={classes.textShare}>Share all course</p>
-			</div>
+			</button>
 		</div>
 	)
 }

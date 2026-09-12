@@ -1,0 +1,154 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	min-height: 453px;
+	background: #fff;
+	box-sizing: border-box;
+}
+
+.header {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	width: 100%;
+	padding: 20px 12px 0;
+	text-align: center;
+}
+
+.title {
+	margin: 0;
+	color: #0f1729;
+	font-size: 17px;
+	font-weight: 600;
+	line-height: 22px;
+}
+
+.subtitle,
+.invite {
+	margin: 0;
+	color: #0f1729;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+}
+
+.percent {
+	color: #e55a0f;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 24px;
+}
+
+.graphic {
+	display: block;
+	width: 300px;
+	height: 196px;
+	margin: 16px 0 auto;
+	object-fit: contain;
+}
+
+.bottom {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	width: 100%;
+	padding: 0 16px 16px;
+}
+
+.shareBar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 8px 12px;
+	border: 0.5px solid #f0f3f9;
+	border-radius: 18px;
+	background: rgba(0, 8, 25, 0.36);
+	backdrop-filter: blur(5px);
+	box-shadow:
+		0 1.23px 1.23px 0 rgba(0, 0, 0, 0.1),
+		1.23px 1.54px 2.47px 0 rgba(0, 0, 0, 0.06);
+	box-sizing: border-box;
+}
+
+.logo {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	height: 32px;
+	color: #fff;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 20px;
+
+	svg {
+		width: 24px;
+		height: 24px;
+		flex-shrink: 0;
+	}
+}
+
+.codeBlock {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	justify-content: center;
+	gap: 2px;
+}
+
+.codeLabel {
+	margin: 0;
+	color: #fff;
+	font-size: 10px;
+	font-weight: 400;
+	line-height: 14px;
+}
+
+.codeValue {
+	margin: 0;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+	text-align: right;
+}
+
+.shareBtn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	min-height: 48px;
+	padding: 0 16px;
+	border: none;
+	border-radius: 999px;
+	background: #e55a0f;
+	color: #fff;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	cursor: pointer;
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: default;
+	}
+}
+
+.shareIcon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	flex-shrink: 0;
+
+	svg {
+		width: 24px;
+		height: 24px;
+	}
+}

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Skeleton } from 'antd'
 import classes from './CourseOverview.module.scss'
 import useCourse from '@/hooks/Course/useCourse'
@@ -6,9 +6,18 @@ import ShareCourse from '@/Components/Course/ShareCourse/ShareCourse'
 import CourseList from '@/Components/Course/CourseList/CourseList'
 import MyCourseList from '@/Components/Course/MyCourseList/MyCourseList'
 import TrackingCourseList from '@/Components/Course/TrackingCourseList/TrackingCourseList'
+import CourseReferralModal from '@/Components/Course/CourseReferralModal/CourseReferralModal'
 
 function CourseOverview() {
-	const { loading, listCourse, myPurchasedCourse, trackingCourse } = useCourse()
+	const {
+		loading,
+		listCourse,
+		myPurchasedCourse,
+		trackingCourse,
+		referralGlobalLink,
+		referralGlobalCode,
+	} = useCourse()
+	const [referralModalOpen, setReferralModalOpen] = useState(false)
 	const isPurchasedReady = !loading.myPurchasedCourse
 	const hasPurchasedCourse = myPurchasedCourse.length > 0
 
@@ -49,7 +58,7 @@ function CourseOverview() {
 	const _renderBottomSection = () => {
 		return (
 			<div className={classes.bottomSection}>
-				<ShareCourse />
+				<ShareCourse onShare={() => setReferralModalOpen(true)} />
 				<CourseList courses={listCourse} loading={loading.listCourse} />
 			</div>
 		)
@@ -58,6 +67,12 @@ function CourseOverview() {
 		<div className={classes.container}>
 			{_renderTopSection()}
 			{_renderBottomSection()}
+			<CourseReferralModal
+				open={referralModalOpen}
+				onClose={() => setReferralModalOpen(false)}
+				referralCode={referralGlobalCode}
+				shareLink={referralGlobalLink}
+			/>
 		</div>
 	)
 }

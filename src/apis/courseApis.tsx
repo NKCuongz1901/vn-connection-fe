@@ -15,3 +15,7 @@ export const getCourseList = async ({
 export const getTrackingCourse = async () => {
 	return await axios.get(COURSE_ROUTES.trackingCourse)
 }
+
+export const getReferralGlobal = async () => {
+	return await axios.post(COURSE_ROUTES.referralGlobal)
+}
