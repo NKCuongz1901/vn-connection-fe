@@ -14,6 +14,7 @@ type MyCourseListProps = {
 	loading?: boolean
 	onCourseClick?: (course: Course) => void
 	onReview?: (course: Course) => void
+	onSeeAll?: () => void
 }
 
 function MyCourseList({
@@ -21,16 +22,22 @@ function MyCourseList({
 	loading,
 	onCourseClick,
 	onReview,
+	onSeeAll,
 }: MyCourseListProps) {
 	const count = courses.length
 
 	return (
 		<div className={classes.wrapper}>
 			<div className={classes.heading}>
-				<div className={classes.titleRow}>
+				<button
+					type="button"
+					className={classes.titleRow}
+					onClick={onSeeAll}
+					disabled={!onSeeAll}
+				>
 					<p className={classes.title}>My paid courses</p>
 					<span className={classes.badge}>{count}</span>
-				</div>
+				</button>
 			</div>
 
 			<div className={classes.list}>

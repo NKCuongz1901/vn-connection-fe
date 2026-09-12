@@ -39,6 +39,7 @@ export const mainRoutes = {
 	feedback: 'profile/account-setting/feedback-support',
 	course: 'course',
 	courseOverview: 'course/overview',
+	courseMyCourse: 'course/my-course',
 	courseTrackProgress: 'course/track-progress',
 	courseLeaderBoard: 'course/leaderboard',
 	courseClassroom: 'course/classroom',
