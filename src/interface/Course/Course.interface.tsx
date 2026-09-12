@@ -33,8 +33,30 @@ export interface CourseOwner {
 	total_learners: number
 }
 
+export type UserCourseStatus = 'inactive' | 'complete' | 'active'
+
+export type UserCoursePaymentStatus = 'purchased' | 'pending' | 'refunded'
+
 export interface UserCourse {
-	[key: string]: unknown
+	id: string
+	course_id: string
+	user_id: string
+	payment_status: UserCoursePaymentStatus | string
+	target_language: string
+	native_language: string
+	status: UserCourseStatus | string
+	type: string
+	transaction_no: string | null
+	onboarding_sheet_count: number
+	intro_streak_open_count: number
+	day_without_submission_count: number
+	last_processed_date: string | null
+	last_language_translate_in_ai_feedback: string | null
+	last_payment_at: string | null
+	day_started: string | null
+	created_at: string
+	updated_at: string
+	is_read_tomorrow: boolean
 }
 
 export interface Course {

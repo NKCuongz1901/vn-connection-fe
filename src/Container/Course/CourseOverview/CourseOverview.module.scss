@@ -22,6 +22,29 @@
 			background: url('/images/course/bannerCourse.png') lightgray 50% / contain
 				no-repeat;
 		}
+
+		.myCourseWrapper {
+			display: flex;
+			gap: 24px;
+			width: 100%;
+
+			.myCourseList {
+				flex: 1;
+				min-width: 0;
+				width: 100%;
+			}
+			.myTrackingList {
+				flex: 2;
+				height: 100%;
+				width: 100%;
+				background-color: blue;
+				display: flex;
+				padding: 16px var(--spacing-spacer-4, 16px);
+				flex-direction: column;
+				align-items: center;
+				gap: 16px;
+			}
+		}
 	}
 
 	.bottomSection {

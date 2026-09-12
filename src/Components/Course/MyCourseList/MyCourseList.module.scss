@@ -1,0 +1,56 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.heading {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	padding: 0 16px 16px 0;
+}
+
+.titleRow {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	gap: 4px;
+	min-width: 0;
+}
+
+.title {
+	margin: 0;
+	color: #0f1729;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 28px;
+	white-space: nowrap;
+}
+
+.badge {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 20px;
+	padding: 0 8px;
+	border-radius: 99px;
+	background: #fff;
+	color: #006b35;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 16px;
+}
+
+.list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	width: 100%;
+}
+
+.skeleton {
+	width: 100% !important;
+	min-height: 132px;
+	border-radius: 16px;
+}
