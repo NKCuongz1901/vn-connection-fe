@@ -63,7 +63,12 @@ function CourseOverview() {
 		return (
 			<div className={classes.bottomSection}>
 				<ShareCourse onShare={() => setReferralModalOpen(true)} />
-				<CourseList courses={listCourse} loading={loading.listCourse} />
+				<CourseList
+					courses={listCourse}
+					loading={loading.listCourse}
+					onSeeAll={() => onChangeRoute(mainRoutes.courseList)}
+					onShare={() => setReferralModalOpen(true)}
+				/>
 			</div>
 		)
 	}

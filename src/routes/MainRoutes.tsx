@@ -40,6 +40,7 @@ export const mainRoutes = {
 	course: 'course',
 	courseOverview: 'course/overview',
 	courseMyCourse: 'course/my-course',
+	courseList: 'course/course-list',
 	courseTrackProgress: 'course/track-progress',
 	courseLeaderBoard: 'course/leaderboard',
 	courseClassroom: 'course/classroom',
