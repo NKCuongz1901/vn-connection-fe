@@ -220,6 +220,7 @@ export const TALKROOM_ROUTES = {
 
 export const COURSE_ROUTES = {
 	baseUrl: 'course-ai',
+	trackingCourse: 'course-ai/overview',
 }
 export const Menus = [
 	{

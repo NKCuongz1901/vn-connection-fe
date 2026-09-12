@@ -96,3 +96,42 @@ export interface CourseListRes {
 	}
 	pagination: PaginationProps
 }
+
+export type TrackingCourseInfo = Pick<
+	Course,
+	| 'id'
+	| 'name'
+	| 'duration_days'
+	| 'start_date'
+	| 'avatar'
+	| 'supported_language'
+	| 'price'
+	| 'about'
+	| 'conversation_id'
+	| 'owner_id'
+	| 'custom_data'
+	| 'type'
+	| 'is_verified'
+	| 'slot_prototype'
+	| 'created_at'
+	| 'updated_at'
+	| 'learner_joined'
+>
+
+export interface TrackingCourse {
+	course: TrackingCourseInfo
+	yesterday_score: number | null
+	last_week_score: number | null
+	total_score: number
+	class_ranking: number
+	next_exercise: string | null
+	is_current_slot_open: boolean
+	current_slot: CourseSlotPrototype | null
+}
+
+export interface TrackingCourseRes {
+	code: number
+	results: {
+		object: TrackingCourse[]
+	}
+}

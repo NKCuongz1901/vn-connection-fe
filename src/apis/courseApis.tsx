@@ -11,3 +11,7 @@ export const getCourseList = async ({
 		params: convertParams(params),
 	})
 }
+
+export const getTrackingCourse = async () => {
+	return await axios.get(COURSE_ROUTES.trackingCourse)
+}

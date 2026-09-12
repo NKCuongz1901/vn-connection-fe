@@ -35,14 +35,8 @@
 			}
 			.myTrackingList {
 				flex: 2;
-				height: 100%;
+				min-width: 0;
 				width: 100%;
-				background-color: blue;
-				display: flex;
-				padding: 16px var(--spacing-spacer-4, 16px);
-				flex-direction: column;
-				align-items: center;
-				gap: 16px;
 			}
 		}
 	}

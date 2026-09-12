@@ -4,9 +4,10 @@ import useCourse from '@/hooks/Course/useCourse'
 import ShareCourse from '@/Components/Course/ShareCourse/ShareCourse'
 import CourseList from '@/Components/Course/CourseList/CourseList'
 import MyCourseList from '@/Components/Course/MyCourseList/MyCourseList'
+import TrackingCourseList from '@/Components/Course/TrackingCourseList/TrackingCourseList'
 
 function CourseOverview() {
-	const { loading, listCourse, myPurchasedCourse } = useCourse()
+	const { loading, listCourse, myPurchasedCourse, trackingCourse } = useCourse()
 	const hasPurchasedCourse = myPurchasedCourse.length > 0
 
 	const _renderTopSection = () => {
@@ -20,7 +21,12 @@ function CourseOverview() {
 		return (
 			<div className={classes.topSection}>
 				<div className={classes.myCourseWrapper}>
-					<div className={classes.myTrackingList}></div>
+					<div className={classes.myTrackingList}>
+						<TrackingCourseList
+							items={trackingCourse}
+							loading={loading.trackingCourse}
+						/>
+					</div>
 					<div className={classes.myCourseList}>
 						<MyCourseList
 							courses={myPurchasedCourse}
