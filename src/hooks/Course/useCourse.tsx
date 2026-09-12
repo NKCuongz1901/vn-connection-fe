@@ -14,9 +14,9 @@ export default function useCourse() {
 	const [myPurchasedCourse, setMyPurchasedCourse] = useState<Course[]>([])
 	const [trackingCourse, setTrackingCourse] = useState<TrackingCourse[]>([])
 	const [loading, setloading] = useState({
-		listCourse: false,
-		myPurchasedCourse: false,
-		trackingCourse: false,
+		listCourse: true,
+		myPurchasedCourse: true,
+		trackingCourse: true,
 	})
 
 	const handleGetListCourse = async () => {

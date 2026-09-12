@@ -1,4 +1,5 @@
 import React from 'react'
+import { Skeleton } from 'antd'
 import classes from './CourseOverview.module.scss'
 import useCourse from '@/hooks/Course/useCourse'
 import ShareCourse from '@/Components/Course/ShareCourse/ShareCourse'
@@ -8,9 +9,17 @@ import TrackingCourseList from '@/Components/Course/TrackingCourseList/TrackingC
 
 function CourseOverview() {
 	const { loading, listCourse, myPurchasedCourse, trackingCourse } = useCourse()
+	const isPurchasedReady = !loading.myPurchasedCourse
 	const hasPurchasedCourse = myPurchasedCourse.length > 0
 
 	const _renderTopSection = () => {
+		if (!isPurchasedReady) {
+			return (
+				<div className={classes.topSection}>
+					<Skeleton.Input active className={classes.topSkeleton} block />
+				</div>
+			)
+		}
 		if (!hasPurchasedCourse) {
 			return (
 				<div className={classes.topSection}>
