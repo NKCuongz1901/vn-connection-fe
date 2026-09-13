@@ -7,11 +7,13 @@ import {
 	getTrackingCourse,
 	handleContributeIdea as contributeIdeaApi,
 	handleReportCourse as reportCourseApi,
+	getPaymentInforCourse,
 } from '@/apis/courseApis'
 import { useModal } from '@/context/ModalContext'
 import {
 	Course,
 	CourseListRes,
+	PaymentInforCourse,
 	TrackingCourse,
 	TrackingCourseRes,
 } from '@/interface/Course/Course.interface'
@@ -26,12 +28,15 @@ export default function useCourse(id?: string) {
 	const [referralGlobalLink, setReferralGlobalLink] = useState<string>('')
 	const [referralGlobalCode, setReferralGlobalCode] = useState<string>('')
 	const [courseDetail, setCourseDetail] = useState<Course | null>(null)
+	const [paymentInforCourse, setPaymentInforCourse] =
+		useState<PaymentInforCourse | null>(null)
 	const [loading, setloading] = useState({
 		listCourse: true,
 		myPurchasedCourse: true,
 		trackingCourse: true,
 		referralGlobal: true,
 		courseDetail: true,
+		paymentInforCourse: true,
 	})
 
 	const handleGetListCourse = async () => {
@@ -155,6 +160,21 @@ export default function useCourse(id?: string) {
 		[openError],
 	)
 
+	const handleGetPaymentInforCourse = async (id: string) => {
+		try {
+			setloading((prev) => ({ ...prev, paymentInforCourse: true }))
+			const res: any = await getPaymentInforCourse(id)
+			const { code, results } = res || {}
+			if (code === 200) {
+				setPaymentInforCourse(results?.object || null)
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setloading((prev) => ({ ...prev, paymentInforCourse: false }))
+		}
+	}
+
 	useEffect(() => {
 		handleGetListCourse()
 		handleGetMyPurchasedCourse()
@@ -165,6 +185,7 @@ export default function useCourse(id?: string) {
 	useEffect(() => {
 		if (!id) return
 		handleGetCourseDetail(id)
+		handleGetPaymentInforCourse(id)
 	}, [id])
 
 	return {
@@ -176,6 +197,7 @@ export default function useCourse(id?: string) {
 		referralGlobalLink,
 		referralGlobalCode,
 		courseDetail,
+		paymentInforCourse,
 
 		// Actions
 		handleReportCourse,

@@ -135,3 +135,13 @@ export interface TrackingCourseRes {
 		object: TrackingCourse[]
 	}
 }
+
+export interface PaymentInforCourse {
+	is_purchased: boolean
+	course_id: string
+	original_price: number | null
+	final_price: number | null
+	is_first_payment_discount: boolean | null
+	discount_percentage: number | null
+	transaction_ref: string | null
+}

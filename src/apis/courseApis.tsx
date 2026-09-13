@@ -61,3 +61,7 @@ export const handleContributeIdea = async (payload: ContributeIdeaPayload) => {
 		why_need_this,
 	})
 }
+
+export const getPaymentInforCourse = async (id: string) => {
+	return await axios.get(COURSE_ROUTES.getPaymentInforCourse(id))
+}

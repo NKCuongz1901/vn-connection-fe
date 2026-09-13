@@ -2,7 +2,7 @@
 
 import { memo, useState } from 'react'
 import { Dropdown } from 'antd'
-import { IconDeviceMobileMessage } from '@tabler/icons-react'
+import { IconChevronDown, IconDeviceMobileMessage } from '@tabler/icons-react'
 
 import ContributeIcon from '@/svg/Course/ContributeIcon'
 import CourseStarIcon from '@/svg/Course/CourseStarIcon'
@@ -16,8 +16,10 @@ import {
 	Course,
 	CourseLearningType,
 	CourseSlotPrototype,
+	PaymentInforCourse,
 } from '@/interface/Course/Course.interface'
 import { formatNumberString } from '@/ultis/string'
+import { OVERVIEW_GUEST_CHAT_ROOMS } from '@/Variable/overviewGuestChatRooms.variable'
 
 import classes from './CourseDetail.module.scss'
 
@@ -28,7 +30,7 @@ const LEARNING_TYPE_LABEL: Record<CourseLearningType, string> = {
 }
 
 const TARGET_LANGUAGE_TEXT =
-	'We offer 15 languages, but for now, only English is available. You can select your target language when making a payment.'
+	'Please select the language you want to learn before proceeding with the course payment.'
 
 const ABOUT_WARNING_TEXT =
 	'If you miss 9 days of submissions during the 90-day course, you’ll be removed from the class.'
@@ -37,9 +39,12 @@ const SHARE_TICKER_TEXT = 'Share & earn 10% per sale'
 
 type CourseDetailProps = {
 	course: Course
+	paymentInforCourse: PaymentInforCourse
+	selectedLanguageCode?: string
 	onShare?: () => void
 	onReport?: () => void
 	onContribute?: () => void
+	onSelectLanguage?: () => void
 }
 
 const formatCoursePrice = (price: string) => {
@@ -70,9 +75,12 @@ const splitSlotColumns = (slots: CourseSlotPrototype[]) => {
 
 function CourseDetail({
 	course,
+	paymentInforCourse,
+	selectedLanguageCode,
 	onShare,
 	onReport,
 	onContribute,
+	onSelectLanguage,
 }: CourseDetailProps) {
 	const { custom_data, slot_prototype, owner } = course
 	const learningTypes = custom_data?.learning_type || []
@@ -94,6 +102,9 @@ function CourseDetail({
 	const classmateLine = learningTypes.includes('learn_with_classmates')
 		? LEARNING_TYPE_LABEL.learn_with_classmates
 		: ''
+	const selectedLanguage = OVERVIEW_GUEST_CHAT_ROOMS.find(
+		(item) => item.code?.toLowerCase() === selectedLanguageCode?.toLowerCase(),
+	)
 	const [moreOpen, setMoreOpen] = useState(false)
 	const moreItems = [
 		{
@@ -218,8 +229,16 @@ function CourseDetail({
 								</p>
 							</div>
 						</div>
-						<button type="button" className={classes.buyBtn} disabled>
-							Buy now
+						<button
+							type="button"
+							className={`${classes.buyBtn} ${
+								selectedLanguageCode ? classes.buyBtnActive : ''
+							}`}
+							disabled={!selectedLanguageCode}
+						>
+							{paymentInforCourse?.is_first_payment_discount === true
+								? 'Get discount'
+								: 'Buy now'}
 						</button>
 					</div>
 				</div>
@@ -270,6 +289,31 @@ function CourseDetail({
 				<div className={classes.cardHeader}>
 					<h2 className={classes.cardTitle}>Target language</h2>
 					<p className={classes.cardText}>{TARGET_LANGUAGE_TEXT}</p>
+				</div>
+				<div className={classes.languageBody}>
+					<button
+						type="button"
+						className={classes.languageTrigger}
+						onClick={onSelectLanguage}
+					>
+						{selectedLanguage ? (
+							<span className={classes.languageValue}>
+								{selectedLanguage.flag ? (
+									<img
+										src={selectedLanguage.flag}
+										alt=""
+										className={classes.languageFlag}
+									/>
+								) : null}
+								<span>{selectedLanguage.name}</span>
+							</span>
+						) : (
+							<span className={classes.languagePlaceholder}>
+								Select language to learn
+							</span>
+						)}
+						<IconChevronDown size={20} stroke={1.5} color="#94a3b8" />
+					</button>
 				</div>
 			</section>
 

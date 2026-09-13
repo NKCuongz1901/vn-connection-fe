@@ -1,11 +1,12 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { IconArrowLeft } from '@tabler/icons-react'
 import { Skeleton } from 'antd'
 
 import ContributeIdeaModal from '@/Components/Course/ContributeIdeaModal'
 import CourseDetail from '@/Components/Course/CourseDetail/CourseDetail'
+import CourseLanguageModal from '@/Components/Course/CourseLanguageModal'
 import CourseReferralModal from '@/Components/Course/CourseReferralModal/CourseReferralModal'
 import ModalReport from '@/Components/Custom/ModalReport'
 import useCourse from '@/hooks/Course/useCourse'
@@ -24,18 +25,23 @@ function DetailCourse({ id }: { id: string }) {
 		referralGlobalCode,
 		handleReportCourse,
 		handleContributeIdea,
+		paymentInforCourse,
 	} = useCourse(id)
 	const [referralModalOpen, setReferralModalOpen] = useState(false)
 	const [reportOpen, setReportOpen] = useState(false)
 	const [contributeOpen, setContributeOpen] = useState(false)
+	const [languageOpen, setLanguageOpen] = useState(false)
+	const [selectedLanguageCode, setSelectedLanguageCode] = useState('')
+
+	useEffect(() => {
+		setSelectedLanguageCode(courseDetail?.userCourse?.target_language || '')
+	}, [courseDetail?.userCourse?.target_language])
 	const courseIssueTypes = useMemo(
 		() => getCourseReportIssueTypes(locale as string),
 		[locale],
 	)
 	const reportHeaderTitle =
-		locale === 'vi'
-			? 'Cho chúng tôi biết vấn đề của bạn'
-			: 'Tell us your issue'
+		locale === 'vi' ? 'Cho chúng tôi biết vấn đề của bạn' : 'Tell us your issue'
 
 	const handleBack = () => {
 		onChangeRoute(mainRoutes.courseOverview)
@@ -59,9 +65,12 @@ function DetailCourse({ id }: { id: string }) {
 				) : courseDetail ? (
 					<CourseDetail
 						course={courseDetail}
+						paymentInforCourse={paymentInforCourse || null}
+						selectedLanguageCode={selectedLanguageCode}
 						onShare={() => setReferralModalOpen(true)}
 						onReport={() => setReportOpen(true)}
 						onContribute={() => setContributeOpen(true)}
+						onSelectLanguage={() => setLanguageOpen(true)}
 					/>
 				) : null}
 			</div>
@@ -87,6 +96,16 @@ function DetailCourse({ id }: { id: string }) {
 				open={contributeOpen}
 				onClose={() => setContributeOpen(false)}
 				onSubmit={handleContributeIdea}
+			/>
+			<CourseLanguageModal
+				open={languageOpen}
+				onClose={() => setLanguageOpen(false)}
+				supportedLanguage={courseDetail?.supported_language || []}
+				initialSelectedCode={selectedLanguageCode}
+				onConfirm={(code) => {
+					setSelectedLanguageCode(code)
+					setLanguageOpen(false)
+				}}
 			/>
 		</div>
 	)
