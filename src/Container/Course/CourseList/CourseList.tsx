@@ -51,6 +51,9 @@ function CourseList() {
 							<CourseCard
 								key={course.id}
 								course={course}
+								onClick={() =>
+									onChangeRoute(`${mainRoutes.course}/${course.id}`)
+								}
 								onShare={() => setReferralModalOpen(true)}
 							/>
 						))}

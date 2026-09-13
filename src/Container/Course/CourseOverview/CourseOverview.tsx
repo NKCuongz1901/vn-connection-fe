@@ -68,6 +68,9 @@ function CourseOverview() {
 					loading={loading.listCourse}
 					onSeeAll={() => onChangeRoute(mainRoutes.courseList)}
 					onShare={() => setReferralModalOpen(true)}
+					onCourseClick={(course) =>
+						onChangeRoute(`${mainRoutes.course}/${course.id}`)
+					}
 				/>
 			</div>
 		)

@@ -19,3 +19,7 @@ export const getTrackingCourse = async () => {
 export const getReferralGlobal = async () => {
 	return await axios.post(COURSE_ROUTES.referralGlobal)
 }
+
+export const getCourseDetail = async (id: string) => {
+	return await axios.get(COURSE_ROUTES.courseDetail(id))
+}
