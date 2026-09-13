@@ -45,6 +45,7 @@ type CourseDetailProps = {
 	onReport?: () => void
 	onContribute?: () => void
 	onSelectLanguage?: () => void
+	onGetDiscount?: () => void
 }
 
 const formatCoursePrice = (price: string) => {
@@ -81,6 +82,7 @@ function CourseDetail({
 	onReport,
 	onContribute,
 	onSelectLanguage,
+	onGetDiscount,
 }: CourseDetailProps) {
 	const { custom_data, slot_prototype, owner } = course
 	const learningTypes = custom_data?.learning_type || []
@@ -235,6 +237,11 @@ function CourseDetail({
 								selectedLanguageCode ? classes.buyBtnActive : ''
 							}`}
 							disabled={!selectedLanguageCode}
+							onClick={() => {
+								if (paymentInforCourse?.is_first_payment_discount === true) {
+									onGetDiscount?.()
+								}
+							}}
 						>
 							{paymentInforCourse?.is_first_payment_discount === true
 								? 'Get discount'

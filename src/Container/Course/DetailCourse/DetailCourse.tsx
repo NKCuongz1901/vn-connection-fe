@@ -6,6 +6,7 @@ import { Skeleton } from 'antd'
 
 import ContributeIdeaModal from '@/Components/Course/ContributeIdeaModal'
 import CourseDetail from '@/Components/Course/CourseDetail/CourseDetail'
+import CourseDiscountModal from '@/Components/Course/CourseDiscountModal'
 import CourseLanguageModal from '@/Components/Course/CourseLanguageModal'
 import CourseReferralModal from '@/Components/Course/CourseReferralModal/CourseReferralModal'
 import ModalReport from '@/Components/Custom/ModalReport'
@@ -31,6 +32,7 @@ function DetailCourse({ id }: { id: string }) {
 	const [reportOpen, setReportOpen] = useState(false)
 	const [contributeOpen, setContributeOpen] = useState(false)
 	const [languageOpen, setLanguageOpen] = useState(false)
+	const [discountOpen, setDiscountOpen] = useState(false)
 	const [selectedLanguageCode, setSelectedLanguageCode] = useState('')
 
 	useEffect(() => {
@@ -71,6 +73,7 @@ function DetailCourse({ id }: { id: string }) {
 						onReport={() => setReportOpen(true)}
 						onContribute={() => setContributeOpen(true)}
 						onSelectLanguage={() => setLanguageOpen(true)}
+						onGetDiscount={() => setDiscountOpen(true)}
 					/>
 				) : null}
 			</div>
@@ -106,6 +109,11 @@ function DetailCourse({ id }: { id: string }) {
 					setSelectedLanguageCode(code)
 					setLanguageOpen(false)
 				}}
+			/>
+			<CourseDiscountModal
+				open={discountOpen}
+				onClose={() => setDiscountOpen(false)}
+				paymentInfor={paymentInforCourse}
 			/>
 		</div>
 	)
