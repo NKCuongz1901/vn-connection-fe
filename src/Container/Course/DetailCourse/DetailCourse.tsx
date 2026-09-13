@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { IconArrowLeft } from '@tabler/icons-react'
 import { Skeleton } from 'antd'
 
+import ContributeIdeaModal from '@/Components/Course/ContributeIdeaModal'
 import CourseDetail from '@/Components/Course/CourseDetail/CourseDetail'
 import CourseReferralModal from '@/Components/Course/CourseReferralModal/CourseReferralModal'
 import ModalReport from '@/Components/Custom/ModalReport'
@@ -22,9 +23,11 @@ function DetailCourse({ id }: { id: string }) {
 		referralGlobalLink,
 		referralGlobalCode,
 		handleReportCourse,
+		handleContributeIdea,
 	} = useCourse(id)
 	const [referralModalOpen, setReferralModalOpen] = useState(false)
 	const [reportOpen, setReportOpen] = useState(false)
+	const [contributeOpen, setContributeOpen] = useState(false)
 	const courseIssueTypes = useMemo(
 		() => getCourseReportIssueTypes(locale as string),
 		[locale],
@@ -58,6 +61,7 @@ function DetailCourse({ id }: { id: string }) {
 						course={courseDetail}
 						onShare={() => setReferralModalOpen(true)}
 						onReport={() => setReportOpen(true)}
+						onContribute={() => setContributeOpen(true)}
 					/>
 				) : null}
 			</div>
@@ -78,6 +82,11 @@ function DetailCourse({ id }: { id: string }) {
 				data={{ report_target_id: courseDetail?.id || id }}
 				onReport={handleReportCourse}
 				message="You want to report this course?"
+			/>
+			<ContributeIdeaModal
+				open={contributeOpen}
+				onClose={() => setContributeOpen(false)}
+				onSubmit={handleContributeIdea}
 			/>
 		</div>
 	)

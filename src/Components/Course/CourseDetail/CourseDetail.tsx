@@ -39,6 +39,7 @@ type CourseDetailProps = {
 	course: Course
 	onShare?: () => void
 	onReport?: () => void
+	onContribute?: () => void
 }
 
 const formatCoursePrice = (price: string) => {
@@ -67,7 +68,12 @@ const splitSlotColumns = (slots: CourseSlotPrototype[]) => {
 	return [slots.slice(0, mid), slots.slice(mid)]
 }
 
-function CourseDetail({ course, onShare, onReport }: CourseDetailProps) {
+function CourseDetail({
+	course,
+	onShare,
+	onReport,
+	onContribute,
+}: CourseDetailProps) {
 	const { custom_data, slot_prototype, owner } = course
 	const learningTypes = custom_data?.learning_type || []
 	const scheduleDescription = custom_data?.schedule_description || ''
@@ -94,6 +100,7 @@ function CourseDetail({ course, onShare, onReport }: CourseDetailProps) {
 			key: 'contribute',
 			icon: <ContributeIcon />,
 			label: 'Contribute ideas',
+			onClick: onContribute,
 		},
 		{
 			key: 'share',

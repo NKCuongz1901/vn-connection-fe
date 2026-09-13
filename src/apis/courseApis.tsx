@@ -16,6 +16,11 @@ export type CourseReportPayload = {
 	medias?: CourseReportMedia[]
 }
 
+export type ContributeIdeaPayload = {
+	feature_title: string
+	why_need_this: string
+}
+
 export const getCourseList = async ({
 	params = {},
 }: {
@@ -46,5 +51,13 @@ export const handleReportCourse = async (payload: CourseReportPayload) => {
 		email,
 		content,
 		medias: medias || [],
+	})
+}
+
+export const handleContributeIdea = async (payload: ContributeIdeaPayload) => {
+	const { feature_title, why_need_this } = payload
+	return await axios.post(COURSE_ROUTES.contributeIdea, {
+		feature_title,
+		why_need_this,
 	})
 }

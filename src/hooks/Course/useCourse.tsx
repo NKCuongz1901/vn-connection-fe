@@ -1,9 +1,11 @@
 import {
+	ContributeIdeaPayload,
 	CourseReportPayload,
 	getCourseDetail,
 	getCourseList,
 	getReferralGlobal,
 	getTrackingCourse,
+	handleContributeIdea as contributeIdeaApi,
 	handleReportCourse as reportCourseApi,
 } from '@/apis/courseApis'
 import { useModal } from '@/context/ModalContext'
@@ -141,6 +143,18 @@ export default function useCourse(id?: string) {
 		[id, openError],
 	)
 
+	/** Submits a course feature idea. */
+	const handleContributeIdea = useCallback(
+		async (payload: ContributeIdeaPayload) => {
+			try {
+				return await contributeIdeaApi(payload)
+			} catch (error) {
+				openError(error)
+			}
+		},
+		[openError],
+	)
+
 	useEffect(() => {
 		handleGetListCourse()
 		handleGetMyPurchasedCourse()
@@ -154,6 +168,7 @@ export default function useCourse(id?: string) {
 	}, [id])
 
 	return {
+		// Data
 		loading,
 		listCourse,
 		myPurchasedCourse,
@@ -161,6 +176,9 @@ export default function useCourse(id?: string) {
 		referralGlobalLink,
 		referralGlobalCode,
 		courseDetail,
+
+		// Actions
 		handleReportCourse,
+		handleContributeIdea,
 	}
 }

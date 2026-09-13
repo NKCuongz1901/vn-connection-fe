@@ -224,6 +224,7 @@ export const COURSE_ROUTES = {
 	referralGlobal: 'course-ai/referral/global/share',
 	courseDetail: (id: string) => `course-ai/${id}`,
 	reportCourse: 'course-ai-reports',
+	contributeIdea: 'course-ai/contribute-idea',
 }
 export const Menus = [
 	{
