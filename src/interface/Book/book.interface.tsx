@@ -1,5 +1,13 @@
 export type BookReviewSummary = {
 	overall_rating?: number
+	total_reviews?: number
+}
+
+export type BookReview = {
+	id?: string
+	book_id?: string
+	content_rating?: number
+	comment?: string | null
 }
 
 export type ReadingProgress = {

@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import { getBookDetail, parseApiList, parseApiObject } from '@/apis/book/bookApis'
+import {
+	getBookDetail,
+	parseApiList,
+	parseApiObject,
+	toggleFavouriteBook,
+} from '@/apis/book/bookApis'
 import { getChapterList, sortChapters } from '@/apis/book/chapterApis'
 import {
 	BookApiItem,
@@ -15,8 +20,9 @@ import { bookReadPath } from '@/Variable/book.variable'
 export default function useBookDetail(bookId: string) {
 	const [book, setBook] = useState<BookApiItem | null>(null)
 	const [chapters, setChapters] = useState<ChapterApiItem[]>([])
-	const [tab, setTab] = useState<'summary' | 'chapter'>('summary')
+	const [tab, setTab] = useState<'summary' | 'vocab' | 'chapter'>('summary')
 	const [loading, setLoading] = useState(true)
+	const [savingFavourite, setSavingFavourite] = useState(false)
 
 	useEffect(() => {
 		let cancelled = false
@@ -68,6 +74,37 @@ export default function useBookDetail(bookId: string) {
 		[book?.reading_progress, bookId, chapters],
 	)
 
+	const refreshBook = useCallback(async () => {
+		try {
+			const bookRes = await getBookDetail(bookId)
+			setBook(parseApiObject<BookApiItem>(bookRes))
+		} catch {
+			// keep current book
+		}
+	}, [bookId])
+
+	const toggleFavourite = useCallback(async () => {
+		if (!bookId || savingFavourite) return
+		setSavingFavourite(true)
+		try {
+			const res = await toggleFavouriteBook(bookId)
+			const next = parseApiObject<{ is_favourited?: boolean }>(res)
+			setBook((prev) =>
+				prev
+					? {
+							...prev,
+							is_favourited:
+								next?.is_favourited ?? !prev.is_favourited,
+						}
+					: prev,
+			)
+		} catch {
+			// keep previous favourite state
+		} finally {
+			setSavingFavourite(false)
+		}
+	}, [bookId, savingFavourite])
+
 	return {
 		book,
 		chapters,
@@ -75,5 +112,8 @@ export default function useBookDetail(bookId: string) {
 		setTab,
 		loading,
 		resume,
+		toggleFavourite,
+		savingFavourite,
+		refreshBook,
 	}
 }

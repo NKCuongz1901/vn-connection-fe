@@ -102,6 +102,14 @@ export const formatBookDuration = (seconds?: number) => {
 	return `${minutes}m`
 }
 
+export const formatListeningTime = (seconds?: number) => {
+	if (!seconds) return '—'
+	const hours = Math.floor(seconds / 3600)
+	if (hours >= 1) return `${hours} hour${hours === 1 ? '' : 's'}`
+	const minutes = Math.max(1, Math.round(seconds / 60))
+	return `${minutes} min`
+}
+
 export const formatPlaybackTime = (seconds?: number) => {
 	const total = Math.max(0, Math.floor(Number(seconds) || 0))
 	const hours = Math.floor(total / 3600)
