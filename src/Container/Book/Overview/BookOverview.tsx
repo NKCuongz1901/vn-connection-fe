@@ -58,20 +58,20 @@ function BookOverview() {
 				}}
 			/>
 			<BookRail
-				title={`All books (${level})`}
-				seeAllPath={BOOK_SEE_ALL.all.path}
-				books={allBooks}
-				loading={loading}
-				emptyText="No books for this level"
-				onSeeAll={onChangeRoute}
-				onOpen={(id) => onChangeRoute(bookDetailPath(id))}
-			/>
-			<BookRail
 				title="Top picks for you"
 				seeAllPath={BOOK_SEE_ALL['top-pick'].path}
 				books={topPicks}
 				loading={loading}
 				emptyText="No top picks yet"
+				onSeeAll={onChangeRoute}
+				onOpen={(id) => onChangeRoute(bookDetailPath(id))}
+			/>
+			<BookRail
+				title="Popular now"
+				seeAllPath={BOOK_SEE_ALL.popular.path}
+				books={popularNow}
+				loading={loading}
+				emptyText="No popular books yet"
 				onSeeAll={onChangeRoute}
 				onOpen={(id) => onChangeRoute(bookDetailPath(id))}
 			/>
@@ -85,12 +85,11 @@ function BookOverview() {
 				onOpen={(id) => onChangeRoute(bookDetailPath(id))}
 			/>
 			<BookRail
-				title="Popular now"
-				seeAllPath={BOOK_SEE_ALL.popular.path}
-				books={popularNow}
+				title={`All books (${level})`}
+				seeAllPath={BOOK_SEE_ALL.all.path}
+				books={allBooks}
 				loading={loading}
-				emptyText="No popular books yet"
-				layout="list"
+				emptyText="No books for this level"
 				onSeeAll={onChangeRoute}
 				onOpen={(id) => onChangeRoute(bookDetailPath(id))}
 			/>

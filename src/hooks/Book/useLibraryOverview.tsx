@@ -62,7 +62,6 @@ const settledList = <T,>(
 
 export default function useLibraryOverview() {
 	const [level, setLevelState] = useState<BookLevel>('A1')
-	const [category, setCategoryState] = useState<string | null>(null)
 	const [reader, setReader] = useState<ReaderProfile | null>(null)
 	const [categories, setCategories] =
 		useState<BookCategory[]>(fallbackCategories)
@@ -77,15 +76,12 @@ export default function useLibraryOverview() {
 	const [loading, setLoading] = useState(true)
 
 	const loadRails = useCallback(
-		async (nextLevel: BookLevel, nextCategory: string | null) => {
+		async (nextLevel: BookLevel) => {
 			const listParams = {
 				page: 1,
 				limit: OVERVIEW_LIMIT,
 				level: toBookListLevel(nextLevel),
 			}
-			const allBooksParams = nextCategory
-				? { ...listParams, category: nextCategory }
-				: listParams
 
 			const [continueRes, allRes, topRes, recentRes, popularRes] =
 				await Promise.allSettled([
@@ -93,7 +89,7 @@ export default function useLibraryOverview() {
 						page: 1,
 						limit: OVERVIEW_LIMIT,
 					}),
-					getBookListV2(allBooksParams),
+					getBookListV2(listParams),
 					getTopPickBooks(listParams),
 					getRecentlyAddedBooks(listParams),
 					getPopularNowBooks(listParams),
@@ -150,7 +146,7 @@ export default function useLibraryOverview() {
 
 				if (!cancelled) {
 					setLevelState(nextLevel)
-					await loadRails(nextLevel, null)
+					await loadRails(nextLevel)
 				}
 			} finally {
 				if (!cancelled) {
@@ -174,27 +170,13 @@ export default function useLibraryOverview() {
 			try {
 				await Promise.allSettled([
 					updateLastSelectedLevel(toLastSelectedLevel(nextLevel)),
-					loadRails(nextLevel, category),
+					loadRails(nextLevel),
 				])
 			} finally {
 				setLoading(false)
 			}
 		},
-		[category, level, loadRails],
-	)
-
-	const setCategory = useCallback(
-		async (nextCategory: string | null) => {
-			const value = nextCategory === category ? null : nextCategory
-			setCategoryState(value)
-			setLoading(true)
-			try {
-				await loadRails(level, value)
-			} finally {
-				setLoading(false)
-			}
-		},
-		[category, level, loadRails],
+		[level, loadRails],
 	)
 
 	const setBookLanguages = useCallback(
@@ -215,8 +197,6 @@ export default function useLibraryOverview() {
 	return {
 		level,
 		setLevel,
-		category,
-		setCategory,
 		reader,
 		categories,
 		languages,

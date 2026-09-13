@@ -8,7 +8,12 @@ import { BookLanguageButton, BookMiniPlayer } from '@/Components/Book'
 import { useBookLibrary } from '@/context/BookLibraryContext'
 import { useOptionalBookPlayer } from '@/context/BookPlayerContext'
 import { useLocalePath } from '@/ultis/route'
-import { BOOK_LEVELS, BOOK_NAV, BOOK_ROOT } from '@/Variable/book.variable'
+import {
+	BOOK_LEVELS,
+	BOOK_NAV,
+	BOOK_ROOT,
+	bookCategoryPath,
+} from '@/Variable/book.variable'
 
 import classes from './BookShell.module.scss'
 
@@ -18,9 +23,12 @@ type BookShellProps = {
 
 function BookShell({ children }: BookShellProps) {
 	const { onChangeRoute, pathname } = useLocalePath()
-	const { level, setLevel, category, setCategory, categories } =
-		useBookLibrary()
+	const { level, setLevel, categories } = useBookLibrary()
 	const player = useOptionalBookPlayer()
+	const categoryPrefix = `${BOOK_ROOT}/category/`
+	const activeCategory = pathname.startsWith(categoryPrefix)
+		? decodeURIComponent(pathname.slice(categoryPrefix.length))
+		: ''
 
 	return (
 		<div className={classes.shell}>
@@ -96,14 +104,17 @@ function BookShell({ children }: BookShellProps) {
 					<div className={classes.categories}>
 						{categories.map((tag) => {
 							const title = tag.title || ''
+							const id = tag.id || title
+							const active =
+								activeCategory === id || activeCategory === title
 							return (
 								<button
-									key={tag.id || title}
+									key={id}
 									type="button"
 									className={clsx(classes.tag, {
-										[classes.active]: category === title,
+										[classes.active]: active,
 									})}
-									onClick={() => setCategory(title)}
+									onClick={() => onChangeRoute(bookCategoryPath(id))}
 								>
 									{title}
 								</button>

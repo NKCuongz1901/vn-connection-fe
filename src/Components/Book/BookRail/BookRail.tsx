@@ -3,6 +3,7 @@
 import { memo } from 'react'
 
 import BookCard from '@/Components/Book/BookCard'
+import BookEmptyState from '@/Components/Book/BookEmptyState'
 import { BookCardItem } from '@/interface/Book/book.interface'
 
 import classes from './BookRail.module.scss'
@@ -59,10 +60,10 @@ function BookRail({
 						/>
 					))}
 				</div>
+			) : loading ? (
+				<div className={classes.empty}>Loading…</div>
 			) : (
-				<div className={classes.empty}>
-					{loading ? 'Loading…' : emptyText}
-				</div>
+				<BookEmptyState title={emptyText} compact />
 			)}
 		</section>
 	)

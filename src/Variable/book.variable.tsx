@@ -58,9 +58,10 @@ export type BookSeeAllKind =
 	| 'popular'
 	| 'recent'
 	| 'continue'
+	| 'category'
 
 export const BOOK_SEE_ALL: Record<
-	BookSeeAllKind,
+	Exclude<BookSeeAllKind, 'category'>,
 	{ title: string; path: string }
 > = {
 	continue: { title: 'Continue reading', path: `${BOOK_ROOT}/continue` },
@@ -69,6 +70,15 @@ export const BOOK_SEE_ALL: Record<
 	recent: { title: 'Recently added', path: `${BOOK_ROOT}/recent` },
 	popular: { title: 'Popular now', path: `${BOOK_ROOT}/popular` },
 }
+
+export const BOOK_SEARCHABLE_KINDS: BookSeeAllKind[] = [
+	'top-pick',
+	'popular',
+	'category',
+]
+
+export const bookCategoryPath = (id: string) =>
+	`${BOOK_ROOT}/category/${encodeURIComponent(id)}`
 
 export const bookDetailPath = (id: string) => `${BOOK_ROOT}/book/${id}`
 
