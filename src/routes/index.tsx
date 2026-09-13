@@ -223,6 +223,7 @@ export const COURSE_ROUTES = {
 	trackingCourse: 'course-ai/overview',
 	referralGlobal: 'course-ai/referral/global/share',
 	courseDetail: (id: string) => `course-ai/${id}`,
+	reportCourse: 'course-ai-reports',
 }
 export const Menus = [
 	{

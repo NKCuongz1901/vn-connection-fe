@@ -1609,7 +1609,85 @@ export const REPORT_ISSUE_TYPE = {
 	GET_HELP: 'GET_HELP',
 	TALKROOM: 'TALKROOM',
 	TUTOR: 'TUTOR',
+	COURSE: 'COURSE',
 } as const
 
 export type ReportIssueType =
 	(typeof REPORT_ISSUE_TYPE)[keyof typeof REPORT_ISSUE_TYPE]
+
+export type ReportTypeOption = {
+	id: string
+	label: string
+	description?: string
+}
+
+const COURSE_REPORT_ISSUE_COPY = [
+	{
+		id: 'incorrect_score',
+		en: {
+			label: 'The score feels incorrect',
+			description: "The AI gives a score that doesn't match my answer.",
+		},
+		vi: {
+			label: 'Điểm số có vẻ không chính xác',
+			description: 'AI cho điểm không khớp với câu trả lời của tôi.',
+		},
+	},
+	{
+		id: 'misunderstood_words',
+		en: {
+			label: 'The AI did not understand my words',
+			description: 'The transcript is different from what I said',
+		},
+		vi: {
+			label: 'AI không hiểu lời nói của tôi',
+			description: 'Bản ghi khác với những gì tôi đã nói',
+		},
+	},
+	{
+		id: 'unhelpful_feedback',
+		en: {
+			label: 'The feedback is not helpful',
+			description: "It is too general or doesn't match my real mistakes",
+		},
+		vi: {
+			label: 'Phản hồi không hữu ích',
+			description: 'Quá chung chung hoặc không phản ánh đúng lỗi thực tế của tôi',
+		},
+	},
+	{
+		id: 'uninteresting_exercise',
+		en: {
+			label: 'The exercise is not interesting',
+			description: 'The topic or question feels boring or not engaging',
+		},
+		vi: {
+			label: 'Bài tập không thú vị',
+			description: 'Chủ đề hoặc câu hỏi cảm thấy nhàm chán hoặc không hấp dẫn',
+		},
+	},
+	{
+		id: 'wrong_correction',
+		en: {
+			label: 'The correction is wrong',
+			description:
+				'The AI marks something as a mistake when it is not, or explains it incorrectly',
+		},
+		vi: {
+			label: 'Sửa lỗi không đúng',
+			description: 'AI đánh dấu sai lỗi hoặc giải thích không chính xác',
+		},
+	},
+] as const
+
+/** Maps course report issue types to the current locale. */
+export const getCourseReportIssueTypes = (
+	locale?: string,
+): ReportTypeOption[] => {
+	const lang = locale === 'vi' ? 'vi' : 'en'
+	return COURSE_REPORT_ISSUE_COPY.map((item) => ({
+		id: item.id,
+		label: item[lang].label,
+		description: item[lang].description,
+	}))
+}

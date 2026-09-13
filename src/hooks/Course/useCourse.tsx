@@ -1,8 +1,10 @@
 import {
+	CourseReportPayload,
 	getCourseDetail,
 	getCourseList,
 	getReferralGlobal,
 	getTrackingCourse,
+	handleReportCourse as reportCourseApi,
 } from '@/apis/courseApis'
 import { useModal } from '@/context/ModalContext'
 import {
@@ -12,7 +14,7 @@ import {
 	TrackingCourseRes,
 } from '@/interface/Course/Course.interface'
 import { getReferralCode } from '@/ultis/string'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export default function useCourse(id?: string) {
 	const { openError } = useModal()
@@ -121,6 +123,24 @@ export default function useCourse(id?: string) {
 		}
 	}
 
+	/** Submits a course issue report. */
+	const handleReportCourse = useCallback(
+		async (payload: CourseReportPayload) => {
+			try {
+				return await reportCourseApi({
+					report_target_id: payload.report_target_id || id || '',
+					issue_type: payload.issue_type,
+					email: payload.email,
+					content: payload.content,
+					medias: payload.medias || [],
+				})
+			} catch (error) {
+				openError(error)
+			}
+		},
+		[id, openError],
+	)
+
 	useEffect(() => {
 		handleGetListCourse()
 		handleGetMyPurchasedCourse()
@@ -141,5 +161,6 @@ export default function useCourse(id?: string) {
 		referralGlobalLink,
 		referralGlobalCode,
 		courseDetail,
+		handleReportCourse,
 	}
 }

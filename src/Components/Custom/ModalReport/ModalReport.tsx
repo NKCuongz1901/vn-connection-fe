@@ -31,7 +31,10 @@ import { topicReportOpt } from '@/Variable/select.variable'
 import classes from './ModalReport.module.scss'
 import { getUserInfo, isLogin } from '@/ultis/storage'
 import CTextArea from '../CTextArea'
-import { ReportIssueType } from '@/Variable/common.variable'
+import {
+	ReportIssueType,
+	ReportTypeOption,
+} from '@/Variable/common.variable'
 
 interface ModalReportProps {
 	open: boolean
@@ -40,12 +43,27 @@ interface ModalReportProps {
 	message?: string
 	reportType?: ReportIssueType
 	title?: string
+	headerTitle?: string
+	issueTypes?: ReportTypeOption[]
+	maxMedia?: number
+	onReport?: (payload: any) => Promise<any>
 	[key: string]: any
 }
 
 const ModalReport = (props: ModalReportProps) => {
-	const { onClose, open, data, message, title, reportType } = props
-	const [reportTypeList, setReportTypeList] = useState([])
+	const {
+		onClose,
+		open,
+		data,
+		message,
+		title,
+		headerTitle,
+		reportType,
+		issueTypes,
+		maxMedia = 5,
+		onReport,
+	} = props
+	const [reportTypeList, setReportTypeList] = useState<ReportTypeOption[]>([])
 	const [loadingReportType, setLoadingReportType] = useState(false)
 	const { loadingContext, toggleLoadingContext } = useLoading()
 	const { openConfirm, openError, openSuccess, closeModal } = useModal()
@@ -65,10 +83,24 @@ const ModalReport = (props: ModalReportProps) => {
 	const [fileList, setFileList] = useState([])
 
 	useEffect(() => {
-		if (!open || !reportType) {
+		if (!open) {
 			setReportTypeList([])
 			setDataModal({ topic: '', email: email || '', content: '' })
 			setFileList([])
+			return
+		}
+		if (issueTypes?.length) {
+			setReportTypeList(issueTypes)
+			setDataModal((prev) => ({
+				...prev,
+				topic: issueTypes[0].id,
+				email: email || '',
+			}))
+			return
+		}
+		if (!reportType) {
+			setReportTypeList([])
+			return
 		}
 		const load = async () => {
 			setLoadingReportType(true)
@@ -86,7 +118,7 @@ const ModalReport = (props: ModalReportProps) => {
 			}
 		}
 		load()
-	}, [open, reportType])
+	}, [email, issueTypes, open, openError, reportType])
 
 	const processUpload = useCallback(
 		async (_values: any[]) => {
@@ -137,16 +169,18 @@ const ModalReport = (props: ModalReportProps) => {
 				return
 			}
 
-			// chỉ ảnh
-			if (images.length > 5) {
+			if (images.length > maxMedia) {
 				openConfirm({
-					message: 'You can only upload up to 5 images.',
+					message:
+						maxMedia === 1
+							? 'You can only upload 1 image or video.'
+							: `You can only upload up to ${maxMedia} images.`,
 					onAccept: () => closeModal(),
 				})
 			}
-			setFileList(images.slice(0, 5))
+			setFileList(images.slice(0, maxMedia))
 		},
-		[closeModal, openConfirm, openError],
+		[closeModal, maxMedia, openConfirm, openError],
 	)
 
 	const handleImportImg = useMemo(
@@ -187,7 +221,20 @@ const ModalReport = (props: ModalReportProps) => {
 					media = await handleUploadMedia(fileList)
 				}
 				const images = (media || []).map((item) => item.url)
-				const res = await reportUser({ ...payload, images })
+				const medias = (media || []).map((item, index) => ({
+					url: typeof item === 'string' ? item : item.url,
+					type: fileList[index]?.type || item.type || 'IMAGE',
+					duration: item.duration ?? 0,
+				}))
+				const res = onReport
+					? await onReport({
+							report_target_id: payload.report_target_id,
+							issue_type: payload.issue_type,
+							email: payload.email,
+							content: payload.content,
+							medias,
+						})
+					: await reportUser({ ...payload, images })
 				if (res) {
 					openSuccess({
 						message: 'You have reported successfully.',
@@ -200,7 +247,7 @@ const ModalReport = (props: ModalReportProps) => {
 				toggleLoadingContext()
 			}
 		},
-		[onClose, fileList, openError, openSuccess, toggleLoadingContext],
+		[fileList, onClose, onReport, openError, openSuccess, toggleLoadingContext],
 	)
 	const handleSubmit = useCallback(async () => {
 		if (!handleValidate(dataModal)) {
@@ -211,6 +258,7 @@ const ModalReport = (props: ModalReportProps) => {
 		const payload = {
 			email,
 			topic: selected?.label ?? '',
+			issue_type: selected?.id ?? topic,
 			content,
 			images: [],
 			...data,
@@ -219,12 +267,22 @@ const ModalReport = (props: ModalReportProps) => {
 			message: message || 'You want to report this user ?',
 			onAccept: () => handleReportUser(payload),
 		})
-	}, [data, dataModal, message, handleReportUser, handleValidate, openConfirm])
+	}, [
+		data,
+		dataModal,
+		handleReportUser,
+		handleValidate,
+		message,
+		openConfirm,
+		reportTypeList,
+	])
 	const _renderTop = () => {
 		return (
 			<Flex className={classes.top} vertical>
 				<FeedbackIcon />
-				<div className={classes.title}>Tell us your issue</div>
+				<div className={classes.title}>
+					{headerTitle || 'Tell us your issue'}
+				</div>
 				<span className={classes.text}>
 					Your feedbacks help us improve a lot
 				</span>
@@ -306,7 +364,7 @@ const ModalReport = (props: ModalReportProps) => {
 					<Flex className={classes.chooseImg} vertical>
 						<Flex className={classes.upload}>
 							<CUploadMuti
-								maxCount={5}
+								maxCount={maxMedia}
 								fileList={fileList.map((i) => i.file)}
 								onChange={({ file: _file, fileList: newList }) => {
 									handleImportImg(newList)
@@ -317,7 +375,9 @@ const ModalReport = (props: ModalReportProps) => {
 							</CUploadMuti>
 						</Flex>
 						<p className={classes.uploadText}>
-							* Upload 5 images or video (max 60s)
+							{maxMedia === 1
+								? '* Upload 1 image or video (max 60s)'
+								: '* Upload 5 images or video (max 60s)'}
 						</p>
 						<Flex className={classes.medias}>
 							{fileList.map((item, idx) => (

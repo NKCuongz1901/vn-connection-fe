@@ -38,6 +38,7 @@ const SHARE_TICKER_TEXT = 'Share & earn 10% per sale'
 type CourseDetailProps = {
 	course: Course
 	onShare?: () => void
+	onReport?: () => void
 }
 
 const formatCoursePrice = (price: string) => {
@@ -66,7 +67,7 @@ const splitSlotColumns = (slots: CourseSlotPrototype[]) => {
 	return [slots.slice(0, mid), slots.slice(mid)]
 }
 
-function CourseDetail({ course, onShare }: CourseDetailProps) {
+function CourseDetail({ course, onShare, onReport }: CourseDetailProps) {
 	const { custom_data, slot_prototype, owner } = course
 	const learningTypes = custom_data?.learning_type || []
 	const scheduleDescription = custom_data?.schedule_description || ''
@@ -104,6 +105,7 @@ function CourseDetail({ course, onShare }: CourseDetailProps) {
 			key: 'report',
 			icon: <FlagIcon fill="#48546B" />,
 			label: 'Report',
+			onClick: onReport,
 		},
 	]
 
