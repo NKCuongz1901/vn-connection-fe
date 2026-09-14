@@ -102,6 +102,35 @@ export const formatBookDuration = (seconds?: number) => {
 	return `${minutes}m`
 }
 
+export const pickBookDuration = (
+	durations?: Array<{ language?: string; duration?: number }> | null,
+	preferredLang?: string | null,
+	fallback?: number,
+) => {
+	if (durations?.length) {
+		const pref = (preferredLang || '').toLowerCase()
+		const prefix = pref.split('-')[0]
+		const match =
+			(pref &&
+				durations.find(
+					(item) => (item.language || '').toLowerCase() === pref,
+				)) ||
+			(prefix &&
+				durations.find((item) => {
+					const lang = (item.language || '').toLowerCase()
+					return (
+						lang === prefix ||
+						lang.startsWith(`${prefix}-`) ||
+						pref.startsWith(lang)
+					)
+				})) ||
+			durations.find((item) => Number(item.duration) > 0)
+		const duration = Number(match?.duration)
+		if (duration > 0) return duration
+	}
+	return fallback && fallback > 0 ? fallback : undefined
+}
+
 export const formatListeningTime = (seconds?: number) => {
 	if (!seconds) return '—'
 	const hours = Math.floor(seconds / 3600)

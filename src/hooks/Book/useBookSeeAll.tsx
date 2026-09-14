@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
 	getBookListV2,
@@ -30,6 +30,21 @@ const SEARCH_DEBOUNCE_MS = 300
 const compactCards = (items: Array<BookCardItem | null>) =>
 	items.filter((item): item is BookCardItem => Boolean(item))
 
+const uniqueById = (items: BookCardItem[]) => {
+	const seen = new Set<string>()
+	return items.filter((item) => {
+		if (seen.has(item.id)) return false
+		seen.add(item.id)
+		return true
+	})
+}
+
+const mergeUnique = (
+	prev: BookCardItem[],
+	rows: BookCardItem[],
+	append: boolean,
+) => uniqueById(append ? [...prev, ...rows] : rows)
+
 type UseBookSeeAllOptions = {
 	categoryId?: string
 }
@@ -48,6 +63,7 @@ export default function useBookSeeAll(
 	const [loading, setLoading] = useState(true)
 	const [loadingMore, setLoadingMore] = useState(false)
 	const [hasMore, setHasMore] = useState(false)
+	const requestSeq = useRef(0)
 
 	const categoryTitle = useMemo(() => {
 		if (kind !== 'category' || !categoryId) return ''
@@ -66,6 +82,7 @@ export default function useBookSeeAll(
 
 	const load = useCallback(
 		async (nextPage: number, append: boolean) => {
+			const seq = ++requestSeq.current
 			if (append) setLoadingMore(true)
 			else setLoading(true)
 
@@ -104,6 +121,8 @@ export default function useBookSeeAll(
 					res = await getBookListV2(params)
 				}
 
+				if (seq !== requestSeq.current) return
+
 				const rows =
 					kind === 'continue'
 						? compactCards(
@@ -115,19 +134,21 @@ export default function useBookSeeAll(
 								parseApiList<BookApiItem>(res).map(mapBookCard),
 							)
 
-				setBooks((prev) => (append ? [...prev, ...rows] : rows))
+				setBooks((prev) => mergeUnique(prev, rows, append))
 				setPage(nextPage)
 				setHasMore(rows.length === LIST_LIMIT)
 				if (!append) {
 					setTotal(parseListTotal(res, rows.length))
 				}
 			} catch {
+				if (seq !== requestSeq.current) return
 				if (!append) {
 					setBooks([])
 					setHasMore(false)
 					setTotal(0)
 				}
 			} finally {
+				if (seq !== requestSeq.current) return
 				setLoading(false)
 				setLoadingMore(false)
 			}

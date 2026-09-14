@@ -24,6 +24,7 @@ import {
 import CImage from '@/Components/Custom/CImage/CImage'
 import { useModal } from '@/context/ModalContext'
 import useBookDetail from '@/hooks/Book/useBookDetail'
+import { useBookLibrary } from '@/context/BookLibraryContext'
 import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
 import { useLocalePath } from '@/ultis/route'
 import { copyToClipboard } from '@/ultis/string'
@@ -31,6 +32,7 @@ import {
 	BOOK_ROOT,
 	bookReadPath,
 	formatListeningTime,
+	pickBookDuration,
 } from '@/Variable/book.variable'
 
 import classes from './BookDetail.module.scss'
@@ -53,12 +55,15 @@ function BookDetail({ bookId }: BookDetailProps) {
 		savingFavourite,
 		refreshBook,
 	} = useBookDetail(bookId)
+	const { learningLang } = useBookLibrary()
 	const [sharing, setSharing] = useState(false)
 	const [reviewOpen, setReviewOpen] = useState(false)
 
 	const rating = book?.review_summary?.overall_rating
 	const reviewCount = book?.review_summary?.total_reviews
-	const listeningTime = formatListeningTime(book?.est_duration)
+	const listeningTime = formatListeningTime(
+		pickBookDuration(book?.book_duration, learningLang, book?.est_duration),
+	)
 	const vocabSize = book?.total_words
 		? `${book.total_words.toLocaleString()} words`
 		: '—'
@@ -184,7 +189,11 @@ function BookDetail({ bookId }: BookDetailProps) {
 									: 'Save to library'
 							}
 						>
-							<IconDownload size={20} stroke={1.5} />
+							<IconDownload
+								size={20}
+								stroke={1.5}
+								fill={book.is_favourited ? 'currentColor' : 'none'}
+							/>
 						</button>
 						<button
 							type="button"

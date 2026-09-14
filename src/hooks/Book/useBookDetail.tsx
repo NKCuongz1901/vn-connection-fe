@@ -9,6 +9,7 @@ import {
 	toggleFavouriteBook,
 } from '@/apis/book/bookApis'
 import { getChapterList, sortChapters } from '@/apis/book/chapterApis'
+import { useModal } from '@/context/ModalContext'
 import {
 	BookApiItem,
 	BookReadMode,
@@ -17,7 +18,22 @@ import {
 } from '@/interface/Book/book.interface'
 import { bookReadPath } from '@/Variable/book.variable'
 
+const parseFavouriteFlag = (res: unknown): boolean | undefined => {
+	const parsed = parseApiObject<{ is_favourited?: boolean }>(res)
+	if (typeof parsed?.is_favourited === 'boolean') return parsed.is_favourited
+	const data = res as {
+		results?: { is_favourited?: boolean }
+		is_favourited?: boolean
+	}
+	if (typeof data?.results?.is_favourited === 'boolean') {
+		return data.results.is_favourited
+	}
+	if (typeof data?.is_favourited === 'boolean') return data.is_favourited
+	return undefined
+}
+
 export default function useBookDetail(bookId: string) {
+	const { openError } = useModal()
 	const [book, setBook] = useState<BookApiItem | null>(null)
 	const [chapters, setChapters] = useState<ChapterApiItem[]>([])
 	const [tab, setTab] = useState<'summary' | 'vocab' | 'chapter'>('summary')
@@ -88,22 +104,21 @@ export default function useBookDetail(bookId: string) {
 		setSavingFavourite(true)
 		try {
 			const res = await toggleFavouriteBook(bookId)
-			const next = parseApiObject<{ is_favourited?: boolean }>(res)
+			const next = parseFavouriteFlag(res)
 			setBook((prev) =>
 				prev
 					? {
 							...prev,
-							is_favourited:
-								next?.is_favourited ?? !prev.is_favourited,
+							is_favourited: next ?? !prev.is_favourited,
 						}
 					: prev,
 			)
-		} catch {
-			// keep previous favourite state
+		} catch (error) {
+			openError(error)
 		} finally {
 			setSavingFavourite(false)
 		}
-	}, [bookId, savingFavourite])
+	}, [bookId, openError, savingFavourite])
 
 	return {
 		book,

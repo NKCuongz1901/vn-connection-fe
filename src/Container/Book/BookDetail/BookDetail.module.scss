@@ -159,11 +159,15 @@
 	&:hover:not(:disabled) {
 		background: #e8f5ee;
 	}
-}
 
-.iconActive {
-	background: #e8f5ee;
-	color: #006b35;
+	&.iconActive {
+		background: #006b35;
+		color: #fff;
+
+		&:hover:not(:disabled) {
+			background: #005a2c;
+		}
+	}
 }
 
 .tabs {

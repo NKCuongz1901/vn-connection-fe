@@ -19,6 +19,11 @@ export type ReadingProgress = {
 	max_page?: number
 }
 
+export type BookDuration = {
+	language?: string
+	duration?: number
+}
+
 export type BookApiItem = {
 	id?: string
 	title?: string
@@ -28,6 +33,7 @@ export type BookApiItem = {
 	level?: string
 	category?: string[]
 	est_duration?: number
+	book_duration?: BookDuration[]
 	total_pages?: number
 	total_words?: number
 	total_sentences?: number

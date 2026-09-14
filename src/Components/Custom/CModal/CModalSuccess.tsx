@@ -63,7 +63,7 @@ const CModalSuccess = (_props: CModalSuccessProps) => {
 		>
 			<Flex vertical align="center" className="cModalContent flex-1" gap={12}>
 				<span className="success CModalTitle">
-					{titleLabel || 'Successfull'}
+					{titleLabel || 'Successful'}
 				</span>
 				<Flex vertical className="CModalBody">
 					{message}
