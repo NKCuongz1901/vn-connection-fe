@@ -7,6 +7,7 @@ import {
 	BookCategory,
 	BookLanguage,
 	BookListQuery,
+	BookReview,
 	ContinueReadingApiItem,
 } from '@/interface/Book/book.interface'
 
@@ -146,6 +147,39 @@ export const parseListTotal = (res: unknown, fallback = 0) => {
 
 export const getBookDetail = async (id: string) => {
 	return axios.get(`${BOOK_ROUTES.book}/${id}`)
+}
+
+export const toggleFavouriteBook = async (bookId: string) => {
+	return axios.post(`${BOOK_ROUTES.favourite}/${bookId}`)
+}
+
+export const getMyBookReview = async (bookId: string) => {
+	return axios.get(`${BOOK_ROUTES.book}/${bookId}/my-review`)
+}
+
+export const createBookReview = async (payload: {
+	book_id: string
+	content_rating: number
+	comment?: string
+}) => {
+	return axios.post(BOOK_ROUTES.review, payload)
+}
+
+export const updateBookReview = async (
+	reviewId: string,
+	payload: {
+		content_rating?: number
+		comment?: string
+	},
+) => {
+	return axios.put(`${BOOK_ROUTES.review}/${reviewId}`, payload)
+}
+
+export const parseBookReview = (res: unknown): BookReview | null => {
+	const parsed = parseApiObject<BookReview>(res)
+	if (parsed?.id) return parsed
+	const data = res as { results?: BookReview | null }
+	return data?.results?.id ? data.results : null
 }
 
 export const getAudioList = async (params: BookListQuery = {}) => {

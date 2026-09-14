@@ -62,7 +62,14 @@ function BookCard({ book, variant = 'tile', onClick }: BookCardProps) {
 				) : null}
 			</div>
 			<div className={classes.title}>{book.title}</div>
-			<div className={classes.meta}>{book.progressLabel || book.author}</div>
+			<div className={classes.meta}>
+				{[
+					book.progressLabel || book.author,
+					rating ? `★ ${rating}` : null,
+				]
+					.filter(Boolean)
+					.join(' · ')}
+			</div>
 		</button>
 	)
 }
