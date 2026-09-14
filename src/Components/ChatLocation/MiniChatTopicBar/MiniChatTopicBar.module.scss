@@ -18,7 +18,17 @@
 	gap: 12px;
 	padding: 0 72px 8px 16px;
 	overflow-x: auto;
-	scrollbar-width: thin;
+	cursor: grab;
+	user-select: none;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	&:active {
+		cursor: grabbing;
+	}
 }
 
 .home,

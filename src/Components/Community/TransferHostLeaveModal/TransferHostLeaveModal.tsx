@@ -199,11 +199,6 @@ function TransferHostLeaveModal({
 					Select a member to become the new admin.
 				</p>
 
-				<div className={classes.sectionHead}>
-					<span className={classes.sectionTitle}>Members</span>
-					<span className={classes.badge}>{total}</span>
-				</div>
-
 				<div className={classes.searchWrap}>
 					<span className={classes.searchIcon}>
 						<SearchNormal fill="#7987A4" />
@@ -219,7 +214,11 @@ function TransferHostLeaveModal({
 
 				<div className={classes.list} onScroll={handleScroll}>
 					{loadingList && !isArray(candidates, 1) ? (
-						<Flex justify="center" align="center" className={classes.loadingBox}>
+						<Flex
+							justify="center"
+							align="center"
+							className={classes.loadingBox}
+						>
 							<Spin />
 						</Flex>
 					) : !isArray(candidates, 1) ? (
