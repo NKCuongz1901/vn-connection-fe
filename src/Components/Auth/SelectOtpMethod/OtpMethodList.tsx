@@ -49,10 +49,12 @@ function OtpMethodList({
 	isVnPhone = false,
 	onChange,
 }: OtpMethodListProps) {
+	// Zalo and SMS are both Vietnam only. The SMS gateway rejects every foreign number with code
+	// -904, so offering it outside Vietnam is offering an option that cannot work.
 	const options = useMemo(
 		() =>
 			OTP_METHOD_OPTIONS.filter(
-				(option) => option.value !== 'zalo' || isVnPhone,
+				(option) => option.value === 'whatsapp' || isVnPhone,
 			),
 		[isVnPhone],
 	)

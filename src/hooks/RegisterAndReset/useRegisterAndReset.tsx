@@ -265,6 +265,24 @@ export default function useRegisterAndReset({
 					throw new Error('Phone already exists')
 				}
 
+				// The SMS gateway is Vietnam only. Measured on production over 90 days: 266 sends to
+				// 52 distinct foreign numbers, every one rejected with gateway code -904, against a
+				// 99.5% delivery rate for Vietnamese numbers. Sending first and offering the other
+				// channels afterwards never worked for those users, because the failure stops the
+				// flow before the OTP screen where the alternatives live. So ask first.
+				const vnPhone = await resolveVnPhone(
+					accountInfo.prefix,
+					accountInfo.phone,
+				)
+				setIsVnPhone(vnPhone)
+
+				if (!vnPhone) {
+					setOtpDestination(formattedPhone)
+					setShowAlternateMethods(true)
+					setStep(1)
+					return
+				}
+
 				const dataSendOtp: any = await sendOTP({ phone: formattedPhone })
 				if (dataSendOtp?.results?.object?.sid === 'success') {
 					setOtpChannel('sms')
