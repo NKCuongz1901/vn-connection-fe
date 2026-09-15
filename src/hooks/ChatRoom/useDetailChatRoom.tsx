@@ -64,6 +64,16 @@ export default function useDetailChatRoom(props: useDetailChatRoomProps) {
 
 	const handleJoinChatRoom = async () => {
 		try {
+			const infoRes: any = await getConvInfoById({
+				id,
+				fields: ['$all'],
+			})
+			const join = infoRes?.results?.object?.join
+			if (join) {
+				onSuccess({ type: 'join', id, data: join })
+				return
+			}
+
 			const res: any = await joinConversation({ id, status: true })
 			onSuccess({ type: 'join', id, data: res?.results?.object })
 		} catch (error) {
