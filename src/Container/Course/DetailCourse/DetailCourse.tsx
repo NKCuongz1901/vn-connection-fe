@@ -27,6 +27,7 @@ function DetailCourse({ id }: { id: string }) {
 		handleReportCourse,
 		handleContributeIdea,
 		paymentInforCourse,
+		handleGetPaymentLink,
 	} = useCourse(id)
 	const [referralModalOpen, setReferralModalOpen] = useState(false)
 	const [reportOpen, setReportOpen] = useState(false)
@@ -47,6 +48,12 @@ function DetailCourse({ id }: { id: string }) {
 
 	const handleBack = () => {
 		onChangeRoute(mainRoutes.courseOverview)
+	}
+
+	/** Starts OnePay checkout for the current course. */
+	const handleBuyNow = () => {
+		if (!id) return
+		handleGetPaymentLink(id)
 	}
 
 	return (
@@ -74,6 +81,8 @@ function DetailCourse({ id }: { id: string }) {
 						onContribute={() => setContributeOpen(true)}
 						onSelectLanguage={() => setLanguageOpen(true)}
 						onGetDiscount={() => setDiscountOpen(true)}
+						onBuyNow={handleBuyNow}
+						isPaying={loading.paymentLink}
 					/>
 				) : null}
 			</div>

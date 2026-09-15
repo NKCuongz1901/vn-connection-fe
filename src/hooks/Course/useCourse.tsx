@@ -8,6 +8,7 @@ import {
 	handleContributeIdea as contributeIdeaApi,
 	handleReportCourse as reportCourseApi,
 	getPaymentInforCourse,
+	handlePaymentLink,
 } from '@/apis/courseApis'
 import { useModal } from '@/context/ModalContext'
 import {
@@ -30,6 +31,7 @@ export default function useCourse(id?: string) {
 	const [courseDetail, setCourseDetail] = useState<Course | null>(null)
 	const [paymentInforCourse, setPaymentInforCourse] =
 		useState<PaymentInforCourse | null>(null)
+	const [paymentLink, setPaymentLink] = useState<string>('')
 	const [loading, setloading] = useState({
 		listCourse: true,
 		myPurchasedCourse: true,
@@ -37,6 +39,7 @@ export default function useCourse(id?: string) {
 		referralGlobal: true,
 		courseDetail: true,
 		paymentInforCourse: true,
+		paymentLink: false,
 	})
 
 	const handleGetListCourse = async () => {
@@ -175,6 +178,24 @@ export default function useCourse(id?: string) {
 		}
 	}
 
+	/** Fetches the OnePay URL and redirects the browser to checkout. */
+	const handleGetPaymentLink = async (course_id: string) => {
+		try {
+			setloading((prev) => ({ ...prev, paymentLink: true }))
+			const res: any = await handlePaymentLink(course_id)
+			const { code, results } = res || {}
+			const url = results?.object?.payment_url || ''
+			if (code === 200 && url) {
+				window.location.href = url
+				return
+			}
+		} catch (error) {
+			openError(error)
+		} finally {
+			setloading((prev) => ({ ...prev, paymentLink: false }))
+		}
+	}
+
 	useEffect(() => {
 		handleGetListCourse()
 		handleGetMyPurchasedCourse()
@@ -198,9 +219,10 @@ export default function useCourse(id?: string) {
 		referralGlobalCode,
 		courseDetail,
 		paymentInforCourse,
-
+		paymentLink,
 		// Actions
 		handleReportCourse,
 		handleContributeIdea,
+		handleGetPaymentLink,
 	}
 }
