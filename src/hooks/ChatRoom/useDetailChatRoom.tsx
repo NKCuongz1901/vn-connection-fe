@@ -64,6 +64,14 @@ export default function useDetailChatRoom(props: useDetailChatRoomProps) {
 
 	const handleJoinChatRoom = async () => {
 		try {
+			const infoRes: any = await getConvInfoById({
+				id,
+				fields: ['$all'],
+			})
+			const join = infoRes?.results?.object?.join
+			// Already a member — skip join success so topic bar is not refetched/reset.
+			if (join) return
+
 			const res: any = await joinConversation({ id, status: true })
 			onSuccess({ type: 'join', id, data: res?.results?.object })
 		} catch (error) {
