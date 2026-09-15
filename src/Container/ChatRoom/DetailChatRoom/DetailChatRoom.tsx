@@ -1,7 +1,10 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 
 import useDetailChatRoom from '@/hooks/ChatRoom/useDetailChatRoom'
 
+import MiniChatTopicBar from '@/Components/ChatLocation/MiniChatTopicBar/MiniChatTopicBar'
+import ModalLeaveMiniChat from '@/Components/ChatLocation/ModalSelectMiniChat/ModalLeaveMiniChat'
+import ModalSelectMiniChat from '@/Components/ChatLocation/ModalSelectMiniChat/ModalSelectMiniChat'
 import ModalNotiChatRoom from '@/Components/ChatRoom/ModalNotiChatRoom'
 import ChatRoomInboxChat from '@/Components/ChatRoomInbox/ChatRoomInboxChat'
 
@@ -34,8 +37,8 @@ const DetailChatRoom = (props: DetailChatRoomProps) => {
 	const {
 		id,
 		isChatLocation,
-		miniChats,
-		fullMiniChats,
+		miniChats = [],
+		fullMiniChats = [],
 		activeMiniChatId,
 		miniChatsLoading,
 		fullMiniChatsLoading,
@@ -46,6 +49,26 @@ const DetailChatRoom = (props: DetailChatRoomProps) => {
 		onSuccess = () => null,
 	} = props
 	const { modal, setModal, onSetTimesJoin } = useDetailChatRoom(props)
+	const [openSelectMiniChat, setOpenSelectMiniChat] = useState(false)
+	const [leaveMiniChatTarget, setLeaveMiniChatTarget] =
+		useState<FullMiniChatItemProps | null>(null)
+
+	/** Opens a mini chat or asks to leave if already joined. */
+	const handleSelectFullMiniChat = (item: FullMiniChatItemProps) => {
+		setOpenSelectMiniChat(false)
+		if (item.joined) {
+			setLeaveMiniChatTarget(item)
+			return
+		}
+		onSelectMiniChat?.(item, { isJoining: true })
+	}
+
+	/** Confirms leave for the selected joined mini chat. */
+	const handleConfirmLeaveMiniChat = async () => {
+		if (!leaveMiniChatTarget || !onLeaveMiniChat) return
+		const success = await onLeaveMiniChat(leaveMiniChatTarget)
+		if (success) setLeaveMiniChatTarget(null)
+	}
 
 	const _renderModal = () => {
 		const { type } = modal || {}
@@ -83,25 +106,45 @@ const DetailChatRoom = (props: DetailChatRoomProps) => {
 		return Content
 	}
 
+	const topicBar =
+		isChatLocation ? (
+			<MiniChatTopicBar
+				key="mini-chat-topic-bar"
+				items={miniChats}
+				activeId={activeMiniChatId}
+				loading={miniChatsLoading}
+				onExpand={() => setOpenSelectMiniChat(true)}
+				onSelect={onSelectMiniChat}
+				onSelectHome={onSelectParentChat}
+			/>
+		) : null
+
 	return (
 		<div className={classes.wrapper}>
-			{/* <InboxChat convId={id} /> */}
+			{/* Inbox remounts chat body via convId; topic bar stays mounted here. */}
 			<ChatRoomInboxChat
-				key={id}
 				convId={id}
 				isChatLocation={isChatLocation}
-				miniChats={miniChats}
-				fullMiniChats={fullMiniChats}
 				activeMiniChatId={activeMiniChatId}
-				miniChatsLoading={miniChatsLoading}
-				fullMiniChatsLoading={fullMiniChatsLoading}
-				miniChatActionId={miniChatActionId}
-				onSelectMiniChat={onSelectMiniChat}
-				onSelectParentChat={onSelectParentChat}
-				onLeaveMiniChat={onLeaveMiniChat}
+				topicBar={topicBar}
 				onSuccess={onSuccess}
 				onChangeModal={setModal}
 			/>
+			{openSelectMiniChat && (
+				<ModalSelectMiniChat
+					items={fullMiniChats}
+					loading={fullMiniChatsLoading}
+					onClose={() => setOpenSelectMiniChat(false)}
+					onSelect={handleSelectFullMiniChat}
+				/>
+			)}
+			{leaveMiniChatTarget && (
+				<ModalLeaveMiniChat
+					loading={miniChatActionId === leaveMiniChatTarget.id}
+					onCancel={() => setLeaveMiniChatTarget(null)}
+					onConfirm={handleConfirmLeaveMiniChat}
+				/>
+			)}
 			{_renderModal()}
 		</div>
 	)

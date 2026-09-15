@@ -92,7 +92,7 @@ const MiniChatTopicBar = (props: MiniChatTopicBarProps) => {
 					<HouseIcon fill="#006B35" />
 				</button>
 
-				{loading
+				{loading && items.length === 0
 					? [0, 1, 2, 3].map((item) => (
 							<span key={item} className={classes.skeleton} />
 						))

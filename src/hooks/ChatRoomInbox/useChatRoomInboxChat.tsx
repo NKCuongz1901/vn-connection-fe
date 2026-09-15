@@ -822,7 +822,10 @@ export default function useChatRoomInboxChat({
 	}, [])
 	useEffect(() => {
 		setEditingMessage(null)
+		setOpenSetting(false)
+		setModal({ type: '', data: null })
 		_paginationRefs.current.page = 1
+		_loadmore.current = true
 		handleGetInfoConv()
 		handleGetListMessById()
 		handleGetMembersConv()
