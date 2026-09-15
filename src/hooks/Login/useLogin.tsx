@@ -16,7 +16,11 @@ import {
 
 import { delay, formatPhone, toJson } from '@/ultis/common'
 import { useLocalePath } from '@/ultis/route'
-import { handleStorageCookie, isLogin, setSessionStorage } from '@/ultis/storage'
+import {
+	handleStorageCookie,
+	isLogin,
+	setSessionStorage,
+} from '@/ultis/storage'
 import { randomString } from '@/ultis/string'
 
 import { mainRoutes } from '@/routes/MainRoutes'
@@ -53,7 +57,7 @@ export default function useLogin(options?: UseLoginOptions) {
 	const { openError } = useModal()
 	const { onChangeRoute, locale } = useLocalePath()
 	const [loginStep, setLoginStep] = useState<LoginStep>('phone')
-	const [otpMethod, setOtpMethod] = useState<OtpSendMethod>('sms')
+	const [otpMethod, setOtpMethod] = useState<OtpSendMethod>('whatsapp')
 	const [isVnPhone, setIsVnPhone] = useState(false)
 	const [account, setAccount] = useState({
 		phone: '',
@@ -228,7 +232,7 @@ export default function useLogin(options?: UseLoginOptions) {
 		if (phone.length < 9) return
 
 		setLoginStep('registerOtp')
-		setOtpMethod('sms')
+		setOtpMethod('whatsapp')
 		toggleLoadingContext(true)
 		try {
 			const checkRes: any = await checkOTP({
@@ -238,11 +242,11 @@ export default function useLogin(options?: UseLoginOptions) {
 			const vnPhone = Boolean(checkRes?.results?.object?.status)
 			setIsVnPhone(vnPhone)
 			if (!vnPhone) {
-				setOtpMethod('sms')
+				setOtpMethod('whatsapp')
 			}
 		} catch (error: any) {
 			setIsVnPhone(false)
-			setOtpMethod('sms')
+			setOtpMethod('whatsapp')
 			openError(error)
 		} finally {
 			toggleLoadingContext(false)
