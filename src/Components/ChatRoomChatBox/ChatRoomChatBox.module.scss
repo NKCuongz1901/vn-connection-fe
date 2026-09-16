@@ -87,7 +87,8 @@
 						align-items: flex-end;
 						gap: 8px;
 						.messageBubbleHitArea {
-							max-width: 100%;
+							width: fit-content;
+							max-width: 80%;
 							flex: 0 1 auto;
 						}
 						.messageBubbleInteractive {
@@ -134,8 +135,9 @@
 							object-fit: cover;
 						}
 						.text {
+							width: fit-content;
 							min-width: 100px;
-							max-width: 80%;
+							max-width: 100%;
 							padding: 8px 12px;
 							gap: 4px;
 							border-radius: 16px;
@@ -184,6 +186,16 @@
 							flex-wrap: wrap;
 							gap: 2px;
 							border-radius: 16px;
+
+							&:has(.mediaContent) {
+								border-radius: 0;
+								width: fit-content;
+							}
+
+							.mediaRow {
+								width: fit-content;
+								max-width: 100%;
+							}
 							// overflow: hidden;
 							.moreIconWrapper {
 								align-items: center;
@@ -221,6 +233,20 @@
 								max-width: 320px;
 								width: fit-content;
 								overflow: hidden;
+
+								&:has(.mediaContent) {
+									background-color: transparent;
+									overflow: visible;
+									border-radius: 0;
+									width: fit-content;
+									max-width: 280px;
+									padding-bottom: 0;
+
+									.mediaContent {
+										border-radius: 0;
+										overflow: visible;
+									}
+								}
 								.mediaContent {
 									flex-wrap: wrap;
 									gap: 2px;
@@ -371,6 +397,12 @@
 
 								&:not(:has(.mediaCaption)):has(.multiMediaContent) {
 									width: 280px;
+									padding-bottom: 36px;
+
+									.reactView {
+										bottom: 4px;
+										transform: none;
+									}
 								}
 
 								&:not(:has(.mediaCaption)):has(.mediaContent) {
@@ -1115,9 +1147,9 @@
 										max-width: 280px;
 									}
 
-									&:not(:has(.mediaCaption)):has(.mediaContent) {
+									&:has(.mediaContent) {
 										width: fit-content;
-										max-width: 320px;
+										max-width: 280px;
 									}
 								}
 							}

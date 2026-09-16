@@ -5,6 +5,7 @@ import { Popover } from 'antd'
 import clsx from 'clsx'
 import { useMemo, useState } from 'react'
 
+import type { ReferralLeaderboardPeriod } from '@/apis/referralApis'
 import ReferralLeaderboardPodium from '@/Components/Referral/ReferralLeaderboardPodium/ReferralLeaderboardPodium'
 
 import classes from './ReferralLeaderboard.module.scss'
@@ -15,37 +16,40 @@ export interface ReferralLeaderboardProps {
 	leaderBoard?: any[]
 	topInvitees?: any[]
 	myPosition?: number
+	myTotalPoints?: number
 	userData?: any
+	period?: ReferralLeaderboardPeriod
+	onChangePeriod?: (period: ReferralLeaderboardPeriod) => void
 }
 
 const PERIOD_OPTIONS = [
 	{
-		value: 'this_month',
+		value: 'monthly' as const,
 		label: 'By this month (default)',
 		triggerLabel: 'By this month',
 	},
 	{
-		value: 'this_year',
+		value: 'yearly' as const,
 		label: 'By this year',
 		triggerLabel: 'By this year',
 	},
 	{
-		value: 'all_time',
+		value: 'all_time' as const,
 		label: 'All time',
 		triggerLabel: 'All time',
 	},
-] as const
-
-type PeriodValue = (typeof PERIOD_OPTIONS)[number]['value']
+]
 
 function ReferralLeaderboard({
 	loading,
 	topInvitees = [],
 	leaderBoard = [],
 	myPosition = 0,
+	myTotalPoints = 0,
 	userData = {},
+	period = 'monthly',
+	onChangePeriod,
 }: ReferralLeaderboardProps) {
-	const [period, setPeriod] = useState<PeriodValue>('this_month')
 	const [open, setOpen] = useState(false)
 
 	const selectedOption = useMemo(
@@ -63,7 +67,7 @@ function ReferralLeaderboard({
 						type="button"
 						className={classes.periodItem}
 						onClick={() => {
-							setPeriod(option.value)
+							onChangePeriod?.(option.value)
 							setOpen(false)
 						}}
 					>
@@ -104,6 +108,7 @@ function ReferralLeaderboard({
 				loading={loading}
 				leaderBoard={leaderBoard}
 				myPosition={myPosition}
+				myTotalPoints={myTotalPoints}
 				userData={userData}
 			/>
 		</div>

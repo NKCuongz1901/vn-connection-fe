@@ -1,5 +1,6 @@
 'use client'
 
+import clsx from 'clsx'
 import { memo } from 'react'
 
 import CModal from '@/Components/Custom/CModal/CModal'
@@ -15,12 +16,16 @@ interface ReferralAllYearsModalProps {
 	onClose: () => void
 	years: ReferralYearStat[]
 	total: number
+	selectedYear?: number | null
+	onSelectYear?: (year: number | null) => void
 }
 
 function ReferralAllYearsModal({
 	onClose,
 	years,
 	total,
+	selectedYear = null,
+	onSelectYear,
 }: ReferralAllYearsModalProps) {
 	return (
 		<div className={classes.wrapper}>
@@ -51,31 +56,47 @@ function ReferralAllYearsModal({
 			>
 				<div className={classes.container}>
 					{years.length ? (
-						years.map(({ year, total: yearTotal }) => (
-							<div key={year} className={classes.yearRow}>
-								<div className={classes.iconWrap}>
-									<CalenderIcon fill="#E55A0F" />
-								</div>
-								<span className={classes.yearLabel}>{year}</span>
-								<div className={classes.points}>
-									<span>{yearTotal}</span>
-									<CoinIcon />
-								</div>
-							</div>
-						))
+						years.map(({ year, total: yearTotal }) => {
+							const isActive = selectedYear === year
+							return (
+								<button
+									key={year}
+									type="button"
+									className={clsx(classes.yearRow, {
+										[classes.yearRowActive]: isActive,
+									})}
+									onClick={() => onSelectYear?.(year)}
+								>
+									<div className={classes.iconWrap}>
+										<CalenderIcon fill="#E55A0F" />
+									</div>
+									<span className={classes.yearLabel}>{year}</span>
+									<div className={classes.points}>
+										<span>{yearTotal}</span>
+										<CoinIcon />
+									</div>
+								</button>
+							)
+						})
 					) : (
 						<div className={classes.empty}>No referral points yet</div>
 					)}
-					<div className={`${classes.yearRow} ${classes.totalRow}`}>
+					<button
+						type="button"
+						className={clsx(classes.yearRow, classes.totalRow, {
+							[classes.yearRowActive]: selectedYear == null,
+						})}
+						onClick={() => onSelectYear?.(null)}
+					>
 						<div className={classes.iconWrap}>
 							<TropyIcon />
 						</div>
-						<span className={classes.totalLabel}>Total points</span>
+						<span className={classes.totalLabel}>All years</span>
 						<div className={classes.points}>
 							<span>{total}</span>
 							<CoinIcon />
 						</div>
-					</div>
+					</button>
 				</div>
 			</CModal>
 		</div>

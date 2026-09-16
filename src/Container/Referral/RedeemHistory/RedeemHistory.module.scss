@@ -47,6 +47,10 @@
 	width: 100%;
 	max-width: 678px;
 	margin: 16px auto 0;
+	max-height: calc(100vh - 160px);
+	overflow-y: auto;
+	overflow-x: hidden;
+	-webkit-overflow-scrolling: touch;
 }
 
 .card {

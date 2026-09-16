@@ -12,6 +12,7 @@ export interface ReferralLeaderboardListProps {
 	loading?: boolean
 	leaderBoard?: LeaderboardUser[]
 	myPosition?: number
+	myTotalPoints?: number
 	userData?: any
 }
 
@@ -19,22 +20,15 @@ function ReferralLeaderboardList({
 	loading,
 	leaderBoard = [],
 	myPosition = 0,
+	myTotalPoints = 0,
 	userData = {},
 }: ReferralLeaderboardListProps) {
 	const listItems = useMemo(() => leaderBoard.slice(3), [leaderBoard])
 
-	const myBoardItem = useMemo(
-		() => leaderBoard.find((item) => item.id === userData?.id),
-		[leaderBoard, userData?.id],
-	)
-
-	const myPoints = myBoardItem?.total_points ?? userData?.wallet ?? 0
-	const myScoreLabel = myBoardItem?.scoreLabel
-
 	return (
 		<div className={classes.wrapper}>
 			<div className={classes.listScroll}>
-				{loading && !listItems.length ? (
+				{loading ? (
 					Array.from({ length: 4 }).map((_, index) => (
 						<div key={index} className={classes.skeletonRow}>
 							<Skeleton active paragraph={{ rows: 1 }} title={false} />
@@ -52,20 +46,17 @@ function ReferralLeaderboardList({
 						/>
 					))
 				) : (
-					!loading && (
-						<div className={classes.empty}>No leaderboard data yet</div>
-					)
+					<div className={classes.empty}>No leaderboard data yet</div>
 				)}
 			</div>
 
 			<div className={classes.myPositionSection}>
 				<div className={classes.myPositionTitle}>Your position</div>
 				<ReferralLeaderboardRow
-					rank={myPosition || myBoardItem?.user_rank}
+					rank={myPosition}
 					name={userData?.name}
 					avatar={userData?.avatar}
-					points={myPoints}
-					scoreLabel={myScoreLabel}
+					points={myTotalPoints}
 					variant="myPosition"
 				/>
 			</div>

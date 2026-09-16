@@ -248,6 +248,18 @@ export const leaveConversation = async (_payload: any) => {
 	return await axios.post(url, payload)
 }
 
+/** Transfers community host role to another member before owner leaves. */
+export const transferHost = async ({
+	id,
+	member_id,
+}: {
+	id: string
+	member_id: string
+}) => {
+	const url = `${CONVERSATION_ROUTES.name}/${id}/${CONVERSATION_ROUTES.transferHost}`
+	return await axios.post(url, { member_id })
+}
+
 export const getAnnouListById = async ({
 	params = {},
 }: {

@@ -37,6 +37,8 @@ const ForgetPassword = ({
 		fromAccount,
 		otpChannel,
 		otpDestination,
+		isVnPhone,
+		showAlternateMethods,
 		onChangeStep,
 		onChangeData,
 		onSubmitPhone,
@@ -44,6 +46,7 @@ const ForgetPassword = ({
 		onSubmitPass,
 		onResendOtp,
 		onSwitchToSms,
+		onSelectAlternateMethod,
 		onClearForgetSession,
 	} = useRegisterAndReset({
 		type,
@@ -100,9 +103,19 @@ const ForgetPassword = ({
 						onAccept={onSubmitOtp}
 						onSendAgain={onResendOtp}
 						onSwitchToSms={onSwitchToSms}
+						onSelectAlternateMethod={
+							type === OTP_TYPE.FORGET_PASSWORD
+								? onSelectAlternateMethod
+								: undefined
+						}
 						showSwitchToPhone={Boolean(phone) && otpChannel === 'email'}
+						showAlternateMethods={
+							type === OTP_TYPE.FORGET_PASSWORD && showAlternateMethods
+						}
+						isVnPhone={isVnPhone}
 						hiddenChangeStep={fromAccount}
 						onChangeStep={onChangeStep}
+						disabled={loadingContext}
 					/>
 				)
 			case 2:

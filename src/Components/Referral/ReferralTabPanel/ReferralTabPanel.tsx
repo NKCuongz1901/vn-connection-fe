@@ -5,9 +5,12 @@ import { useState } from 'react'
 
 import ReferralHistory from '@/Components/Referral/ReferralHistory/ReferralHistory'
 import ReferralLeaderboard from '@/Components/Referral/ReferralLeaderboard/ReferralLeaderboard'
+import type {
+	ReferralOverviewData,
+	ReferralWalletHistoryItem,
+} from '@/Components/Referral/ReferralHistory/referralHistory.utils'
 
 import classes from './ReferralTabPanel.module.scss'
-import { Divider } from 'antd'
 
 const TABS = [
 	{ key: 'leaderboard', label: 'Leaderboard' },
@@ -17,29 +20,35 @@ const TABS = [
 type ReferralTab = (typeof TABS)[number]['key']
 
 export interface ReferralTabPanelProps {
-	loading?: boolean
+	loadingLeaderBoard?: boolean
+	loadingOverview?: boolean
+	loadingHistory?: boolean
 	leaderBoard?: any[]
 	topInvitees?: any[]
 	myPosition?: number
+	myTotalPoints?: number
 	userData?: any
-	walletHistory?: any[]
-	walletHistoryGroupByMonth?: any[]
-	onLoadMoreHistory?: () => void
+	referralOverview?: ReferralOverviewData
+	walletHistory?: ReferralWalletHistoryItem[]
+	period?: 'monthly' | 'yearly' | 'all_time'
+	onChangePeriod?: (period: 'monthly' | 'yearly' | 'all_time') => void
 	onScrollHistory?: (e: React.UIEvent<HTMLDivElement>) => void
-	loadingHistory?: boolean
 }
 
 function ReferralTabPanel({
-	loading,
+	loadingLeaderBoard,
+	loadingOverview,
+	loadingHistory,
 	leaderBoard = [],
 	topInvitees = [],
 	myPosition = 0,
+	myTotalPoints = 0,
 	userData = {},
+	referralOverview,
 	walletHistory = [],
-	walletHistoryGroupByMonth = [],
-	onLoadMoreHistory,
+	period,
+	onChangePeriod,
 	onScrollHistory,
-	loadingHistory,
 }: ReferralTabPanelProps) {
 	const [activeTab, setActiveTab] = useState<ReferralTab>('leaderboard')
 
@@ -64,20 +73,22 @@ function ReferralTabPanel({
 			<div className={classes.tabContent}>
 				{activeTab === 'leaderboard' && (
 					<ReferralLeaderboard
-						loading={loading}
+						loading={loadingLeaderBoard}
 						leaderBoard={leaderBoard}
 						topInvitees={topInvitees}
 						myPosition={myPosition}
+						myTotalPoints={myTotalPoints}
 						userData={userData}
+						period={period}
+						onChangePeriod={onChangePeriod}
 					/>
 				)}
 				{activeTab === 'history' && (
 					<ReferralHistory
-						loading={loading}
+						loading={loadingOverview}
 						loadingHistory={loadingHistory}
+						referralOverview={referralOverview}
 						walletHistory={walletHistory}
-						walletHistoryGroupByMonth={walletHistoryGroupByMonth}
-						onLoadMore={onLoadMoreHistory}
 						onScroll={onScrollHistory}
 					/>
 				)}

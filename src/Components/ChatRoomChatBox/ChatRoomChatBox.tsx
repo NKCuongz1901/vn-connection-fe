@@ -486,7 +486,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 				}
 				return (
 					<Flex className={classes.medias} vertical>
-						<Flex>
+						<Flex align="center" className={classes.mediaRow}>
 							{!(isTemp || isMemberAction) && isAudioMedia && !isMe && (
 								<Flex
 									className={classes.moreIconWrapper}
@@ -923,12 +923,18 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 
 	const _renderEdit = () => {
 		if (!editingMessage) return null
+		const content = String(editingMessage?.content ?? '').trim()
 
 		return (
 			<Flex className={classes.chatReply}>
 				<ReplyIcon />
 				<Flex className={classes.replyInfo} vertical>
 					<div className={classes.replyName}>Editing message</div>
+					{content ? (
+						<div className={classes.text}>
+							<div>{editingMessage.content}</div>
+						</div>
+					) : null}
 					{_renderEditMediaThumbnails()}
 				</Flex>
 				<Flex className={classes.replyCancel} onClick={handleCancelEditMode}>
