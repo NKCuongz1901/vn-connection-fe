@@ -4,10 +4,8 @@ import { IconChevronLeft } from '@tabler/icons-react'
 
 import CCheckbox from '@/Components/Custom/CCheckbox'
 import CInput from '@/Components/Custom/CInput'
-import CSelect from '@/Components/Custom/CSelect'
 import useAddBankCard from '@/hooks/Referral/useAddBankCard'
 
-import { BANK_OPTIONS } from './addBankCard.constants'
 import classes from './AddBankCard.module.scss'
 
 const INPUT_STYLE = {
@@ -26,6 +24,7 @@ function AddBankCard() {
 		issuedInVietnam,
 		agreeTerms,
 		isValid,
+		loading,
 		setCardHolderName,
 		setCardNumber,
 		setBankName,
@@ -81,16 +80,15 @@ function AddBankCard() {
 				</div>
 
 				<div className={classes.formField}>
-					<CSelect
+					<CInput
 						label="Bank name"
 						isRequired
 						value={bankName}
 						placeholder="Bank name"
-						options={[...BANK_OPTIONS]}
 						allowClear={false}
 						bordered={false}
-						style={{ width: '100%' }}
-						onChange={(value) => setBankName(value)}
+						style={INPUT_STYLE}
+						onChange={(e) => setBankName(e.target.value)}
 					/>
 				</div>
 
@@ -145,7 +143,7 @@ function AddBankCard() {
 				<button
 					type="button"
 					className={classes.submitBtn}
-					disabled={!isValid}
+					disabled={!isValid || loading}
 					onClick={onSubmit}
 				>
 					Add

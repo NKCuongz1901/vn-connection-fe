@@ -243,6 +243,7 @@ const EventComment = (
 							<CCommentItem
 								item={item}
 								key={item.id}
+								isPublic={isPublic}
 								onAction={handleCommentAction}
 							/>
 						))}

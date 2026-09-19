@@ -27,6 +27,14 @@
 	}
 }
 
+.toastInfo {
+	background: #fff;
+
+	.title {
+		color: #0f1729;
+	}
+}
+
 .statusIcon {
 	display: flex;
 	flex-shrink: 0;
@@ -73,4 +81,10 @@
 	border: none;
 	background: transparent;
 	cursor: pointer;
+}
+
+.spacer {
+	flex-shrink: 0;
+	width: 24px;
+	height: 24px;
 }

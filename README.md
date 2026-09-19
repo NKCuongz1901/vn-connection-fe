@@ -9,7 +9,8 @@ First, run the development server:
 npm run dev
 ```
 
-update build 5
+update build 6
+
 ![](https://img.shields.io/badge/Important-FF0000?style=for-the-badge)
 
 ## Run next lint before commit code
@@ -25,7 +26,7 @@ update build 5
 7. Variable
 8. Define variable
 9. Define type/interface
-10. Update Build 3
+10. Update Build 4
 
 ## Rule passing props down
 

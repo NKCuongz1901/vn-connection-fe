@@ -22,6 +22,8 @@ export const AUTH_ROUTES = {
 	forgetPassword: '/auth/forget_password',
 	registerByPhone: '/auth/register_by_phone',
 	sendToMail: 'auth/otp/send-to-mail',
+	sendToZalo: 'auth/otp/send-to-zalo',
+	sendToWhatsapp: 'auth/otp/send-otp-whatsapp',
 	logout: '/auth/logout',
 	requestFeature: '/inquiries',
 }
@@ -72,6 +74,7 @@ export const CONVERSATION_ROUTES = {
 	convSuggest: 'conversation/suggest',
 	joinConversation: 'request-join-conversation',
 	leave: 'leave',
+	transferHost: 'transfer-host',
 	anouncement: 'anouncement',
 	anouncementPublic: 'anouncement/public',
 	anouncementLike: 'anouncement/like',
@@ -155,9 +158,13 @@ export const SEARCH_ROUTES = {
 }
 
 export const REFERRAL_ROUTES = {
-	leaderBoard: 'user/leader-board',
+	leaderBoard: 'user/leader-board/list',
 	walletHistoryGroupByMonth: 'wallet-history/grouped-by-month',
 	walletHistory: 'wallet-history',
+	walletHistoryOverview: 'wallet-history/referral-overview',
+	addBankAccount: 'redeem-request/bank-account',
+	myRedeemRequests: 'redeem-request/my',
+	createRedeemRequest: 'redeem-request',
 }
 export const MAP_ROUTES = {
 	name: 'map/google/place/textsearch/json',

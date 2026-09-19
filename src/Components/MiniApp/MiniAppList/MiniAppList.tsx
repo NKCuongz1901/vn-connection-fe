@@ -18,7 +18,7 @@ const MiniAppList = ({ size = 'sm', className }: MiniAppListProps) => {
 
 	return (
 		<div className={clsx(classes.list, classes[size], className)}>
-			{MINI_APP_ITEMS.map(
+			{MINI_APP_ITEMS.filter((item) => !item.hidden).map(
 				({ id, label, variant, Icon, route, availableOnWeb }) => (
 					<MiniAppButton
 						key={id}

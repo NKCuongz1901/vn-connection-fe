@@ -34,6 +34,9 @@ import { useSocket } from './SocketContext'
 
 type SecurityStep = 'notice' | 'secure'
 
+/** Temporary kill-switch for the "New login detected" popup. Set true to restore. */
+const NEW_DEVICE_LOGIN_CHECK_ENABLED = false
+
 /** Extracts pending alerts from the supported API response envelopes. */
 const getAlertsFromResponse = (response: any): unknown[] => {
 	const alerts =
@@ -80,6 +83,8 @@ export const NewDeviceSecurityProvider = ({
 
 	/** Validates, deduplicates, and displays an incoming new-device alert. */
 	const handleNewDeviceAlert = useCallback(async (payload: unknown) => {
+		if (!NEW_DEVICE_LOGIN_CHECK_ENABLED) return
+
 		const alert = parseNewDeviceAlert(payload)
 		if (!alert || handledAlertIdsRef.current.has(alert.id)) return
 
@@ -189,6 +194,7 @@ export const NewDeviceSecurityProvider = ({
 
 	/** Fetches alerts missed while the app was closed or disconnected. */
 	const handleFetchPendingAlerts = useCallback(async () => {
+		if (!NEW_DEVICE_LOGIN_CHECK_ENABLED) return
 		if (!isLogin()) return
 
 		try {

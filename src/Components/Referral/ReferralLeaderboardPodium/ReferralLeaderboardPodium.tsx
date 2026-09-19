@@ -33,7 +33,7 @@ function ReferralLeaderboardPodium({
 		[topInvitees],
 	)
 
-	if (loading && !topInvitees.length) {
+	if (loading) {
 		return (
 			<div className={classes.podium}>
 				{PODIUM_SLOTS.map(({ rank }) => (

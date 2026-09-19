@@ -1,6 +1,7 @@
 'use client'
 
 import { IconChevronLeft } from '@tabler/icons-react'
+import { Skeleton } from 'antd'
 import clsx from 'clsx'
 
 import CalenderIcon from '@/svg/CalenderIcon'
@@ -8,43 +9,18 @@ import ClockIcon from '@/svg/ClockIcon'
 import CoinIcon from '@/svg/CoinIcon'
 import TickCircleIcon from '@/svg/TickCircleIcon'
 import WalletIcon from '@/svg/Referral/WalletIcon'
+import useRedeemHistory, {
+	type RedeemHistoryItem,
+} from '@/hooks/Referral/useRedeemHistory'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { useLocalePath } from '@/ultis/route'
 import { formatNumberString } from '@/ultis/string'
 
 import classes from './RedeemHistory.module.scss'
 
-type RedeemStatus = 'pending' | 'paid'
-
-interface RedeemHistoryItem {
-	id: string
-	date: string
-	status: RedeemStatus
-	amount: number
-	points: number
-	paidAt?: string
-}
-
-const REDEEM_HISTORY_ITEMS: RedeemHistoryItem[] = [
-	{
-		id: '1',
-		date: 'Jan 10, 2025',
-		status: 'pending',
-		amount: 1000000,
-		points: 200,
-	},
-	{
-		id: '2',
-		date: 'Jan 10, 2025',
-		status: 'paid',
-		amount: 1000000,
-		points: 200,
-		paidAt: 'Paid on Dec 5, 2024 at 02:45 PM',
-	},
-]
-
 function RedeemHistory() {
 	const { onChangeRoute } = useLocalePath()
+	const { loading, items, onScroll } = useRedeemHistory()
 
 	const renderRedeemItem = (item: RedeemHistoryItem) => {
 		const isPending = item.status === 'pending'
@@ -112,8 +88,15 @@ function RedeemHistory() {
 				</p>
 			</div>
 
-			<div className={classes.list}>
-				{REDEEM_HISTORY_ITEMS.map((item) => renderRedeemItem(item))}
+			<div className={classes.list} onScroll={onScroll}>
+				{loading ? (
+					<>
+						<Skeleton.Input active style={{ width: '100%', height: 140 }} />
+						<Skeleton.Input active style={{ width: '100%', height: 140 }} />
+					</>
+				) : (
+					items.map((item) => renderRedeemItem(item))
+				)}
 			</div>
 		</div>
 	)
