@@ -314,7 +314,7 @@ const Overview = () => {
 										<div key={people.id}>
 											<CAvatar
 												src={people.avatar}
-												style={{ width: 48, height: 48 }}
+												style={{ width: 64, height: 64 }}
 											/>
 										</div>
 									))}
