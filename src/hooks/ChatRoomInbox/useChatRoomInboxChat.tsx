@@ -52,6 +52,7 @@ export default function useChatRoomInboxChat({
 	convId,
 	onSuccess = () => null,
 	onChangeModal = () => null,
+	activeMiniChatId,
 }: useHangoutChatProps) {
 	const { openError } = useModal()
 	const { socket } = useSocket()
@@ -407,7 +408,8 @@ export default function useChatRoomInboxChat({
 			})
 			const { join, amount_of_user } = res?.results?.object || {}
 			const { amount_of_remind } = join || {}
-			if (!amount_of_remind || amount_of_remind < 2) {
+			const isMiniChat = Boolean(activeMiniChatId)
+			if (!isMiniChat && (!amount_of_remind || amount_of_remind < 2)) {
 				onChangeModal({ type: 'noti' })
 			}
 			setConvInfo(res?.results?.object)
@@ -820,7 +822,10 @@ export default function useChatRoomInboxChat({
 	}, [])
 	useEffect(() => {
 		setEditingMessage(null)
+		setOpenSetting(false)
+		setModal({ type: '', data: null })
 		_paginationRefs.current.page = 1
+		_loadmore.current = true
 		handleGetInfoConv()
 		handleGetListMessById()
 		handleGetMembersConv()

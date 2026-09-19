@@ -61,8 +61,28 @@ function TransferHostLeaveModal({
 	const hasMoreRef = useRef(false)
 	const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 	const skipSearchEffectRef = useRef(true)
+	const adminsOnlyRef = useRef(false)
+	const modeResolvedRef = useRef(false)
 
-	/** Loads candidates from GET /conversation/{id}/members. */
+	/** Applies a members API response into candidate list state. */
+	const applyMemberResult = (
+		memberRes: any,
+		{ append, page }: { append: boolean; page: number },
+	) => {
+		const rows = memberRes?.results?.objects?.rows || []
+		const mapped = mapCandidates(rows)
+		const totalMembers =
+			memberRes?.results?.objects?.count ||
+			memberRes?.results?.objects?.total ||
+			mapped.length
+
+		setCandidates((prev) => (append ? [...prev, ...mapped] : mapped))
+		setTotal(totalMembers)
+		pageRef.current = page
+		hasMoreRef.current = isArray(rows, 20)
+	}
+
+	/** Loads candidates: co-admins only when any exist, otherwise members. */
 	const loadCandidates = useCallback(
 		async ({
 			keyword = '',
@@ -78,23 +98,33 @@ function TransferHostLeaveModal({
 			else setLoadingList(true)
 
 			try {
+				if (!append && !modeResolvedRef.current) {
+					const adminRes: any = await getConvMembersById({
+						id: conversationId,
+						page: 1,
+						limit: 20,
+						admins: true,
+					})
+					const adminMapped = mapCandidates(
+						adminRes?.results?.objects?.rows || [],
+					)
+					modeResolvedRef.current = true
+					adminsOnlyRef.current = adminMapped.length > 0
+
+					if (adminsOnlyRef.current && !keyword) {
+						applyMemberResult(adminRes, { append: false, page: 1 })
+						return
+					}
+				}
+
 				const memberRes: any = await getConvMembersById({
 					id: conversationId,
 					page,
 					limit: 20,
 					...(keyword ? { name: keyword } : {}),
+					...(adminsOnlyRef.current ? { admins: true } : {}),
 				})
-				const rows = memberRes?.results?.objects?.rows || []
-				const mapped = mapCandidates(rows)
-				const totalMembers =
-					memberRes?.results?.objects?.count ||
-					memberRes?.results?.objects?.total ||
-					mapped.length
-
-				setCandidates((prev) => (append ? [...prev, ...mapped] : mapped))
-				setTotal(totalMembers)
-				pageRef.current = page
-				hasMoreRef.current = isArray(rows, 20)
+				applyMemberResult(memberRes, { append, page })
 			} catch (error) {
 				openError(error)
 			} finally {
@@ -108,6 +138,8 @@ function TransferHostLeaveModal({
 	useEffect(() => {
 		if (!open) return
 		skipSearchEffectRef.current = true
+		modeResolvedRef.current = false
+		adminsOnlyRef.current = false
 		setSearch('')
 		setSelectedId('')
 		setCandidates([])
@@ -199,11 +231,6 @@ function TransferHostLeaveModal({
 					Select a member to become the new admin.
 				</p>
 
-				<div className={classes.sectionHead}>
-					<span className={classes.sectionTitle}>Members</span>
-					<span className={classes.badge}>{total}</span>
-				</div>
-
 				<div className={classes.searchWrap}>
 					<span className={classes.searchIcon}>
 						<SearchNormal fill="#7987A4" />
@@ -219,7 +246,11 @@ function TransferHostLeaveModal({
 
 				<div className={classes.list} onScroll={handleScroll}>
 					{loadingList && !isArray(candidates, 1) ? (
-						<Flex justify="center" align="center" className={classes.loadingBox}>
+						<Flex
+							justify="center"
+							align="center"
+							className={classes.loadingBox}
+						>
 							<Spin />
 						</Flex>
 					) : !isArray(candidates, 1) ? (
