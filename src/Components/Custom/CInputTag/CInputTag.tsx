@@ -57,6 +57,9 @@ const defaultUser = {
 	avatar: '',
 }
 
+/** Two Enter sends closer than this come from one key press, not two. */
+const ENTER_SEND_DEDUPE_MS = 300
+
 const getQuickMessageQuery = (plainText: string, cursorPos: number) => {
 	for (let i = cursorPos - 1; i >= 0; i--) {
 		if (plainText[i] === '/') {
@@ -88,6 +91,7 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 	const quickMessageDebounceRef = useRef<any>(null)
 	const quickMessageSearchTokenRef = useRef(0)
 	const slashInfoRef = useRef<{ start: number; query: string } | null>(null)
+	const lastEnterSendAtRef = useRef(0)
 	const searchTokenRef = useRef(0)
 	const pagination = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const loadMore = useRef(true)
@@ -535,6 +539,13 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 
 		if (e.shiftKey) return
 
+		// On macOS an input method (Vietnamese Telex, Korean, Japanese) delivers
+		// the Enter that commits the composed word as its own keydown, and Chrome
+		// then fires a second Enter keydown for the same press. Sending on both
+		// posts the message twice, so leave the composing one to the input method
+		// and drop any Enter that lands right after the last send.
+		if (e.nativeEvent?.isComposing) return
+
 		const inputValue = e.target?.value || ''
 		const pendingMention = hasPendingMention(inputValue, value || '')
 		const suggestionOpen = isMentionSuggestionOpen()
@@ -551,6 +562,11 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 
 		e.preventDefault()
 		e.stopPropagation()
+
+		const now = Date.now()
+		if (now - lastEnterSendAtRef.current < ENTER_SEND_DEDUPE_MS) return
+		lastEnterSendAtRef.current = now
+
 		onSendMessage?.(e)
 	}
 
