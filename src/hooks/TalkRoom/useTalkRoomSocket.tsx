@@ -7,6 +7,8 @@ type TalkroomSocketType = {
 	roomId: string
 	enabled?: boolean
 	onRoomEvent?: (event: string, data: any) => void
+	/** Called when the room channel subscribes again after a drop, so state can be refetched. */
+	onResubscribed?: () => void
 }
 
 /** Normalizes server events and client emit payloads from Centrifugo. */
@@ -32,13 +34,15 @@ export const normalizeTalkRoomSocketPublication = (message?: {
 }
 
 export default function useTalkRoomSocket(props: TalkroomSocketType) {
-	const { roomId, onRoomEvent, enabled = false } = props
+	const { roomId, onRoomEvent, onResubscribed, enabled = false } = props
 	const centrifugeRef = useRef<Centrifuge | null>(null)
 	const subscriptionRef = useRef<Subscription | null>(null)
 	const onRoomEventRef = useRef(onRoomEvent)
+	const onResubscribedRef = useRef(onResubscribed)
 	const [isConnected, setIsConnected] = useState<boolean>(false)
 
 	onRoomEventRef.current = onRoomEvent
+	onResubscribedRef.current = onResubscribed
 
 	const emitRoomEvent = useCallback(
 		(
@@ -93,6 +97,20 @@ export default function useTalkRoomSocket(props: TalkroomSocketType) {
 
 				if (!event) return
 				onRoomEventRef.current?.(event, payload)
+			})
+
+			// Events published while the channel was down are lost, so every
+			// subscribe after the first one asks the caller to refetch room state.
+			let subscribedOnce = false
+			subcribe.on('subscribed', () => {
+				if (subscribedOnce) onResubscribedRef.current?.()
+				subscribedOnce = true
+			})
+			subcribe.on('error', (ctx) => {
+				console.warn('[TalkRoomSocket] subscription error', ctx?.error)
+			})
+			centrifuge.on('error', (ctx) => {
+				console.warn('[TalkRoomSocket] connection error', ctx?.error)
 			})
 
 			subcribe.subscribe()

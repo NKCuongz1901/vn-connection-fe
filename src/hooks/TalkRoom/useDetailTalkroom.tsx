@@ -1419,10 +1419,22 @@ export default function useDetailTalkroom(
 		],
 	)
 
+	const handleRoomSocketResubscribed = useCallback(() => {
+		handleGetDetailTalkRoom(id)
+		handleGetListenerInRoom(id)
+		handleGetRaiseHandUsers()
+	}, [
+		id,
+		handleGetDetailTalkRoom,
+		handleGetListenerInRoom,
+		handleGetRaiseHandUsers,
+	])
+
 	const { isConnected, emitRoomEvent } = useTalkRoomSocket({
 		roomId: id,
 		enabled: isJoined,
 		onRoomEvent: handleRoomSocketEvent,
+		onResubscribed: handleRoomSocketResubscribed,
 	})
 
 	const handleEnterRoom = useCallback(async () => {

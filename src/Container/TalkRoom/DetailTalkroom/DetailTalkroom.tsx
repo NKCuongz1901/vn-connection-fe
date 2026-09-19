@@ -999,13 +999,32 @@ function DetailTalkroom({ id }: { id: string }) {
 				return
 			}
 
-			await onPostRaiseHand({
+			const res: any = await onPostRaiseHand({
 				isRaiseHand: true,
 				slotId: resolveRaiseHandSlotId(
 					talkRoomDetail ?? undefined,
 					preferredSlot,
 				),
 			})
+
+			if (!res) {
+				// The server may already hold us as speaker (it answers 400
+				// "Speaker can not raise hand"); refetching lets the on-stage
+				// effect take the speaker role instead of staying stuck.
+				onGetDetailTalkRoom(id)
+				return
+			}
+
+			// Auto speaker promotion: the server promotes us inside raise_hand.
+			// Act on the response itself instead of waiting for the
+			// raise_hand_accepted socket event, which may never arrive.
+			const raiseHandData = res?.results?.object?.data
+			if (
+				raiseHandData?.isAutoPromoted === true ||
+				raiseHandData?.action === 'promoted_to_speaker'
+			) {
+				handlePromoteToSpeaker({ autoOnMic: true })
+			}
 		},
 		[
 			beSpeakerState,
@@ -1013,6 +1032,9 @@ function DetailTalkroom({ id }: { id: string }) {
 			raiseHandUserIds,
 			talkRoomDetail,
 			onPostRaiseHand,
+			onGetDetailTalkRoom,
+			id,
+			handlePromoteToSpeaker,
 		],
 	)
 
