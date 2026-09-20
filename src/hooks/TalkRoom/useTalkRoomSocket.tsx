@@ -11,6 +11,20 @@ type TalkroomSocketType = {
 	onResubscribed?: () => void
 }
 
+/**
+ * Centrifugo only accepts a websocket at /connection/websocket, but the
+ * deployed environment variable has been set to the bare host more than once,
+ * and a bare host answers the upgrade with an HTML page instead, so the room
+ * channel never subscribes and no event ever arrives (UD-367). Append the path
+ * when it is missing rather than depending on whoever edits the variable next.
+ */
+export const centrifugoEndpoint = (url?: string) => {
+	if (!url) return url
+	const trimmed = url.replace(/[/]+$/, '')
+	if (trimmed.endsWith('/connection/websocket')) return trimmed
+	return `${trimmed}/connection/websocket`
+}
+
 /** Normalizes server events and client emit payloads from Centrifugo. */
 export const normalizeTalkRoomSocketPublication = (message?: {
 	data?: Record<string, unknown>
@@ -76,7 +90,9 @@ export default function useTalkRoomSocket(props: TalkroomSocketType) {
 			if (!token || cancelled) return
 
 			const centrifuge = new Centrifuge(
-				process.env.NEXT_PUBLIC_CENTRIFUGAL_SOCKET_URL,
+				centrifugoEndpoint(
+					process.env.NEXT_PUBLIC_CENTRIFUGAL_SOCKET_URL,
+				) as string,
 				{
 					token: token,
 				},
