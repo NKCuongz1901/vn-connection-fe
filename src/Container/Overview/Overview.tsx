@@ -52,7 +52,11 @@ import LiveIcon from '@/svg/Talkroom/LiveIcon'
 import ModalTalkRoomSoundQuality from '@/Components/Modal/ModalTalkRoomSoundQuality'
 import ModalCreateTalkRoom from '@/Components/Modal/ModalCreateTalkRoom'
 import { TalkRoomListItem } from '@/apis/talkRoomApis'
-import { setTalkRoomAutoJoinFlag } from '@/ultis/talkRoom'
+import {
+	getTalkRoomScheduleCardKey,
+	getTalkRoomScheduleCards,
+	setTalkRoomAutoJoinFlag,
+} from '@/ultis/talkRoom'
 
 const Overview = () => {
 	const { loadingContext } = useLoading()
@@ -812,16 +816,18 @@ const Overview = () => {
 										</Flex>
 									))
 								: isArray(listTalkroom, 1) &&
-									listTalkroom.map((room) => (
-										<TalkRoomCard
-											key={room.id}
-											room={room}
-											onClick={() => handleOpenTalkRoomJoinModal(room.id)}
-											onAvatarClick={(userId) =>
-												onChangeRoute(`${mainRoutes.profile}/${userId}`)
-											}
-										/>
-									))}
+									listTalkroom
+										.flatMap((room) => getTalkRoomScheduleCards(room))
+										.map((room) => (
+											<TalkRoomCard
+												key={getTalkRoomScheduleCardKey(room)}
+												room={room}
+												onClick={() => handleOpenTalkRoomJoinModal(room.id)}
+												onAvatarClick={(userId) =>
+													onChangeRoute(`${mainRoutes.profile}/${userId}`)
+												}
+											/>
+										))}
 						</Flex>
 					)}
 				</Flex>
