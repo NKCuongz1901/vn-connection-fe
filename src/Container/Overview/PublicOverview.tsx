@@ -28,6 +28,10 @@ import CalendarIcon from '@/svg/CalenderIcon'
 import LiveIcon from '@/svg/Talkroom/LiveIcon'
 
 import { arrayFrom, isArray } from '@/ultis/array'
+import {
+	getTalkRoomScheduleCardKey,
+	getTalkRoomScheduleCards,
+} from '@/ultis/talkRoom'
 
 import { mappingEventTitle } from '@/Variable/event.variable'
 import {
@@ -190,13 +194,15 @@ function PublicOverview() {
 									</Flex>
 								))
 							: isArray(listTalkroom, 1) &&
-								listTalkroom.map((room) => (
-									<TalkRoomCard
-										key={room.id}
-										room={room}
-										onClick={requireLogin}
-									/>
-								))}
+								listTalkroom
+									.flatMap((room) => getTalkRoomScheduleCards(room))
+									.map((room) => (
+										<TalkRoomCard
+											key={getTalkRoomScheduleCardKey(room)}
+											room={room}
+											onClick={requireLogin}
+										/>
+									))}
 					</Flex>
 				)}
 			</Flex>
