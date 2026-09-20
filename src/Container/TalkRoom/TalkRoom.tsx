@@ -29,6 +29,8 @@ import {
 	setTalkRoomAutoJoinFlag,
 	TalkRoomRoom,
 	formatHostMinutes,
+	getTalkRoomScheduleCardKey,
+	getTalkRoomScheduleCards,
 	isTalkRoomUserNotified,
 } from '@/ultis/talkRoom'
 import { useLocalePath } from '@/ultis/route'
@@ -327,22 +329,24 @@ function TalkRoom() {
 					) : isNoResults ? (
 						<TalkRoomListEmpty variant="search" />
 					) : (
-						displayTalkRooms.map((room) => (
-							<RoomCard
-								key={room.id}
-								room={room}
-								onShare={handleShareRoom}
-								onCountMeIn={handleCountMeIn}
-								onNotJoining={handleNotJoining}
-								onNotifyMe={handleNotifyMe}
-								onViewCmiPeople={handleViewCmiPeople}
-								onEditRoom={setEditRoom}
-								onCancelRoom={setCancelRoom}
-								onStart={handleStartTalkroom}
-								onJoin={handleStartTalkroom}
-								onAvatarClick={handleAvatarClick}
-							/>
-						))
+						displayTalkRooms
+							.flatMap((room) => getTalkRoomScheduleCards(room))
+							.map((room) => (
+								<RoomCard
+									key={getTalkRoomScheduleCardKey(room)}
+									room={room}
+									onShare={handleShareRoom}
+									onCountMeIn={handleCountMeIn}
+									onNotJoining={handleNotJoining}
+									onNotifyMe={handleNotifyMe}
+									onViewCmiPeople={handleViewCmiPeople}
+									onEditRoom={setEditRoom}
+									onCancelRoom={setCancelRoom}
+									onStart={handleStartTalkroom}
+									onJoin={handleStartTalkroom}
+									onAvatarClick={handleAvatarClick}
+								/>
+							))
 					)}
 				</Flex>
 			</div>
@@ -389,20 +393,22 @@ function TalkRoom() {
 									style={{ height: 220, borderRadius: 16 }}
 								/>
 							))
-						: listMyFriendTalkRooms.map((room) => (
-								<RoomCard
-									key={room.id}
-									room={room}
-									variant="friend"
-									onShare={handleShareRoom}
-									onCountMeIn={handleCountMeIn}
-									onNotJoining={handleNotJoining}
-									onNotifyMe={handleNotifyMe}
-									onViewCmiPeople={handleViewCmiPeople}
-									onStart={handleStartTalkroom}
-									onAvatarClick={handleAvatarClick}
-								/>
-							))}
+						: listMyFriendTalkRooms
+								.flatMap((room) => getTalkRoomScheduleCards(room))
+								.map((room) => (
+									<RoomCard
+										key={getTalkRoomScheduleCardKey(room)}
+										room={room}
+										variant="friend"
+										onShare={handleShareRoom}
+										onCountMeIn={handleCountMeIn}
+										onNotJoining={handleNotJoining}
+										onNotifyMe={handleNotifyMe}
+										onViewCmiPeople={handleViewCmiPeople}
+										onStart={handleStartTalkroom}
+										onAvatarClick={handleAvatarClick}
+									/>
+								))}
 				</Flex>
 			</div>
 		)

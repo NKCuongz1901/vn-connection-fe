@@ -862,6 +862,77 @@ export const getTalkRoomStartTimeDisplay = (room?: TalkRoomRoom) => {
 	return formatTalkRoomSchedule(getTalkRoomScheduledStartAt(room))
 }
 
+/**
+ * One copy of a room per session it still has ahead of it, each carrying
+ * only its own schedule entry so the card reads that session's own start
+ * time instead of the room's single next_schedule_at (UD-365, mirrors
+ * mobile's TalkRoom.scheduleCards getter). A room with fewer than two
+ * schedule entries, and a room with no upcoming sessions left, is returned
+ * unchanged: the collapse this replaces only ever affected rooms booked for
+ * more than one session.
+ *
+ * schedule_at comes back from the API as UTC. dayjs parses it without the
+ * utc plugin here, same as the rest of this file, so it is already local
+ * time by the time the same-day check below runs.
+ */
+export const getTalkRoomScheduleCards = (
+	room?: TalkRoomRoom,
+): TalkRoomRoom[] => {
+	if (!room) return []
+
+	const schedules = room.schedules ?? []
+	if (schedules.length < 2) return [room]
+
+	const sortedSchedules = [...schedules]
+		.filter(
+			(schedule) =>
+				!!schedule.schedule_at && dayjs(schedule.schedule_at).isValid(),
+		)
+		.sort(
+			(a, b) =>
+				dayjs(a.schedule_at).valueOf() - dayjs(b.schedule_at).valueOf(),
+		)
+
+	const upcomingSchedules = sortedSchedules.filter(
+		(schedule) =>
+			schedule.enabled !== false &&
+			schedule.status !== 'cancelled' &&
+			schedule.status !== 'ended',
+	)
+
+	if (upcomingSchedules.length < 2) return [room]
+
+	// Only the session actually on air is live; the room's own status is
+	// live for every one of its sessions, so the other cards have to read as
+	// scheduled or the list shows several "Join now" cards for one room.
+	// When no schedule row is itself marked live, the one landing on today
+	// (local time, per the conversion note above) is taken to be on air.
+	const now = dayjs()
+	const liveSchedule = isTalkRoomLive(room.status)
+		? (upcomingSchedules.find((schedule) => schedule.status === 'live') ??
+				upcomingSchedules.find((schedule) =>
+					dayjs(schedule.schedule_at).isSame(now, 'day'),
+				) ??
+				upcomingSchedules[0])
+		: null
+
+	return upcomingSchedules.map((schedule) => ({
+		...room,
+		status:
+			!liveSchedule || schedule === liveSchedule ? room.status : 'scheduled',
+		schedules: [schedule],
+		next_schedule_at: schedule.schedule_at ?? room.next_schedule_at,
+	}))
+}
+
+/**
+ * React key for a card produced by getTalkRoomScheduleCards: room id plus
+ * its own session time, so an expanded room does not collide on room.id
+ * alone and produce duplicate keys (UD-365).
+ */
+export const getTalkRoomScheduleCardKey = (room?: TalkRoomRoom): string =>
+	`${room?.id ?? ''}-${room?.next_schedule_at ?? room?.started_at ?? ''}`
+
 export const formatTalkRoomLevelLabel = (level?: string) => {
 	if (!level) return ''
 	return level.charAt(0).toUpperCase() + level.slice(1)
