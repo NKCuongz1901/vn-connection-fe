@@ -127,6 +127,7 @@ export const showMiniChatLeftToast = () => {
 export const TALK_ROOM_SPEAKER_PROMOTE_TOAST_ID = 'talkroom-speaker-promote'
 export const TALK_ROOM_AUTO_CLOSE_TOAST_ID = 'talkroom-auto-close'
 export const TALK_ROOM_USER_KICKED_TOAST_ID = 'talkroom-user-kicked'
+export const TALK_ROOM_OTHER_DEVICE_TOAST_ID = 'talkroom-other-device'
 export const TALK_ROOM_INVITE_SENT_TOAST_ID = 'talkroom-invite-sent'
 export const TALK_ROOM_LISTENER_REJECT_INVITE_TOAST_ID =
 	'talkroom-listener-reject-invite'
@@ -158,6 +159,15 @@ export const showTalkRoomUserKickedToast = () => {
 		content: 'You cannot rejoin this room session',
 		variant: 'error',
 		toastId: TALK_ROOM_USER_KICKED_TOAST_ID,
+	})
+}
+
+export const showTalkRoomAccountInUseOtherDeviceToast = () => {
+	showSocketToast({
+		title: 'You are in a Talk Room on another device',
+		content: 'Leave the room on your other device, then join here.',
+		variant: 'error',
+		toastId: TALK_ROOM_OTHER_DEVICE_TOAST_ID,
 	})
 }
 
