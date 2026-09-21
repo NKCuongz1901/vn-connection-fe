@@ -38,6 +38,7 @@ import type {
 	TalkRoomParticipantProfileRole,
 } from '@/Components/Modal/TalkRoomParticipantProfileModal'
 import {
+	showTalkRoomAccountInUseOtherDeviceToast,
 	showTalkRoomInviteSentToast,
 	showTalkRoomListenerRejectInviteToast,
 	showTalkRoomNoSpeakerSlotToast,
@@ -48,6 +49,7 @@ import { useModal } from '@/context/ModalContext'
 import { UserProps } from '@/interface/User/User.interface'
 import {
 	TALK_ROOM_CONNECTION_TYPE,
+	TALK_ROOM_JOIN_REASON,
 	TALK_ROOM_ROLE,
 } from '@/Variable/talkRoom.variable'
 import { useLocalePath } from '@/ultis/route'
@@ -434,6 +436,13 @@ export default function useDetailTalkroom(
 
 					if (isTalkRoomPreJoinBlockedByKick(data)) {
 						showTalkRoomUserKickedToast()
+						return null
+					}
+
+					// UD-381: the room page opened and then went straight back to the list
+					// with no word of why, because the account was live in a room in the app.
+					if (data?.reason === TALK_ROOM_JOIN_REASON.ACCOUNT_IN_USE_OTHER_DEVICE) {
+						showTalkRoomAccountInUseOtherDeviceToast()
 						return null
 					}
 
