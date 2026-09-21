@@ -9,7 +9,7 @@ First, run the development server:
 npm run dev
 ```
 
-update build 6
+update build 10
 
 build 9
 
