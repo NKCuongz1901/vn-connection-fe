@@ -32,6 +32,8 @@ export const TALK_ROOM_JOIN_REASON = {
 	ROOM_NOT_AVAILABLE: 'ROOM_NOT_AVAILABLE',
 	ROOM_NOT_LIVE_YET: 'ROOM_NOT_LIVE_YET',
 	HOST_NOT_JOINED: 'HOST_NOT_JOINED',
+	// The account is live in a room on another device (UD-326); only one device per account.
+	ACCOUNT_IN_USE_OTHER_DEVICE: 'ACCOUNT_IN_USE_OTHER_DEVICE',
 	NONE: 'NONE',
 } as const
 export type TalkRoomJoinReason =
