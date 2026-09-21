@@ -26,6 +26,7 @@ function BookOverview() {
 		topPicks,
 		recentlyAdded,
 		popularNow,
+		totals,
 	} = useBookLibrary()
 
 	const name = reader?.name || getUserInfo('name') || ''
@@ -41,6 +42,7 @@ function BookOverview() {
 
 			<BookRail
 				title="Continue reading"
+				total={totals.continueReading}
 				seeAllPath={BOOK_SEE_ALL.continue.path}
 				books={continueReading}
 				loading={loading}
@@ -59,6 +61,7 @@ function BookOverview() {
 			/>
 			<BookRail
 				title="Top picks for you"
+				total={totals.topPicks}
 				seeAllPath={BOOK_SEE_ALL['top-pick'].path}
 				books={topPicks}
 				loading={loading}
@@ -68,6 +71,7 @@ function BookOverview() {
 			/>
 			<BookRail
 				title="Popular now"
+				total={totals.popularNow}
 				seeAllPath={BOOK_SEE_ALL.popular.path}
 				books={popularNow}
 				loading={loading}
@@ -77,6 +81,7 @@ function BookOverview() {
 			/>
 			<BookRail
 				title="Recently added"
+				total={totals.recentlyAdded}
 				seeAllPath={BOOK_SEE_ALL.recent.path}
 				books={recentlyAdded}
 				loading={loading}
@@ -86,6 +91,7 @@ function BookOverview() {
 			/>
 			<BookRail
 				title={`All books (${level})`}
+				total={totals.allBooks}
 				seeAllPath={BOOK_SEE_ALL.all.path}
 				books={allBooks}
 				loading={loading}

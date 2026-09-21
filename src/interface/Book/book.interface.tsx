@@ -100,6 +100,8 @@ export type BookCardItem = {
 	category?: string
 	rating?: number
 	progressLabel?: string
+	durationLabel?: string
+	languageLabel?: string
 	chapterId?: string
 	page?: number
 }
@@ -156,3 +158,26 @@ export type ChapterAudio = {
 }
 
 export type BookReadMode = 'read' | 'listen'
+
+export type ReadingSearchVocabSense = {
+	meaning?: string
+	example?: string
+	translations?: Array<{
+		language?: string
+		vocab?: string
+		meaning?: string
+		example?: string
+		ipa?: string | null
+	}>
+}
+
+export type ReadingSearchVocabItem = {
+	source_vocab_id: string
+	vocab: string
+	source_language?: string
+	part_of_speech?: string
+	ipa?: string | null
+	audio_url?: string | null
+	added_at?: string
+	senses?: ReadingSearchVocabSense[]
+}

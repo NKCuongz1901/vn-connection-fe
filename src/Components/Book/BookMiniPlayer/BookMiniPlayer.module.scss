@@ -1,4 +1,9 @@
 .bar {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1000;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -93,6 +98,22 @@
 	background: none;
 	color: #0f1729;
 	cursor: pointer;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	&.iconActive {
+		color: #006b35;
+	}
+}
+
+.trailing {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-shrink: 0;
 }
 
 .play {

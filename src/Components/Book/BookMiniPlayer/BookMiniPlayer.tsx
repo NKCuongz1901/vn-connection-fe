@@ -3,13 +3,18 @@
 import { memo } from 'react'
 
 import {
+	IconArrowsShuffle,
+	IconDownload,
 	IconPlayerPauseFilled,
 	IconPlayerPlayFilled,
 	IconPlayerSkipBackFilled,
 	IconPlayerSkipForwardFilled,
+	IconRepeat,
+	IconRepeatOnce,
 	IconRewindBackward10,
 	IconRewindForward10,
 } from '@tabler/icons-react'
+import clsx from 'clsx'
 
 import CImage from '@/Components/Custom/CImage/CImage'
 import { useBookPlayer } from '@/context/BookPlayerContext'
@@ -33,10 +38,16 @@ function BookMiniPlayer() {
 		currentTime,
 		duration,
 		rate,
+		shuffle,
+		repeat,
+		favouritePending,
 		toggle,
 		seek,
 		skip,
 		setRate,
+		toggleShuffle,
+		cycleRepeat,
+		toggleFavourite,
 		prevChapter,
 		nextChapter,
 	} = useBookPlayer()
@@ -94,6 +105,15 @@ function BookMiniPlayer() {
 				<div className={classes.controls}>
 					<button
 						type="button"
+						className={clsx(classes.iconBtn, { [classes.iconActive]: shuffle })}
+						onClick={toggleShuffle}
+						aria-pressed={shuffle}
+						aria-label="Shuffle"
+					>
+						<IconArrowsShuffle size={18} />
+					</button>
+					<button
+						type="button"
 						className={classes.iconBtn}
 						onClick={prevChapter}
 						aria-label="Previous chapter"
@@ -136,6 +156,26 @@ function BookMiniPlayer() {
 					>
 						<IconPlayerSkipForwardFilled size={16} />
 					</button>
+					<button
+						type="button"
+						className={clsx(classes.iconBtn, {
+							[classes.iconActive]: repeat !== 'off',
+						})}
+						onClick={cycleRepeat}
+						aria-label={
+							repeat === 'one'
+								? 'Repeat one chapter'
+								: repeat === 'all'
+									? 'Repeat all chapters'
+									: 'Repeat off'
+						}
+					>
+						{repeat === 'one' ? (
+							<IconRepeatOnce size={18} />
+						) : (
+							<IconRepeat size={18} />
+						)}
+					</button>
 				</div>
 				<div className={classes.seek}>
 					<span>{formatPlaybackTime(currentTime)}</span>
@@ -157,13 +197,32 @@ function BookMiniPlayer() {
 				</div>
 			</div>
 
-			<button
-				type="button"
-				className={classes.speed}
-				onClick={cycleSpeed}
-			>
-				{rate.toFixed(1)}x
-			</button>
+			<div className={classes.trailing}>
+				<button
+					type="button"
+					className={clsx(classes.iconBtn, {
+						[classes.iconActive]: book.is_favourited,
+					})}
+					onClick={toggleFavourite}
+					disabled={favouritePending}
+					aria-label={
+						book.is_favourited ? 'Remove from library' : 'Save to library'
+					}
+				>
+					<IconDownload
+						size={18}
+						stroke={1.5}
+						fill={book.is_favourited ? 'currentColor' : 'none'}
+					/>
+				</button>
+				<button
+					type="button"
+					className={classes.speed}
+					onClick={cycleSpeed}
+				>
+					{rate.toFixed(1)}x
+				</button>
+			</div>
 		</div>
 	)
 }

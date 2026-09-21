@@ -11,19 +11,44 @@
 }
 
 .sectionTitle {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	color: #0f1729;
 	font-size: 16px;
 	font-weight: 600;
 	line-height: 24px;
 }
 
+.sectionTotal {
+	min-width: 22px;
+	height: 22px;
+	padding: 0 6px;
+	border-radius: 99px;
+	background: #eef3f6;
+	color: #48546b;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 22px;
+	text-align: center;
+}
+
 .seeAll {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	padding: 0;
 	border: none;
-	background: none;
+	border-radius: 99px;
+	background: #f4f8fc;
 	color: #006b35;
-	font-size: 14px;
-	font-weight: 500;
 	cursor: pointer;
+
+	&:hover {
+		background: #e8f5ee;
+	}
 }
 
 .rail {

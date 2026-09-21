@@ -4,7 +4,7 @@ import { memo } from 'react'
 import clsx from 'clsx'
 import { Tooltip } from 'antd'
 
-import { BookLanguageButton, BookMiniPlayer } from '@/Components/Book'
+import { BookLanguageButton } from '@/Components/Book'
 import { useBookLibrary } from '@/context/BookLibraryContext'
 import { useOptionalBookPlayer } from '@/context/BookPlayerContext'
 import { useLocalePath } from '@/ultis/route'
@@ -130,7 +130,6 @@ function BookShell({ children }: BookShellProps) {
 					{children}
 				</main>
 			</div>
-			<BookMiniPlayer />
 		</div>
 	)
 }
