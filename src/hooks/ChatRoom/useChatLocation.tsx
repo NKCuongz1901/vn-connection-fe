@@ -309,6 +309,12 @@ export default function useChatLocation(props: useChatLocationProps) {
 		}
 	}
 
+	/** Clears map search results when the address input is cleared. */
+	const handleClearFindChatLocation = () => {
+		setListFindChatLocation([])
+		setFindKeyword('')
+	}
+
 	// Resolve an existing location or create a new location room before opening it.
 	const handleEnterChatLocation = async (item: ChatLocationEntry) => {
 		const { id: locationId, title, level } = item || {}
@@ -401,6 +407,7 @@ export default function useChatLocation(props: useChatLocationProps) {
 
 		// Actions
 		onFindChatLocation: handleFindChatLocation,
+		onClearFindChatLocation: handleClearFindChatLocation,
 		onEnterChatLocation: handleEnterChatLocation,
 		onGetListMyMiniChat: handleGetListMyMiniChat,
 		onGetListFullMiniChat: handleGetListFullMiniChat,
