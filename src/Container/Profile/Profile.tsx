@@ -168,6 +168,7 @@ const Profile = (props: ProfileProps) => {
 			i_am_from,
 			mode,
 			amount_of_friend,
+			amount_of_invited_friend,
 			wallet,
 		} = userData || {}
 		const isMe = id === getUserInfo('id')
@@ -275,7 +276,7 @@ const Profile = (props: ProfileProps) => {
 										<span className={classes.communityBuilderText}>
 											Community builder:{' '}
 											<span className={classes.communityBuilderTextBold}>
-												{wallet}
+												{amount_of_invited_friend}
 											</span>{' '}
 											friends invited
 										</span>
