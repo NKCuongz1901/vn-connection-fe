@@ -77,6 +77,7 @@ function ChatLocation(props: ChatLocationProps) {
 		enteringLocationKey,
 		miniChatActionId,
 		onFindChatLocation,
+		onClearFindChatLocation,
 		onEnterChatLocation,
 		onRefreshMyChatLocation,
 		listMyMiniChat,
@@ -177,6 +178,12 @@ function ChatLocation(props: ChatLocationProps) {
 
 		setMapValue({ address: display_name, latitude, longitude })
 		onFindChatLocation({ latitude, longitude, keyword: display_name })
+	}
+
+	/** Clears the address input and map search results. */
+	const handleClearMap = () => {
+		setMapValue({ address: '', latitude: 0, longitude: 0 })
+		onClearFindChatLocation()
 	}
 
 	const _renderFindSection = () => {
@@ -299,6 +306,7 @@ function ChatLocation(props: ChatLocationProps) {
 					latitude={mapValue.latitude}
 					prefix={<SearchIcon />}
 					onSubmitModal={handleSubmitMap}
+					onClear={handleClearMap}
 				/>
 			</div>
 

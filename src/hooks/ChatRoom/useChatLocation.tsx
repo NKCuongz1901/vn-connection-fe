@@ -90,7 +90,7 @@ export default function useChatLocation(props: useChatLocationProps) {
 				setListMyMiniChat(results.objects.rows || [])
 			}
 		} catch (error) {
-			openError(error.message)
+			openError(error?.message)
 		} finally {
 			setLoading((prev) => ({ ...prev, getMyMiniChat: false }))
 		}
@@ -309,6 +309,12 @@ export default function useChatLocation(props: useChatLocationProps) {
 		}
 	}
 
+	/** Clears map search results when the address input is cleared. */
+	const handleClearFindChatLocation = () => {
+		setListFindChatLocation([])
+		setFindKeyword('')
+	}
+
 	// Resolve an existing location or create a new location room before opening it.
 	const handleEnterChatLocation = async (item: ChatLocationEntry) => {
 		const { id: locationId, title, level } = item || {}
@@ -336,13 +342,30 @@ export default function useChatLocation(props: useChatLocationProps) {
 			})
 			const createdId = res?.results?.object?.id
 			if (res?.code !== 200 || !createdId) {
+				const message = res?.message || res?.response?.data?.message
+				if (
+					typeof message === 'string' &&
+					message.toLowerCase().includes('maximum 10 chat location')
+				) {
+					openError({ title: 'Limit reached', message })
+					return
+				}
 				openError(res)
 				return
 			}
 
 			await handleGetListMyChatLocation()
 			onPushState({ type: 'location', id: createdId })
-		} catch (error) {
+		} catch (error: any) {
+			const message =
+				error?.response?.data?.message || error?.message || error
+			if (
+				typeof message === 'string' &&
+				message.toLowerCase().includes('maximum 10 chat location')
+			) {
+				openError({ title: 'Limit reached', message })
+				return
+			}
 			openError(error)
 		} finally {
 			setEnteringLocationKey(null)
@@ -384,6 +407,7 @@ export default function useChatLocation(props: useChatLocationProps) {
 
 		// Actions
 		onFindChatLocation: handleFindChatLocation,
+		onClearFindChatLocation: handleClearFindChatLocation,
 		onEnterChatLocation: handleEnterChatLocation,
 		onGetListMyMiniChat: handleGetListMyMiniChat,
 		onGetListFullMiniChat: handleGetListFullMiniChat,

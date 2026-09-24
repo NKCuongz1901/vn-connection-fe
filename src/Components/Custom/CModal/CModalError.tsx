@@ -27,6 +27,8 @@ const CModalError = (_props: CModalProps) => {
 	if (codes.includes(code)) {
 		message = codeMessage[code] || message
 	}
+	const title =
+		(typeof error === 'object' && error?.title) || 'Notice'
 
 	const onClose = (e: any) => {
 		e.stopPropagation()
@@ -54,7 +56,7 @@ const CModalError = (_props: CModalProps) => {
 			{...props}
 		>
 			<Flex vertical align="center" className="cModalContent flex-1" gap={12}>
-				<span className="error CModalTitle">ERROR</span>
+				<span className="error CModalTitle">{title}</span>
 				<Flex vertical className="CModalBody">
 					{message}
 				</Flex>
