@@ -539,12 +539,19 @@ const CInputTag = forwardRef((_props: CInputTagProps, ref: any) => {
 
 		if (e.shiftKey) return
 
-		// On macOS an input method (Vietnamese Telex, Korean, Japanese) delivers
-		// the Enter that commits the composed word as its own keydown, and Chrome
-		// then fires a second Enter keydown for the same press. Sending on both
-		// posts the message twice, so leave the composing one to the input method
-		// and drop any Enter that lands right after the last send.
-		if (e.nativeEvent?.isComposing) return
+		// On macOS/Windows an input method (Vietnamese Telex, Korean, Japanese)
+		// delivers the Enter that commits the composed word as its own keydown,
+		// and Chrome/Edge then fire a second, real Enter keydown for the same
+		// press. Browsers mark that first, throwaway keydown with the reserved
+		// IME keyCode 229, which is a reliable cross-browser signal that a
+		// follow-up keydown will arrive. `isComposing` is not: on some
+		// browser/IME combinations (notably Windows' built-in Vietnamese IME)
+		// only ONE Enter keydown ever fires and it can still report
+		// `isComposing: true`, so gating on `isComposing` alone silently
+		// dropped that Enter and the message never sent at all (UD-401). Gate
+		// on keyCode 229 instead, and rely on the time-based dedupe below to
+		// collapse the genuine Chrome/macOS double-fire.
+		if (e.nativeEvent?.keyCode === 229) return
 
 		const inputValue = e.target?.value || ''
 		const pendingMention = hasPendingMention(inputValue, value || '')
