@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from 'react-toastify'
 
 import { useModal } from '@/context/ModalContext'
 import { useSocket } from '@/context/SocketContext'
@@ -26,6 +27,7 @@ import { buildChatMediasPayload } from '@/ultis/chatMedia'
 import { mappingMessageChat, uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay } from '@/ultis/common'
 import { isEmptyObject } from '@/ultis/object'
+import { isNoResponseError } from '@/ultis/requestError'
 import { onPushState } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
 import { generateCustomUuid, parseMentions, randomString } from '@/ultis/string'
@@ -41,6 +43,13 @@ import {
 	MAX_CHAT_MEDIAS,
 	paginationCommon,
 } from '@/Variable/common.variable'
+
+export type SendMessageResult = {
+	sent: boolean
+	// true when the failed message stays in the chat with a Retry action
+	retryable?: boolean
+	error?: any
+}
 
 type useHangoutChatProps = {
 	convId: string
@@ -299,7 +308,10 @@ export default function useChatRoomInboxChat({
 		medias?: any[]
 		parent?: any
 		audio?: any
-	}) => {
+	}): Promise<SendMessageResult> => {
+		// Set once the pending bubble is on screen; a failure after that point
+		// marks the bubble as failed with Retry instead of dropping the message.
+		let pendingLocalId = ''
 		try {
 			let type = _type
 			let medias: any[] = []
@@ -354,9 +366,20 @@ export default function useChatRoomInboxChat({
 				_id,
 				isTemp: true,
 				...(parent && { parent }),
+				_sendPayload: { message, mentions },
 			}
 			setMessList((prev: any[]) => {
-				const contents = prev
+				// Sending the same text again from the input replaces an earlier
+				// failed copy of it, so the chat does not show it twice.
+				const contents = (prev || []).filter(
+					(i) =>
+						!(
+							i?.isFailed &&
+							type === 'TEXT' &&
+							i?.type === 'TEXT' &&
+							i?.content === text
+						),
+				)
 				const newData = [_res, ...contents]
 				const dataShow = mappingMessageChat(newData)
 
@@ -365,36 +388,107 @@ export default function useChatRoomInboxChat({
 			if (_scrollRef.current) {
 				_scrollRef.current.scrollTop = _scrollRef.current.scrollHeight
 			}
+			pendingLocalId = message_local_id
 			const res: any = await sendMessage({
 				conversation_id: convId,
 				message: message,
 				mentions,
 			})
-			const _data = res?.results?.object || {}
-			setMessList((prev: any[]) => {
-				const contents = prev
-				const newMess = {
-					user_id: _data.sender_id,
-					user: _data?.sender,
-					..._data,
-					message_local_id,
-					...(parent && { parent }),
-				}
-				const idx = (contents || []).findIndex(
-					(i) => i.message_local_id === message_local_id,
-				)
-				if (idx > -1) {
-					contents[idx] = newMess
-				} else {
-					contents.unshift(newMess)
-				}
-
-				const dataShow = mappingMessageChat(contents)
-
-				return dataShow
-			})
+			handleSendSucceeded(res, message_local_id, parent)
+			return { sent: true }
 		} catch (error) {
+			handleSendFailed(error, pendingLocalId)
+			return { sent: false, retryable: !!pendingLocalId, error }
+		}
+	}
+
+	const handleSendSucceeded = (res: any, message_local_id: string, parent?: any) => {
+		const _data = res?.results?.object || {}
+		setMessList((prev: any[]) => {
+			const contents = prev
+			const newMess = {
+				user_id: _data.sender_id,
+				user: _data?.sender,
+				..._data,
+				message_local_id,
+				...(parent && { parent }),
+			}
+			const idx = (contents || []).findIndex(
+				(i) => i.message_local_id === message_local_id,
+			)
+			if (idx > -1) {
+				contents[idx] = newMess
+			} else {
+				contents.unshift(newMess)
+			}
+
+			const dataShow = mappingMessageChat(contents)
+
+			return dataShow
+		})
+	}
+
+	// A chat send that got no response from the server does not open the
+	// blocking error modal: the bubble shows "Not sent" with Retry and the input
+	// gets the text back. When the server did answer with an error, its message
+	// is still shown in the modal as before (for example a suspended account).
+	const handleSendFailed = (error: any, message_local_id: string) => {
+		const noResponse = isNoResponseError(error)
+		if (message_local_id) {
+			const failReason = noResponse
+				? error.reason === 'timeout'
+					? 'Not sent: the server did not respond in time'
+					: 'Network error, message not sent'
+				: 'Message not sent'
+			setMessList((prev: any[]) =>
+				mappingMessageChat(
+					(prev || []).map((i) =>
+						// Only a bubble still pending; if the socket already delivered
+						// the real message for this local id, leave it alone.
+						i?.message_local_id === message_local_id && i?.isTemp
+							? { ...i, isFailed: true, isRetrying: false, failReason }
+							: i,
+					),
+				),
+			)
+		}
+		if (!noResponse) {
 			openError(error)
+		} else if (!message_local_id) {
+			// Failed before the bubble was shown (for example a media upload):
+			// a short notice, and the chat box puts the text and files back.
+			toast.error('Network error, message not sent')
+		}
+	}
+
+	const retryingRef = useRef<Set<string>>(new Set())
+	const handleRetryMessage = async (item: any) => {
+		const { message_local_id, _sendPayload, parent } = item || {}
+		if (!item?.isFailed || !message_local_id || !_sendPayload) return
+		if (retryingRef.current.has(message_local_id)) return
+		retryingRef.current.add(message_local_id)
+
+		setMessList((prev: any[]) =>
+			mappingMessageChat(
+				(prev || []).map((i) =>
+					i?.message_local_id === message_local_id
+						? { ...i, isFailed: false, isRetrying: true, failReason: '' }
+						: i,
+				),
+			),
+		)
+		try {
+			// Same payload and same message_local_id as the first attempt, sent once.
+			const res: any = await sendMessage({
+				conversation_id: convId,
+				message: _sendPayload.message,
+				mentions: _sendPayload.mentions,
+			})
+			handleSendSucceeded(res, message_local_id, parent)
+		} catch (error) {
+			handleSendFailed(error, message_local_id)
+		} finally {
+			retryingRef.current.delete(message_local_id)
 		}
 	}
 
@@ -863,6 +957,7 @@ export default function useChatRoomInboxChat({
 		setMessList,
 		editingMessage,
 		onSendMessage: handleSendMessage,
+		onRetryMessage: handleRetryMessage,
 		onEditMessage: handleEditMessage,
 		onCancelEdit: handleCancelEdit,
 		onLoadMore: handleLoadMore,

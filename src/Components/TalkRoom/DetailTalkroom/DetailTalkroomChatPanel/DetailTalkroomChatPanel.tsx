@@ -25,6 +25,7 @@ function DetailTalkroomChatPanel({ convId }: DetailTalkroomChatPanelProps) {
 		loading,
 		editingMessage,
 		onSendMessage,
+		onRetryMessage,
 		onEditMessage,
 		onCancelEdit,
 		onActionMessage,
@@ -64,6 +65,7 @@ function DetailTalkroomChatPanel({ convId }: DetailTalkroomChatPanelProps) {
 					onLoadMore={onLoadMore}
 					_scrollRef={_scrollRef}
 					onSendMessage={onSendMessage}
+					onRetryMessage={onRetryMessage}
 					editingMessage={editingMessage}
 					onEditMessage={onEditMessage}
 					onCancelEdit={onCancelEdit}

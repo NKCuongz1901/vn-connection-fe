@@ -70,6 +70,7 @@ interface ChatRoomChatBoxProps {
 		medias?: any[]
 	}) => void
 	onCancelEdit?: () => void
+	onRetryMessage?: (message: any) => void
 }
 
 const mapMessageMediasToFileList = (medias: any[] = []) =>
@@ -97,6 +98,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		editingMessage,
 		onEditMessage,
 		onCancelEdit,
+		onRetryMessage,
 	} = props
 	const { openConfirm, closeModal } = useModal()
 	const cancelEditRef = useRef<() => void>(() => {})
@@ -173,7 +175,7 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [editingMessage?.id])
 
-	const handleSubmitMessage = () => {
+	const handleSubmitMessage = async () => {
 		if (!(!!text.trim() || isArray(fileList, 1))) return
 
 		if (editingMessage && onEditMessage) {
@@ -188,15 +190,38 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 			return
 		}
 
+		const sentText = text
+		const sentReply = reply
+		const sentFiles = fileList
 		setText('')
 		setReply(null)
-		onSendMessage({
-			type: 'TEXT',
-			content: text,
-			parent: reply,
-			medias: fileList,
-		})
 		setFileList([])
+		const result = await onSendMessage({
+			type: 'TEXT',
+			content: sentText,
+			parent: sentReply,
+			medias: sentFiles,
+		})
+		if (result?.sent !== false) return
+
+		// The send failed: give the typed text back, unless the user has
+		// already started typing something new.
+		setText((prev: string) => (prev?.trim() ? prev : sentText))
+		if (!result?.retryable) {
+			// Nothing reached the chat, so put back the reply and the files too.
+			setReply((prev: any) => prev || sentReply)
+			setFileList((prev) => (isArray(prev, 1) ? prev : sentFiles))
+		}
+	}
+
+	const handleRetryMessage = (item: any) => {
+		// Retry resends the failed bubble; drop the same text from the input so
+		// it is not sent a second time from there.
+		const failedText = String(item?.content ?? '').trim()
+		if (failedText && text.trim() === failedText) {
+			setText('')
+		}
+		onRetryMessage?.(item)
 	}
 
 	const handleEnsureMessageLoaded = async (parentId?: string) => {
@@ -645,6 +670,8 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 			isLast,
 			isNewDate,
 			isTemp,
+			isFailed,
+			failReason,
 			type,
 			user_id,
 			reactions,
@@ -682,7 +709,8 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 						[classes.isMe]: isMe,
 						[classes.isLast]: isLast,
 						[classes.isCenter]: isMemberAction,
-						[classes.isTemp]: isTemp,
+						[classes.isTemp]: isTemp && !isFailed,
+						[classes.isFailed]: isFailed,
 					})}
 				>
 					<Flex
@@ -744,6 +772,23 @@ const ChatRoomChatBox = (props: ChatRoomChatBoxProps) => {
 									type,
 								})}
 							</Flex>
+							{isFailed && (
+								<Flex
+									className={classes.failedRow}
+									align="center"
+									gap={6}
+									onClick={(e) => e.stopPropagation()}
+								>
+									<span>{failReason || 'Message not sent'}</span>
+									<button
+										type="button"
+										className={classes.retryButton}
+										onClick={() => handleRetryMessage(item)}
+									>
+										Retry
+									</button>
+								</Flex>
+							)}
 						</Flex>
 					</Flex>
 				</Flex>
