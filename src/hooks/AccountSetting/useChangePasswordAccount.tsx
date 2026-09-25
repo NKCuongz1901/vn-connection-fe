@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { acknowledgeSecurityAlert, changeUserPassword } from '@/apis/userApis'
+import { changeUserPassword } from '@/apis/userApis'
 import { useLoading } from '@/context/LoadingContext'
 import { useModal } from '@/context/ModalContext'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { useLocalePath } from '@/ultis/route'
+import { acknowledgeAlertsForDevice } from '@/ultis/securityAlerts'
 import {
 	getSessionStorage,
 	removeSessionStorage,
@@ -22,13 +23,18 @@ type FormErrors = {
 	confirmPassword?: string
 }
 
-/** Acknowledges the security alert that sent the user to this screen. */
+/** Acknowledges every pending alert for the device that sent the user here. */
 const acknowledgePendingSecurityAlert = async () => {
-	const alertId = getSessionStorage(SECURITY_ALERT_ACK_SESSION_KEY)?.alertId
-	if (!alertId) return
+	const pending = getSessionStorage(SECURITY_ALERT_ACK_SESSION_KEY)
+	const alertId = pending?.alertId
+	const newDeviceId = pending?.newDeviceId
+	if (!alertId && !newDeviceId) return
 
 	try {
-		await acknowledgeSecurityAlert(alertId)
+		await acknowledgeAlertsForDevice({
+			deviceId: newDeviceId,
+			fallbackAlertId: alertId,
+		})
 		removeSessionStorage(SECURITY_ALERT_ACK_SESSION_KEY)
 	} catch (error) {
 		console.error('Unable to acknowledge security alert', error)

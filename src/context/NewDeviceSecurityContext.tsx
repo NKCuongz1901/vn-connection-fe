@@ -4,11 +4,7 @@ import { onMessage } from 'firebase/messaging'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import {
-	acknowledgeSecurityAlert,
-	getPendingSecurityAlerts,
-	logoutOtherDevices,
-} from '@/apis/userApis'
+import { logoutOtherDevices } from '@/apis/userApis'
 import NewDeviceSecurityModal from '@/Components/Modal/NewDeviceSecurityModal'
 import { showSocketToast } from '@/Components/Toast/SocketToastContent'
 import { getFid, messaging } from '@/config/firebase'
@@ -25,8 +21,8 @@ import { useLocalePath } from '@/ultis/route'
 import {
 	ensureSecurityAlertAnchor,
 	isSecurityAlertBeforeAnchor,
-	isWithinPendingAlertGrace,
 } from '@/ultis/security'
+import { acknowledgeAlertsForDevice } from '@/ultis/securityAlerts'
 import {
 	handleRemoveAllCookie,
 	handleRemoveAllSession,
@@ -44,16 +40,6 @@ const NEW_DEVICE_LOGIN_CHECK_ENABLED = true
 
 /** Kill-switch for the legacy change_device / change_password sign-out events. */
 const LEGACY_DEVICE_EVENTS_ENABLED = true
-
-/** Extracts pending alerts from the supported API response envelopes. */
-const getAlertsFromResponse = (response: any): unknown[] => {
-	const alerts =
-		response?.results?.object?.alerts ??
-		response?.results?.alerts ??
-		response?.alerts
-
-	return Array.isArray(alerts) ? alerts : []
-}
 
 /** Returns a user-safe API error message. */
 const getErrorMessage = (error: any) => {
@@ -190,6 +176,18 @@ export const NewDeviceSecurityProvider = ({
 		[handleForceSignOut],
 	)
 
+	/** Acknowledges every pending alert for the same device as the current modal. */
+	const handleAcknowledgeCurrentDeviceAlerts = useCallback(async () => {
+		const alert = currentAlertRef.current
+		if (!alert) return
+
+		const acknowledgedIds = await acknowledgeAlertsForDevice({
+			deviceId: alert.new_device_id,
+			fallbackAlertId: alert.id,
+		})
+		acknowledgedIds.forEach((id) => handledAlertIdsRef.current.add(id))
+	}, [])
+
 	/** Acknowledges that the new login belongs to the current user. */
 	const handleConfirmLogin = useCallback(async () => {
 		const alert = currentAlertRef.current
@@ -199,7 +197,11 @@ export const NewDeviceSecurityProvider = ({
 		handleCompleteCurrentAlert()
 
 		try {
-			await acknowledgeSecurityAlert(alert.id)
+			const acknowledgedIds = await acknowledgeAlertsForDevice({
+				deviceId: alert.new_device_id,
+				fallbackAlertId: alert.id,
+			})
+			acknowledgedIds.forEach((id) => handledAlertIdsRef.current.add(id))
 		} catch (error) {
 			handledAlertIdsRef.current.delete(alert.id)
 			showSocketToast({
@@ -223,7 +225,7 @@ export const NewDeviceSecurityProvider = ({
 
 		setLoading(true)
 		try {
-			await acknowledgeSecurityAlert(currentAlertRef.current.id)
+			await handleAcknowledgeCurrentDeviceAlerts()
 			await logoutOtherDevices()
 			handleCompleteCurrentAlert()
 			showSocketToast({
@@ -242,16 +244,23 @@ export const NewDeviceSecurityProvider = ({
 		} finally {
 			setLoading(false)
 		}
-	}, [handleCompleteCurrentAlert, loading])
+	}, [
+		handleAcknowledgeCurrentDeviceAlerts,
+		handleCompleteCurrentAlert,
+		loading,
+	])
 
 	/** Closes the alert and opens the account password screen. */
 	const handleChangePassword = useCallback(() => {
-		const alertId = currentAlertRef.current?.id
-		// The password screen acknowledges this alert once the change succeeds.
-		if (alertId) {
+		const alert = currentAlertRef.current
+		// The password screen acknowledges this device's alerts once the change succeeds.
+		if (alert) {
 			setSessionStorage({
 				key: SECURITY_ALERT_ACK_SESSION_KEY,
-				data: { alertId },
+				data: {
+					alertId: alert.id,
+					newDeviceId: alert.new_device_id,
+				},
 			})
 		}
 
@@ -261,43 +270,25 @@ export const NewDeviceSecurityProvider = ({
 		onChangeRoute(`${mainRoutes.accountSetting}/manage-account/change`)
 	}, [onChangeRoute])
 
-	/** Fetches alerts missed while the app was closed or disconnected. */
-	const handleFetchPendingAlerts = useCallback(async () => {
-		if (!NEW_DEVICE_LOGIN_CHECK_ENABLED) return
-		if (!isLogin()) return
-		// Right after signing in, realtime events already cover new logins.
-		if (isWithinPendingAlertGrace()) return
-
-		try {
-			const response = await getPendingSecurityAlerts()
-			const alerts = getAlertsFromResponse(response)
-			if (alerts[0]) {
-				void handleNewDeviceAlert(alerts[0])
-			}
-		} catch (error) {
-			console.error('Unable to fetch pending security alerts', error)
-		}
-	}, [handleNewDeviceAlert])
-
 	useEffect(() => {
 		if (!socket) return
 
 		const handleChangeDevice = (payload: unknown) => {
 			void handleLegacyDeviceEvent(payload, 'change_device')
 		}
-		const handleChangePassword = (payload: unknown) => {
+		const handleChangePasswordEvent = (payload: unknown) => {
 			void handleLegacyDeviceEvent(payload, 'change_password')
 		}
 
 		socket.on('new_device_login', handleNewDeviceAlert)
 		socket.on('session_revoked', handleSessionRevoked)
 		socket.on('change_device', handleChangeDevice)
-		socket.on('change_password', handleChangePassword)
+		socket.on('change_password', handleChangePasswordEvent)
 		return () => {
 			socket.off('new_device_login', handleNewDeviceAlert)
 			socket.off('session_revoked', handleSessionRevoked)
 			socket.off('change_device', handleChangeDevice)
-			socket.off('change_password', handleChangePassword)
+			socket.off('change_password', handleChangePasswordEvent)
 		}
 	}, [
 		handleLegacyDeviceEvent,
@@ -324,23 +315,9 @@ export const NewDeviceSecurityProvider = ({
 		if (!isLogin()) return
 
 		// Sessions signed in before this check shipped get an anchor from now on.
+		// Pending HTTP backlog is intentionally disabled on web; realtime covers new logins.
 		ensureSecurityAlertAnchor()
-		void handleFetchPendingAlerts()
-	}, [handleFetchPendingAlerts])
-
-	useEffect(() => {
-		if (!socket) return
-
-		/** Catches alerts missed while the socket was disconnected. */
-		const handleReconnect = () => {
-			void handleFetchPendingAlerts()
-		}
-
-		socket.on('connect', handleReconnect)
-		return () => {
-			socket.off('connect', handleReconnect)
-		}
-	}, [handleFetchPendingAlerts, socket])
+	}, [])
 
 	return (
 		<>
