@@ -1,6 +1,7 @@
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
-import { memo, useState } from 'react'
+import { memo, useCallback, useState } from 'react'
+import { IconMapPinFilled } from '@tabler/icons-react'
 
 import { useLoading } from '@/context/LoadingContext'
 import useOverview from '@/hooks/Overview/useOverview'
@@ -9,6 +10,7 @@ import { arrayFrom, isArray } from '@/ultis/array'
 import { getDiffFromNow } from '@/ultis/date'
 import { useLocalePath } from '@/ultis/route'
 import { formatNumberString } from '@/ultis/string'
+import { getUserInfo } from '@/ultis/storage'
 
 import CheckEmail from '@/Components/CheckEmail/CheckEmail'
 import ModalCRUDCommunity from '@/Components/Community/ModalCRUDCommunity'
@@ -17,6 +19,7 @@ import CAvatarBandage from '@/Components/Custom/CAvatarBandage'
 import CButton from '@/Components/Custom/CButton'
 import CButtonCreate from '@/Components/Custom/CButtonCreate'
 import CDatePickerRanger from '@/Components/Custom/CDatePickerRanger'
+import CGGMap from '@/Components/Custom/CGGMap/CGGMap'
 import CInput from '@/Components/Custom/CInput'
 import CSelect from '@/Components/Custom/CSelect'
 import EventTitle from '@/Components/Event/EventTitle'
@@ -58,6 +61,20 @@ import {
 	setTalkRoomAutoJoinFlag,
 } from '@/ultis/talkRoom'
 
+const EVENT_NEARBY_FALLBACK_LIMIT = 20
+
+/** Builds the centered fallback line under upcoming activity filters. */
+const getNearbyFallbackMessage = (nearbyCount: number, totalCount: number) => {
+	const showingUpTo = Math.min(EVENT_NEARBY_FALLBACK_LIMIT, totalCount)
+	if (nearbyCount <= 0) {
+		return `No activity nearby • Showing up to ${showingUpTo} activities`
+	}
+	if (nearbyCount === 1) {
+		return `1 activity nearby • Showing up to ${showingUpTo} activities`
+	}
+	return `${nearbyCount} activities nearby • Showing up to ${showingUpTo} activities`
+}
+
 const Overview = () => {
 	const { loadingContext } = useLoading()
 	const { onChangeRoute } = useLocalePath()
@@ -89,6 +106,7 @@ const Overview = () => {
 
 		loading,
 		total,
+		eventFallback,
 		listPost,
 		_parentRef,
 		_childRefUp,
@@ -99,6 +117,7 @@ const Overview = () => {
 		setCheckmail,
 		onCheckMailSubmit,
 		onUpdateUserInfo,
+		onChangeLocation,
 		onRefreshTalkroomOverview,
 	} = useOverview()
 	const [talkRoomJoinModal, setTalkRoomJoinModal] = useState<{
@@ -116,6 +135,37 @@ const Overview = () => {
 	}>({ open: false })
 	const [chatRoomTab, setChatRoomTab] = useState<'language' | 'location'>(
 		'language',
+	)
+	const [openMap, setOpenMap] = useState(false)
+
+	/** Opens the shared map modal for upcoming activities location. */
+	const handleOpenMap = useCallback(() => {
+		setOpenMap(true)
+	}, [])
+
+	/** Closes the map modal. */
+	const handleCloseMap = useCallback(() => {
+		setOpenMap(false)
+	}, [])
+
+	/** Saves the chosen map location and reloads nearby upcoming activities. */
+	const handleSubmitMapLocation = useCallback(
+		async (value: {
+			display_name?: string
+			lat?: number
+			lng?: number
+			type?: string[] | string
+		}) => {
+			const { display_name, lat, lng } = value || {}
+			if (!display_name || lat == null || lng == null) {
+				handleCloseMap()
+				return
+			}
+
+			await onChangeLocation(value)
+			handleCloseMap()
+		},
+		[handleCloseMap, onChangeLocation],
 	)
 
 	const handleChatRoomTabClick = (next: 'language' | 'location') => {
@@ -284,6 +334,13 @@ const Overview = () => {
 						)
 					})}
 				</Flex>
+				{eventFallback.fallbackApplied &&
+				eventFallback.nearbyCount <= EVENT_NEARBY_FALLBACK_LIMIT &&
+				isArray(listPost, 1) ? (
+					<p className={classes.nearbyFallback}>
+						{getNearbyFallbackMessage(eventFallback.nearbyCount, total.event)}
+					</p>
+				) : null}
 			</Flex>
 		)
 	}
@@ -856,16 +913,34 @@ const Overview = () => {
 				{_renderMyCommunity()}
 				{_renderMyEvent()}
 				<Flex className={classes.wrapperUp} vertical>
-					<Flex
-						className={classes.title}
-						onClick={() => onChangeRoute(mainRoutes.upcomingEvent)}
-					>
-						<EventTitle
-							hiddenAdd
-							label={mappingEventTitle[mainRoutes.upcomingEvent]}
-							number={total.event}
-							icon={<UpcomingEvent />}
-						/>
+					<Flex className={classes.upcomingHeading} vertical>
+						<Flex
+							className={classes.title}
+							onClick={() => onChangeRoute(mainRoutes.upcomingEvent)}
+						>
+							<EventTitle
+								hiddenAdd
+								label={mappingEventTitle[mainRoutes.upcomingEvent]}
+								number={total.event}
+								icon={<UpcomingEvent fill="#006B35" />}
+							/>
+						</Flex>
+						<button
+							type="button"
+							className={classes.upcomingLocation}
+							onClick={handleOpenMap}
+						>
+							<span className={classes.upcomingLocationIcon}>
+								<IconMapPinFilled size={20} color="#E55A0F" />
+							</span>
+							<span className={classes.upcomingLocationText}>
+								{(filters?.google_title || userData?.address || '')
+									.split(',')
+									.slice(-2)
+									.join(',')
+									.trim() || 'Choose location'}
+							</span>
+						</button>
 					</Flex>
 					{_renderFilter()}
 
@@ -901,6 +976,27 @@ const Overview = () => {
 				</Flex>
 			</Flex>
 			{_renderModal()}
+			{openMap ? (
+				<CGGMap
+					title="Location"
+					latitude={
+						typeof filters?.latitude === 'number'
+							? filters.latitude
+							: typeof userData?.latitude === 'number'
+								? userData.latitude
+								: Number(getUserInfo('latitude')) || 10.762622
+					}
+					longitude={
+						typeof filters?.longitude === 'number'
+							? filters.longitude
+							: typeof userData?.longitude === 'number'
+								? userData.longitude
+								: Number(getUserInfo('longitude')) || 106.660172
+					}
+					onClose={handleCloseMap}
+					onSubmit={handleSubmitMapLocation}
+				/>
+			) : null}
 			<ModalTalkRoomWelcome
 				open={talkRoomJoinModal.open}
 				onClose={handleCloseTalkRoomJoinModal}

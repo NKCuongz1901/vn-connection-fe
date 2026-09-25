@@ -29,6 +29,7 @@ import { getTalkRoomOverview } from '@/apis/talkRoomApis'
 type userDataProps = {
 	is_open_hangout: boolean
 	title_open_hangout: string
+	address: string
 	latitude: null | number
 	longitude: null | number
 	keyIntroTalkRoom: null | boolean
@@ -39,16 +40,66 @@ type filterProps = {
 	date: [Dayjs, Dayjs] | null
 	categories: string[] | null
 	title: string | null
+	latitude: number | null
+	longitude: number | null
+	google_title: string
+	types: string[] | null
+}
+
+/** Builds location query params for upcoming activity search. */
+const getLocationSearchParams = ({
+	latitude,
+	longitude,
+	google_title,
+	types,
+}: Pick<
+	filterProps,
+	'latitude' | 'longitude' | 'google_title' | 'types'
+>) => {
+	if (
+		!Number(latitude) ||
+		!Number(longitude) ||
+		Number.isNaN(Number(latitude)) ||
+		Number.isNaN(Number(longitude))
+	) {
+		return {}
+	}
+
+	return {
+		latitude: Number(latitude),
+		longitude: Number(longitude),
+		google_title: google_title || '',
+		...(isArray(types, 1) ? { types } : {}),
+	}
+}
+
+/** Reads the signed-in user's stored coordinates for the first search. */
+const getInitialLocationFilter = (): Pick<
+	filterProps,
+	'latitude' | 'longitude' | 'google_title' | 'types'
+> => {
+	const info = getUserInfo() || {}
+	const latitude = Number(info.latitude)
+	const longitude = Number(info.longitude)
+
+	return {
+		latitude: latitude && !Number.isNaN(latitude) ? latitude : null,
+		longitude: longitude && !Number.isNaN(longitude) ? longitude : null,
+		google_title: info.address || '',
+		types: null,
+	}
 }
 export default function useOverview() {
 	const { toggleLoadingContext } = useLoading()
 	const { openError } = useModal()
+	const initialLocation = getInitialLocationFilter()
 	const _childRef = useRef<HTMLDivElement | null>(null)
 	const _filterRef = useRef<filterProps>({
 		radius: 50,
 		date: null,
 		categories: null,
 		title: '',
+		...initialLocation,
 	})
 	const _parentRef = useRef<HTMLDivElement | null>(null)
 	const _childRefUp = useRef<HTMLDivElement | null>(null)
@@ -63,8 +114,9 @@ export default function useOverview() {
 	const [userData, setUserData] = useState<userDataProps>({
 		is_open_hangout: false,
 		title_open_hangout: '',
-		latitude: null,
-		longitude: null,
+		address: initialLocation.google_title || '',
+		latitude: initialLocation.latitude,
+		longitude: initialLocation.longitude,
 		keyIntroTalkRoom: null,
 		keyAudioRemind: null,
 	})
@@ -91,6 +143,10 @@ export default function useOverview() {
 		chatlocation: false,
 	})
 	const [total, setTotal] = useState({ event: 0, network: 0, chatroom: 0 })
+	const [eventFallback, setEventFallback] = useState({
+		fallbackApplied: false,
+		nearbyCount: 0,
+	})
 
 	const [loadmore, setLoadMore] = useState(true)
 	const [filters, setFilters] = useState<filterProps>({
@@ -98,6 +154,7 @@ export default function useOverview() {
 		date: null,
 		categories: null,
 		title: '',
+		...initialLocation,
 	})
 	const [totalTalkroom, setTotalTalkroom] = useState(0)
 	const [statsTalkroom, setStatsTalkroom] = useState<any>({})
@@ -195,7 +252,16 @@ export default function useOverview() {
 		setLoading((prev) => ({ ...prev, event: true }))
 		try {
 			const { page, limit } = _paginationRefs.current
-			const { radius, date, categories, title } = _filterRef.current
+			const {
+				radius,
+				date,
+				categories,
+				title,
+				latitude,
+				longitude,
+				google_title,
+				types,
+			} = _filterRef.current
 			const dates = {}
 			if (date) {
 				Object.assign(dates, {
@@ -209,21 +275,33 @@ export default function useOverview() {
 			}
 			if (isNew) {
 				setListPost([])
+				setEventFallback({ fallbackApplied: false, nearbyCount: 0 })
 			}
 			const res: any = await getListPost({
 				fields: ['$all', { user: ['name', 'phone', 'avatar', 'is_verified'] }],
 				page: !isNotLoading ? page : 1,
 				limit: !isNotLoading ? limit : 50,
 				type: mainRoutes.upcomingEvent,
-				radius,
+				...(radius !== '' && radius != null ? { radius } : {}),
 				...(categories && { categories: categories }),
 				...(title && { title }),
 				...dates,
+				...getLocationSearchParams({
+					latitude,
+					longitude,
+					google_title,
+					types,
+				}),
 			})
 			const { code, results } = res || {}
 			await delay(1000)
 			if (code === 200) {
-				const { rows, count } = results?.objects || {}
+				const {
+					rows,
+					count,
+					fallback_applied: fallbackApplied,
+					nearby_count: nearbyCount,
+				} = results?.objects || {}
 				if (!isNotLoading) {
 					setLoadMore(isArray(rows, limit))
 				}
@@ -233,6 +311,13 @@ export default function useOverview() {
 					return dataShow
 				})
 				setTotal((prev) => ({ ...prev, event: count }))
+				// Fallback banner is driven by page-1 metadata only.
+				if (isNew || page === 1) {
+					setEventFallback({
+						fallbackApplied: !!fallbackApplied,
+						nearbyCount: Number(nearbyCount) || 0,
+					})
+				}
 			}
 		} catch (error) {
 			openError(error)
@@ -310,6 +395,52 @@ export default function useOverview() {
 			setLoading((prev) => ({ ...prev, network: false }))
 		}
 	}
+	/** Applies a picked map location to filters, profile, and upcoming search. */
+	const handleChangeLocation = async (value: {
+		display_name?: string
+		lat?: number
+		lng?: number
+		type?: string[] | string
+	}) => {
+		const { display_name, lat, lng, type } = value || {}
+		if (lat == null || lng == null) return
+
+		const nextTypes = Array.isArray(type) ? type : type ? [type] : null
+		const nextLocation = {
+			latitude: Number(lat),
+			longitude: Number(lng),
+			google_title: display_name || '',
+			types: nextTypes,
+		}
+
+		_filterRef.current = {
+			..._filterRef.current,
+			...nextLocation,
+		}
+		setFilters((prev) => ({ ...prev, ...nextLocation }))
+		setUserData((prev) => ({
+			...prev,
+			address: display_name || '',
+			latitude: nextLocation.latitude,
+			longitude: nextLocation.longitude,
+		}))
+
+		setLoadMore(true)
+		_paginationRefs.current.page = 1
+
+		try {
+			await updateUserProfile({
+				address: display_name || '',
+				latitude: nextLocation.latitude,
+				longitude: nextLocation.longitude,
+			})
+		} catch (error) {
+			openError(error)
+		}
+
+		await handleGetListPost()
+	}
+
 	const handleGetUserProfile = async () => {
 		const id = getUserInfo('id')
 		setLoadingProfile(true)
@@ -325,6 +456,7 @@ export default function useOverview() {
 				const {
 					is_open_hangout,
 					title_open_hangout,
+					address,
 					latitude,
 					longitude,
 					status_of_tutorial,
@@ -332,11 +464,45 @@ export default function useOverview() {
 				setUserData({
 					is_open_hangout,
 					title_open_hangout,
+					address: address || '',
 					latitude,
 					longitude,
 					keyIntroTalkRoom: status_of_tutorial?._keyIntroTalkRoom,
 					keyAudioRemind: status_of_tutorial?._keyAudioRemind,
 				})
+
+				const nextLatitude = Number(latitude)
+				const nextLongitude = Number(longitude)
+				const hasLocation =
+					nextLatitude &&
+					nextLongitude &&
+					!Number.isNaN(nextLatitude) &&
+					!Number.isNaN(nextLongitude)
+
+				if (hasLocation) {
+					const nextLocation = {
+						latitude: nextLatitude,
+						longitude: nextLongitude,
+						google_title: address || _filterRef.current.google_title || '',
+					}
+					const locationChanged =
+						_filterRef.current.latitude !== nextLocation.latitude ||
+						_filterRef.current.longitude !== nextLocation.longitude ||
+						_filterRef.current.google_title !== nextLocation.google_title
+
+					_filterRef.current = {
+						..._filterRef.current,
+						...nextLocation,
+					}
+					setFilters((prev) => ({ ...prev, ...nextLocation }))
+
+					if (locationChanged) {
+						setLoadMore(true)
+						_paginationRefs.current.page = 1
+						await handleGetListPost()
+					}
+				}
+
 				await handleGetOpenHangout(!!is_open_hangout)
 			}
 		} catch (error) {
@@ -373,6 +539,7 @@ export default function useOverview() {
 					is_open_hangout: isOpenHangout,
 					title_open_hangout:
 						obj.title_open_hangout ?? payload.title_open_hangout,
+					address: obj.address ?? payload.address ?? userData.address,
 					latitude: obj.latitude ?? payload.latitude,
 					longitude: obj.longitude ?? payload.longitude,
 					keyIntroTalkRoom:
@@ -587,6 +754,7 @@ export default function useOverview() {
 		setModal,
 		loading,
 		total,
+		eventFallback,
 		listPost,
 		filters,
 		listNetwork,
@@ -601,6 +769,7 @@ export default function useOverview() {
 
 		OnChangeTitleHangout: handleOnChangeTitleHangout,
 		onUpdateUserInfo: handleUpdateUserInfo,
+		onChangeLocation: handleChangeLocation,
 		onCRUDSuccess: handleCRUDSuccess,
 		onScroll: handleScroll,
 		onScrollUp: handleScrollUp,
