@@ -13,6 +13,8 @@ import classes from './BookCard.module.scss'
 type BookCardProps = {
 	book: BookCardItem
 	variant?: 'tile' | 'rail' | 'row' | 'popular'
+	/** popular variant only: show the share button */
+	showShare?: boolean
 	onClick?: () => void
 }
 
@@ -28,9 +30,14 @@ function MetaLine({ parts, rating }: { parts: (string | undefined)[]; rating?: n
 	)
 }
 
-function BookCard({ book, variant = 'tile', onClick }: BookCardProps) {
+function BookCard({
+	book,
+	variant = 'tile',
+	showShare,
+	onClick,
+}: BookCardProps) {
 	if (variant === 'popular') {
-		return <BookPopularCard book={book} onClick={onClick} />
+		return <BookPopularCard book={book} showShare={showShare} onClick={onClick} />
 	}
 
 	if (variant === 'row') {

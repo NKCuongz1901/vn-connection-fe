@@ -72,7 +72,9 @@ export const BOOK_SEE_ALL: Record<
 }
 
 export const BOOK_SEARCHABLE_KINDS: BookSeeAllKind[] = [
+	'all',
 	'top-pick',
+	'recent',
 	'popular',
 	'category',
 ]

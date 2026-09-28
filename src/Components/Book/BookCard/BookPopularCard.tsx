@@ -5,6 +5,7 @@ import {
 	IconCircleArrowDown,
 	IconHeart,
 	IconHeartFilled,
+	IconShare3,
 } from '@tabler/icons-react'
 import clsx from 'clsx'
 import { toast } from 'react-toastify'
@@ -14,6 +15,9 @@ import CImage from '@/Components/Custom/CImage/CImage'
 import { useOptionalBookLibrary } from '@/context/BookLibraryContext'
 import { BookCardItem } from '@/interface/Book/book.interface'
 import { downloadBookAudio } from '@/ultis/bookDownload'
+import { useLocalePath } from '@/ultis/route'
+import { copyToClipboard } from '@/ultis/string'
+import { bookDetailPath } from '@/Variable/book.variable'
 import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
 
 import BookRating from './BookRating'
@@ -21,6 +25,8 @@ import classes from './BookCard.module.scss'
 
 type BookPopularCardProps = {
 	book: BookCardItem
+	/** Show the share button (list screens) */
+	showShare?: boolean
 	onClick?: () => void
 }
 
@@ -30,8 +36,9 @@ const formatViews = (count?: number) => {
 }
 
 /** Popular now card: cover, title, author, category and duration, then language, rating, views, favourite and download */
-function BookPopularCard({ book, onClick }: BookPopularCardProps) {
+function BookPopularCard({ book, showShare = false, onClick }: BookPopularCardProps) {
 	const library = useOptionalBookLibrary()
+	const { onGetPath } = useLocalePath()
 	const [favourited, setFavourited] = useState(Boolean(book.isFavourited))
 	const [savingFavourite, setSavingFavourite] = useState(false)
 	const [downloading, setDownloading] = useState(false)
@@ -68,6 +75,26 @@ function BookPopularCard({ book, onClick }: BookPopularCardProps) {
 			toast.error('Could not download this book')
 		} finally {
 			setDownloading(false)
+		}
+	}
+
+	// Same flow as Book detail: native share sheet, else copy the link
+	const onShare = async () => {
+		const url =
+			book.shareLink || `${window.location.origin}${onGetPath(bookDetailPath(book.id))}`
+		const copy = () => {
+			copyToClipboard(url)
+			toast.success('Link copied successfully!')
+		}
+		try {
+			if (navigator.share) {
+				await navigator.share({ title: book.title, url })
+				return
+			}
+			copy()
+		} catch (error) {
+			if ((error as Error)?.name === 'AbortError') return
+			copy()
 		}
 	}
 
@@ -138,6 +165,16 @@ function BookPopularCard({ book, onClick }: BookPopularCardProps) {
 					>
 						<IconCircleArrowDown size={20} stroke={1.5} />
 					</button>
+					{showShare ? (
+						<button
+							type="button"
+							className={classes.popularAction}
+							onClick={onShare}
+							aria-label="Share"
+						>
+							<IconShare3 size={20} stroke={1.5} />
+						</button>
+					) : null}
 				</div>
 			</div>
 		</div>

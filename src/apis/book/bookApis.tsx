@@ -79,6 +79,7 @@ export const mapBookCard = (item?: BookApiItem | null): BookCardItem | null => {
 		languageLabel: languageLabelFromCodes(item.language),
 		viewCount: item.total_view_count,
 		isFavourited: item.is_favourited,
+		shareLink: item.share_link,
 	}
 }
 
