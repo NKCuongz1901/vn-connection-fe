@@ -9,7 +9,7 @@ First, run the development server:
 npm run dev
 ```
 
-update build 17
+update build 18
 
 ![](https://img.shields.io/badge/Important-FF0000?style=for-the-badge)
 
