@@ -8,6 +8,7 @@ import {
 	BookLanguage,
 	BookListQuery,
 	BookReview,
+	BookReviewStatistics,
 	ContinueReadingApiItem,
 } from '@/interface/Book/book.interface'
 import { formatListeningTime, pickBookDuration } from '@/Variable/book.variable'
@@ -182,6 +183,22 @@ export const getBookDetail = async (id: string) => {
 
 export const toggleFavouriteBook = async (bookId: string) => {
 	return axios.post(`${BOOK_ROUTES.favourite}/${bookId}`)
+}
+
+export const getBookReviews = async (
+	bookId: string,
+	params: { limit?: number; offset?: number } = {},
+) => {
+	return axios.get(`${BOOK_ROUTES.book}/${bookId}/reviews`, {
+		params: { sortBy: 'newest', limit: 20, offset: 0, ...params },
+	})
+}
+
+export const parseBookReviewStatistics = (
+	res: unknown,
+): BookReviewStatistics | null => {
+	const data = res as { results?: { statistics?: BookReviewStatistics } }
+	return data?.results?.statistics || null
 }
 
 export const getMyBookReview = async (bookId: string) => {

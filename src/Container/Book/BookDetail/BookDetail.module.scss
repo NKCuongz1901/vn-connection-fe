@@ -75,6 +75,20 @@
 	min-width: 120px;
 }
 
+.statButton {
+	align-self: flex-start;
+	padding: 0;
+	border: none;
+	background: none;
+	font-family: inherit;
+	text-align: left;
+	cursor: pointer;
+
+	&:hover span {
+		text-decoration: underline;
+	}
+}
+
 .statLabel {
 	color: #7987a4;
 	font-size: 12px;
