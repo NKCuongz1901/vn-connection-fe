@@ -1,0 +1,186 @@
+.body {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	padding: 20px 24px 24px;
+}
+
+.summary {
+	display: flex;
+	align-items: center;
+	gap: 32px;
+}
+
+.average {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	flex-shrink: 0;
+}
+
+.averageValue {
+	color: #0f1729;
+	font-size: 40px;
+	font-weight: 700;
+	line-height: 48px;
+}
+
+.count {
+	color: #64748b;
+	font-size: 13px;
+}
+
+.stars {
+	display: inline-flex;
+	gap: 2px;
+	color: #cbd5e1;
+
+	.starOn {
+		color: #f5a623;
+	}
+}
+
+.bars {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0;
+}
+
+.barRow {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: #48546b;
+	font-size: 12px;
+}
+
+.bar {
+	flex: 1;
+	height: 6px;
+	border-radius: 99px;
+	background: #eef3f6;
+	overflow: hidden;
+}
+
+.barFill {
+	height: 100%;
+	border-radius: 99px;
+	background: #f5a623;
+}
+
+.barCount {
+	min-width: 20px;
+	text-align: right;
+}
+
+.write {
+	align-self: flex-start;
+	height: 36px;
+	padding: 0 16px;
+	border: 1px solid #006b35;
+	border-radius: 99px;
+	background: #fff;
+	color: #006b35;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+
+	&:hover {
+		background: #e8f5ee;
+	}
+}
+
+.list {
+	display: flex;
+	flex-direction: column;
+}
+
+.item {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 14px 0;
+	border-top: 1px solid #e2e8f0;
+}
+
+.itemHead {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.avatar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 99px;
+	background: #e8f5ee;
+	color: #006b35;
+	font-weight: 600;
+	overflow: hidden;
+	flex-shrink: 0;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}
+
+.itemMeta {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.name {
+	color: #0f1729;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.itemSub {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: #94a3b8;
+	font-size: 12px;
+}
+
+.comment {
+	color: #334155;
+	font-size: 14px;
+	line-height: 20px;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.more {
+	align-self: center;
+	margin-top: 8px;
+	height: 36px;
+	padding: 0 16px;
+	border: 1px solid #e2e8f0;
+	border-radius: 99px;
+	background: #fff;
+	color: #0f1729;
+	cursor: pointer;
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}
+
+.empty {
+	padding: 24px 0;
+	color: #94a3b8;
+	font-size: 14px;
+	text-align: center;
+}

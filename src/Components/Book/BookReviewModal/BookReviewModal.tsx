@@ -9,7 +9,6 @@ import {
 	createBookReview,
 	parseBookReview,
 	getMyBookReview,
-	updateBookReview,
 } from '@/apis/book/bookApis'
 import { useModal } from '@/context/ModalContext'
 
@@ -88,7 +87,9 @@ function BookReviewModal({
 	const [comment, setComment] = useState('')
 	const [submitting, setSubmitting] = useState(false)
 	const [ready, setReady] = useState(false)
-	const isUpdate = Boolean(reviewId)
+	// One review per account: once it exists the form is read-only here and is
+	// edited from Profile → Your review
+	const alreadyReviewed = Boolean(reviewId)
 
 	useEffect(() => {
 		if (!open) return
@@ -127,45 +128,33 @@ function BookReviewModal({
 	if (!open) return null
 
 	const copy = RATING_COPY[rating] || RATING_COPY[0]
-	const canSubmit = ready && rating >= 1 && !submitting
+	const canSubmit = ready && !alreadyReviewed && rating >= 1 && !submitting
 
 	const submit = async () => {
 		if (!canSubmit) return
 		setSubmitting(true)
-		const payload = {
-			content_rating: rating,
-			comment: comment.trim() || undefined,
-		}
 		try {
-			if (reviewId) {
-				await updateBookReview(reviewId, payload)
-			} else {
-				try {
-					const res = await createBookReview({
-						book_id: bookId,
-						...payload,
-					})
-					const created = parseBookReview(res)
-					if (created?.id) setReviewId(created.id)
-				} catch (error) {
-					if (reviewErrorMessage(error) !== 'Review already exists') {
-						throw error
-					}
-					const res = await getMyBookReview(bookId)
-					const existing = parseBookReview(res)
-					if (!existing?.id) throw error
-					setReviewId(existing.id)
-					await updateBookReview(existing.id, payload)
-				}
-			}
-			openSuccess({
-				message: isUpdate
-					? 'Review updated successfully!'
-					: 'Review submitted successfully!',
+			await createBookReview({
+				book_id: bookId,
+				content_rating: rating,
+				comment: comment.trim() || undefined,
 			})
+			openSuccess({ message: 'Review submitted successfully!' })
 			onSubmitted?.()
 			onClose()
 		} catch (error) {
+			if (reviewErrorMessage(error) === 'Review already exists') {
+				// reviewed from another device: show that review instead
+				const existing = parseBookReview(
+					await getMyBookReview(bookId).catch(() => null),
+				)
+				if (existing?.id) {
+					setReviewId(existing.id)
+					setRating(existing.content_rating || 0)
+					setComment(existing.comment || '')
+					return
+				}
+			}
 			openError(error)
 		} finally {
 			setSubmitting(false)
@@ -176,7 +165,7 @@ function BookReviewModal({
 		<CModal
 			open
 			centered
-			title="Review"
+			title={alreadyReviewed ? 'Your review' : 'Review'}
 			footer={null}
 			onCancel={onClose}
 			styles={{
@@ -209,30 +198,44 @@ function BookReviewModal({
 							{copy.emoji}
 						</div>
 						<div className={classes.label}>{copy.label}</div>
-						<BookRatingStars value={rating} onChange={setRating} />
+						<BookRatingStars
+							value={rating}
+							onChange={setRating}
+							readOnly={alreadyReviewed}
+						/>
 					</div>
 					<div className={classes.field}>
 						<textarea
 							className={classes.textarea}
 							value={comment}
 							maxLength={REVIEW_COMMENT_MAX}
-							placeholder="Write your review here…"
+							placeholder={alreadyReviewed ? '' : 'Write your review here…'}
+							readOnly={alreadyReviewed}
 							onChange={(event) => setComment(event.target.value)}
 						/>
-						<div className={classes.counter}>
-							{comment.length}/{REVIEW_COMMENT_MAX}
-						</div>
+						{alreadyReviewed ? null : (
+							<div className={classes.counter}>
+								{comment.length}/{REVIEW_COMMENT_MAX}
+							</div>
+						)}
 					</div>
 				</div>
 				<div className={classes.footer}>
-					<button
-						type="button"
-						className={classes.submit}
-						disabled={!canSubmit}
-						onClick={submit}
-					>
-						Submit review
-					</button>
+					{alreadyReviewed ? (
+						<div className={classes.notice}>
+							You have already reviewed this book. To change your review,
+							go to Profile → Your review.
+						</div>
+					) : (
+						<button
+							type="button"
+							className={classes.submit}
+							disabled={!canSubmit}
+							onClick={submit}
+						>
+							Submit review
+						</button>
+					)}
 				</div>
 			</div>
 		</CModal>

@@ -10,18 +10,23 @@ import {
 	IconDownload,
 	IconFlag,
 	IconHeadphones,
+	IconHeart,
+	IconHeartFilled,
 	IconList,
 	IconShare3,
 	IconStar,
 	IconStarFilled,
 	IconX,
 } from '@tabler/icons-react'
+import { toast } from 'react-toastify'
 
 import {
 	BookEmptyState,
 	BookLanguageButton,
+	BookReviewListModal,
 	BookReviewModal,
 } from '@/Components/Book'
+import { downloadBookAudio } from '@/ultis/bookDownload'
 import CImage from '@/Components/Custom/CImage/CImage'
 import { useModal } from '@/context/ModalContext'
 import useBookDetail from '@/hooks/Book/useBookDetail'
@@ -62,6 +67,24 @@ function BookDetail({ bookId }: BookDetailProps) {
 	const { learningLang } = useBookLibrary()
 	const [sharing, setSharing] = useState(false)
 	const [reviewOpen, setReviewOpen] = useState(false)
+	const [reviewListOpen, setReviewListOpen] = useState(false)
+	const [downloading, setDownloading] = useState(false)
+
+	const handleDownload = async () => {
+		if (downloading || !book?.id) return
+		setDownloading(true)
+		try {
+			const saved = await downloadBookAudio(
+				{ id: book.id, title: book.title },
+				learningLang,
+			)
+			if (!saved) toast.info('No audio for this book yet')
+		} catch {
+			toast.error('Could not download this book')
+		} finally {
+			setDownloading(false)
+		}
+	}
 
 	const rating = book?.review_summary?.overall_rating
 	const reviewCount = book?.review_summary?.total_reviews
@@ -155,14 +178,20 @@ function BookDetail({ bookId }: BookDetailProps) {
 						</div>
 						<div className={classes.stat}>
 							<div className={classes.statLabel}>Rating</div>
-							<div
-								className={clsx(classes.statValue, classes.statRating, {
-									[classes.statRatingActive]: Boolean(rating),
-								})}
+							<button
+								type="button"
+								className={clsx(
+									classes.statValue,
+									classes.statRating,
+									classes.statButton,
+									{ [classes.statRatingActive]: Boolean(rating) },
+								)}
+								onClick={() => setReviewListOpen(true)}
+								aria-label="See book reviews"
 							>
 								<IconStarFilled size={16} />
 								<span>{ratingLabel}</span>
-							</div>
+							</button>
 						</div>
 					</div>
 					<div className={classes.actions}>
@@ -191,17 +220,27 @@ function BookDetail({ bookId }: BookDetailProps) {
 							})}
 							onClick={toggleFavourite}
 							disabled={savingFavourite}
+							aria-pressed={Boolean(book.is_favourited)}
 							aria-label={
 								book.is_favourited
-									? 'Remove from library'
-									: 'Save to library'
+									? 'Remove from favourites'
+									: 'Add to favourites'
 							}
 						>
-							<IconDownload
-								size={20}
-								stroke={1.5}
-								fill={book.is_favourited ? 'currentColor' : 'none'}
-							/>
+							{book.is_favourited ? (
+								<IconHeartFilled size={20} />
+							) : (
+								<IconHeart size={20} stroke={1.5} />
+							)}
+						</button>
+						<button
+							type="button"
+							className={classes.iconBtn}
+							onClick={handleDownload}
+							disabled={downloading || !chapters.length}
+							aria-label="Download audio"
+						>
+							<IconDownload size={20} stroke={1.5} />
 						</button>
 						<button
 							type="button"
@@ -362,6 +401,16 @@ function BookDetail({ bookId }: BookDetailProps) {
 				</div>
 			)}
 
+			<BookReviewListModal
+				open={reviewListOpen}
+				bookId={bookId}
+				bookTitle={book.title}
+				onClose={() => setReviewListOpen(false)}
+				onWrite={() => {
+					setReviewListOpen(false)
+					setReviewOpen(true)
+				}}
+			/>
 			<BookReviewModal
 				open={reviewOpen}
 				bookId={bookId}

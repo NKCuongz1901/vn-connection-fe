@@ -8,6 +8,22 @@ export type BookReview = {
 	book_id?: string
 	content_rating?: number
 	comment?: string | null
+	created_at?: string
+	updated_at?: string
+	reader?: {
+		id?: string
+		user_id?: string
+		name?: string
+		avatar?: string | null
+	}
+}
+
+export type BookReviewStatistics = {
+	total_reviews?: number
+	overall_rating?: number
+	rating_distribution?: {
+		content?: Record<string, number>
+	}
 }
 
 export type ReadingProgress = {
