@@ -16,7 +16,7 @@ import { useOptionalBookLibrary } from '@/context/BookLibraryContext'
 import { BookCardItem } from '@/interface/Book/book.interface'
 import { downloadBookAudio } from '@/ultis/bookDownload'
 import { useLocalePath } from '@/ultis/route'
-import { copyToClipboard } from '@/ultis/string'
+import BookShareModal from '@/Components/Book/BookShareModal'
 import { bookDetailPath } from '@/Variable/book.variable'
 import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
 
@@ -42,6 +42,7 @@ function BookPopularCard({ book, showShare = false, onClick }: BookPopularCardPr
 	const [favourited, setFavourited] = useState(Boolean(book.isFavourited))
 	const [savingFavourite, setSavingFavourite] = useState(false)
 	const [downloading, setDownloading] = useState(false)
+	const [shareOpen, setShareOpen] = useState(false)
 
 	useEffect(() => {
 		setFavourited(Boolean(book.isFavourited))
@@ -78,25 +79,9 @@ function BookPopularCard({ book, showShare = false, onClick }: BookPopularCardPr
 		}
 	}
 
-	// Same flow as Book detail: native share sheet, else copy the link
-	const onShare = async () => {
-		const url =
-			book.shareLink || `${window.location.origin}${onGetPath(bookDetailPath(book.id))}`
-		const copy = () => {
-			copyToClipboard(url)
-			toast.success('Link copied successfully!')
-		}
-		try {
-			if (navigator.share) {
-				await navigator.share({ title: book.title, url })
-				return
-			}
-			copy()
-		} catch (error) {
-			if ((error as Error)?.name === 'AbortError') return
-			copy()
-		}
-	}
+	// Same UniVini share as Book detail: copy the link or send it to a friend
+	const shareUrl = () =>
+		book.shareLink || `${window.location.origin}${onGetPath(bookDetailPath(book.id))}`
 
 	const views = formatViews(book.viewCount)
 	const subline = [book.category, book.durationLabel].filter(Boolean)
@@ -169,7 +154,7 @@ function BookPopularCard({ book, showShare = false, onClick }: BookPopularCardPr
 						<button
 							type="button"
 							className={classes.popularAction}
-							onClick={onShare}
+							onClick={() => setShareOpen(true)}
 							aria-label="Share"
 						>
 							<IconShare3 size={20} stroke={1.5} />
@@ -177,6 +162,9 @@ function BookPopularCard({ book, showShare = false, onClick }: BookPopularCardPr
 					) : null}
 				</div>
 			</div>
+			{shareOpen ? (
+				<BookShareModal open url={shareUrl()} onClose={() => setShareOpen(false)} />
+			) : null}
 		</div>
 	)
 }

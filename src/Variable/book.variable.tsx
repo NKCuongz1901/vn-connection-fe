@@ -41,6 +41,7 @@ export const BOOK_CATEGORIES = [
 ] as const
 
 export const BOOK_ROOT = 'mini-apps/books-audio'
+export const BOOK_STREAK_PATH = `${BOOK_ROOT}/streak`
 
 /** Temporary kill switch for Books & Audio on web (main). Flip to true to ship. */
 export const BOOK_WEB_ENABLED = true
