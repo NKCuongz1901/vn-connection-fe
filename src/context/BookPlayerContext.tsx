@@ -10,8 +10,17 @@ import {
 	useState,
 } from 'react'
 
-import { getAudioList, parseApiList, toggleFavouriteBook } from '@/apis/book/bookApis'
-import { pickChapterAudio } from '@/apis/book/chapterApis'
+import {
+	getAudioList,
+	getBookListV2,
+	parseApiList,
+	toggleFavouriteBook,
+} from '@/apis/book/bookApis'
+import {
+	getChapterList,
+	pickChapterAudio,
+	sortChapters,
+} from '@/apis/book/chapterApis'
 import { BookApiItem, ChapterApiItem, ChapterAudio } from '@/interface/Book/book.interface'
 
 type PlayerTrack = {
@@ -25,10 +34,23 @@ type PlayerTrack = {
 
 export type RepeatMode = 'off' | 'one' | 'all'
 
+// A played position, kept so Previous can step back across books
+type TrackEntry = {
+	book: BookApiItem
+	chapter: ChapterApiItem
+	chapters: ChapterApiItem[]
+}
+
+// How many books to try before giving up when the next ones have no audio
+const MAX_BOOK_ATTEMPTS = 5
+const BOOK_QUEUE_LIMIT = 50
+const HISTORY_LIMIT = 50
+
 type BookPlayerContextValue = {
 	url: string
 	book: BookApiItem | null
 	chapter: ChapterApiItem | null
+	chapters: ChapterApiItem[]
 	playing: boolean
 	currentTime: number
 	duration: number
@@ -46,6 +68,7 @@ type BookPlayerContextValue = {
 	toggleFavourite: () => Promise<void>
 	prevChapter: () => void
 	nextChapter: () => void
+	selectChapter: (chapter: ChapterApiItem) => Promise<boolean>
 	getCurrentTime: () => number
 }
 
@@ -65,10 +88,16 @@ export function BookPlayerProvider({
 	const learningLangRef = useRef('en-gb')
 	const shuffleRef = useRef(false)
 	const repeatRef = useRef<RepeatMode>('off')
+	const historyRef = useRef<TrackEntry[]>([])
+	const bookQueueRef = useRef<{ level: string; books: BookApiItem[] } | null>(
+		null,
+	)
+	const navigatingRef = useRef(false)
 
 	const [url, setUrl] = useState('')
 	const [book, setBook] = useState<BookApiItem | null>(null)
 	const [chapter, setChapter] = useState<ChapterApiItem | null>(null)
+	const [chapters, setChapters] = useState<ChapterApiItem[]>([])
 	const [playing, setPlaying] = useState(false)
 	const [currentTime, setCurrentTime] = useState(0)
 	const [duration, setDuration] = useState(0)
@@ -96,54 +125,219 @@ export function BookPlayerProvider({
 		}
 	}, [])
 
-	const playChapter = useCallback(
-		async (nextChapter: ChapterApiItem, autoPlay = true) => {
-			if (!nextChapter?.id || !bookRef.current?.id) return
-			try {
-				const res = await getAudioList({
-					book_id: bookRef.current.id,
-					chapter_id: nextChapter.id,
-					page: 1,
-					limit: 30,
-				})
-				const audios = parseApiList<ChapterAudio>(res)
-				const audio = pickChapterAudio(audios, learningLangRef.current)
-				if (audio?.url) {
-					setChapter(nextChapter)
-					playAudioUrl(audio.url, autoPlay)
-				}
-			} catch {
-				// keep current track if the next one has no audio
-			}
+	const fetchChapterAudioUrl = useCallback(
+		async (bookId: string, chapterId: string) => {
+			const res = await getAudioList({
+				book_id: bookId,
+				chapter_id: chapterId,
+				page: 1,
+				limit: 30,
+			})
+			const audios = parseApiList<ChapterAudio>(res)
+			return pickChapterAudio(audios, learningLangRef.current)?.url || ''
 		},
-		[playAudioUrl],
+		[],
 	)
 
-	const pickAdjacentChapter = useCallback((direction: 1 | -1) => {
-		const list = chaptersRef.current
-		const current = chapterRef.current
-		if (!list.length || !current?.id) return null
-
-		if (shuffleRef.current) {
-			if (list.length < 2) return null
-			let candidate = current
-			let guard = 0
-			while (candidate?.id === current.id && guard < 10) {
-				candidate = list[Math.floor(Math.random() * list.length)]
-				guard += 1
-			}
-			return candidate?.id !== current.id ? candidate : null
-		}
-
-		const index = list.findIndex((item) => item.id === current.id)
-		if (index === -1) return null
-		const nextIndex = index + direction
-		if (nextIndex >= 0 && nextIndex < list.length) return list[nextIndex]
-		if (repeatRef.current === 'all') {
-			return direction === 1 ? list[0] : list[list.length - 1]
-		}
-		return null
+	const pushHistory = useCallback(() => {
+		const current = bookRef.current
+		const currentChapter = chapterRef.current
+		if (!current?.id || !currentChapter?.id) return
+		historyRef.current = [
+			...historyRef.current,
+			{ book: current, chapter: currentChapter, chapters: chaptersRef.current },
+		].slice(-HISTORY_LIMIT)
 	}, [])
+
+	// Switch the player to a track, which may belong to another book
+	const playTrack = useCallback(
+		async (entry: TrackEntry, audioUrl?: string, autoPlay = true) => {
+			if (!entry.book.id || !entry.chapter.id) return false
+			try {
+				const src =
+					audioUrl ||
+					(await fetchChapterAudioUrl(entry.book.id, entry.chapter.id))
+				if (!src) return false
+				bookRef.current = entry.book
+				chapterRef.current = entry.chapter
+				chaptersRef.current = entry.chapters
+				setBook(entry.book)
+				setChapter(entry.chapter)
+				setChapters(entry.chapters)
+				playAudioUrl(src, autoPlay)
+				return true
+			} catch {
+				// keep current track if the target has no audio
+				return false
+			}
+		},
+		[fetchChapterAudioUrl, playAudioUrl],
+	)
+
+	const playChapter = useCallback(
+		async (nextChapter: ChapterApiItem, autoPlay = true) => {
+			const current = bookRef.current
+			if (!nextChapter?.id || !current?.id) return false
+			return playTrack(
+				{ book: current, chapter: nextChapter, chapters: chaptersRef.current },
+				undefined,
+				autoPlay,
+			)
+		},
+		[playTrack],
+	)
+
+	// Books the player can move to, same level as the current book when possible
+	const getBookQueue = useCallback(async () => {
+		const level = bookRef.current?.level || ''
+		const cached = bookQueueRef.current
+		if (cached && cached.level === level && cached.books.length > 1) {
+			return cached.books
+		}
+		const fetchBooks = async (params: { level?: string }) =>
+			parseApiList<BookApiItem>(
+				await getBookListV2({ page: 1, limit: BOOK_QUEUE_LIMIT, ...params }),
+			).filter((item) => item?.id)
+
+		let books = level ? await fetchBooks({ level }) : []
+		if (books.length < 2) books = await fetchBooks({})
+		bookQueueRef.current = { level, books }
+		return books
+	}, [])
+
+	// Start another book at its first (or last) chapter that has audio
+	const openBook = useCallback(
+		async (target: BookApiItem, position: 'first' | 'last') => {
+			if (!target.id) return false
+			const list = sortChapters(
+				parseApiList<ChapterApiItem>(await getChapterList(target.id)),
+			).filter((item) => item.id)
+			const ordered = position === 'first' ? list : [...list].reverse()
+			for (const candidate of ordered.slice(0, 3)) {
+				const src = await fetchChapterAudioUrl(
+					target.id,
+					candidate.id as string,
+				).catch(() => '')
+				if (src) {
+					return playTrack(
+						{ book: target, chapter: candidate, chapters: list },
+						src,
+					)
+				}
+			}
+			return false
+		},
+		[fetchChapterAudioUrl, playTrack],
+	)
+
+	const moveToOtherBook = useCallback(
+		async (direction: 1 | -1) => {
+			const currentId = bookRef.current?.id
+			const all = await getBookQueue()
+			const others = all.filter((item) => item.id !== currentId)
+			if (!others.length) return false
+
+			let candidates: BookApiItem[]
+			if (shuffleRef.current) {
+				candidates = [...others].sort(() => Math.random() - 0.5)
+			} else {
+				const index = all.findIndex((item) => item.id === currentId)
+				// walk the list from the current book, wrapping around
+				candidates =
+					index === -1
+						? others
+						: others.map(
+								(_, step) =>
+									all[
+										(((index + direction * (step + 1)) % all.length) +
+											all.length) %
+											all.length
+									],
+							)
+			}
+
+			for (const candidate of candidates.slice(0, MAX_BOOK_ATTEMPTS)) {
+				const ok = await openBook(
+					candidate,
+					direction === 1 || shuffleRef.current ? 'first' : 'last',
+				).catch(() => false)
+				if (ok) return true
+			}
+			return false
+		},
+		[getBookQueue, openBook],
+	)
+
+	// Play the first chapter in the list that has audio, skipping silent ones
+	const playFirstWithAudio = useCallback(
+		async (candidates: ChapterApiItem[]) => {
+			for (const candidate of candidates) {
+				if (await playChapter(candidate)) return true
+			}
+			return false
+		},
+		[playChapter],
+	)
+
+	const goNext = useCallback(async () => {
+		if (navigatingRef.current) return
+		navigatingRef.current = true
+		try {
+			const list = chaptersRef.current
+			const index = list.findIndex(
+				(item) => item.id === chapterRef.current?.id,
+			)
+			pushHistory()
+			let moved = false
+			if (shuffleRef.current) {
+				// shuffle plays a random other book, from its first chapter
+				moved = await moveToOtherBook(1)
+			} else {
+				moved = await playFirstWithAudio(list.slice(index + 1))
+				if (!moved && repeatRef.current === 'all') {
+					moved = await playFirstWithAudio(list.slice(0, Math.max(index, 0)))
+				}
+				if (!moved && repeatRef.current !== 'all') {
+					moved = await moveToOtherBook(1)
+				}
+			}
+			if (!moved) historyRef.current = historyRef.current.slice(0, -1)
+		} finally {
+			navigatingRef.current = false
+		}
+	}, [moveToOtherBook, playFirstWithAudio, pushHistory])
+
+	const goPrev = useCallback(async () => {
+		if (navigatingRef.current) return
+		navigatingRef.current = true
+		try {
+			if (shuffleRef.current) {
+				const previous = historyRef.current[historyRef.current.length - 1]
+				if (previous && (await playTrack(previous))) {
+					historyRef.current = historyRef.current.slice(0, -1)
+				}
+				return
+			}
+			const list = chaptersRef.current
+			const index = list.findIndex(
+				(item) => item.id === chapterRef.current?.id,
+			)
+			let moved =
+				index > 0 &&
+				(await playFirstWithAudio(list.slice(0, index).reverse()))
+			if (!moved && repeatRef.current === 'all') {
+				moved = await playFirstWithAudio(list.slice(index + 1).reverse())
+			}
+			if (!moved && repeatRef.current !== 'all') {
+				await moveToOtherBook(-1)
+			}
+		} finally {
+			navigatingRef.current = false
+		}
+	}, [moveToOtherBook, playFirstWithAudio, playTrack])
+
+	const goNextRef = useRef(goNext)
+	goNextRef.current = goNext
 
 	useEffect(() => {
 		const audio = new Audio()
@@ -161,8 +355,7 @@ export function BookPlayerProvider({
 				audio.play().catch(() => {})
 				return
 			}
-			const next = pickAdjacentChapter(1)
-			if (next) playChapter(next, true)
+			goNextRef.current()
 		}
 
 		audio.addEventListener('timeupdate', onTime)
@@ -181,7 +374,7 @@ export function BookPlayerProvider({
 			audio.removeEventListener('ended', onEnded)
 			audioRef.current = null
 		}
-	}, [pickAdjacentChapter, playChapter])
+	}, [])
 
 	const load = useCallback((track: PlayerTrack) => {
 		const audio = audioRef.current
@@ -191,7 +384,10 @@ export function BookPlayerProvider({
 		setChapter(track.chapter || null)
 		bookRef.current = track.book || null
 		chapterRef.current = track.chapter || null
-		if (track.chapters) chaptersRef.current = track.chapters
+		if (track.chapters) {
+			chaptersRef.current = track.chapters
+			setChapters(track.chapters)
+		}
 		if (track.learningLang) learningLangRef.current = track.learningLang
 
 		if (urlRef.current === track.url) {
@@ -234,12 +430,27 @@ export function BookPlayerProvider({
 		}
 	}, [])
 
+	// Shuffle and repeat are exclusive: turning one on turns the other off
 	const toggleShuffle = useCallback(() => {
-		setShuffle((prev) => !prev)
+		const next = !shuffleRef.current
+		shuffleRef.current = next
+		setShuffle(next)
+		if (next) {
+			repeatRef.current = 'off'
+			setRepeat('off')
+		}
 	}, [])
 
 	const cycleRepeat = useCallback(() => {
-		setRepeat((prev) => (prev === 'off' ? 'all' : prev === 'all' ? 'one' : 'off'))
+		const prev = repeatRef.current
+		const next: RepeatMode =
+			prev === 'off' ? 'all' : prev === 'all' ? 'one' : 'off'
+		repeatRef.current = next
+		setRepeat(next)
+		if (next !== 'off') {
+			shuffleRef.current = false
+			setShuffle(false)
+		}
 	}, [])
 
 	const toggleFavourite = useCallback(async () => {
@@ -260,14 +471,24 @@ export function BookPlayerProvider({
 	}, [favouritePending])
 
 	const prevChapter = useCallback(() => {
-		const target = pickAdjacentChapter(-1)
-		if (target) playChapter(target, true)
-	}, [pickAdjacentChapter, playChapter])
+		goPrev()
+	}, [goPrev])
 
 	const nextChapter = useCallback(() => {
-		const target = pickAdjacentChapter(1)
-		if (target) playChapter(target, true)
-	}, [pickAdjacentChapter, playChapter])
+		goNext()
+	}, [goNext])
+
+	const selectChapter = useCallback(
+		async (target: ChapterApiItem) => {
+			if (!target.id) return false
+			if (target.id === chapterRef.current?.id) return true
+			pushHistory()
+			const ok = await playChapter(target)
+			if (!ok) historyRef.current = historyRef.current.slice(0, -1)
+			return ok
+		},
+		[playChapter, pushHistory],
+	)
 
 	const getCurrentTime = useCallback(
 		() => audioRef.current?.currentTime || 0,
@@ -279,6 +500,7 @@ export function BookPlayerProvider({
 			url,
 			book,
 			chapter,
+			chapters,
 			playing,
 			currentTime,
 			duration,
@@ -296,12 +518,14 @@ export function BookPlayerProvider({
 			toggleFavourite,
 			prevChapter,
 			nextChapter,
+			selectChapter,
 			getCurrentTime,
 		}),
 		[
 			url,
 			book,
 			chapter,
+			chapters,
 			playing,
 			currentTime,
 			duration,
@@ -319,6 +543,7 @@ export function BookPlayerProvider({
 			toggleFavourite,
 			prevChapter,
 			nextChapter,
+			selectChapter,
 			getCurrentTime,
 		],
 	)

@@ -2,6 +2,7 @@ import { Flex } from 'antd'
 import { memo } from 'react'
 
 import { useLocalePath } from '@/ultis/route'
+import { isNoResponseError } from '@/ultis/requestError'
 import { handleRemoveAllCookie } from '@/ultis/storage'
 
 import { CModalProps } from '@/interface/CComponent/CComponent.interface'
@@ -21,7 +22,10 @@ const CModalError = (_props: CModalProps) => {
 	const { onChangeRoute } = useLocalePath()
 	let message = error?.response?.data?.message || error?.message || error
 	const code = error?.response?.data?.code || error?.code || 0
-	if (typeof message !== 'string') {
+	if (isNoResponseError(error)) {
+		// No HTTP response: say what happened instead of "Unknow error".
+		message = error.message
+	} else if (typeof message !== 'string') {
 		message = 'Unknow error'
 	}
 	if (codes.includes(code)) {

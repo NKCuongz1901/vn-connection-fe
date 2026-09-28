@@ -64,6 +64,7 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 
 		setOpenSetting,
 		onSendMessage,
+		onRetryMessage,
 		editingMessage,
 		onEditMessage,
 		onCancelEdit,
@@ -219,6 +220,7 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 						onLoadMore={onLoadMore}
 						_scrollRef={_scrollRef}
 						onSendMessage={onSendMessage}
+						onRetryMessage={onRetryMessage}
 						editingMessage={editingMessage}
 						onEditMessage={onEditMessage}
 						onCancelEdit={onCancelEdit}

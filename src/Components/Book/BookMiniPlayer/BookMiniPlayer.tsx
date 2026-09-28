@@ -1,23 +1,29 @@
 'use client'
 
-import { memo } from 'react'
+import { memo, useState } from 'react'
 
 import {
 	IconArrowsShuffle,
 	IconDownload,
+	IconHeart,
+	IconHeartFilled,
 	IconPlayerPauseFilled,
 	IconPlayerPlayFilled,
 	IconPlayerSkipBackFilled,
 	IconPlayerSkipForwardFilled,
 	IconRepeat,
 	IconRepeatOnce,
+	IconPlaylist,
 	IconRewindBackward10,
 	IconRewindForward10,
 } from '@tabler/icons-react'
+import { Dropdown } from 'antd'
 import clsx from 'clsx'
+import { toast } from 'react-toastify'
 
 import CImage from '@/Components/Custom/CImage/CImage'
 import { useBookPlayer } from '@/context/BookPlayerContext'
+import { downloadAudio } from '@/ultis/bookDownload'
 import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
 import { useLocalePath } from '@/ultis/route'
 import {
@@ -29,11 +35,13 @@ import {
 import classes from './BookMiniPlayer.module.scss'
 
 function BookMiniPlayer() {
+	const [downloading, setDownloading] = useState(false)
 	const { onChangeRoute } = useLocalePath()
 	const {
 		url,
 		book,
 		chapter,
+		chapters,
 		playing,
 		currentTime,
 		duration,
@@ -50,6 +58,7 @@ function BookMiniPlayer() {
 		toggleFavourite,
 		prevChapter,
 		nextChapter,
+		selectChapter,
 	} = useBookPlayer()
 
 	if (!url || !book?.id) return null
@@ -69,6 +78,21 @@ function BookMiniPlayer() {
 		const next = PLAYBACK_SPEEDS[(index + 1) % PLAYBACK_SPEEDS.length]
 		setRate(next)
 	}
+
+	const onDownload = async () => {
+		if (downloading) return
+		setDownloading(true)
+		const name = [book.title, chapter?.title].filter(Boolean).join(' - ')
+		await downloadAudio(url, name)
+		setDownloading(false)
+	}
+
+	const chapterItems = chapters
+		.filter((item) => item.id)
+		.map((item, index) => ({
+			key: item.id as string,
+			label: `${item.chapter_number ?? index + 1}. ${item.title || 'Chapter'}`,
+		}))
 
 	return (
 		<div className={classes.bar}>
@@ -116,7 +140,7 @@ function BookMiniPlayer() {
 						type="button"
 						className={classes.iconBtn}
 						onClick={prevChapter}
-						aria-label="Previous chapter"
+						aria-label="Previous"
 					>
 						<IconPlayerSkipBackFilled size={16} />
 					</button>
@@ -152,7 +176,7 @@ function BookMiniPlayer() {
 						type="button"
 						className={classes.iconBtn}
 						onClick={nextChapter}
-						aria-label="Next chapter"
+						aria-label="Next"
 					>
 						<IconPlayerSkipForwardFilled size={16} />
 					</button>
@@ -205,16 +229,51 @@ function BookMiniPlayer() {
 					})}
 					onClick={toggleFavourite}
 					disabled={favouritePending}
+					aria-pressed={Boolean(book.is_favourited)}
 					aria-label={
-						book.is_favourited ? 'Remove from library' : 'Save to library'
+						book.is_favourited ? 'Remove from favourites' : 'Add to favourites'
 					}
 				>
-					<IconDownload
-						size={18}
-						stroke={1.5}
-						fill={book.is_favourited ? 'currentColor' : 'none'}
-					/>
+					{book.is_favourited ? (
+						<IconHeartFilled size={20} />
+					) : (
+						<IconHeart size={20} stroke={1.5} />
+					)}
 				</button>
+				<button
+					type="button"
+					className={classes.iconBtn}
+					onClick={onDownload}
+					disabled={downloading}
+					aria-label="Download audio"
+				>
+					<IconDownload size={20} stroke={1.5} />
+				</button>
+				<Dropdown
+					trigger={['click']}
+					placement="topRight"
+					disabled={!chapterItems.length}
+					menu={{
+						items: chapterItems,
+						selectable: true,
+						selectedKeys: chapter?.id ? [chapter.id] : [],
+						onClick: async ({ key }) => {
+							const target = chapters.find((item) => item.id === key)
+							if (target && !(await selectChapter(target))) {
+								toast.info('No audio for this chapter yet')
+							}
+						},
+						style: { maxHeight: 320, overflowY: 'auto' },
+					}}
+				>
+					<button
+						type="button"
+						className={classes.iconBtn}
+						aria-label="Chapter list"
+					>
+						<IconPlaylist size={20} stroke={1.5} />
+					</button>
+				</Dropdown>
 				<button
 					type="button"
 					className={classes.speed}

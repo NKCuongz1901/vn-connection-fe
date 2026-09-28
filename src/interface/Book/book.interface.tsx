@@ -8,6 +8,22 @@ export type BookReview = {
 	book_id?: string
 	content_rating?: number
 	comment?: string | null
+	created_at?: string
+	updated_at?: string
+	reader?: {
+		id?: string
+		user_id?: string
+		name?: string
+		avatar?: string | null
+	}
+}
+
+export type BookReviewStatistics = {
+	total_reviews?: number
+	overall_rating?: number
+	rating_distribution?: {
+		content?: Record<string, number>
+	}
 }
 
 export type ReadingProgress = {
@@ -41,6 +57,8 @@ export type BookApiItem = {
 	language_type?: string
 	review_summary?: BookReviewSummary
 	is_favourited?: boolean
+	total_view_count?: number
+	share_link?: string
 	reading_progress?: ReadingProgress[]
 }
 
@@ -100,8 +118,13 @@ export type BookCardItem = {
 	category?: string
 	rating?: number
 	progressLabel?: string
+	/** 0-100, reading progress of a Continue reading book */
+	progressPercent?: number
 	durationLabel?: string
 	languageLabel?: string
+	viewCount?: number
+	isFavourited?: boolean
+	shareLink?: string
 	chapterId?: string
 	page?: number
 }

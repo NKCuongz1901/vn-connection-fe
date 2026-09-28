@@ -12,6 +12,7 @@ import useBookReader from '@/hooks/Book/useBookReader'
 import { useLocalePath } from '@/ultis/route'
 import { bookDetailPath } from '@/Variable/book.variable'
 
+import ReaderDisplay, { useReaderDisplay } from './ReaderDisplay'
 import classes from './BookReader.module.scss'
 
 type BookReaderProps = {
@@ -72,6 +73,7 @@ function BookReader({ bookId }: BookReaderProps) {
 	const player = useBookPlayer()
 	const { languages } = useBookLibrary()
 	const [finishedDismissed, setFinishedDismissed] = useState(false)
+	const { settings: display, update: updateDisplay } = useReaderDisplay()
 
 	useEffect(() => {
 		setFinishedDismissed(false)
@@ -110,6 +112,7 @@ function BookReader({ bookId }: BookReaderProps) {
 
 				<div className={classes.modes}>
 					<BookLanguageButton />
+					<ReaderDisplay settings={display} onChange={updateDisplay} />
 					{mode === 'listen' ? (
 						<select
 							className={classes.select}
@@ -176,7 +179,14 @@ function BookReader({ bookId }: BookReaderProps) {
 				</div>
 			) : null}
 
-			<div className={classes.reader}>
+			<div
+				className={clsx(classes.reader, {
+					[classes.themeSepia]: display.theme === 'sepia',
+					[classes.themeGreen]: display.theme === 'green',
+					[classes.themeDark]: display.theme === 'dark',
+				})}
+				style={{ '--reader-size': `${display.fontSize}px` } as React.CSSProperties}
+			>
 				{pageLoading ? (
 					<div className={classes.empty}>Loading page…</div>
 				) : sentences.length ? (

@@ -8,17 +8,29 @@ import {
 	BookLanguage,
 	BookListQuery,
 	BookReview,
+	BookReviewStatistics,
 	ContinueReadingApiItem,
 } from '@/interface/Book/book.interface'
 import { formatListeningTime, pickBookDuration } from '@/Variable/book.variable'
 
-const languageLabelFromCodes = (codes?: string[]) => {
+const languageName = (code: string) => {
+	try {
+		return (
+			new Intl.DisplayNames(['en'], { type: 'language' }).of(code) ||
+			code.toUpperCase()
+		)
+	} catch {
+		return code.toUpperCase()
+	}
+}
+
+// One language reads "Vietnamese only"; more than one reads "Multi-language"
+export const languageLabelFromCodes = (codes?: string[]) => {
 	if (!codes?.length) return undefined
 	const unique = Array.from(
-		new Set(codes.map((code) => code.split('-')[0].toUpperCase())),
+		new Set(codes.map((code) => code.split('-')[0].toLowerCase())),
 	)
-	const shown = unique.slice(0, 3).join(', ')
-	return unique.length > 3 ? `${shown} +${unique.length - 3}` : shown
+	return unique.length > 1 ? 'Multi-language' : `${languageName(unique[0])} only`
 }
 
 export const parseApiList = <T,>(res: unknown): T[] => {
@@ -66,6 +78,9 @@ export const mapBookCard = (item?: BookApiItem | null): BookCardItem | null => {
 		rating: item.review_summary?.overall_rating,
 		durationLabel: duration ? formatListeningTime(duration) : undefined,
 		languageLabel: languageLabelFromCodes(item.language),
+		viewCount: item.total_view_count,
+		isFavourited: item.is_favourited,
+		shareLink: item.share_link,
 	}
 }
 
@@ -104,6 +119,9 @@ export const mapContinueReadingCard = (
 		category: book?.category?.[0],
 		rating: book?.review_summary?.overall_rating,
 		progressLabel: maxPages ? `Page ${currentPage}/${maxPages}` : undefined,
+		progressPercent: maxPages
+			? Math.min(100, Math.round((currentPage / maxPages) * 100))
+			: undefined,
 		durationLabel: duration ? formatListeningTime(duration) : undefined,
 		languageLabel: languageLabelFromCodes(book?.language),
 		chapterId: resume?.chapter_id || resume?.chapter?.id,
@@ -168,6 +186,35 @@ export const getBookDetail = async (id: string) => {
 
 export const toggleFavouriteBook = async (bookId: string) => {
 	return axios.post(`${BOOK_ROUTES.favourite}/${bookId}`)
+}
+
+export const getBookReviews = async (
+	bookId: string,
+	params: {
+		limit?: number
+		offset?: number
+		sortBy?: 'newest' | 'highest' | 'lowest'
+	} = {},
+) => {
+	return axios.get(`${BOOK_ROUTES.book}/${bookId}/reviews`, {
+		params: { sortBy: 'newest', limit: 20, offset: 0, ...params },
+	})
+}
+
+export const parseBookReviewStatistics = (
+	res: unknown,
+): BookReviewStatistics | null => {
+	const data = res as { results?: { statistics?: BookReviewStatistics } }
+	return data?.results?.statistics || null
+}
+
+export const reportBook = async (payload: {
+	report_target_id: string
+	issue_type: string
+	email: string
+	content: string
+}) => {
+	return axios.post('book-reports', { report_type: 'book', ...payload })
 }
 
 export const getMyBookReview = async (bookId: string) => {

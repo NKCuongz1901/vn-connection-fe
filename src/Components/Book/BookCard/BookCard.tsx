@@ -1,26 +1,45 @@
 'use client'
 
 import { memo } from 'react'
+import clsx from 'clsx'
 
 import CImage from '@/Components/Custom/CImage/CImage'
 import { BookCardItem } from '@/interface/Book/book.interface'
 import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
 
+import BookPopularCard from './BookPopularCard'
+import BookRating, { formatRating } from './BookRating'
 import classes from './BookCard.module.scss'
 
 type BookCardProps = {
 	book: BookCardItem
-	variant?: 'tile' | 'rail' | 'row'
+	variant?: 'tile' | 'rail' | 'row' | 'popular'
+	/** popular variant only: show the share button */
+	showShare?: boolean
 	onClick?: () => void
 }
 
-function formatRating(rating?: number) {
-	if (!rating) return null
-	return rating.toFixed(1)
+function MetaLine({ parts, rating }: { parts: (string | undefined)[]; rating?: number }) {
+	const text = parts.filter(Boolean).join(' · ')
+	const hasRating = Boolean(formatRating(rating))
+	return (
+		<>
+			{text}
+			{text && hasRating ? ' · ' : null}
+			<BookRating rating={rating} />
+		</>
+	)
 }
 
-function BookCard({ book, variant = 'tile', onClick }: BookCardProps) {
-	const rating = formatRating(book.rating)
+function BookCard({
+	book,
+	variant = 'tile',
+	showShare,
+	onClick,
+}: BookCardProps) {
+	if (variant === 'popular') {
+		return <BookPopularCard book={book} showShare={showShare} onClick={onClick} />
+	}
 
 	if (variant === 'row') {
 		return (
@@ -37,15 +56,15 @@ function BookCard({ book, variant = 'tile', onClick }: BookCardProps) {
 				<div>
 					<div className={classes.rowTitle}>{book.title}</div>
 					<div className={classes.rowMeta}>
-						{[
-							book.author,
-							book.category,
-							book.durationLabel,
-							book.languageLabel,
-							rating ? `★ ${rating}` : null,
-						]
-							.filter(Boolean)
-							.join(' · ')}
+						<MetaLine
+							parts={[
+								book.author,
+								book.category,
+								book.durationLabel,
+								book.languageLabel,
+							]}
+							rating={book.rating}
+						/>
 					</div>
 					{book.progressLabel ? (
 						<div className={classes.rowProgress}>{book.progressLabel}</div>
@@ -70,19 +89,40 @@ function BookCard({ book, variant = 'tile', onClick }: BookCardProps) {
 					/>
 				) : null}
 			</div>
-			<div className={classes.title}>{book.title}</div>
+			<div className={classes.title} title={book.title}>
+				{book.title}
+			</div>
 			<div className={classes.meta}>
-				{[
-					book.author,
-					book.durationLabel,
-					book.languageLabel,
-					rating ? `★ ${rating}` : null,
-				]
-					.filter(Boolean)
-					.join(' · ')}
+				<MetaLine
+					parts={[book.author, book.durationLabel, book.languageLabel]}
+					rating={book.rating}
+				/>
 			</div>
 			{book.progressLabel ? (
-				<div className={classes.progress}>{book.progressLabel}</div>
+				<div className={classes.progress}>
+					{book.progressPercent !== undefined ? (
+						<div
+							className={classes.progressBar}
+							role="progressbar"
+							aria-valuenow={book.progressPercent}
+							aria-valuemin={0}
+							aria-valuemax={100}
+						>
+							<div
+								className={clsx(classes.progressFill, {
+									[classes.progressDone]: book.progressPercent >= 100,
+								})}
+								style={{ width: `${book.progressPercent}%` }}
+							/>
+						</div>
+					) : null}
+					<div className={classes.progressText}>
+						<span>{book.progressLabel}</span>
+						{book.progressPercent !== undefined ? (
+							<span className={classes.progressPct}>{book.progressPercent}% read</span>
+						) : null}
+					</div>
+				</div>
 			) : null}
 		</button>
 	)

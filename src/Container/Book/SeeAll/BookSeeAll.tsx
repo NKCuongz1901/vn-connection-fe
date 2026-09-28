@@ -37,6 +37,9 @@ function BookSeeAll({ kind, categoryId }: BookSeeAllProps) {
 		categoryTitle,
 	} = useBookSeeAll(kind, { categoryId })
 	const searchable = BOOK_SEARCHABLE_KINDS.includes(kind)
+	// Continue reading keeps the cover grid with the reading progress;
+	// the other lists show views, favourite, share and download on each book
+	const listView = kind !== 'continue'
 	const title =
 		kind === 'category'
 			? categoryTitle || 'Category'
@@ -84,12 +87,13 @@ function BookSeeAll({ kind, categoryId }: BookSeeAllProps) {
 				<div className={classes.loading}>Loading…</div>
 			) : books.length ? (
 				<>
-					<div className={classes.grid}>
+					<div className={listView ? classes.list : classes.grid}>
 						{books.map((book) => (
 							<BookCard
 								key={book.id}
 								book={book}
-								variant="tile"
+								variant={listView ? 'popular' : 'tile'}
+								showShare={listView}
 								onClick={() => {
 									if (kind === 'continue') {
 										onChangeRoute(

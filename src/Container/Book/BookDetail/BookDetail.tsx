@@ -10,25 +10,30 @@ import {
 	IconDownload,
 	IconFlag,
 	IconHeadphones,
+	IconHeart,
+	IconHeartFilled,
 	IconList,
 	IconShare3,
 	IconStar,
 	IconStarFilled,
 	IconX,
 } from '@tabler/icons-react'
+import { toast } from 'react-toastify'
 
 import {
 	BookEmptyState,
 	BookLanguageButton,
+	BookReportModal,
+	BookReviewListModal,
 	BookReviewModal,
+	BookShareModal,
 } from '@/Components/Book'
+import { downloadBookAudio } from '@/ultis/bookDownload'
 import CImage from '@/Components/Custom/CImage/CImage'
-import { useModal } from '@/context/ModalContext'
 import useBookDetail from '@/hooks/Book/useBookDetail'
 import { useBookLibrary } from '@/context/BookLibraryContext'
 import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
 import { useLocalePath } from '@/ultis/route'
-import { copyToClipboard } from '@/ultis/string'
 import {
 	BOOK_ROOT,
 	bookReadPath,
@@ -44,7 +49,6 @@ type BookDetailProps = {
 
 function BookDetail({ bookId }: BookDetailProps) {
 	const { onChangeRoute } = useLocalePath()
-	const { openSuccess } = useModal()
 	const {
 		book,
 		chapters,
@@ -60,8 +64,27 @@ function BookDetail({ bookId }: BookDetailProps) {
 		deleteVocabWord,
 	} = useBookDetail(bookId)
 	const { learningLang } = useBookLibrary()
-	const [sharing, setSharing] = useState(false)
+	const [shareOpen, setShareOpen] = useState(false)
+	const [reportOpen, setReportOpen] = useState(false)
 	const [reviewOpen, setReviewOpen] = useState(false)
+	const [reviewListOpen, setReviewListOpen] = useState(false)
+	const [downloading, setDownloading] = useState(false)
+
+	const handleDownload = async () => {
+		if (downloading || !book?.id) return
+		setDownloading(true)
+		try {
+			const saved = await downloadBookAudio(
+				{ id: book.id, title: book.title },
+				learningLang,
+			)
+			if (!saved) toast.info('No audio for this book yet')
+		} catch {
+			toast.error('Could not download this book')
+		} finally {
+			setDownloading(false)
+		}
+	}
 
 	const rating = book?.review_summary?.overall_rating
 	const reviewCount = book?.review_summary?.total_reviews
@@ -76,33 +99,10 @@ function BookDetail({ bookId }: BookDetailProps) {
 		: '—'
 
 	const shareUrl = useMemo(() => {
+		if (book?.share_link) return book.share_link
 		if (typeof window === 'undefined') return ''
 		return window.location.href
-	}, [])
-
-	const handleShare = async () => {
-		if (sharing) return
-		setSharing(true)
-		try {
-			if (navigator.share) {
-				await navigator.share({
-					title: book?.title,
-					url: shareUrl || window.location.href,
-				})
-				return
-			}
-			copyToClipboard(shareUrl || window.location.href, {
-				callback: openSuccess({ message: 'Link copied successfully!' }),
-			})
-		} catch (error) {
-			if ((error as Error)?.name === 'AbortError') return
-			copyToClipboard(shareUrl || window.location.href, {
-				callback: openSuccess({ message: 'Link copied successfully!' }),
-			})
-		} finally {
-			setSharing(false)
-		}
-	}
+	}, [book?.share_link])
 
 	if (loading && !book) {
 		return <div className={classes.empty}>Loading…</div>
@@ -155,14 +155,20 @@ function BookDetail({ bookId }: BookDetailProps) {
 						</div>
 						<div className={classes.stat}>
 							<div className={classes.statLabel}>Rating</div>
-							<div
-								className={clsx(classes.statValue, classes.statRating, {
-									[classes.statRatingActive]: Boolean(rating),
-								})}
+							<button
+								type="button"
+								className={clsx(
+									classes.statValue,
+									classes.statRating,
+									classes.statButton,
+									{ [classes.statRatingActive]: Boolean(rating) },
+								)}
+								onClick={() => setReviewListOpen(true)}
+								aria-label="See book reviews"
 							>
 								<IconStarFilled size={16} />
 								<span>{ratingLabel}</span>
-							</div>
+							</button>
 						</div>
 					</div>
 					<div className={classes.actions}>
@@ -191,23 +197,32 @@ function BookDetail({ bookId }: BookDetailProps) {
 							})}
 							onClick={toggleFavourite}
 							disabled={savingFavourite}
+							aria-pressed={Boolean(book.is_favourited)}
 							aria-label={
 								book.is_favourited
-									? 'Remove from library'
-									: 'Save to library'
+									? 'Remove from favourites'
+									: 'Add to favourites'
 							}
 						>
-							<IconDownload
-								size={20}
-								stroke={1.5}
-								fill={book.is_favourited ? 'currentColor' : 'none'}
-							/>
+							{book.is_favourited ? (
+								<IconHeartFilled size={20} />
+							) : (
+								<IconHeart size={20} stroke={1.5} />
+							)}
 						</button>
 						<button
 							type="button"
 							className={classes.iconBtn}
-							onClick={handleShare}
-							disabled={sharing}
+							onClick={handleDownload}
+							disabled={downloading || !chapters.length}
+							aria-label="Download audio"
+						>
+							<IconDownload size={20} stroke={1.5} />
+						</button>
+						<button
+							type="button"
+							className={classes.iconBtn}
+							onClick={() => setShareOpen(true)}
 							aria-label="Share"
 						>
 							<IconShare3 size={20} stroke={1.5} />
@@ -226,11 +241,11 @@ function BookDetail({ bookId }: BookDetailProps) {
 										key: 'report',
 										label: 'Report',
 										icon: <IconFlag size={16} />,
-										disabled: true,
 									},
 								],
 								onClick: ({ key }) => {
 									if (key === 'review') setReviewOpen(true)
+									if (key === 'report') setReportOpen(true)
 								},
 							}}
 						>
@@ -362,6 +377,26 @@ function BookDetail({ bookId }: BookDetailProps) {
 				</div>
 			)}
 
+			<BookShareModal
+				open={shareOpen}
+				url={shareUrl}
+				onClose={() => setShareOpen(false)}
+			/>
+			<BookReportModal
+				open={reportOpen}
+				bookId={bookId}
+				onClose={() => setReportOpen(false)}
+			/>
+			<BookReviewListModal
+				open={reviewListOpen}
+				bookId={bookId}
+				bookTitle={book.title}
+				onClose={() => setReviewListOpen(false)}
+				onWrite={() => {
+					setReviewListOpen(false)
+					setReviewOpen(true)
+				}}
+			/>
 			<BookReviewModal
 				open={reviewOpen}
 				bookId={bookId}

@@ -35,7 +35,13 @@
 	width: 140px;
 }
 
+// Title and meta keep a fixed two-line height so the Page line lines up across cards
 .title {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	min-height: 36px;
 	color: #0f1729;
 	font-size: 13px;
 	font-weight: 600;
@@ -43,6 +49,11 @@
 }
 
 .meta {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	min-height: 32px;
 	color: #64748b;
 	font-size: 12px;
 	line-height: 16px;
@@ -55,6 +66,182 @@
 	font-weight: 600;
 	line-height: 16px;
 	margin-top: 2px;
+}
+
+.tile .progress,
+.rail .progress {
+	margin-top: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.progressBar {
+	height: 4px;
+	border-radius: 99px;
+	background: #e2e8f0;
+	overflow: hidden;
+}
+
+.progressFill {
+	height: 100%;
+	border-radius: 99px;
+	background: #006b35;
+}
+
+.progressDone {
+	background: #16a34a;
+}
+
+.progressText {
+	display: flex;
+	justify-content: space-between;
+	gap: 6px;
+}
+
+.progressPct {
+	color: #64748b;
+	font-weight: 500;
+}
+
+.rating {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	white-space: nowrap;
+	vertical-align: bottom;
+
+	svg {
+		color: #f5a623;
+	}
+}
+
+.popular {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #e2e8f0;
+	min-width: 0;
+}
+
+.popularMain {
+	display: flex;
+	gap: 16px;
+	align-items: center;
+	width: 100%;
+	padding: 0;
+	border: none;
+	background: none;
+	text-align: left;
+	cursor: pointer;
+}
+
+.popularCover {
+	width: 64px;
+	height: 86px;
+	border-radius: 6px;
+	background: #eef3f6;
+	overflow: hidden;
+	flex-shrink: 0;
+
+	:global(.ant-flex),
+	:global(.ant-image),
+	:global(.ant-image img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}
+
+.popularCopy {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.popularTitle {
+	color: #0f1729;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 22px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.popularAuthor {
+	color: #48546b;
+	font-size: 14px;
+	line-height: 20px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.popularSub {
+	color: #64748b;
+	font-size: 13px;
+	line-height: 18px;
+}
+
+.popularFooter {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.popularStats {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	color: #48546b;
+	font-size: 13px;
+	line-height: 18px;
+
+	.rating svg {
+		width: 16px;
+		height: 16px;
+	}
+}
+
+.sep {
+	flex-shrink: 0;
+	width: 1px;
+	height: 12px;
+	background: #cbd5e1;
+}
+
+.popularActions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-shrink: 0;
+}
+
+.popularAction {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: none;
+	background: none;
+	color: #94a3b8;
+	cursor: pointer;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}
+
+.popularActionActive {
+	color: #006b35;
 }
 
 .row {
