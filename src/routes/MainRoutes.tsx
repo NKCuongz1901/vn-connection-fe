@@ -37,4 +37,12 @@ export const mainRoutes = {
 	talkroom: 'talkroom',
 	talkroomLeaderBoard: 'talkroom/leaderboard',
 	feedback: 'profile/account-setting/feedback-support',
+	course: 'course',
+	courseOverview: 'course/overview',
+	courseMyCourse: 'course/my-course',
+	courseList: 'course/course-list',
+	courseTrackProgress: 'course/track-progress',
+	courseLeaderBoard: 'course/leaderboard',
+	courseClassroom: 'course/classroom',
+	courseChatSupport: 'course/chat-support',
 }

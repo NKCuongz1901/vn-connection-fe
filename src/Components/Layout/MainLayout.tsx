@@ -18,11 +18,8 @@ import AuthLayout from './Child/AuthLayout'
 import HeaderMainLayout from './Child/HeaderMainLayout'
 import TermPolicy from '@/Components/TermPolicy'
 
-import {
-	appLayoutAuth,
-	appLayoutGuestAllowed,
-} from '@/app/variable/layoutData'
-import { Menus } from '@/routes'
+import { appLayoutAuth, appLayoutGuestAllowed } from '@/app/variable/layoutData'
+import { CourseMenus, Menus } from '@/routes'
 import { mainRoutes } from '@/routes/MainRoutes'
 
 import './MainLayout.scss'
@@ -84,6 +81,8 @@ const MainLayout = (props: MainLayoutProps) => {
 	}, [])
 
 	const _renderSideBar = () => {
+		const isCourseRoute = pathname.startsWith(mainRoutes.course)
+		const menus = isCourseRoute ? CourseMenus : Menus
 		return (
 			<Flex
 				className={`sideBarMainLayoutWrapper ${
@@ -101,7 +100,9 @@ const MainLayout = (props: MainLayoutProps) => {
 							className="sideBarMenuToggleICon sideBarMenuToggleMobile"
 							onClick={toggleMenus}
 						/>
-						<span className="sideBarMenuToggleLabel">Menu</span>
+						<span className="sideBarMenuToggleLabel">
+							{isCourseRoute ? 'UniVini Course' : 'Menu'}
+						</span>
 						<div
 							className="sideBarCollapseBtn"
 							onClick={toggleSidebarCollapsed}
@@ -115,7 +116,7 @@ const MainLayout = (props: MainLayoutProps) => {
 						</div>
 					</Flex>
 					<Flex vertical className="sideBarMainLayoutItem">
-						{Menus.map((menu) => {
+						{menus.map((menu) => {
 							const { title, Icon, path } = menu
 							const active = Boolean(path) && pathname.startsWith(path)
 							const isInboxMenu = path === mainRoutes.inbox
@@ -130,7 +131,9 @@ const MainLayout = (props: MainLayoutProps) => {
 									<Flex
 										gap={12}
 										className={`menuItem ${active ? 'menuItemActive' : ''} ${
-											menu.hasTopDivider ? 'menuItemTopDivider' : ''
+											'hasTopDivider' in menu && menu.hasTopDivider
+												? 'menuItemTopDivider'
+												: ''
 										}`}
 									>
 										<div className="iconItemMenu">
@@ -190,10 +193,35 @@ const MainLayout = (props: MainLayoutProps) => {
 		</Flex>
 	)
 
+	const _renderCourseLayout = () => {
+		return (
+			<Flex vertical className="wrapperMainLayout">
+				<HeaderMainLayout onToggleMenus={toggleMenus} />
+				<Flex className="bodyMainLayout">
+					{_renderSideBar()}
+					<Flex vertical className="contentMainLayout">
+						<div className="contentMainLayoutBody">{children}</div>
+						<footer className="mainLayoutLegalFooter">
+							<TermPolicy layout="inline" />
+						</footer>
+					</Flex>
+				</Flex>
+			</Flex>
+		)
+	}
+
 	useEffect(() => {
 		const login = isLogin()
 		if (appLayoutGuestAllowed.some((i) => pathname.includes(i))) {
 			setContent(_renderAppShell())
+			return
+		}
+		if (pathname === mainRoutes.course) {
+			setContent(<AuthLayout>{children}</AuthLayout>)
+			return
+		}
+		if (pathname.startsWith(`${mainRoutes.course}/`)) {
+			setContent(_renderCourseLayout())
 			return
 		}
 		if (!appLayoutAuth.some((i) => pathname.includes(i))) {

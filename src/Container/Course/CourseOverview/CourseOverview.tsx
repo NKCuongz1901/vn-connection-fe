@@ -1,0 +1,92 @@
+import React, { useState } from 'react'
+import { Skeleton } from 'antd'
+import classes from './CourseOverview.module.scss'
+import useCourse from '@/hooks/Course/useCourse'
+import { mainRoutes } from '@/routes/MainRoutes'
+import { useLocalePath } from '@/ultis/route'
+import ShareCourse from '@/Components/Course/ShareCourse/ShareCourse'
+import CourseList from '@/Components/Course/CourseList/CourseList'
+import MyCourseList from '@/Components/Course/MyCourseList/MyCourseList'
+import TrackingCourseList from '@/Components/Course/TrackingCourseList/TrackingCourseList'
+import CourseReferralModal from '@/Components/Course/CourseReferralModal/CourseReferralModal'
+
+function CourseOverview() {
+	const {
+		loading,
+		listCourse,
+		myPurchasedCourse,
+		trackingCourse,
+		referralGlobalLink,
+		referralGlobalCode,
+	} = useCourse()
+	const { onChangeRoute } = useLocalePath()
+	const [referralModalOpen, setReferralModalOpen] = useState(false)
+	const isPurchasedReady = !loading.myPurchasedCourse
+	const hasPurchasedCourse = myPurchasedCourse.length > 0
+
+	const _renderTopSection = () => {
+		if (!isPurchasedReady) {
+			return (
+				<div className={classes.topSection}>
+					<Skeleton.Input active className={classes.topSkeleton} block />
+				</div>
+			)
+		}
+		if (!hasPurchasedCourse) {
+			return (
+				<div className={classes.topSection}>
+					<div className={classes.bannerWrapper} />
+				</div>
+			)
+		}
+		return (
+			<div className={classes.topSection}>
+				<div className={classes.myCourseWrapper}>
+					<div className={classes.myTrackingList}>
+						<TrackingCourseList
+							items={trackingCourse}
+							loading={loading.trackingCourse}
+						/>
+					</div>
+					<div className={classes.myCourseList}>
+						<MyCourseList
+							courses={myPurchasedCourse}
+							loading={loading.myPurchasedCourse}
+							onSeeAll={() => onChangeRoute(mainRoutes.courseMyCourse)}
+						/>
+					</div>
+				</div>
+			</div>
+		)
+	}
+	const _renderBottomSection = () => {
+		return (
+			<div className={classes.bottomSection}>
+				<ShareCourse onShare={() => setReferralModalOpen(true)} />
+				<CourseList
+					courses={listCourse}
+					loading={loading.listCourse}
+					onSeeAll={() => onChangeRoute(mainRoutes.courseList)}
+					onShare={() => setReferralModalOpen(true)}
+					onCourseClick={(course) =>
+						onChangeRoute(`${mainRoutes.course}/${course.id}`)
+					}
+				/>
+			</div>
+		)
+	}
+	return (
+		<div className={classes.container}>
+			{_renderTopSection()}
+			{_renderBottomSection()}
+			<CourseReferralModal
+				open={referralModalOpen}
+				onClose={() => setReferralModalOpen(false)}
+				referralCode={referralGlobalCode}
+				shareLink={referralGlobalLink}
+			/>
+		</div>
+	)
+}
+
+export default CourseOverview
