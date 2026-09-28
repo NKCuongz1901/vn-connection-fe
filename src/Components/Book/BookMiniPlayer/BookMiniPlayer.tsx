@@ -23,6 +23,7 @@ import { toast } from 'react-toastify'
 
 import CImage from '@/Components/Custom/CImage/CImage'
 import { useBookPlayer } from '@/context/BookPlayerContext'
+import { downloadAudio } from '@/ultis/bookDownload'
 import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
 import { useLocalePath } from '@/ultis/route'
 import {
@@ -32,29 +33,6 @@ import {
 } from '@/Variable/book.variable'
 
 import classes from './BookMiniPlayer.module.scss'
-
-const safeFileName = (value: string) =>
-	value.replace(/[\\/:*?"<>|]+/g, ' ').trim() || 'audio'
-
-// Save the chapter audio; open it in a new tab when the host blocks a direct fetch
-const downloadAudio = async (audioUrl: string, fileName: string) => {
-	try {
-		const res = await fetch(audioUrl)
-		if (!res.ok) throw new Error(`HTTP ${res.status}`)
-		const blob = await res.blob()
-		const objectUrl = URL.createObjectURL(blob)
-		const ext = audioUrl.split('?')[0].split('.').pop()
-		const link = document.createElement('a')
-		link.href = objectUrl
-		link.download = `${safeFileName(fileName)}.${ext && ext.length <= 4 ? ext : 'mp3'}`
-		document.body.appendChild(link)
-		link.click()
-		link.remove()
-		URL.revokeObjectURL(objectUrl)
-	} catch {
-		window.open(audioUrl, '_blank', 'noopener')
-	}
-}
 
 function BookMiniPlayer() {
 	const [downloading, setDownloading] = useState(false)

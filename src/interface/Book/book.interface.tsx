@@ -41,6 +41,7 @@ export type BookApiItem = {
 	language_type?: string
 	review_summary?: BookReviewSummary
 	is_favourited?: boolean
+	total_view_count?: number
 	reading_progress?: ReadingProgress[]
 }
 
@@ -102,6 +103,8 @@ export type BookCardItem = {
 	progressLabel?: string
 	durationLabel?: string
 	languageLabel?: string
+	viewCount?: number
+	isFavourited?: boolean
 	chapterId?: string
 	page?: number
 }

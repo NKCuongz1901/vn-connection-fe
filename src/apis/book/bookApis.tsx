@@ -12,13 +12,24 @@ import {
 } from '@/interface/Book/book.interface'
 import { formatListeningTime, pickBookDuration } from '@/Variable/book.variable'
 
-const languageLabelFromCodes = (codes?: string[]) => {
+const languageName = (code: string) => {
+	try {
+		return (
+			new Intl.DisplayNames(['en'], { type: 'language' }).of(code) ||
+			code.toUpperCase()
+		)
+	} catch {
+		return code.toUpperCase()
+	}
+}
+
+// One language reads "Vietnamese only"; more than one reads "Multi-language"
+export const languageLabelFromCodes = (codes?: string[]) => {
 	if (!codes?.length) return undefined
 	const unique = Array.from(
-		new Set(codes.map((code) => code.split('-')[0].toUpperCase())),
+		new Set(codes.map((code) => code.split('-')[0].toLowerCase())),
 	)
-	const shown = unique.slice(0, 3).join(', ')
-	return unique.length > 3 ? `${shown} +${unique.length - 3}` : shown
+	return unique.length > 1 ? 'Multi-language' : `${languageName(unique[0])} only`
 }
 
 export const parseApiList = <T,>(res: unknown): T[] => {
@@ -66,6 +77,8 @@ export const mapBookCard = (item?: BookApiItem | null): BookCardItem | null => {
 		rating: item.review_summary?.overall_rating,
 		durationLabel: duration ? formatListeningTime(duration) : undefined,
 		languageLabel: languageLabelFromCodes(item.language),
+		viewCount: item.total_view_count,
+		isFavourited: item.is_favourited,
 	}
 }
 

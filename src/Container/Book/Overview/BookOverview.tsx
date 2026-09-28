@@ -74,6 +74,8 @@ function BookOverview() {
 				total={totals.popularNow}
 				seeAllPath={BOOK_SEE_ALL.popular.path}
 				books={popularNow}
+				layout="grid"
+				cardVariant="popular"
 				loading={loading}
 				emptyText="No popular books yet"
 				onSeeAll={onChangeRoute}

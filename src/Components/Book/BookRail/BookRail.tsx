@@ -16,9 +16,9 @@ type BookRailProps = {
 	books: BookCardItem[]
 	loading?: boolean
 	emptyText?: string
-	/** Horizontal scroll vs vertical list */
-	layout?: 'rail' | 'list'
-	cardVariant?: 'tile' | 'rail' | 'row'
+	/** Horizontal scroll, vertical list, or a two-column grid */
+	layout?: 'rail' | 'list' | 'grid'
+	cardVariant?: 'tile' | 'rail' | 'row' | 'popular'
 	onSeeAll?: (path: string) => void
 	onOpen: (id: string) => void
 }
@@ -57,7 +57,7 @@ function BookRail({
 				) : null}
 			</div>
 			{books.length ? (
-				<div className={layout === 'list' ? classes.list : classes.rail}>
+				<div className={classes[layout]}>
 					{books.map((book) => (
 						<BookCard
 							key={book.id}
