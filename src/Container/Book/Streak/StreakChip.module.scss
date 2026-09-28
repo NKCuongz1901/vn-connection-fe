@@ -1,0 +1,29 @@
+.chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 36px;
+	padding: 0 14px;
+	border: 1px solid #e2e8f0;
+	border-radius: 99px;
+	background: #fff;
+	color: #64748b;
+	font-size: 14px;
+	font-weight: 700;
+	cursor: pointer;
+	flex-shrink: 0;
+
+	&:hover {
+		border-color: #f97316;
+	}
+}
+
+.active {
+	border-color: #fed7aa;
+	background: #fff4e8;
+	color: #f97316;
+}
+
+.label {
+	font-weight: 500;
+}

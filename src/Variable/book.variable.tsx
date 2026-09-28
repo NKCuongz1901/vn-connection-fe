@@ -41,6 +41,7 @@ export const BOOK_CATEGORIES = [
 ] as const
 
 export const BOOK_ROOT = 'mini-apps/books-audio'
+export const BOOK_STREAK_PATH = `${BOOK_ROOT}/streak`
 
 export const DEFAULT_LEARNING_LANG = 'en-gb'
 export const DEFAULT_NATIVE_LANG = 'vi-south'

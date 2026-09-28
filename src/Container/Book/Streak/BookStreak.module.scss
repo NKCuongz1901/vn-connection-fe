@@ -1,0 +1,513 @@
+$orange: #f97316;
+$orange-soft: #fff4e8;
+$green: #006b35;
+
+.page {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	max-width: 720px;
+}
+
+.back {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	align-self: flex-start;
+	padding: 0;
+	border: none;
+	background: none;
+	color: #0f1729;
+	font-size: 20px;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+// Banner
+.banner {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 20px 24px;
+	border-radius: 16px;
+	background: #f0f3f9;
+	color: #48546b;
+}
+
+.bannerActive {
+	background: linear-gradient(90deg, #ffe7cc 0%, $orange-soft 100%);
+
+	.bannerFlame {
+		color: $orange;
+	}
+
+	.bannerCount {
+		color: $orange;
+	}
+}
+
+.bannerFlame {
+	color: #94a3b8;
+	flex-shrink: 0;
+}
+
+.bannerCount {
+	color: #48546b;
+	font-size: 36px;
+	font-weight: 800;
+	line-height: 40px;
+}
+
+.bannerLabel {
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.bannerMeta {
+	margin-left: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	font-size: 13px;
+	text-align: right;
+
+	b {
+		color: #0f1729;
+	}
+}
+
+// Tabs
+.tabs {
+	display: flex;
+	gap: 24px;
+	border-bottom: 1px solid #e2e8f0;
+}
+
+.tab {
+	padding: 10px 0;
+	border: none;
+	border-bottom: 2px solid transparent;
+	background: none;
+	color: #64748b;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.tabActive {
+	border-bottom-color: $green;
+	color: $green;
+	font-weight: 600;
+}
+
+.mine {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+// Cards
+.card {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 20px;
+	border-radius: 16px;
+	border: 1px solid #e2e8f0;
+	background: #fff;
+}
+
+.loading {
+	opacity: 0.6;
+}
+
+.cardTitle {
+	color: #0f1729;
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.stats {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 12px;
+}
+
+.statCard {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 14px 16px;
+	border-radius: 16px;
+	border: 1px solid #e2e8f0;
+	background: #fff;
+}
+
+.statIcon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 99px;
+	background: #e2e8f0;
+	color: #fff;
+	flex-shrink: 0;
+}
+
+.statIconOn {
+	background: $orange;
+}
+
+.statIconFreeze {
+	background: #38bdf8;
+}
+
+.statValue {
+	color: #0f1729;
+	font-size: 18px;
+	font-weight: 700;
+}
+
+.statLabel {
+	color: #64748b;
+	font-size: 13px;
+}
+
+// Calendar
+.calendarHead {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.calendarTitle {
+	color: #0f1729;
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.navBtn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border: 1px solid #e2e8f0;
+	border-radius: 99px;
+	background: #fff;
+	color: #48546b;
+	cursor: pointer;
+
+	&:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+}
+
+.calendarGrid {
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	gap: 6px;
+	justify-items: center;
+}
+
+.weekDay {
+	padding: 4px 0;
+	color: #94a3b8;
+	font-size: 12px;
+}
+
+.day {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 99px;
+	color: #334155;
+	font-size: 14px;
+}
+
+.dayDone {
+	background: $orange;
+	color: #fff;
+}
+
+.dayFrozen {
+	background: #38bdf8;
+	color: #fff;
+}
+
+.dayToday:not(.dayDone):not(.dayFrozen) {
+	box-shadow: inset 0 0 0 2px $orange;
+	color: $orange;
+	font-weight: 600;
+}
+
+.dayFuture {
+	color: #cbd5e1;
+}
+
+// Daily challenge
+.challengeHead {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.challengeBadge {
+	padding: 0 10px;
+	border-radius: 99px;
+	background: $orange-soft;
+	color: $orange;
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 22px;
+}
+
+.challengeBadgeDone {
+	background: #e8f5ee;
+	color: $green;
+}
+
+.challengeHint {
+	margin-top: -6px;
+	color: #64748b;
+	font-size: 13px;
+}
+
+.missions {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.mission {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.missionIcon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 10px;
+	background: $orange-soft;
+	color: $orange;
+	flex-shrink: 0;
+}
+
+.missionBody {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0;
+}
+
+.missionName {
+	color: #0f1729;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.progress {
+	height: 6px;
+	border-radius: 99px;
+	background: #eef3f6;
+	overflow: hidden;
+}
+
+.progressFill {
+	height: 100%;
+	border-radius: 99px;
+	background: $orange;
+}
+
+.progressDone {
+	background: $green;
+}
+
+.missionCount {
+	color: #64748b;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.missionDone {
+	color: $green;
+}
+
+// Leaderboard
+.leaderHead {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.leaderSort {
+	min-width: 160px;
+}
+
+.podium {
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	gap: 24px;
+	padding: 8px 0 12px;
+}
+
+.podiumItem {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	width: 120px;
+	text-align: center;
+}
+
+.rank1 {
+	padding-bottom: 16px;
+}
+
+.podiumRank {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	border-radius: 99px;
+	background: #e2e8f0;
+	color: #0f1729;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.rank1 .podiumRank {
+	background: #fbbf24;
+	color: #fff;
+}
+
+.rank2 .podiumRank {
+	background: #94a3b8;
+	color: #fff;
+}
+
+.rank3 .podiumRank {
+	background: #d97706;
+	color: #fff;
+}
+
+.podiumName {
+	max-width: 100%;
+	color: #0f1729;
+	font-size: 14px;
+	font-weight: 600;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.avatar {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 99px;
+	background: #e8f5ee;
+	color: $green;
+	font-weight: 600;
+	overflow: hidden;
+	flex-shrink: 0;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}
+
+.points {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	color: $orange;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.leaderList {
+	display: flex;
+	flex-direction: column;
+}
+
+.leaderRow {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 10px 8px;
+	border-top: 1px solid #f1f5f9;
+}
+
+.leaderRank {
+	width: 24px;
+	color: #0f1729;
+	font-size: 12px;
+	font-weight: 700;
+	text-align: center;
+}
+
+.leaderName {
+	flex: 1;
+	min-width: 0;
+	color: #0f1729;
+	font-size: 14px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.me {
+	border-radius: 12px;
+	background: $orange-soft;
+
+	.leaderName,
+	.podiumName,
+	.leaderRank {
+		color: $orange;
+	}
+}
+
+.myPosition {
+	padding: 12px;
+	border-radius: 12px;
+	background: #f4f8fc;
+	color: #48546b;
+	font-size: 13px;
+	text-align: center;
+}
+
+.empty {
+	padding: 24px 0;
+	color: #94a3b8;
+	font-size: 14px;
+	text-align: center;
+}
+
+@media (max-width: 767px) {
+	.bannerMeta {
+		display: none;
+	}
+
+	.podium {
+		gap: 8px;
+	}
+
+	.podiumItem {
+		width: 96px;
+	}
+}
