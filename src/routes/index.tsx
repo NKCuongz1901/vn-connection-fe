@@ -165,6 +165,7 @@ export const REFERRAL_ROUTES = {
 	addBankAccount: 'redeem-request/bank-account',
 	myRedeemRequests: 'redeem-request/my',
 	createRedeemRequest: 'redeem-request',
+	summaryRedeemRequest: 'redeem-request/summary',
 }
 export const MAP_ROUTES = {
 	name: 'map/google/place/textsearch/json',
@@ -181,6 +182,9 @@ export const BOOK_ROUTES = {
 	recentlyAdded: 'book/recently-added',
 	popularNow: 'book/popular-now',
 	book: 'book',
+	favourite: 'book/favourite',
+	myLib: 'book/my-lib',
+	review: 'book/review',
 	audioList: 'book/audio/list',
 	updateReadingProgress: 'book/reading-progress',
 	readingProgress: 'reading-progress',
@@ -191,6 +195,8 @@ export const BOOK_ROUTES = {
 	bookLanguageLearning: 'reader/profile/book-language-learning',
 	bookLanguageNative: 'reader/profile/book-language-native',
 	languagesVariant: 'book/languages-variant',
+	quickTranslate: 'vocabulary/quick-translate',
+	readingSearchVocab: 'vocabulary/reading-search-vocab',
 }
 export const TALKROOM_ROUTES = {
 	talkRoomOverview: 'talkroom/overview',

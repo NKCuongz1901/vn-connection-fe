@@ -61,9 +61,10 @@ export type BookSeeAllKind =
 	| 'popular'
 	| 'recent'
 	| 'continue'
+	| 'category'
 
 export const BOOK_SEE_ALL: Record<
-	BookSeeAllKind,
+	Exclude<BookSeeAllKind, 'category'>,
 	{ title: string; path: string }
 > = {
 	continue: { title: 'Continue reading', path: `${BOOK_ROOT}/continue` },
@@ -72,6 +73,17 @@ export const BOOK_SEE_ALL: Record<
 	recent: { title: 'Recently added', path: `${BOOK_ROOT}/recent` },
 	popular: { title: 'Popular now', path: `${BOOK_ROOT}/popular` },
 }
+
+export const BOOK_SEARCHABLE_KINDS: BookSeeAllKind[] = [
+	'all',
+	'top-pick',
+	'recent',
+	'popular',
+	'category',
+]
+
+export const bookCategoryPath = (id: string) =>
+	`${BOOK_ROOT}/category/${encodeURIComponent(id)}`
 
 export const bookDetailPath = (id: string) => `${BOOK_ROOT}/book/${id}`
 
@@ -93,6 +105,43 @@ export const formatBookDuration = (seconds?: number) => {
 	const minutes = Math.round((seconds % 3600) / 60)
 	if (hours) return `${hours}h ${minutes}m`
 	return `${minutes}m`
+}
+
+export const pickBookDuration = (
+	durations?: Array<{ language?: string; duration?: number }> | null,
+	preferredLang?: string | null,
+	fallback?: number,
+) => {
+	if (durations?.length) {
+		const pref = (preferredLang || '').toLowerCase()
+		const prefix = pref.split('-')[0]
+		const match =
+			(pref &&
+				durations.find(
+					(item) => (item.language || '').toLowerCase() === pref,
+				)) ||
+			(prefix &&
+				durations.find((item) => {
+					const lang = (item.language || '').toLowerCase()
+					return (
+						lang === prefix ||
+						lang.startsWith(`${prefix}-`) ||
+						pref.startsWith(lang)
+					)
+				})) ||
+			durations.find((item) => Number(item.duration) > 0)
+		const duration = Number(match?.duration)
+		if (duration > 0) return duration
+	}
+	return fallback && fallback > 0 ? fallback : undefined
+}
+
+export const formatListeningTime = (seconds?: number) => {
+	if (!seconds) return '—'
+	const hours = Math.floor(seconds / 3600)
+	if (hours >= 1) return `${hours} hour${hours === 1 ? '' : 's'}`
+	const minutes = Math.max(1, Math.round(seconds / 60))
+	return `${minutes} min`
 }
 
 export const formatPlaybackTime = (seconds?: number) => {

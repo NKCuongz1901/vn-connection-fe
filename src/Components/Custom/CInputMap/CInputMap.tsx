@@ -1,5 +1,6 @@
 'use client'
 
+import { IconX } from '@tabler/icons-react'
 import { Flex, Input } from 'antd'
 import { memo, useCallback, useState } from 'react'
 
@@ -14,6 +15,7 @@ interface CInputMapProps {
 	title?: string
 	onSubmitModal?: any
 	onInputClick?: () => void
+	onClear?: () => void
 	open?: boolean
 	onOpenChange?: (open: boolean) => void
 }
@@ -29,13 +31,17 @@ const CInputMap = (_props: CInputMapProps & CInputProps) => {
 		longitude,
 		latitude,
 		onInputClick,
+		onClear,
 		open,
 		onOpenChange,
+		value,
+		suffix,
 		...props
 	} = _props
 	const [internalOpen, setInternalOpen] = useState(false)
 	const isControlled = open !== undefined
 	const openModal = isControlled ? open : internalOpen
+	const hasValue = typeof value === 'string' ? value.trim().length > 0 : !!value
 	const setOpenModal = useCallback(
 		(next: boolean) => {
 			if (isControlled) {
@@ -61,6 +67,14 @@ const CInputMap = (_props: CInputMapProps & CInputProps) => {
 		}
 		setOpenModal(true)
 	}, [onInputClick, setOpenModal])
+	/** Clears the selected address without opening the map modal. */
+	const handleClear = useCallback(
+		(e: React.MouseEvent) => {
+			e.stopPropagation()
+			onClear?.()
+		},
+		[onClear],
+	)
 	return (
 		<Flex
 			vertical
@@ -74,7 +88,6 @@ const CInputMap = (_props: CInputMapProps & CInputProps) => {
 				</span>
 			)}
 			<Input
-				allowClear
 				readOnly
 				className={classes.wrapper}
 				style={{
@@ -85,6 +98,22 @@ const CInputMap = (_props: CInputMapProps & CInputProps) => {
 				}}
 				status={status}
 				{...props}
+				value={value}
+				suffix={
+					<>
+						{hasValue && onClear ? (
+							<button
+								type="button"
+								className={classes.clearBtn}
+								aria-label="Clear"
+								onClick={handleClear}
+							>
+								<IconX size={16} stroke={2} color="#7987A4" />
+							</button>
+						) : null}
+						{suffix}
+					</>
+				}
 			/>
 			{error && <span className="error">{error}</span>}
 			{openModal && (

@@ -118,6 +118,14 @@ const Overview = () => {
 		'language',
 	)
 
+	const handleChatRoomTabClick = (next: 'language' | 'location') => {
+		if (chatRoomTab === next) {
+			onChangeRoute(`${mainRoutes.chatRoom}?type=${next}`)
+			return
+		}
+		setChatRoomTab(next)
+	}
+
 	const handleOpenTalkRoomJoinModal = (roomId: string) => {
 		if (userData.keyIntroTalkRoom === true) {
 			onChangeRoute(`${mainRoutes.talkroom}`)
@@ -310,7 +318,7 @@ const Overview = () => {
 										<div key={people.id}>
 											<CAvatar
 												src={people.avatar}
-												style={{ width: 48, height: 48 }}
+												style={{ width: 64, height: 64 }}
 											/>
 										</div>
 									))}
@@ -682,7 +690,7 @@ const Overview = () => {
 							className={clsx(classes.chatRoomTab, {
 								[classes.chatRoomTabActive]: !isLocationTab,
 							})}
-							onClick={() => setChatRoomTab('language')}
+							onClick={() => handleChatRoomTabClick('language')}
 						>
 							Language chat ({total.chatroom})
 						</div>
@@ -690,7 +698,7 @@ const Overview = () => {
 							className={clsx(classes.chatRoomTab, {
 								[classes.chatRoomTabActive]: isLocationTab,
 							})}
-							onClick={() => setChatRoomTab('location')}
+							onClick={() => handleChatRoomTabClick('location')}
 						>
 							Location chat ({totalChatlocation})
 						</div>

@@ -1,15 +1,12 @@
 import { Flex, Skeleton } from 'antd'
 import clsx from 'clsx'
-import { memo, useState } from 'react'
+import { memo, type ReactNode } from 'react'
 
 import useChatRoomInboxChat from '@/hooks/ChatRoomInbox/useChatRoomInboxChat'
 
 import { onPushState } from '@/ultis/route'
 import { formatNumberString } from '@/ultis/string'
 
-import MiniChatTopicBar from '@/Components/ChatLocation/MiniChatTopicBar/MiniChatTopicBar'
-import ModalLeaveMiniChat from '@/Components/ChatLocation/ModalSelectMiniChat/ModalLeaveMiniChat'
-import ModalSelectMiniChat from '@/Components/ChatLocation/ModalSelectMiniChat/ModalSelectMiniChat'
 import ChatRoomChatBox from '@/Components/ChatRoomChatBox'
 import AdminDeleteMessageModal, {
 	AdminDeleteMessageReasonModal,
@@ -25,11 +22,6 @@ import ModalViewMember from '../ModalViewMember'
 import ModelPin from '../ModelPin'
 import SettingConv from '../SettingConv'
 
-import {
-	FullMiniChatItemProps,
-	MiniChatItemProps,
-} from '@/interface/Conversation/Conversation.interface'
-
 import classes from './ChatRoomInboxChat.module.scss'
 
 const mappingType = {
@@ -40,18 +32,9 @@ interface ChatRoomInboxChatProps {
 	convId: string
 	isNoHeader?: boolean
 	isChatLocation?: boolean
-	miniChats?: MiniChatItemProps[]
-	fullMiniChats?: FullMiniChatItemProps[]
 	activeMiniChatId?: string
-	miniChatsLoading?: boolean
-	fullMiniChatsLoading?: boolean
-	miniChatActionId?: string
-	onSelectMiniChat?: (
-		item: Pick<MiniChatItemProps, 'id'>,
-		options?: { isJoining?: boolean },
-	) => void
-	onSelectParentChat?: () => void
-	onLeaveMiniChat?: (item: FullMiniChatItemProps) => Promise<boolean>
+	/** Stable topic bar from parent so it is not remounted with convId. */
+	topicBar?: ReactNode
 	onSuccess?: any
 	onChangeModal?: any
 }
@@ -60,37 +43,9 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 		convId,
 		isNoHeader,
 		isChatLocation,
-		miniChats = [],
-		fullMiniChats = [],
-		activeMiniChatId,
-		miniChatsLoading,
-		fullMiniChatsLoading,
-		miniChatActionId,
-		onSelectMiniChat,
-		onSelectParentChat,
-		onLeaveMiniChat,
+		topicBar,
 		onChangeModal = () => null,
 	} = props
-	const [openSelectMiniChat, setOpenSelectMiniChat] = useState(false)
-	const [leaveMiniChatTarget, setLeaveMiniChatTarget] =
-		useState<FullMiniChatItemProps | null>(null)
-
-	// Open a mini chat or request confirmation before leaving a joined room.
-	const handleSelectFullMiniChat = (item: FullMiniChatItemProps) => {
-		setOpenSelectMiniChat(false)
-		if (item.joined) {
-			setLeaveMiniChatTarget(item)
-			return
-		}
-		onSelectMiniChat?.(item, { isJoining: true })
-	}
-
-	// Confirm leaving the selected joined mini chat.
-	const handleConfirmLeaveMiniChat = async () => {
-		if (!leaveMiniChatTarget || !onLeaveMiniChat) return
-		const success = await onLeaveMiniChat(leaveMiniChatTarget)
-		if (success) setLeaveMiniChatTarget(null)
-	}
 
 	const {
 		_scrollRef,
@@ -109,6 +64,7 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 
 		setOpenSetting,
 		onSendMessage,
+		onRetryMessage,
 		editingMessage,
 		onEditMessage,
 		onCancelEdit,
@@ -254,18 +210,9 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 				vertical
 			>
 				{_renderHeader()}
-				{isChatLocation && (
-					<MiniChatTopicBar
-						items={miniChats}
-						activeId={activeMiniChatId}
-						loading={miniChatsLoading}
-						onExpand={() => setOpenSelectMiniChat(true)}
-						onSelect={onSelectMiniChat}
-						onSelectHome={onSelectParentChat}
-					/>
-				)}
+				{topicBar}
 				{/* {isArray(pinList, 1) && _renderPin()} */}
-				<Flex className={classes.chatBox}>
+				<Flex className={classes.chatBox} key={convId}>
 					<ChatRoomChatBox
 						convId={convId}
 						itemList={messList}
@@ -273,6 +220,7 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 						onLoadMore={onLoadMore}
 						_scrollRef={_scrollRef}
 						onSendMessage={onSendMessage}
+						onRetryMessage={onRetryMessage}
 						editingMessage={editingMessage}
 						onEditMessage={onEditMessage}
 						onCancelEdit={onCancelEdit}
@@ -292,21 +240,6 @@ const ChatRoomInboxChat = (props: ChatRoomInboxChatProps) => {
 			)}
 
 			{modal?.type && _renderModal()}
-			{openSelectMiniChat && (
-				<ModalSelectMiniChat
-					items={fullMiniChats}
-					loading={fullMiniChatsLoading}
-					onClose={() => setOpenSelectMiniChat(false)}
-					onSelect={handleSelectFullMiniChat}
-				/>
-			)}
-			{leaveMiniChatTarget && (
-				<ModalLeaveMiniChat
-					loading={miniChatActionId === leaveMiniChatTarget.id}
-					onCancel={() => setLeaveMiniChatTarget(null)}
-					onConfirm={handleConfirmLeaveMiniChat}
-				/>
-			)}
 
 			<AdminDeleteMessageModal
 				open={!!adminDeleteTarget && !openAdminDeleteReason}

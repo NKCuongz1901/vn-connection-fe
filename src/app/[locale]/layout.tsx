@@ -13,6 +13,7 @@ import { NewDeviceSecurityProvider } from '@/context/NewDeviceSecurityContext'
 import { SearchLocationProvider } from '@/context/SearchLocationContext'
 
 import MainLayout from '@/Components/Layout/MainLayout'
+import GlobalBookPlayer from '@/Components/Book/GlobalBookPlayer'
 import ToastProvider from '@/Components/Toast/ToastProvider'
 import 'country-flag-icons/3x2/flags.css'
 
@@ -44,7 +45,7 @@ export default async function LocaleLayout({
 								<SocketToastProvider>
 									<NewInboxProvider>
 										<SearchLocationProvider>
-											<MainLayout>{children}</MainLayout>
+											<GlobalBookPlayer><MainLayout>{children}</MainLayout></GlobalBookPlayer>
 										</SearchLocationProvider>
 									</NewInboxProvider>
 								</SocketToastProvider>

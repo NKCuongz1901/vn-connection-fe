@@ -5,6 +5,7 @@ import { memo } from 'react'
 
 import CAvatar from '@/Components/Custom/CAvatar'
 import CoinIcon from '@/svg/CoinIcon'
+import { formatNumberString } from '@/ultis/string'
 
 import classes from './ReferralLeaderboardRow.module.scss'
 
@@ -45,7 +46,9 @@ function ReferralLeaderboardRow({
 					<span className={classes.pointsValue}>{scoreLabel}</span>
 				) : (
 					<>
-						<span className={classes.pointsValue}>{points}</span>
+						<span className={classes.pointsValue}>
+							{formatNumberString(points)}
+						</span>
 						<CoinIcon />
 					</>
 				)}

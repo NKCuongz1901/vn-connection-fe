@@ -91,6 +91,14 @@ export const setSessionStorage = ({ key, data }) => {
 	}
 }
 
+export const removeSessionStorage = (key: string) => {
+	try {
+		sessionStorage.removeItem(key)
+	} catch (e) {
+		console.error('SessionStorage remove error:', e)
+	}
+}
+
 export const getSessionStorage = (key) => {
 	try {
 		const raw = sessionStorage.getItem(key)

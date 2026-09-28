@@ -9,6 +9,12 @@ import {
 } from '@/ultis/storage'
 
 import { getFid } from '@/config/firebase'
+import {
+	RequestNoResponseError,
+	classifyNoResponse,
+	describeEndpoint,
+	recordFailedRequest,
+} from '@/ultis/requestError'
 
 let cachedBuildInfo: { version: number } | null = null
 
@@ -156,6 +162,42 @@ axios.interceptors.response.use(
 			handleRemoveAllCookie()
 		}
 
+		const method = String(originalConfig?.method || 'get').toUpperCase()
+		const endpoint = describeEndpoint(originalConfig)
+		const online =
+			typeof navigator !== 'undefined' ? navigator.onLine : undefined
+
+		// No HTTP response at all (network drop, blocked request, timeout, abort).
+		// Rejecting with error.response.data here used to reject with undefined,
+		// which every caller then showed as "Unknow error".
+		if (!error?.response) {
+			const reason = classifyNoResponse(error)
+			recordFailedRequest({
+				time: new Date().toISOString(),
+				method,
+				endpoint,
+				reason,
+				axiosCode: error?.code,
+				online,
+			})
+			return Promise.reject(
+				new RequestNoResponseError({
+					reason,
+					method,
+					endpoint,
+					axiosCode: error?.code,
+				}),
+			)
+		}
+
+		recordFailedRequest({
+			time: new Date().toISOString(),
+			method,
+			endpoint,
+			reason: 'http_error',
+			status: error.response.status,
+			online,
+		})
 		return Promise.reject(error?.response?.data)
 	},
 )

@@ -16,6 +16,7 @@ import {
 	parseApiList,
 	parseApiObject,
 	parseBookLanguages,
+	parseListTotal,
 } from '@/apis/book/bookApis'
 import {
 	getReaderProfile,
@@ -60,9 +61,13 @@ const settledList = <T,>(
 	return compactCards(parseApiList<T>(result.value).map(mapItem))
 }
 
+const settledTotal = (result: PromiseSettledResult<unknown>, fallback: number) => {
+	if (result.status !== 'fulfilled') return fallback
+	return parseListTotal(result.value, fallback)
+}
+
 export default function useLibraryOverview() {
 	const [level, setLevelState] = useState<BookLevel>('A1')
-	const [category, setCategoryState] = useState<string | null>(null)
 	const [reader, setReader] = useState<ReaderProfile | null>(null)
 	const [categories, setCategories] =
 		useState<BookCategory[]>(fallbackCategories)
@@ -74,18 +79,22 @@ export default function useLibraryOverview() {
 	const [languages, setLanguages] = useState<BookLanguage[]>(
 		FALLBACK_BOOK_LANGUAGES,
 	)
+	const [totals, setTotals] = useState({
+		continueReading: 0,
+		allBooks: 0,
+		topPicks: 0,
+		recentlyAdded: 0,
+		popularNow: 0,
+	})
 	const [loading, setLoading] = useState(true)
 
 	const loadRails = useCallback(
-		async (nextLevel: BookLevel, nextCategory: string | null) => {
+		async (nextLevel: BookLevel) => {
 			const listParams = {
 				page: 1,
 				limit: OVERVIEW_LIMIT,
 				level: toBookListLevel(nextLevel),
 			}
-			const allBooksParams = nextCategory
-				? { ...listParams, category: nextCategory }
-				: listParams
 
 			const [continueRes, allRes, topRes, recentRes, popularRes] =
 				await Promise.allSettled([
@@ -93,22 +102,33 @@ export default function useLibraryOverview() {
 						page: 1,
 						limit: OVERVIEW_LIMIT,
 					}),
-					getBookListV2(allBooksParams),
+					getBookListV2(listParams),
 					getTopPickBooks(listParams),
 					getRecentlyAddedBooks(listParams),
 					getPopularNowBooks(listParams),
 				])
 
-			setContinueReading(
-				settledList<ContinueReadingApiItem>(
-					continueRes,
-					mapContinueReadingCard,
-				),
+			const nextContinueReading = settledList<ContinueReadingApiItem>(
+				continueRes,
+				mapContinueReadingCard,
 			)
-			setAllBooks(settledList<BookApiItem>(allRes, mapBookCard))
-			setTopPicks(settledList<BookApiItem>(topRes, mapBookCard))
-			setRecentlyAdded(settledList<BookApiItem>(recentRes, mapBookCard))
-			setPopularNow(settledList<BookApiItem>(popularRes, mapBookCard))
+			const nextAllBooks = settledList<BookApiItem>(allRes, mapBookCard)
+			const nextTopPicks = settledList<BookApiItem>(topRes, mapBookCard)
+			const nextRecentlyAdded = settledList<BookApiItem>(recentRes, mapBookCard)
+			const nextPopularNow = settledList<BookApiItem>(popularRes, mapBookCard)
+
+			setContinueReading(nextContinueReading)
+			setAllBooks(nextAllBooks)
+			setTopPicks(nextTopPicks)
+			setRecentlyAdded(nextRecentlyAdded)
+			setPopularNow(nextPopularNow)
+			setTotals({
+				continueReading: settledTotal(continueRes, nextContinueReading.length),
+				allBooks: settledTotal(allRes, nextAllBooks.length),
+				topPicks: settledTotal(topRes, nextTopPicks.length),
+				recentlyAdded: settledTotal(recentRes, nextRecentlyAdded.length),
+				popularNow: settledTotal(popularRes, nextPopularNow.length),
+			})
 		},
 		[],
 	)
@@ -150,7 +170,7 @@ export default function useLibraryOverview() {
 
 				if (!cancelled) {
 					setLevelState(nextLevel)
-					await loadRails(nextLevel, null)
+					await loadRails(nextLevel)
 				}
 			} finally {
 				if (!cancelled) {
@@ -174,27 +194,13 @@ export default function useLibraryOverview() {
 			try {
 				await Promise.allSettled([
 					updateLastSelectedLevel(toLastSelectedLevel(nextLevel)),
-					loadRails(nextLevel, category),
+					loadRails(nextLevel),
 				])
 			} finally {
 				setLoading(false)
 			}
 		},
-		[category, level, loadRails],
-	)
-
-	const setCategory = useCallback(
-		async (nextCategory: string | null) => {
-			const value = nextCategory === category ? null : nextCategory
-			setCategoryState(value)
-			setLoading(true)
-			try {
-				await loadRails(level, value)
-			} finally {
-				setLoading(false)
-			}
-		},
-		[category, level, loadRails],
+		[level, loadRails],
 	)
 
 	const setBookLanguages = useCallback(
@@ -215,8 +221,6 @@ export default function useLibraryOverview() {
 	return {
 		level,
 		setLevel,
-		category,
-		setCategory,
 		reader,
 		categories,
 		languages,
@@ -228,6 +232,7 @@ export default function useLibraryOverview() {
 		topPicks,
 		recentlyAdded,
 		popularNow,
+		totals,
 		loading,
 	}
 }

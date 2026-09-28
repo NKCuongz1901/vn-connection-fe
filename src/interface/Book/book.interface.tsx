@@ -1,5 +1,13 @@
 export type BookReviewSummary = {
 	overall_rating?: number
+	total_reviews?: number
+}
+
+export type BookReview = {
+	id?: string
+	book_id?: string
+	content_rating?: number
+	comment?: string | null
 }
 
 export type ReadingProgress = {
@@ -11,6 +19,11 @@ export type ReadingProgress = {
 	max_page?: number
 }
 
+export type BookDuration = {
+	language?: string
+	duration?: number
+}
+
 export type BookApiItem = {
 	id?: string
 	title?: string
@@ -20,6 +33,7 @@ export type BookApiItem = {
 	level?: string
 	category?: string[]
 	est_duration?: number
+	book_duration?: BookDuration[]
 	total_pages?: number
 	total_words?: number
 	total_sentences?: number
@@ -27,6 +41,8 @@ export type BookApiItem = {
 	language_type?: string
 	review_summary?: BookReviewSummary
 	is_favourited?: boolean
+	total_view_count?: number
+	share_link?: string
 	reading_progress?: ReadingProgress[]
 }
 
@@ -86,6 +102,11 @@ export type BookCardItem = {
 	category?: string
 	rating?: number
 	progressLabel?: string
+	durationLabel?: string
+	languageLabel?: string
+	viewCount?: number
+	isFavourited?: boolean
+	shareLink?: string
 	chapterId?: string
 	page?: number
 }
@@ -142,3 +163,26 @@ export type ChapterAudio = {
 }
 
 export type BookReadMode = 'read' | 'listen'
+
+export type ReadingSearchVocabSense = {
+	meaning?: string
+	example?: string
+	translations?: Array<{
+		language?: string
+		vocab?: string
+		meaning?: string
+		example?: string
+		ipa?: string | null
+	}>
+}
+
+export type ReadingSearchVocabItem = {
+	source_vocab_id: string
+	vocab: string
+	source_language?: string
+	part_of_speech?: string
+	ipa?: string | null
+	audio_url?: string | null
+	added_at?: string
+	senses?: ReadingSearchVocabSense[]
+}

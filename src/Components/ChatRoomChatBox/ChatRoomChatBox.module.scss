@@ -29,8 +29,9 @@
 		.date {
 			width: 100%;
 			justify-content: center;
-			font-weight: 600;
+			font-weight: 300;
 			margin: 8px 0;
+			color: #7b88a6;
 		}
 		.itemChat {
 			max-width: 100%;
@@ -661,6 +662,25 @@
 		}
 		.isTemp {
 			opacity: 0.5;
+		}
+		.isFailed {
+			opacity: 0.85;
+		}
+		.failedRow {
+			margin-top: 4px;
+			font-size: 12px;
+			line-height: 16px;
+			color: #cf1322;
+			.retryButton {
+				padding: 0;
+				border: none;
+				background: none;
+				color: #006b35;
+				font-size: 12px;
+				font-weight: 600;
+				text-decoration: underline;
+				cursor: pointer;
+			}
 		}
 	}
 

@@ -5,12 +5,16 @@
 }
 
 .back {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
 	align-self: flex-start;
 	border: none;
 	background: none;
 	color: #006b35;
-	font-size: 14px;
-	font-weight: 500;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 28px;
 	cursor: pointer;
 	padding: 0;
 }
@@ -57,25 +61,68 @@
 	line-height: 24px;
 }
 
-.meta {
-	color: #64748b;
-	font-size: 13px;
+.stats {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 24px;
+	margin-top: 8px;
+}
+
+.stat {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 120px;
+}
+
+.statLabel {
+	color: #7987a4;
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 16px;
+}
+
+.statValue {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: #0f1729;
+	font-size: 14px;
+	font-weight: 600;
 	line-height: 20px;
+
+	svg {
+		color: #006b35;
+		flex-shrink: 0;
+	}
+
+	&.statRating svg {
+		color: #cbd5e1;
+	}
+
+	&.statRatingActive svg {
+		color: #f5a623;
+	}
 }
 
 .actions {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 12px;
-	margin-top: 12px;
+	margin-top: 16px;
 	align-items: center;
 }
 
 .cta {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-width: 140px;
 	height: 40px;
 	padding: 0 20px;
 	border: none;
-	border-radius: 8px;
+	border-radius: 99px;
 	font-size: 14px;
 	font-weight: 600;
 	cursor: pointer;
@@ -88,16 +135,48 @@
 }
 
 .read {
-	background: #f97316;
+	background: #e55a0f;
 }
 
 .listen {
 	background: #006b35;
 }
 
+.iconBtn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	border: none;
+	border-radius: 99px;
+	background: #f4f8fc;
+	color: #006b35;
+	cursor: pointer;
+
+	&:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
+	}
+
+	&:hover:not(:disabled) {
+		background: #e8f5ee;
+	}
+
+	&.iconActive {
+		background: #006b35;
+		color: #fff;
+
+		&:hover:not(:disabled) {
+			background: #005a2c;
+		}
+	}
+}
+
 .tabs {
 	display: flex;
-	gap: 16px;
+	gap: 24px;
 	border-bottom: 1px solid #eef3f6;
 }
 
@@ -106,7 +185,7 @@
 	padding: 0;
 	border: none;
 	background: none;
-	color: #64748b;
+	color: #94a3b8;
 	font-size: 14px;
 	font-weight: 500;
 	cursor: pointer;
@@ -125,6 +204,67 @@
 	font-size: 15px;
 	line-height: 24px;
 	white-space: pre-wrap;
+}
+
+.vocabTitle {
+	color: #0f1729;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+	margin-bottom: 8px;
+}
+
+.vocabList {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.vocabItem {
+	padding: 12px 14px;
+	border: 1px solid #eef3f6;
+	border-radius: 10px;
+	background: #fff;
+}
+
+.vocabItemHead {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.vocabItemWord {
+	color: #0f1729;
+	font-size: 15px;
+	font-weight: 700;
+	text-transform: capitalize;
+}
+
+.vocabItemRemove {
+	border: none;
+	background: none;
+	color: #94a3b8;
+	cursor: pointer;
+	padding: 0;
+
+	&:hover {
+		color: #ef4444;
+	}
+}
+
+.vocabItemMeaning {
+	margin-top: 4px;
+	color: #334155;
+	font-size: 14px;
+	line-height: 20px;
+}
+
+.vocabItemExample {
+	margin-top: 2px;
+	color: #64748b;
+	font-size: 13px;
+	font-style: italic;
 }
 
 .chapters {

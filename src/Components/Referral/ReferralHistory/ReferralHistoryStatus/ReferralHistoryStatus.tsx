@@ -4,6 +4,7 @@ import { IconCircleCheckFilled, IconClock } from '@tabler/icons-react'
 import { memo } from 'react'
 
 import CoinIcon from '@/svg/CoinIcon'
+import { formatNumberString } from '@/ultis/string'
 
 import type { ReferralHistoryStatusResult } from '../referralHistory.utils'
 import classes from './ReferralHistoryStatus.module.scss'
@@ -16,7 +17,9 @@ function ReferralHistoryStatus({ status }: ReferralHistoryStatusProps) {
 	if (status.type === 'reward') {
 		return (
 			<div className={classes.status}>
-				<span className={classes.rewardValue}>+{status.amount ?? 0}</span>
+				<span className={classes.rewardValue}>
+					+{formatNumberString(status.amount ?? 0)}
+				</span>
 				<div className={classes.coinIcon}>
 					<CoinIcon />
 				</div>

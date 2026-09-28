@@ -7,8 +7,30 @@ import {
 	BookCategory,
 	BookLanguage,
 	BookListQuery,
+	BookReview,
 	ContinueReadingApiItem,
 } from '@/interface/Book/book.interface'
+import { formatListeningTime, pickBookDuration } from '@/Variable/book.variable'
+
+const languageName = (code: string) => {
+	try {
+		return (
+			new Intl.DisplayNames(['en'], { type: 'language' }).of(code) ||
+			code.toUpperCase()
+		)
+	} catch {
+		return code.toUpperCase()
+	}
+}
+
+// One language reads "Vietnamese only"; more than one reads "Multi-language"
+export const languageLabelFromCodes = (codes?: string[]) => {
+	if (!codes?.length) return undefined
+	const unique = Array.from(
+		new Set(codes.map((code) => code.split('-')[0].toLowerCase())),
+	)
+	return unique.length > 1 ? 'Multi-language' : `${languageName(unique[0])} only`
+}
 
 export const parseApiList = <T,>(res: unknown): T[] => {
 	const data = res as { results?: any }
@@ -44,6 +66,8 @@ export const mapBookCard = (item?: BookApiItem | null): BookCardItem | null => {
 	const id = item?.id
 	if (!id) return null
 
+	const duration = pickBookDuration(item.book_duration, undefined, item.est_duration)
+
 	return {
 		id,
 		title: item.title || 'Untitled',
@@ -51,6 +75,11 @@ export const mapBookCard = (item?: BookApiItem | null): BookCardItem | null => {
 		coverImage: item.cover_image,
 		category: item.category?.[0],
 		rating: item.review_summary?.overall_rating,
+		durationLabel: duration ? formatListeningTime(duration) : undefined,
+		languageLabel: languageLabelFromCodes(item.language),
+		viewCount: item.total_view_count,
+		isFavourited: item.is_favourited,
+		shareLink: item.share_link,
 	}
 }
 
@@ -79,6 +108,7 @@ export const mapContinueReadingCard = (
 	}) || chapters[0]
 	const resumePages =
 		resume?.progress_by_language?.map((row) => row.current_page || 0) || []
+	const duration = pickBookDuration(book?.book_duration, undefined, book?.est_duration)
 
 	return {
 		id,
@@ -88,6 +118,8 @@ export const mapContinueReadingCard = (
 		category: book?.category?.[0],
 		rating: book?.review_summary?.overall_rating,
 		progressLabel: maxPages ? `Page ${currentPage}/${maxPages}` : undefined,
+		durationLabel: duration ? formatListeningTime(duration) : undefined,
+		languageLabel: languageLabelFromCodes(book?.language),
 		chapterId: resume?.chapter_id || resume?.chapter?.id,
 		page: resumePages.length ? Math.max(...resumePages) : 1,
 	}
@@ -148,6 +180,39 @@ export const getBookDetail = async (id: string) => {
 	return axios.get(`${BOOK_ROUTES.book}/${id}`)
 }
 
+export const toggleFavouriteBook = async (bookId: string) => {
+	return axios.post(`${BOOK_ROUTES.favourite}/${bookId}`)
+}
+
+export const getMyBookReview = async (bookId: string) => {
+	return axios.get(`${BOOK_ROUTES.book}/${bookId}/my-review`)
+}
+
+export const createBookReview = async (payload: {
+	book_id: string
+	content_rating: number
+	comment?: string
+}) => {
+	return axios.post(BOOK_ROUTES.review, payload)
+}
+
+export const updateBookReview = async (
+	reviewId: string,
+	payload: {
+		content_rating?: number
+		comment?: string
+	},
+) => {
+	return axios.put(`${BOOK_ROUTES.review}/${reviewId}`, payload)
+}
+
+export const parseBookReview = (res: unknown): BookReview | null => {
+	const parsed = parseApiObject<BookReview>(res)
+	if (parsed?.id) return parsed
+	const data = res as { results?: BookReview | null }
+	return data?.results?.id ? data.results : null
+}
+
 export const getAudioList = async (params: BookListQuery = {}) => {
 	return axios.get(BOOK_ROUTES.audioList, {
 		params: convertParams(params),
@@ -178,6 +243,30 @@ export const parseBookLanguages = (res: unknown): BookLanguage[] => {
 		return object.languages.filter((item) => item.code)
 	}
 	return parseApiList<BookLanguage>(res).filter((item) => item.code)
+}
+
+export const quickTranslateWord = async (payload: {
+	word: string
+	sourceLanguage: string
+	targetLanguage: string
+	book_id?: string
+}) => {
+	return axios.post(BOOK_ROUTES.quickTranslate, payload)
+}
+
+export const getReadingSearchVocab = async (params: {
+	book_id?: string
+	source_language?: string
+	limit?: number
+	offset?: number
+} = {}) => {
+	return axios.get(BOOK_ROUTES.readingSearchVocab, {
+		params: convertParams(params),
+	})
+}
+
+export const deleteReadingSearchVocabWord = async (sourceVocabId: string) => {
+	return axios.delete(`${BOOK_ROUTES.readingSearchVocab}/${sourceVocabId}`)
 }
 
 export const findBookLanguage = (

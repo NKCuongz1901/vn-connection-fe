@@ -22,6 +22,10 @@ export function BookLibraryProvider({
 	)
 }
 
+export function useOptionalBookLibrary() {
+	return useContext(BookLibraryContext)
+}
+
 export function useBookLibrary() {
 	const ctx = useContext(BookLibraryContext)
 	if (!ctx) {

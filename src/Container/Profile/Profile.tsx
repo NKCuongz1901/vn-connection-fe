@@ -168,8 +168,8 @@ const Profile = (props: ProfileProps) => {
 			i_am_from,
 			mode,
 			amount_of_friend,
+			amount_of_invited_friend,
 			wallet,
-			amount_of_feedback,
 		} = userData || {}
 		const isMe = id === getUserInfo('id')
 		const completedScore = userData?.complete_profile?.point || 0
@@ -276,7 +276,7 @@ const Profile = (props: ProfileProps) => {
 										<span className={classes.communityBuilderText}>
 											Community builder:{' '}
 											<span className={classes.communityBuilderTextBold}>
-												{wallet}
+												{amount_of_invited_friend}
 											</span>{' '}
 											friends invited
 										</span>
@@ -533,7 +533,7 @@ const Profile = (props: ProfileProps) => {
 	}, [toJson(userData)])
 
 	const _renderReferences = useCallback(() => {
-		const { id, wallet } = userData || {}
+		const { id, wallet, amount_of_invited_friend } = userData || {}
 		const isMe = id === getUserInfo('id')
 		if (!isMe) return null
 		return (
@@ -547,7 +547,7 @@ const Profile = (props: ProfileProps) => {
 						<div className={classes.DetailTextSub}>
 							Community builder:{' '}
 							<span className={classes.DetailTextSubBold}>
-								{wallet} friends invited
+								{amount_of_invited_friend} friends invited
 							</span>
 						</div>
 					</Flex>

@@ -174,9 +174,7 @@ const HeaderMainLayout = (props: HeaderMainLayoutProps) => {
 			// Sửa lỗi TS1252: Chuyển Function Declaration thành Arrow Function Expression.
 			const setupFCM = async () => {
 				try {
-					// Tắt console.log() sau khi debug
 					const token = await initFCM()
-					console.log('🏖️ FCM Token:', token)
 					if (token) {
 						handleStorageCookie({
 							key: 'last_token_web',

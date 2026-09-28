@@ -6,10 +6,12 @@ import {
 	getListMyChatLocation,
 	getListMyMiniChat,
 	getListSuggestChatLocation,
+	getMessageReadMessage,
 	leaveConvById,
 } from '@/apis/conversationApis'
 import { showMiniChatLeftToast } from '@/Components/Toast/SocketToastContent'
 import { useModal } from '@/context/ModalContext'
+import { useSocket } from '@/context/SocketContext'
 import {
 	ChatLocationItemProps,
 	FullMiniChatItemProps,
@@ -17,11 +19,12 @@ import {
 } from '@/interface/Conversation/Conversation.interface'
 import { onPushState } from '@/ultis/route'
 import { getUserInfo } from '@/ultis/storage'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface useChatLocationProps {
 	tabOpts?: { value: string; label: string }[]
 	id?: string
+	activeMiniChatId?: string
 }
 
 export interface ChatLocationEntry {
@@ -31,8 +34,9 @@ export interface ChatLocationEntry {
 }
 
 export default function useChatLocation(props: useChatLocationProps) {
-	const { tabOpts, id } = props
+	const { id, activeMiniChatId } = props
 	const { openError } = useModal()
+	const { socket } = useSocket() ?? { socket: null }
 	const [loading, setLoading] = useState({
 		myChatLocation: false,
 		activeChatLocation: false,
@@ -63,6 +67,16 @@ export default function useChatLocation(props: useChatLocationProps) {
 		FullMiniChatItemProps[]
 	>([])
 
+	const activeMiniChatIdRef = useRef(activeMiniChatId)
+	const listMyMiniChatRef = useRef(listMyMiniChat)
+	const listFullMiniChatRef = useRef(listFullMiniChat)
+	const locationIdRef = useRef(id)
+
+	activeMiniChatIdRef.current = activeMiniChatId
+	listMyMiniChatRef.current = listMyMiniChat
+	listFullMiniChatRef.current = listFullMiniChat
+	locationIdRef.current = id
+
 	const handleGetListMyMiniChat = async (parentId: string) => {
 		setLoading((prev) => ({ ...prev, getMyMiniChat: true }))
 		try {
@@ -76,7 +90,7 @@ export default function useChatLocation(props: useChatLocationProps) {
 				setListMyMiniChat(results.objects.rows || [])
 			}
 		} catch (error) {
-			openError(error.message)
+			openError(error?.message)
 		} finally {
 			setLoading((prev) => ({ ...prev, getMyMiniChat: false }))
 		}
@@ -98,6 +112,88 @@ export default function useChatLocation(props: useChatLocationProps) {
 			setLoading((prev) => ({ ...prev, getFullMiniChat: false }))
 		}
 	}
+
+	/** Marks a mini chat as read in local lists and notifies the backend. */
+	const handleMarkMiniChatRead = useCallback(async (miniChatId?: string) => {
+		if (!miniChatId) return
+
+		setListMyMiniChat((prev) =>
+			prev.map((item) =>
+				item.id === miniChatId ? { ...item, is_read: true } : item,
+			),
+		)
+		setListFullMiniChat((prev) =>
+			prev.map((item) =>
+				item.id === miniChatId ? { ...item, is_read: true } : item,
+			),
+		)
+
+		try {
+			await getMessageReadMessage(miniChatId)
+		} catch {
+			// Keep optimistic local clear even if read API fails.
+		}
+	}, [])
+
+	/** Applies realtime mini-chat unread state from socket messages. */
+	const handleMiniChatSocketMessage = useCallback((data: any) => {
+		const locationId = locationIdRef.current
+		const { conversation_id, sender_id, related_conversation_id } = data || {}
+		if (!locationId || !conversation_id) return
+
+		const isKnownMini =
+			listMyMiniChatRef.current.some((item) => item.id === conversation_id) ||
+			listFullMiniChatRef.current.some((item) => item.id === conversation_id)
+		const isUnderLocation =
+			related_conversation_id === locationId || isKnownMini
+
+		if (!isUnderLocation) return
+
+		const myUserId = getUserInfo('id')
+		const isMe = sender_id === myUserId
+		const isActive = conversation_id === activeMiniChatIdRef.current
+		const nextIsRead = Boolean(isMe || isActive)
+
+		setListMyMiniChat((prev) => {
+			const idx = prev.findIndex((item) => item.id === conversation_id)
+			if (idx < 0) return prev
+
+			const next = [...prev]
+			next[idx] = {
+				...next[idx],
+				is_read: nextIsRead,
+				last_message: {
+					...(next[idx].last_message || {}),
+					...data,
+					id: data?.id || next[idx].last_message?.id,
+					conversation_id,
+					sender_id,
+				},
+			}
+			return next
+		})
+
+		setListFullMiniChat((prev) => {
+			const idx = prev.findIndex((item) => item.id === conversation_id)
+			if (idx < 0) return prev
+
+			const next = [...prev]
+			next[idx] = {
+				...next[idx],
+				is_read: nextIsRead,
+				last_message: data?.id
+					? {
+							id: data.id,
+							content: data.content || next[idx].last_message?.content || '',
+							type: data.type || next[idx].last_message?.type || '',
+							created_at:
+								data.created_at || next[idx].last_message?.created_at || '',
+						}
+					: next[idx].last_message,
+			}
+			return next
+		})
+	}, [])
 
 	// Leave a mini chat and refresh both mini-chat lists.
 	const handleLeaveMiniChat = async (miniChatId: string) => {
@@ -213,16 +309,22 @@ export default function useChatLocation(props: useChatLocationProps) {
 		}
 	}
 
+	/** Clears map search results when the address input is cleared. */
+	const handleClearFindChatLocation = () => {
+		setListFindChatLocation([])
+		setFindKeyword('')
+	}
+
 	// Resolve an existing location or create a new location room before opening it.
 	const handleEnterChatLocation = async (item: ChatLocationEntry) => {
-		const { id, title, level } = item || {}
-		const locationKey = id || `${title}-${level || ''}`
+		const { id: locationId, title, level } = item || {}
+		const locationKey = locationId || `${title}-${level || ''}`
 		if (!title || enteringLocationKey) return
 
 		setEnteringLocationKey(locationKey)
 		try {
-			if (id) {
-				onPushState({ type: 'location', id })
+			if (locationId) {
+				onPushState({ type: 'location', id: locationId })
 				return
 			}
 			if (!level) {
@@ -240,13 +342,30 @@ export default function useChatLocation(props: useChatLocationProps) {
 			})
 			const createdId = res?.results?.object?.id
 			if (res?.code !== 200 || !createdId) {
+				const message = res?.message || res?.response?.data?.message
+				if (
+					typeof message === 'string' &&
+					message.toLowerCase().includes('maximum 10 chat location')
+				) {
+					openError({ title: 'Limit reached', message })
+					return
+				}
 				openError(res)
 				return
 			}
 
 			await handleGetListMyChatLocation()
 			onPushState({ type: 'location', id: createdId })
-		} catch (error) {
+		} catch (error: any) {
+			const message =
+				error?.response?.data?.message || error?.message || error
+			if (
+				typeof message === 'string' &&
+				message.toLowerCase().includes('maximum 10 chat location')
+			) {
+				openError({ title: 'Limit reached', message })
+				return
+			}
 			openError(error)
 		} finally {
 			setEnteringLocationKey(null)
@@ -257,7 +376,22 @@ export default function useChatLocation(props: useChatLocationProps) {
 		handleGetListMyChatLocation()
 		handleGetListActiveChatLocation()
 		handleGetListSuggestChatLocation()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
+
+	useEffect(() => {
+		if (!activeMiniChatId) return
+		void handleMarkMiniChatRead(activeMiniChatId)
+	}, [activeMiniChatId, handleMarkMiniChatRead])
+
+	useEffect(() => {
+		if (!socket || !id) return
+
+		socket.on('message', handleMiniChatSocketMessage)
+		return () => {
+			socket.off('message', handleMiniChatSocketMessage)
+		}
+	}, [handleMiniChatSocketMessage, id, socket])
 
 	return {
 		loading,
@@ -273,10 +407,12 @@ export default function useChatLocation(props: useChatLocationProps) {
 
 		// Actions
 		onFindChatLocation: handleFindChatLocation,
+		onClearFindChatLocation: handleClearFindChatLocation,
 		onEnterChatLocation: handleEnterChatLocation,
 		onGetListMyMiniChat: handleGetListMyMiniChat,
 		onGetListFullMiniChat: handleGetListFullMiniChat,
 		onLeaveMiniChat: handleLeaveMiniChat,
 		onRefreshMyChatLocation: handleGetListMyChatLocation,
+		onMarkMiniChatRead: handleMarkMiniChatRead,
 	}
 }

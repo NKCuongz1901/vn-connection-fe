@@ -1,12 +1,14 @@
 'use client'
 
 import { memo } from 'react'
+import { IconChevronLeft, IconSearch } from '@tabler/icons-react'
 
-import { BookCard } from '@/Components/Book'
+import { BookCard, BookEmptyState } from '@/Components/Book'
 import useBookSeeAll from '@/hooks/Book/useBookSeeAll'
 import { useLocalePath } from '@/ultis/route'
 import {
 	BOOK_ROOT,
+	BOOK_SEARCHABLE_KINDS,
 	BOOK_SEE_ALL,
 	BookSeeAllKind,
 	bookDetailPath,
@@ -17,40 +19,81 @@ import classes from './BookSeeAll.module.scss'
 
 type BookSeeAllProps = {
 	kind: BookSeeAllKind
+	categoryId?: string
 }
 
-function BookSeeAll({ kind }: BookSeeAllProps) {
+function BookSeeAll({ kind, categoryId }: BookSeeAllProps) {
 	const { onChangeRoute } = useLocalePath()
-	const { books, loading, loadingMore, hasMore, loadMore, level } =
-		useBookSeeAll(kind)
-	const meta = BOOK_SEE_ALL[kind]
-	const title = kind === 'all' ? `${meta.title} (${level})` : meta.title
+	const {
+		books,
+		total,
+		loading,
+		loadingMore,
+		hasMore,
+		loadMore,
+		level,
+		search,
+		setSearch,
+		categoryTitle,
+	} = useBookSeeAll(kind, { categoryId })
+	const searchable = BOOK_SEARCHABLE_KINDS.includes(kind)
+	// Continue reading keeps the cover grid with the reading progress;
+	// the other lists show views, favourite, share and download on each book
+	const listView = kind !== 'continue'
+	const title =
+		kind === 'category'
+			? categoryTitle || 'Category'
+			: kind === 'all'
+				? `${BOOK_SEE_ALL.all.title} (${level})`
+				: BOOK_SEE_ALL[kind].title
 
 	return (
 		<div className={classes.page}>
-			<button
-				type="button"
-				className={classes.back}
-				onClick={() => onChangeRoute(BOOK_ROOT)}
-			>
-				← Back
-			</button>
-			<div className={classes.title}>{title}</div>
+			<div className={classes.head}>
+				<button
+					type="button"
+					className={classes.back}
+					onClick={() => onChangeRoute(BOOK_ROOT)}
+					aria-label="Back"
+				>
+					<IconChevronLeft size={20} />
+				</button>
+				<div className={classes.headCopy}>
+					<div className={classes.titleRow}>
+						<div className={classes.title}>{title}</div>
+						{total ? (
+							<span className={classes.badge}>{total}</span>
+						) : null}
+					</div>
+					{kind !== 'continue' ? (
+						<div className={classes.level}>Level {level}</div>
+					) : null}
+				</div>
+			</div>
+
+			{searchable ? (
+				<label className={classes.search}>
+					<IconSearch size={20} stroke={1.5} />
+					<input
+						type="search"
+						value={search}
+						onChange={(event) => setSearch(event.target.value)}
+						placeholder="Search by keywords"
+					/>
+				</label>
+			) : null}
 
 			{loading ? (
-				<div className={classes.empty}>Loading…</div>
+				<div className={classes.loading}>Loading…</div>
 			) : books.length ? (
 				<>
-					<div
-						className={
-							kind === 'popular' ? classes.rows : classes.grid
-						}
-					>
+					<div className={listView ? classes.list : classes.grid}>
 						{books.map((book) => (
 							<BookCard
 								key={book.id}
 								book={book}
-								variant={kind === 'popular' ? 'row' : 'tile'}
+								variant={listView ? 'popular' : 'tile'}
+								showShare={listView}
 								onClick={() => {
 									if (kind === 'continue') {
 										onChangeRoute(
@@ -79,7 +122,7 @@ function BookSeeAll({ kind }: BookSeeAllProps) {
 					) : null}
 				</>
 			) : (
-				<div className={classes.empty}>No books yet</div>
+				<BookEmptyState />
 			)}
 		</div>
 	)

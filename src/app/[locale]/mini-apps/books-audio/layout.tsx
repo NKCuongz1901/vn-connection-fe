@@ -2,15 +2,12 @@ import { redirect } from 'next/navigation'
 
 import BookShell from '@/Container/Book/BookShell'
 import { BookLibraryProvider } from '@/context/BookLibraryContext'
-import { BookPlayerProvider } from '@/context/BookPlayerContext'
 import { BOOK_WEB_ENABLED } from '@/Variable/book.variable'
 
 function BookAudioProviders({ children }: { children: React.ReactNode }) {
 	return (
 		<BookLibraryProvider>
-			<BookPlayerProvider>
-				<BookShell>{children}</BookShell>
-			</BookPlayerProvider>
+			<BookShell>{children}</BookShell>
 		</BookLibraryProvider>
 	)
 }

@@ -8,6 +8,7 @@ import {
 	getBookDetail,
 	parseApiList,
 	parseApiObject,
+	quickTranslateWord,
 	updateReadingProgress,
 } from '@/apis/book/bookApis'
 import {
@@ -36,9 +37,7 @@ export default function useBookReader(bookId: string) {
 	const { learningLang, nativeLang } = useBookLibrary()
 	const {
 		load: loadAudio,
-		setOnEnded,
-		setOnPrevChapter,
-		setOnNextChapter,
+		chapter: playingChapter,
 		toggle,
 		getCurrentTime,
 	} = useBookPlayer()
@@ -54,6 +53,8 @@ export default function useBookReader(bookId: string) {
 	const [loading, setLoading] = useState(true)
 	const [pageLoading, setPageLoading] = useState(false)
 	const [audioMissing, setAudioMissing] = useState(false)
+	const [audioLangOverride, setAudioLangOverride] = useState<string | null>(null)
+	const audioLang = audioLangOverride || learningLang
 	const progressTimer = useRef<number | null>(null)
 	const modeRef = useRef(mode)
 	modeRef.current = mode
@@ -62,6 +63,10 @@ export default function useBookReader(bookId: string) {
 		chapters.find((item) => item.id === chapterId) || chapters[0] || null
 	const totalPages =
 		pageContent?.total_pages || currentChapter?.total_pages || 1
+
+	useEffect(() => {
+		setAudioLangOverride(null)
+	}, [bookId])
 
 	const replaceQuery = useCallback(
 		(next: {
@@ -187,13 +192,15 @@ export default function useBookReader(bookId: string) {
 					limit: 30,
 				})
 				if (cancelled) return
-				const audio = pickChapterAudio(parseApiList(res), learningLang)
+				const audio = pickChapterAudio(parseApiList(res), audioLang)
 				if (audio?.url) {
 					setAudioMissing(false)
 					loadAudio({
 						url: audio.url,
 						book,
 						chapter,
+						chapters,
+						learningLang: audioLang,
 						autoPlay: true,
 					})
 				} else {
@@ -209,7 +216,7 @@ export default function useBookReader(bookId: string) {
 		return () => {
 			cancelled = true
 		}
-	}, [book, bookId, currentChapter?.id, learningLang, loadAudio, mode])
+	}, [audioLang, book, bookId, chapters, currentChapter?.id, loadAudio, mode])
 
 	const saveProgress = useCallback(
 		(nextPage: number, chapter = currentChapter) => {
@@ -272,41 +279,11 @@ export default function useBookReader(bookId: string) {
 	}, [chapters, currentChapter?.id, goToChapter, page, replaceQuery])
 
 	useEffect(() => {
-		if (mode !== 'listen') {
-			setOnEnded(null)
-			setOnPrevChapter(null)
-			setOnNextChapter(null)
-			return
-		}
-		setOnEnded(() => {
-			const index = chapters.findIndex((item) => item.id === currentChapter?.id)
-			const next = chapters[index + 1]
-			if (next) goToChapter(next, 1)
-		})
-		setOnPrevChapter(() => {
-			const index = chapters.findIndex((item) => item.id === currentChapter?.id)
-			const prev = chapters[index - 1]
-			if (prev) goToChapter(prev, 1)
-		})
-		setOnNextChapter(() => {
-			const index = chapters.findIndex((item) => item.id === currentChapter?.id)
-			const next = chapters[index + 1]
-			if (next) goToChapter(next, 1)
-		})
-		return () => {
-			setOnEnded(null)
-			setOnPrevChapter(null)
-			setOnNextChapter(null)
-		}
-	}, [
-		chapters,
-		currentChapter?.id,
-		goToChapter,
-		mode,
-		setOnEnded,
-		setOnNextChapter,
-		setOnPrevChapter,
-	])
+		if (mode !== 'listen') return
+		if (!playingChapter?.id || playingChapter.id === currentChapter?.id) return
+		if (!chapters.some((item) => item.id === playingChapter.id)) return
+		goToChapter(playingChapter, 1)
+	}, [chapters, currentChapter?.id, goToChapter, mode, playingChapter])
 
 	useEffect(() => {
 		const onKey = (event: KeyboardEvent) => {
@@ -329,6 +306,44 @@ export default function useBookReader(bookId: string) {
 		}))
 	}, [learningLang, nativeLang, pageContent])
 
+	const [translation, setTranslation] = useState<{
+		word: string
+		loading: boolean
+		result: { vocab?: string; meaning?: string; example?: string } | null
+		error?: boolean
+	} | null>(null)
+
+	const translateWord = useCallback(
+		async (rawWord: string) => {
+			const word = rawWord.trim().replace(/^[.,!?;:"'()\[\]{}]+|[.,!?;:"'()\[\]{}]+$/g, '')
+			if (!word || !bookId) return
+			setTranslation({ word, loading: true, result: null })
+			try {
+				const res = await quickTranslateWord({
+					word,
+					sourceLanguage: learningLang,
+					targetLanguage: nativeLang,
+					book_id: bookId,
+				})
+				const result = parseApiObject<{
+					vocab?: string
+					meaning?: string
+					example?: string
+				}>(res)
+				setTranslation({ word, loading: false, result })
+			} catch {
+				setTranslation({ word, loading: false, result: null, error: true })
+			}
+		},
+		[bookId, learningLang, nativeLang],
+	)
+
+	const clearTranslation = useCallback(() => setTranslation(null), [])
+
+	const isLastChapter =
+		chapters.length > 0 && chapters[chapters.length - 1]?.id === currentChapter?.id
+	const finished = isLastChapter && page >= totalPages && !loading && !pageLoading
+
 	return {
 		book,
 		chapters,
@@ -340,6 +355,12 @@ export default function useBookReader(bookId: string) {
 		loading,
 		pageLoading,
 		audioMissing,
+		audioLang,
+		setAudioLang: setAudioLangOverride,
+		finished,
+		translation,
+		translateWord,
+		clearTranslation,
 		replaceQuery,
 		goNextPage,
 		goPrevPage,

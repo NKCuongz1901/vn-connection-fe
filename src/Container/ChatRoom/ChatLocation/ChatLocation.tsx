@@ -77,6 +77,7 @@ function ChatLocation(props: ChatLocationProps) {
 		enteringLocationKey,
 		miniChatActionId,
 		onFindChatLocation,
+		onClearFindChatLocation,
 		onEnterChatLocation,
 		onRefreshMyChatLocation,
 		listMyMiniChat,
@@ -86,7 +87,8 @@ function ChatLocation(props: ChatLocationProps) {
 		onGetListMyMiniChat,
 		onGetListFullMiniChat,
 		onLeaveMiniChat,
-	} = useChatLocation({ id })
+		onMarkMiniChatRead,
+	} = useChatLocation({ id, activeMiniChatId })
 	const [mapValue, setMapValue] = useState({
 		address: '',
 		latitude: 0,
@@ -96,8 +98,16 @@ function ChatLocation(props: ChatLocationProps) {
 
 	useEffect(() => {
 		if (!id) return
-		onGetListMyMiniChat(id)
-		onGetListFullMiniChat(id)
+
+		const loadMiniChats = async () => {
+			await Promise.all([onGetListMyMiniChat(id), onGetListFullMiniChat(id)])
+			if (activeMiniChatId) {
+				void onMarkMiniChatRead(activeMiniChatId)
+			}
+		}
+
+		void loadMiniChats()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id])
 
 	// Open a mini chat while preserving its parent location in the URL.
@@ -108,22 +118,28 @@ function ChatLocation(props: ChatLocationProps) {
 		if (!id || !item.id) return
 		// Only rooms opened from the selector should confirm the join with a toast.
 		pendingJoinIdRef.current = options?.isJoining ? item.id : null
+		void onMarkMiniChatRead(item.id)
 		onPushState({ type: 'location', id, mini_id: item.id })
 	}
 
 	// Refresh location lists after a join/leave and confirm intentional joins.
-	const handleSuccessDetailChat = ({
+	// `remind` is persisted in useDetailChatRoom; ignore it here.
+	const handleSuccessDetailChat = async ({
 		type,
 		id: convId,
 	}: {
 		type?: string
 		id?: string
 	}) => {
+		if (type === 'remind') return
 		if (type !== 'join' && type !== 'leave') return
 
 		onRefreshMyChatLocation()
-		onGetListMyMiniChat(id)
-		onGetListFullMiniChat(id)
+		await Promise.all([onGetListMyMiniChat(id), onGetListFullMiniChat(id)])
+
+		if (activeMiniChatId) {
+			void onMarkMiniChatRead(activeMiniChatId)
+		}
 
 		if (type === 'join' && pendingJoinIdRef.current === convId) {
 			pendingJoinIdRef.current = null
@@ -162,6 +178,12 @@ function ChatLocation(props: ChatLocationProps) {
 
 		setMapValue({ address: display_name, latitude, longitude })
 		onFindChatLocation({ latitude, longitude, keyword: display_name })
+	}
+
+	/** Clears the address input and map search results. */
+	const handleClearMap = () => {
+		setMapValue({ address: '', latitude: 0, longitude: 0 })
+		onClearFindChatLocation()
 	}
 
 	const _renderFindSection = () => {
@@ -284,6 +306,7 @@ function ChatLocation(props: ChatLocationProps) {
 					latitude={mapValue.latitude}
 					prefix={<SearchIcon />}
 					onSubmitModal={handleSubmitMap}
+					onClear={handleClearMap}
 				/>
 			</div>
 
