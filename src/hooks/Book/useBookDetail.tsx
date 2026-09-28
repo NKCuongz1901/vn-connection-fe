@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import {
+	deleteReadingSearchVocabWord,
 	getBookDetail,
+	getReadingSearchVocab,
 	parseApiList,
 	parseApiObject,
 	toggleFavouriteBook,
@@ -15,6 +17,7 @@ import {
 	BookReadMode,
 	ChapterApiItem,
 	ReadingProgress,
+	ReadingSearchVocabItem,
 } from '@/interface/Book/book.interface'
 import { bookReadPath } from '@/Variable/book.variable'
 
@@ -39,6 +42,9 @@ export default function useBookDetail(bookId: string) {
 	const [tab, setTab] = useState<'summary' | 'vocab' | 'chapter'>('summary')
 	const [loading, setLoading] = useState(true)
 	const [savingFavourite, setSavingFavourite] = useState(false)
+	const [vocabWords, setVocabWords] = useState<ReadingSearchVocabItem[]>([])
+	const [vocabLoading, setVocabLoading] = useState(false)
+	const [vocabLoaded, setVocabLoaded] = useState(false)
 
 	useEffect(() => {
 		let cancelled = false
@@ -65,11 +71,48 @@ export default function useBookDetail(bookId: string) {
 		}
 
 		load()
+		setVocabWords([])
+		setVocabLoaded(false)
 
 		return () => {
 			cancelled = true
 		}
 	}, [bookId])
+
+	useEffect(() => {
+		if (tab !== 'vocab' || vocabLoaded || !bookId) return
+		let cancelled = false
+
+		const loadVocab = async () => {
+			setVocabLoading(true)
+			try {
+				const res = await getReadingSearchVocab({ book_id: bookId, limit: 100 })
+				if (!cancelled) {
+					setVocabWords(parseApiList<ReadingSearchVocabItem>(res))
+					setVocabLoaded(true)
+				}
+			} finally {
+				if (!cancelled) setVocabLoading(false)
+			}
+		}
+
+		loadVocab()
+
+		return () => {
+			cancelled = true
+		}
+	}, [bookId, tab, vocabLoaded])
+
+	const deleteVocabWord = useCallback(async (sourceVocabId: string) => {
+		const prev = vocabWords
+		setVocabWords((list) => list.filter((item) => item.source_vocab_id !== sourceVocabId))
+		try {
+			await deleteReadingSearchVocabWord(sourceVocabId)
+		} catch (error) {
+			setVocabWords(prev)
+			openError(error)
+		}
+	}, [openError, vocabWords])
 
 	const resume = useCallback(
 		(mode: BookReadMode) => {
@@ -130,5 +173,8 @@ export default function useBookDetail(bookId: string) {
 		toggleFavourite,
 		savingFavourite,
 		refreshBook,
+		vocabWords,
+		vocabLoading,
+		deleteVocabWord,
 	}
 }

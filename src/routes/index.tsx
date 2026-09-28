@@ -195,6 +195,8 @@ export const BOOK_ROUTES = {
 	bookLanguageLearning: 'reader/profile/book-language-learning',
 	bookLanguageNative: 'reader/profile/book-language-native',
 	languagesVariant: 'book/languages-variant',
+	quickTranslate: 'vocabulary/quick-translate',
+	readingSearchVocab: 'vocabulary/reading-search-vocab',
 }
 export const TALKROOM_ROUTES = {
 	talkRoomOverview: 'talkroom/overview',

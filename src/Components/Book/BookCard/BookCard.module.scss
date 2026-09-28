@@ -48,6 +48,15 @@
 	line-height: 16px;
 }
 
+.progress,
+.rowProgress {
+	color: #006b35;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 16px;
+	margin-top: 2px;
+}
+
 .row {
 	display: flex;
 	gap: 12px;

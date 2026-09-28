@@ -74,7 +74,16 @@ export default function useDetailChatRoom(props: useDetailChatRoomProps) {
 
 			const res: any = await joinConversation({ id, status: true })
 			onSuccess({ type: 'join', id, data: res?.results?.object })
-		} catch (error) {
+		} catch (error: any) {
+			const message =
+				error?.response?.data?.message || error?.message || error
+			if (
+				typeof message === 'string' &&
+				message.toLowerCase().includes('maximum 10 chat location')
+			) {
+				openError({ title: 'Limit reached', message })
+				return
+			}
 			openError(error)
 		}
 	}

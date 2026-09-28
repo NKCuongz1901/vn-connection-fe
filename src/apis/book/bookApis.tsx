@@ -10,6 +10,16 @@ import {
 	BookReview,
 	ContinueReadingApiItem,
 } from '@/interface/Book/book.interface'
+import { formatListeningTime, pickBookDuration } from '@/Variable/book.variable'
+
+const languageLabelFromCodes = (codes?: string[]) => {
+	if (!codes?.length) return undefined
+	const unique = Array.from(
+		new Set(codes.map((code) => code.split('-')[0].toUpperCase())),
+	)
+	const shown = unique.slice(0, 3).join(', ')
+	return unique.length > 3 ? `${shown} +${unique.length - 3}` : shown
+}
 
 export const parseApiList = <T,>(res: unknown): T[] => {
 	const data = res as { results?: any }
@@ -45,6 +55,8 @@ export const mapBookCard = (item?: BookApiItem | null): BookCardItem | null => {
 	const id = item?.id
 	if (!id) return null
 
+	const duration = pickBookDuration(item.book_duration, undefined, item.est_duration)
+
 	return {
 		id,
 		title: item.title || 'Untitled',
@@ -52,6 +64,8 @@ export const mapBookCard = (item?: BookApiItem | null): BookCardItem | null => {
 		coverImage: item.cover_image,
 		category: item.category?.[0],
 		rating: item.review_summary?.overall_rating,
+		durationLabel: duration ? formatListeningTime(duration) : undefined,
+		languageLabel: languageLabelFromCodes(item.language),
 	}
 }
 
@@ -80,6 +94,7 @@ export const mapContinueReadingCard = (
 	}) || chapters[0]
 	const resumePages =
 		resume?.progress_by_language?.map((row) => row.current_page || 0) || []
+	const duration = pickBookDuration(book?.book_duration, undefined, book?.est_duration)
 
 	return {
 		id,
@@ -89,6 +104,8 @@ export const mapContinueReadingCard = (
 		category: book?.category?.[0],
 		rating: book?.review_summary?.overall_rating,
 		progressLabel: maxPages ? `Page ${currentPage}/${maxPages}` : undefined,
+		durationLabel: duration ? formatListeningTime(duration) : undefined,
+		languageLabel: languageLabelFromCodes(book?.language),
 		chapterId: resume?.chapter_id || resume?.chapter?.id,
 		page: resumePages.length ? Math.max(...resumePages) : 1,
 	}
@@ -212,6 +229,30 @@ export const parseBookLanguages = (res: unknown): BookLanguage[] => {
 		return object.languages.filter((item) => item.code)
 	}
 	return parseApiList<BookLanguage>(res).filter((item) => item.code)
+}
+
+export const quickTranslateWord = async (payload: {
+	word: string
+	sourceLanguage: string
+	targetLanguage: string
+	book_id?: string
+}) => {
+	return axios.post(BOOK_ROUTES.quickTranslate, payload)
+}
+
+export const getReadingSearchVocab = async (params: {
+	book_id?: string
+	source_language?: string
+	limit?: number
+	offset?: number
+} = {}) => {
+	return axios.get(BOOK_ROUTES.readingSearchVocab, {
+		params: convertParams(params),
+	})
+}
+
+export const deleteReadingSearchVocabWord = async (sourceVocabId: string) => {
+	return axios.delete(`${BOOK_ROUTES.readingSearchVocab}/${sourceVocabId}`)
 }
 
 export const findBookLanguage = (

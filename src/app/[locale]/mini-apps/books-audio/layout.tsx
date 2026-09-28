@@ -2,7 +2,6 @@
 
 import BookShell from '@/Container/Book/BookShell'
 import { BookLibraryProvider } from '@/context/BookLibraryContext'
-import { BookPlayerProvider } from '@/context/BookPlayerContext'
 
 export default function BookAudioLayout({
 	children,
@@ -11,9 +10,7 @@ export default function BookAudioLayout({
 }) {
 	return (
 		<BookLibraryProvider>
-			<BookPlayerProvider>
-				<BookShell>{children}</BookShell>
-			</BookPlayerProvider>
+			<BookShell>{children}</BookShell>
 		</BookLibraryProvider>
 	)
 }

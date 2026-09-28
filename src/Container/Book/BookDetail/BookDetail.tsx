@@ -14,6 +14,7 @@ import {
 	IconShare3,
 	IconStar,
 	IconStarFilled,
+	IconX,
 } from '@tabler/icons-react'
 
 import {
@@ -54,6 +55,9 @@ function BookDetail({ bookId }: BookDetailProps) {
 		toggleFavourite,
 		savingFavourite,
 		refreshBook,
+		vocabWords,
+		vocabLoading,
+		deleteVocabWord,
 	} = useBookDetail(bookId)
 	const { learningLang } = useBookLibrary()
 	const [sharing, setSharing] = useState(false)
@@ -151,7 +155,11 @@ function BookDetail({ bookId }: BookDetailProps) {
 						</div>
 						<div className={classes.stat}>
 							<div className={classes.statLabel}>Rating</div>
-							<div className={clsx(classes.statValue, classes.statRating)}>
+							<div
+								className={clsx(classes.statValue, classes.statRating, {
+									[classes.statRatingActive]: Boolean(rating),
+								})}
+							>
 								<IconStarFilled size={16} />
 								<span>{ratingLabel}</span>
 							</div>
@@ -277,10 +285,47 @@ function BookDetail({ bookId }: BookDetailProps) {
 					<div className={classes.vocabTitle}>
 						Words you looked up while reading
 					</div>
-					<BookEmptyState
-						title="No searched vocab yet"
-						description="Look up a word while reading to save it here."
-					/>
+					{vocabLoading && !vocabWords.length ? (
+						<div className={classes.empty}>Loading…</div>
+					) : vocabWords.length ? (
+						<div className={classes.vocabList}>
+							{vocabWords.map((word) => {
+								const sense = word.senses?.[0]
+								return (
+									<div key={word.source_vocab_id} className={classes.vocabItem}>
+										<div className={classes.vocabItemHead}>
+											<span className={classes.vocabItemWord}>
+												{word.vocab}
+											</span>
+											<button
+												type="button"
+												className={classes.vocabItemRemove}
+												onClick={() => deleteVocabWord(word.source_vocab_id)}
+												aria-label={`Remove ${word.vocab}`}
+											>
+												<IconX size={14} />
+											</button>
+										</div>
+										{sense?.meaning ? (
+											<div className={classes.vocabItemMeaning}>
+												{sense.meaning}
+											</div>
+										) : null}
+										{sense?.example ? (
+											<div className={classes.vocabItemExample}>
+												{sense.example}
+											</div>
+										) : null}
+									</div>
+								)
+							})}
+						</div>
+					) : (
+						<BookEmptyState
+							title="No searched vocab yet"
+							description="Look up a word while reading to save it here."
+						/>
+					)}
 				</div>
 			) : (
 				<div className={classes.chapters}>

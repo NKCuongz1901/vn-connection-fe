@@ -37,10 +37,19 @@ function BookCard({ book, variant = 'tile', onClick }: BookCardProps) {
 				<div>
 					<div className={classes.rowTitle}>{book.title}</div>
 					<div className={classes.rowMeta}>
-						{[book.author, book.category, rating ? `★ ${rating}` : null]
+						{[
+							book.author,
+							book.category,
+							book.durationLabel,
+							book.languageLabel,
+							rating ? `★ ${rating}` : null,
+						]
 							.filter(Boolean)
 							.join(' · ')}
 					</div>
+					{book.progressLabel ? (
+						<div className={classes.rowProgress}>{book.progressLabel}</div>
+					) : null}
 				</div>
 			</button>
 		)
@@ -64,12 +73,17 @@ function BookCard({ book, variant = 'tile', onClick }: BookCardProps) {
 			<div className={classes.title}>{book.title}</div>
 			<div className={classes.meta}>
 				{[
-					book.progressLabel || book.author,
+					book.author,
+					book.durationLabel,
+					book.languageLabel,
 					rating ? `★ ${rating}` : null,
 				]
 					.filter(Boolean)
 					.join(' · ')}
 			</div>
+			{book.progressLabel ? (
+				<div className={classes.progress}>{book.progressLabel}</div>
+			) : null}
 		</button>
 	)
 }

@@ -2,6 +2,8 @@ import { SearchOutlined } from '@ant-design/icons'
 import { IconChevronDown, IconChevronLeft } from '@tabler/icons-react'
 import { Flex, Popover, Skeleton } from 'antd'
 import { memo } from 'react'
+import { getCountries } from 'react-phone-number-input'
+import en from 'react-phone-number-input/locale/en.json'
 
 import useLocal from '@/hooks/Search/useLocal'
 
@@ -26,7 +28,7 @@ import NotFound from '@/svg/NotFound'
 import ProfileIcon from '@/svg/ProfileIcon'
 
 import { mainRoutes } from '@/routes/MainRoutes'
-import { genderOpts, countryCodes } from '@/Variable/common.variable'
+import { genderOpts } from '@/Variable/common.variable'
 import { languages, radiusOpts } from '@/Variable/select.variable'
 
 import DotIcon from '@/svg/DotIcon'
@@ -73,11 +75,17 @@ const filterGenderOpts = genderOpts.map((item) =>
 	item.value === 'OTHER' ? { ...item, label: 'All' } : item,
 )
 
-const nationalityOptions = countryCodes.map((item) => ({
-	value: item.code,
-	label: item.name,
-	name: item.name,
-}))
+/** Nationality labels from react-phone-number-input (same as login). */
+const nationalityOptions = getCountries()
+	.map((code) => {
+		const name = en[code] || code
+		return {
+			value: code,
+			label: name,
+			name,
+		}
+	})
+	.sort((a, b) => a.label.localeCompare(b.label))
 
 const Local = (props: LocalProps) => {
 	const { onChangeRoute } = useLocalePath()

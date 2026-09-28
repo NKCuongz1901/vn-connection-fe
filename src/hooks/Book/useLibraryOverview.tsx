@@ -16,6 +16,7 @@ import {
 	parseApiList,
 	parseApiObject,
 	parseBookLanguages,
+	parseListTotal,
 } from '@/apis/book/bookApis'
 import {
 	getReaderProfile,
@@ -60,6 +61,11 @@ const settledList = <T,>(
 	return compactCards(parseApiList<T>(result.value).map(mapItem))
 }
 
+const settledTotal = (result: PromiseSettledResult<unknown>, fallback: number) => {
+	if (result.status !== 'fulfilled') return fallback
+	return parseListTotal(result.value, fallback)
+}
+
 export default function useLibraryOverview() {
 	const [level, setLevelState] = useState<BookLevel>('A1')
 	const [reader, setReader] = useState<ReaderProfile | null>(null)
@@ -73,6 +79,13 @@ export default function useLibraryOverview() {
 	const [languages, setLanguages] = useState<BookLanguage[]>(
 		FALLBACK_BOOK_LANGUAGES,
 	)
+	const [totals, setTotals] = useState({
+		continueReading: 0,
+		allBooks: 0,
+		topPicks: 0,
+		recentlyAdded: 0,
+		popularNow: 0,
+	})
 	const [loading, setLoading] = useState(true)
 
 	const loadRails = useCallback(
@@ -95,16 +108,27 @@ export default function useLibraryOverview() {
 					getPopularNowBooks(listParams),
 				])
 
-			setContinueReading(
-				settledList<ContinueReadingApiItem>(
-					continueRes,
-					mapContinueReadingCard,
-				),
+			const nextContinueReading = settledList<ContinueReadingApiItem>(
+				continueRes,
+				mapContinueReadingCard,
 			)
-			setAllBooks(settledList<BookApiItem>(allRes, mapBookCard))
-			setTopPicks(settledList<BookApiItem>(topRes, mapBookCard))
-			setRecentlyAdded(settledList<BookApiItem>(recentRes, mapBookCard))
-			setPopularNow(settledList<BookApiItem>(popularRes, mapBookCard))
+			const nextAllBooks = settledList<BookApiItem>(allRes, mapBookCard)
+			const nextTopPicks = settledList<BookApiItem>(topRes, mapBookCard)
+			const nextRecentlyAdded = settledList<BookApiItem>(recentRes, mapBookCard)
+			const nextPopularNow = settledList<BookApiItem>(popularRes, mapBookCard)
+
+			setContinueReading(nextContinueReading)
+			setAllBooks(nextAllBooks)
+			setTopPicks(nextTopPicks)
+			setRecentlyAdded(nextRecentlyAdded)
+			setPopularNow(nextPopularNow)
+			setTotals({
+				continueReading: settledTotal(continueRes, nextContinueReading.length),
+				allBooks: settledTotal(allRes, nextAllBooks.length),
+				topPicks: settledTotal(topRes, nextTopPicks.length),
+				recentlyAdded: settledTotal(recentRes, nextRecentlyAdded.length),
+				popularNow: settledTotal(popularRes, nextPopularNow.length),
+			})
 		},
 		[],
 	)
@@ -208,6 +232,7 @@ export default function useLibraryOverview() {
 		topPicks,
 		recentlyAdded,
 		popularNow,
+		totals,
 		loading,
 	}
 }
