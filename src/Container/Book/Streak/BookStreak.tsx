@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { IconChevronLeft, IconFlame } from '@tabler/icons-react'
 import clsx from 'clsx'
 
@@ -24,7 +25,10 @@ type StreakTab = 'mine' | 'leaderboard'
 /** Books streak: banner, My streak (calendar + daily challenge) and Leaderboard */
 function BookStreak() {
 	const { onChangeRoute } = useLocalePath()
-	const [tab, setTab] = useState<StreakTab>('mine')
+	const searchParams = useSearchParams()
+	const [tab, setTab] = useState<StreakTab>(
+		searchParams?.get('tab') === 'leaderboard' ? 'leaderboard' : 'mine',
+	)
 	const [profile, setProfile] = useState<StreakProfile | null>(null)
 	const [missions, setMissions] = useState<StreakMissions>({ missions: [], today: null })
 

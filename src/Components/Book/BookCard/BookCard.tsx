@@ -1,6 +1,7 @@
 'use client'
 
 import { memo } from 'react'
+import clsx from 'clsx'
 
 import CImage from '@/Components/Custom/CImage/CImage'
 import { BookCardItem } from '@/interface/Book/book.interface'
@@ -98,7 +99,30 @@ function BookCard({
 				/>
 			</div>
 			{book.progressLabel ? (
-				<div className={classes.progress}>{book.progressLabel}</div>
+				<div className={classes.progress}>
+					{book.progressPercent !== undefined ? (
+						<div
+							className={classes.progressBar}
+							role="progressbar"
+							aria-valuenow={book.progressPercent}
+							aria-valuemin={0}
+							aria-valuemax={100}
+						>
+							<div
+								className={clsx(classes.progressFill, {
+									[classes.progressDone]: book.progressPercent >= 100,
+								})}
+								style={{ width: `${book.progressPercent}%` }}
+							/>
+						</div>
+					) : null}
+					<div className={classes.progressText}>
+						<span>{book.progressLabel}</span>
+						{book.progressPercent !== undefined ? (
+							<span className={classes.progressPct}>{book.progressPercent}% read</span>
+						) : null}
+					</div>
+				</div>
 			) : null}
 		</button>
 	)

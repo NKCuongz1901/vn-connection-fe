@@ -119,6 +119,9 @@ export const mapContinueReadingCard = (
 		category: book?.category?.[0],
 		rating: book?.review_summary?.overall_rating,
 		progressLabel: maxPages ? `Page ${currentPage}/${maxPages}` : undefined,
+		progressPercent: maxPages
+			? Math.min(100, Math.round((currentPage / maxPages) * 100))
+			: undefined,
 		durationLabel: duration ? formatListeningTime(duration) : undefined,
 		languageLabel: languageLabelFromCodes(book?.language),
 		chapterId: resume?.chapter_id || resume?.chapter?.id,
@@ -187,7 +190,11 @@ export const toggleFavouriteBook = async (bookId: string) => {
 
 export const getBookReviews = async (
 	bookId: string,
-	params: { limit?: number; offset?: number } = {},
+	params: {
+		limit?: number
+		offset?: number
+		sortBy?: 'newest' | 'highest' | 'lowest'
+	} = {},
 ) => {
 	return axios.get(`${BOOK_ROUTES.book}/${bookId}/reviews`, {
 		params: { sortBy: 'newest', limit: 20, offset: 0, ...params },
@@ -199,6 +206,15 @@ export const parseBookReviewStatistics = (
 ): BookReviewStatistics | null => {
 	const data = res as { results?: { statistics?: BookReviewStatistics } }
 	return data?.results?.statistics || null
+}
+
+export const reportBook = async (payload: {
+	report_target_id: string
+	issue_type: string
+	email: string
+	content: string
+}) => {
+	return axios.post('book-reports', { report_type: 'book', ...payload })
 }
 
 export const getMyBookReview = async (bookId: string) => {

@@ -71,6 +71,37 @@
 .tile .progress,
 .rail .progress {
 	margin-top: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.progressBar {
+	height: 4px;
+	border-radius: 99px;
+	background: #e2e8f0;
+	overflow: hidden;
+}
+
+.progressFill {
+	height: 100%;
+	border-radius: 99px;
+	background: #006b35;
+}
+
+.progressDone {
+	background: #16a34a;
+}
+
+.progressText {
+	display: flex;
+	justify-content: space-between;
+	gap: 6px;
+}
+
+.progressPct {
+	color: #64748b;
+	font-weight: 500;
 }
 
 .rating {

@@ -118,6 +118,8 @@ export type BookCardItem = {
 	category?: string
 	rating?: number
 	progressLabel?: string
+	/** 0-100, reading progress of a Continue reading book */
+	progressPercent?: number
 	durationLabel?: string
 	languageLabel?: string
 	viewCount?: number

@@ -76,6 +76,17 @@
 	text-align: right;
 }
 
+.toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.sort {
+	min-width: 130px;
+}
+
 .write {
 	align-self: flex-start;
 	height: 36px;

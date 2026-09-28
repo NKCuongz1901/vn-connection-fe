@@ -4,6 +4,7 @@ import { memo } from 'react'
 
 import BookRail from '@/Components/Book/BookRail'
 import StreakChip from '@/Container/Book/Streak/StreakChip'
+import StreakTopReaders from '@/Container/Book/Streak/StreakTopReaders'
 import { useBookLibrary } from '@/context/BookLibraryContext'
 import { getUserInfo } from '@/ultis/storage'
 import { useLocalePath } from '@/ultis/route'
@@ -43,6 +44,8 @@ function BookOverview() {
 				</div>
 				<StreakChip />
 			</div>
+
+			<StreakTopReaders />
 
 			<BookRail
 				title="Continue reading"

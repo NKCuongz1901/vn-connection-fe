@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useEffect, useState } from 'react'
 import { IconStarFilled } from '@tabler/icons-react'
+import { Select } from 'antd'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
 
@@ -20,6 +21,14 @@ import {
 import classes from './BookReviewListModal.module.scss'
 
 const PAGE_SIZE = 20
+
+type ReviewSort = 'newest' | 'highest' | 'lowest'
+
+const SORT_OPTIONS: { value: ReviewSort; label: string }[] = [
+	{ value: 'newest', label: 'Newest' },
+	{ value: 'highest', label: 'Highest' },
+	{ value: 'lowest', label: 'Lowest' },
+]
 
 type BookReviewListModalProps = {
 	open: boolean
@@ -57,16 +66,21 @@ function BookReviewListModal({
 	const [total, setTotal] = useState(0)
 	const [loading, setLoading] = useState(false)
 	const [loadingMore, setLoadingMore] = useState(false)
+	const [sort, setSort] = useState<ReviewSort>('newest')
 
 	const load = useCallback(
 		async (offset: number) => {
-			const res = await getBookReviews(bookId, { limit: PAGE_SIZE, offset })
+			const res = await getBookReviews(bookId, {
+				limit: PAGE_SIZE,
+				offset,
+				sortBy: sort,
+			})
 			const rows = parseApiList<BookReview>(res)
 			setReviews((prev) => (offset ? [...prev, ...rows] : rows))
 			setTotal(parseListTotal(res, rows.length))
 			if (!offset) setStats(parseBookReviewStatistics(res))
 		},
-		[bookId],
+		[bookId, sort],
 	)
 
 	useEffect(() => {
@@ -150,9 +164,18 @@ function BookReviewListModal({
 					</div>
 				</div>
 
-				<button type="button" className={classes.write} onClick={onWrite}>
-					Write a review
-				</button>
+				<div className={classes.toolbar}>
+					<button type="button" className={classes.write} onClick={onWrite}>
+						Write a review
+					</button>
+					<Select
+						value={sort}
+						options={SORT_OPTIONS}
+						onChange={setSort}
+						className={classes.sort}
+						aria-label="Sort by"
+					/>
+				</div>
 
 				{loading ? (
 					<div className={classes.empty}>Loading…</div>
