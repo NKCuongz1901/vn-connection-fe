@@ -31,6 +31,7 @@ export interface ChatLocationEntry {
 	id: string | null
 	title: string
 	level?: number
+	metadata?: { chat_location?: { level?: number } }
 }
 
 export default function useChatLocation(props: useChatLocationProps) {
@@ -317,8 +318,10 @@ export default function useChatLocation(props: useChatLocationProps) {
 
 	// Resolve an existing location or create a new location room before opening it.
 	const handleEnterChatLocation = async (item: ChatLocationEntry) => {
-		const { id: locationId, title, level } = item || {}
+		const { id: locationId, title, level, metadata } = item || {}
 		const locationKey = locationId || `${title}-${level || ''}`
+		// TODO: BE suggest-chat-location does not return level; fallback to 1 (global) like mobile.
+		const createLevel = level ?? metadata?.chat_location?.level ?? 1
 		if (!title || enteringLocationKey) return
 
 		setEnteringLocationKey(locationKey)
@@ -327,18 +330,10 @@ export default function useChatLocation(props: useChatLocationProps) {
 				onPushState({ type: 'location', id: locationId })
 				return
 			}
-			if (!level) {
-				openError({
-					message:
-						'Unable to create this location because its level is missing.',
-				})
-				return
-			}
-
 			const res: any = await createConversation({
 				title,
 				kind: 'CHAT_LOCATION',
-				level,
+				level: createLevel,
 			})
 			const createdId = res?.results?.object?.id
 			if (res?.code !== 200 || !createdId) {
