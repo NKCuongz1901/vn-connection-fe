@@ -38,17 +38,27 @@ const ABOUT_WARNING_TEXT =
 
 const SHARE_TICKER_TEXT = 'Share & earn 10% per sale'
 
+/** What the main button does, chosen the same way as the app's bottom bar. */
+export type CourseDetailAction = 'classroom' | 'trial' | 'discount' | 'buy'
+
+const ACTION_LABEL: Record<CourseDetailAction, string> = {
+	classroom: 'Go to classroom',
+	trial: 'Get 3 days free',
+	discount: 'Get discount',
+	buy: 'Buy now',
+}
+
 type CourseDetailProps = {
 	course: Course
-	paymentInforCourse: PaymentInforCourse
+	paymentInforCourse?: PaymentInforCourse | null
 	selectedLanguageCode?: string
 	onShare?: () => void
 	onReport?: () => void
 	onContribute?: () => void
 	onSelectLanguage?: () => void
-	onGetDiscount?: () => void
-	onBuyNow?: () => void
-	isPaying?: boolean
+	primaryAction: CourseDetailAction
+	onPrimaryAction?: () => void
+	isBusy?: boolean
 }
 
 const formatCoursePrice = (price: string) => {
@@ -74,15 +84,14 @@ const splitSlotColumns = (slots: CourseSlotPrototype[]) => {
 
 function CourseDetail({
 	course,
-	paymentInforCourse,
 	selectedLanguageCode,
 	onShare,
 	onReport,
 	onContribute,
 	onSelectLanguage,
-	onGetDiscount,
-	onBuyNow,
-	isPaying,
+	primaryAction,
+	onPrimaryAction,
+	isBusy,
 }: CourseDetailProps) {
 	const { custom_data, slot_prototype, owner } = course
 	const learningTypes = custom_data?.learning_type || []
@@ -233,22 +242,15 @@ function CourseDetail({
 						</div>
 						<button
 							type="button"
-							className={`${classes.buyBtn} ${
-								selectedLanguageCode ? classes.buyBtnActive : ''
-							}`}
-							disabled={!selectedLanguageCode || isPaying}
+							className={`${classes.buyBtn} ${classes.buyBtnActive}`}
+							disabled={isBusy}
+							aria-busy={isBusy || undefined}
 							onClick={() => {
-								if (!selectedLanguageCode || isPaying) return
-								if (paymentInforCourse?.is_first_payment_discount === true) {
-									onGetDiscount?.()
-									return
-								}
-								onBuyNow?.()
+								if (isBusy) return
+								onPrimaryAction?.()
 							}}
 						>
-							{paymentInforCourse?.is_first_payment_discount === true
-								? 'Get discount'
-								: 'Buy now'}
+							{ACTION_LABEL[primaryAction]}
 						</button>
 					</div>
 				</div>

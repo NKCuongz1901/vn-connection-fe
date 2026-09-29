@@ -227,6 +227,7 @@ export const COURSE_ROUTES = {
 	contributeIdea: 'course-ai/contribute-idea',
 	getPaymentInforCourse: (id: string) => `course-ai/payment/${id}`,
 	paymentLink: 'course-ai/payment-link',
+	freeTrial: (id: string) => `course-ai/${id}/free-trial`,
 }
 export const Menus = [
 	{

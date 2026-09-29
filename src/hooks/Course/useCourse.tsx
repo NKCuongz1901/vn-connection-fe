@@ -9,6 +9,7 @@ import {
 	handleReportCourse as reportCourseApi,
 	getPaymentInforCourse,
 	handlePaymentLink,
+	startCourseFreeTrial,
 } from '@/apis/courseApis'
 import { useModal } from '@/context/ModalContext'
 import {
@@ -18,11 +19,12 @@ import {
 	TrackingCourse,
 	TrackingCourseRes,
 } from '@/interface/Course/Course.interface'
+import { getCoursePaymentReturnUrl } from '@/ultis/courseEnrollment'
 import { getReferralCode } from '@/ultis/string'
 import { useCallback, useEffect, useState } from 'react'
 
 export default function useCourse(id?: string) {
-	const { openError } = useModal()
+	const { openError, openSuccess } = useModal()
 	const [listCourse, setListCourse] = useState<Course[]>([])
 	const [myPurchasedCourse, setMyPurchasedCourse] = useState<Course[]>([])
 	const [trackingCourse, setTrackingCourse] = useState<TrackingCourse[]>([])
@@ -33,6 +35,7 @@ export default function useCourse(id?: string) {
 		useState<PaymentInforCourse | null>(null)
 	const [paymentLink, setPaymentLink] = useState<string>('')
 	const [loading, setloading] = useState({
+		freeTrial: false,
 		listCourse: true,
 		myPurchasedCourse: true,
 		trackingCourse: true,
@@ -107,9 +110,7 @@ export default function useCourse(id?: string) {
 			const { code, results } = res || {}
 			if (code === 200) {
 				setReferralGlobalLink(results?.object?.share_link || '')
-				setReferralGlobalCode(
-					getReferralCode(results?.object?.share_link || ''),
-				)
+				setReferralGlobalCode(getReferralCode(results?.object?.share_link || ''))
 			}
 		} catch (error) {
 			openError(error)
@@ -178,11 +179,33 @@ export default function useCourse(id?: string) {
 		}
 	}
 
-	/** Fetches the OnePay URL and redirects the browser to checkout. */
-	const handleGetPaymentLink = async (course_id: string) => {
+	/**
+	 * Starts OnePay checkout, the same path for a normal purchase and for the
+	 * 50% first-course offer: the server prices the checkout and applies the
+	 * discount itself. The chosen learning language is recorded first through
+	 * the payment details call, the language the IPN then enrolls the learner
+	 * in, and OnePay is told to send the learner back to this website.
+	 */
+	const handleGetPaymentLink = async (
+		course_id: string,
+		targetLanguage?: string,
+		locale: string = 'en',
+	) => {
 		try {
 			setloading((prev) => ({ ...prev, paymentLink: true }))
-			const res: any = await handlePaymentLink(course_id)
+			const infoRes: any = await getPaymentInforCourse(course_id, targetLanguage)
+			const info: PaymentInforCourse | null = infoRes?.results?.object || null
+			if (info) setPaymentInforCourse(info)
+			if (info?.is_purchased) {
+				// Bought in the meantime (another tab or the app): show the classroom
+				// button instead of charging again.
+				await handleGetCourseDetail(course_id)
+				return
+			}
+			const res: any = await handlePaymentLink(
+				course_id,
+				getCoursePaymentReturnUrl(locale),
+			)
 			const { code, results } = res || {}
 			const url = results?.object?.payment_url || ''
 			if (code === 200 && url) {
@@ -193,6 +216,31 @@ export default function useCourse(id?: string) {
 			openError(error)
 		} finally {
 			setloading((prev) => ({ ...prev, paymentLink: false }))
+		}
+	}
+
+	/**
+	 * Starts the 3-day free trial (UD-380), then reloads the course so the page
+	 * shows it as enrolled. Returns false when the server refused.
+	 */
+	const handleStartFreeTrial = async (
+		course_id: string,
+		targetLanguage?: string,
+	) => {
+		try {
+			setloading((prev) => ({ ...prev, freeTrial: true }))
+			await startCourseFreeTrial(course_id, targetLanguage)
+			await Promise.all([
+				handleGetCourseDetail(course_id),
+				handleGetPaymentInforCourse(course_id),
+			])
+			openSuccess({ message: 'Your 3-day free trial has started.' })
+			return true
+		} catch (error) {
+			openError(error)
+			return false
+		} finally {
+			setloading((prev) => ({ ...prev, freeTrial: false }))
 		}
 	}
 
@@ -224,5 +272,6 @@ export default function useCourse(id?: string) {
 		handleReportCourse,
 		handleContributeIdea,
 		handleGetPaymentLink,
+		handleStartFreeTrial,
 	}
 }

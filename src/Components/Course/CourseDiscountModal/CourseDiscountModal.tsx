@@ -13,6 +13,7 @@ type CourseDiscountModalProps = {
 	onClose: () => void
 	paymentInfor?: PaymentInforCourse | null
 	onPayNow?: () => void
+	isPaying?: boolean
 }
 
 const formatPrice = (price?: number | null) => {
@@ -21,12 +22,16 @@ const formatPrice = (price?: number | null) => {
 	return `${formatted} đ`
 }
 
-/** Shows first-course discount prices from payment info. */
+/**
+ * Shows first-course discount prices from payment info. Pay now starts the
+ * same OnePay checkout as Buy now; the server applies the discount.
+ */
 function CourseDiscountModal({
 	open,
 	onClose,
 	paymentInfor,
 	onPayNow,
+	isPaying,
 }: CourseDiscountModalProps) {
 	if (!open) return null
 
@@ -91,7 +96,12 @@ function CourseDiscountModal({
 					<button
 						type="button"
 						className={classes.payBtn}
-						onClick={onPayNow}
+						disabled={isPaying}
+						aria-busy={isPaying || undefined}
+						onClick={() => {
+							if (isPaying) return
+							onPayNow?.()
+						}}
 					>
 						Pay now
 					</button>
