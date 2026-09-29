@@ -23,7 +23,7 @@ export const normalizeBookLevel = (value?: string | null): BookLevel => {
 export const BOOK_NAV = [
 	{ id: 'overview', label: 'All books', href: 'mini-apps/books-audio' },
 	{ id: 'shadowing', label: 'Shadowing', disabled: true },
-	{ id: 'library', label: 'My Library', disabled: true },
+	{ id: 'library', label: 'My Library', href: 'mini-apps/books-audio/library' },
 	{ id: 'vocab', label: 'Vocabulary', disabled: true },
 	{ id: 'profile', label: 'Reading profile', disabled: true },
 	{ id: 'contribute', label: 'Contributed book', disabled: true },

@@ -123,6 +123,7 @@ export type BookCardItem = {
 	durationLabel?: string
 	languageLabel?: string
 	viewCount?: number
+	level?: string
 	isFavourited?: boolean
 	shareLink?: string
 	chapterId?: string

@@ -6,6 +6,27 @@ import {
 } from '@/apis/book/chapterApis'
 import { ChapterApiItem, ChapterAudio } from '@/interface/Book/book.interface'
 
+const DOWNLOADED_KEY = 'book-downloaded-ids'
+
+/** Books this browser has downloaded audio for (My Library → Downloaded) */
+export const getDownloadedBookIds = (): string[] => {
+	try {
+		const ids = JSON.parse(window.localStorage.getItem(DOWNLOADED_KEY) || '[]')
+		return Array.isArray(ids) ? ids.filter((id) => typeof id === 'string') : []
+	} catch {
+		return []
+	}
+}
+
+export const markBookDownloaded = (bookId: string) => {
+	try {
+		const ids = getDownloadedBookIds().filter((id) => id !== bookId)
+		window.localStorage.setItem(DOWNLOADED_KEY, JSON.stringify([bookId, ...ids]))
+	} catch {
+		// storage blocked: the file is still saved, it just is not listed
+	}
+}
+
 const safeFileName = (value: string) =>
 	value.replace(/[\\/:*?"<>|]+/g, ' ').trim() || 'audio'
 
@@ -58,5 +79,6 @@ export const downloadBookAudio = async (
 		await downloadAudio(url, name)
 		saved += 1
 	}
+	if (saved) markBookDownloaded(book.id)
 	return saved
 }
