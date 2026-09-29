@@ -18,6 +18,7 @@ import {
 	CourseSlotPrototype,
 	PaymentInforCourse,
 } from '@/interface/Course/Course.interface'
+import { formatUtcHmRange } from '@/ultis/courseSlotTime'
 import { formatNumberString } from '@/ultis/string'
 import { OVERVIEW_GUEST_CHAT_ROOMS } from '@/Variable/overviewGuestChatRooms.variable'
 
@@ -56,19 +57,14 @@ const formatCoursePrice = (price: string) => {
 	return `${formatted} đ`
 }
 
-const formatSlotTime = (time: string) => {
-	if (!time) return ''
-	if (time === '24:00') return '00:00'
-	const [hour, minute] = time.split(':')
-	return `${hour.padStart(2, '0')}:${(minute || '00').padStart(2, '0')}`
-}
-
-/** Builds a display range from UTC start/end, e.g. "01:00 - 01:30". */
+/**
+ * The slot's UTC start and end shown in the viewer's local time, as the app
+ * does (course_slot_time.dart): 01:00 - 01:30 UTC reads 08:00 - 08:30 in
+ * Vietnam.
+ */
 const formatSlotRange = (slot: CourseSlotPrototype) => {
-	const start = formatSlotTime(slot.start_time_utc)
-	const end = formatSlotTime(slot.end_time_utc)
-	if (!start || !end) return ''
-	return `${start} - ${end}`
+	if (!slot.start_time_utc || !slot.end_time_utc) return ''
+	return formatUtcHmRange(slot.start_time_utc, slot.end_time_utc)
 }
 
 const splitSlotColumns = (slots: CourseSlotPrototype[]) => {
