@@ -261,6 +261,8 @@ function ContributeBookModal({ open, book, onClose, onSaved }: ContributeBookMod
 					error={show('author')}
 					onChange={setAuthor}
 					placeholder="Item name"
+					disabled={isEdit && !isDev}
+					hint={isEdit && !isDev ? 'The author cannot be changed after creating the book.' : undefined}
 				/>
 
 				<div className={classes.field}>
@@ -284,15 +286,31 @@ function ContributeBookModal({ open, book, onClose, onSaved }: ContributeBookMod
 					<div className={classes.label}>
 						Category <span className={classes.required}>*</span>
 					</div>
-					<Select
-						mode="multiple"
-						value={categories}
-						options={categoryOptions}
-						onChange={setCategories}
-						placeholder="Choose category"
-						status={show('category') ? 'error' : undefined}
-						className={classes.select}
-					/>
+					{isDev ? (
+						<Select
+							mode="multiple"
+							value={categories}
+							options={categoryOptions}
+							onChange={setCategories}
+							placeholder="Choose category"
+							status={show('category') ? 'error' : undefined}
+							className={classes.select}
+						/>
+					) : (
+						<>
+							<Select
+								value={categories[0]}
+								options={categoryOptions}
+								onChange={(value: string) => setCategories(value ? [value] : [])}
+								placeholder="Choose category"
+								status={show('category') ? 'error' : undefined}
+								className={classes.select}
+							/>
+							<div className={classes.hint}>
+								Your book is also listed in Contributed by Users.
+							</div>
+						</>
+					)}
 					{show('category') ? <div className={classes.error}>{show('category')}</div> : null}
 				</div>
 
@@ -309,7 +327,7 @@ function ContributeBookModal({ open, book, onClose, onSaved }: ContributeBookMod
 									[classes.segmentActive]: languageType === type,
 								})}
 								onClick={() => setLanguageType(type)}
-								disabled={isEdit}
+								disabled={isEdit || (type === 'bilingual' && !isDev)}
 							>
 								{type === 'single' ? 'One language' : 'Multilingual'}
 							</button>
@@ -335,6 +353,8 @@ function ContributeBookModal({ open, book, onClose, onSaved }: ContributeBookMod
 					)}
 					{isEdit ? (
 						<div className={classes.hint}>The language type cannot be changed after creating the book.</div>
+					) : !isDev ? (
+						<div className={classes.hint}>Multilingual books are published by UniVini.</div>
 					) : null}
 					{show('language') ? <div className={classes.error}>{show('language')}</div> : null}
 				</div>
@@ -376,10 +396,22 @@ type TextFieldProps = {
 	error?: string
 	placeholder?: string
 	multiline?: boolean
+	disabled?: boolean
+	hint?: string
 	onChange: (value: string) => void
 }
 
-function TextField({ label, value, max, error, placeholder, multiline, onChange }: TextFieldProps) {
+function TextField({
+	label,
+	value,
+	max,
+	error,
+	placeholder,
+	multiline,
+	disabled,
+	hint,
+	onChange,
+}: TextFieldProps) {
 	const Tag = multiline ? 'textarea' : 'input'
 	return (
 		<div className={classes.field}>
@@ -387,14 +419,20 @@ function TextField({ label, value, max, error, placeholder, multiline, onChange 
 				{label} <span className={classes.required}>*</span>
 			</div>
 			<Tag
-				className={clsx(classes.input, { [classes.textarea]: multiline, [classes.invalid]: error })}
+				className={clsx(classes.input, {
+					[classes.textarea]: multiline,
+					[classes.invalid]: error,
+					[classes.readOnly]: disabled,
+				})}
 				value={value}
+				disabled={disabled}
 				maxLength={max}
 				placeholder={placeholder}
 				onChange={(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
 					onChange(event.target.value)
 				}
 			/>
+			{hint ? <div className={classes.hint}>{hint}</div> : null}
 			<div className={classes.fieldFoot}>
 				<span className={classes.error}>{error}</span>
 				<span className={classes.counter}>
