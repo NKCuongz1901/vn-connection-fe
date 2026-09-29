@@ -16,6 +16,13 @@ export type BookReview = {
 		name?: string
 		avatar?: string | null
 	}
+	/** present on the reader's own reviews (GET book/my/reviews) */
+	book?: {
+		id?: string
+		title?: string
+		author?: string
+		cover_image?: string
+	}
 }
 
 export type BookReviewStatistics = {

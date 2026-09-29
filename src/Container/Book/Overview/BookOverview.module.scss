@@ -24,3 +24,95 @@
 	font-size: 14px;
 	line-height: 20px;
 }
+
+// Category block
+.category {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.categoryHead {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.categoryTitle {
+	color: #0f1729;
+	font-size: 18px;
+	font-weight: 700;
+}
+
+.categoryAll {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border: none;
+	border-radius: 99px;
+	background: #f4f8fc;
+	color: #006b35;
+	cursor: pointer;
+}
+
+.categoryChips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.categoryChip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 34px;
+	padding: 0 12px;
+	border: 1px solid #e2e8f0;
+	border-radius: 99px;
+	background: #fff;
+	color: #334155;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.categoryChipActive {
+	border-color: #006b35;
+	background: #006b35;
+	color: #fff;
+
+	.categoryCount {
+		background: rgba(255, 255, 255, 0.2);
+		color: #fff;
+	}
+}
+
+.categoryCount {
+	padding: 0 6px;
+	border-radius: 99px;
+	background: #f4f8fc;
+	color: #006b35;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 18px;
+}
+
+.categoryTotal {
+	color: #64748b;
+	font-size: 13px;
+}
+
+.categoryRail {
+	display: flex;
+	gap: 16px;
+	overflow-x: auto;
+	padding-bottom: 4px;
+}
+
+.categoryEmpty {
+	padding: 24px 0;
+	color: #94a3b8;
+	font-size: 14px;
+}

@@ -4,6 +4,7 @@ import { memo } from 'react'
 
 import BookRail from '@/Components/Book/BookRail'
 import StreakChip from '@/Container/Book/Streak/StreakChip'
+import BookCategoryBlock from './BookCategoryBlock'
 import StreakTopReaders from '@/Container/Book/Streak/StreakTopReaders'
 import { useBookLibrary } from '@/context/BookLibraryContext'
 import { getUserInfo } from '@/ultis/storage'
@@ -66,6 +67,7 @@ function BookOverview() {
 					)
 				}}
 			/>
+			<BookCategoryBlock />
 			<BookRail
 				title="Top picks for you"
 				total={totals.topPicks}
