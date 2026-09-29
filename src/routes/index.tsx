@@ -228,6 +228,9 @@ export const COURSE_ROUTES = {
 	getPaymentInforCourse: (id: string) => `course-ai/payment/${id}`,
 	paymentLink: 'course-ai/payment-link',
 	freeTrial: (id: string) => `course-ai/${id}/free-trial`,
+	shareCourse: (id: string) => `course-ai/${id}/share`,
+	referralRegister: 'course-ai/referral/register',
+	referralGlobalRegister: 'course-ai/referral/global/register',
 }
 export const Menus = [
 	{

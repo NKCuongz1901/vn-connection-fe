@@ -13,6 +13,7 @@ import CourseLanguageModal from '@/Components/Course/CourseLanguageModal'
 import CourseReferralModal from '@/Components/Course/CourseReferralModal/CourseReferralModal'
 import ModalReport from '@/Components/Custom/ModalReport'
 import useCourse from '@/hooks/Course/useCourse'
+import useCourseReferralCapture from '@/hooks/Course/useCourseReferralCapture'
 import { mainRoutes } from '@/routes/MainRoutes'
 import {
 	canStartFreeTrial,
@@ -33,12 +34,15 @@ function DetailCourse({ id }: { id: string }) {
 		loading,
 		referralGlobalLink,
 		referralGlobalCode,
+		courseShareLink,
+		courseShareCode,
 		handleReportCourse,
 		handleContributeIdea,
 		paymentInforCourse,
 		handleGetPaymentLink,
 		handleStartFreeTrial,
 	} = useCourse(id)
+	useCourseReferralCapture(id)
 	const [referralModalOpen, setReferralModalOpen] = useState(false)
 	const [reportOpen, setReportOpen] = useState(false)
 	const [contributeOpen, setContributeOpen] = useState(false)
@@ -68,6 +72,11 @@ function DetailCourse({ id }: { id: string }) {
 			: isFirstPaymentDiscount
 				? 'discount'
 				: 'buy'
+
+	// The app shares the per-course REF link on this page and the global one
+	// on the overview; the global link stands in until this one has loaded.
+	const shareLink = courseShareLink || referralGlobalLink
+	const shareCode = courseShareLink ? courseShareCode : referralGlobalCode
 
 	const handleBack = () => {
 		onChangeRoute(mainRoutes.courseOverview)
@@ -155,8 +164,8 @@ function DetailCourse({ id }: { id: string }) {
 			<CourseReferralModal
 				open={referralModalOpen}
 				onClose={() => setReferralModalOpen(false)}
-				referralCode={referralGlobalCode}
-				shareLink={referralGlobalLink}
+				referralCode={shareCode}
+				shareLink={shareLink}
 			/>
 			<ModalReport
 				open={reportOpen}

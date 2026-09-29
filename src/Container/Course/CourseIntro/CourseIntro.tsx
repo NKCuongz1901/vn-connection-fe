@@ -4,6 +4,7 @@ import { memo, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
 import TickCircleIcon from '@/svg/TickCircleIcon'
+import useCourseReferralCapture from '@/hooks/Course/useCourseReferralCapture'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { useLocalePath } from '@/ultis/route'
 
@@ -69,6 +70,8 @@ const itemVariants = {
 /** Full-page Course intro splash; redirects to Course overview after a short delay. */
 function CourseIntro() {
 	const { onChangeRoute } = useLocalePath()
+	// A global REF link may land here; keep it before the redirect drops it.
+	useCourseReferralCapture()
 
 	useEffect(() => {
 		const timer = window.setTimeout(() => {

@@ -7,6 +7,7 @@ import { Skeleton } from 'antd'
 import CourseCard from '@/Components/Course/CourseCard/CourseCard'
 import CourseReferralModal from '@/Components/Course/CourseReferralModal/CourseReferralModal'
 import useCourse from '@/hooks/Course/useCourse'
+import useCourseReferralCapture from '@/hooks/Course/useCourseReferralCapture'
 import { mainRoutes } from '@/routes/MainRoutes'
 import { arrayFrom } from '@/ultis/array'
 import { useLocalePath } from '@/ultis/route'
@@ -15,6 +16,7 @@ import classes from './CourseList.module.scss'
 
 function CourseList() {
 	const { onChangeRoute } = useLocalePath()
+	useCourseReferralCapture()
 	const { loading, listCourse, referralGlobalLink, referralGlobalCode } =
 		useCourse()
 	const [referralModalOpen, setReferralModalOpen] = useState(false)

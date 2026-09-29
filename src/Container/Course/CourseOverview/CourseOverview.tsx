@@ -9,6 +9,7 @@ import CourseList from '@/Components/Course/CourseList/CourseList'
 import MyCourseList from '@/Components/Course/MyCourseList/MyCourseList'
 import TrackingCourseList from '@/Components/Course/TrackingCourseList/TrackingCourseList'
 import CourseReferralModal from '@/Components/Course/CourseReferralModal/CourseReferralModal'
+import useCourseReferralCapture from '@/hooks/Course/useCourseReferralCapture'
 
 function CourseOverview() {
 	const {
@@ -20,6 +21,8 @@ function CourseOverview() {
 		referralGlobalCode,
 	} = useCourse()
 	const { onChangeRoute } = useLocalePath()
+	// The global REF link opens the Course pages (UNIWEB-696).
+	useCourseReferralCapture()
 	const [referralModalOpen, setReferralModalOpen] = useState(false)
 	const isPurchasedReady = !loading.myPurchasedCourse
 	const hasPurchasedCourse = myPurchasedCourse.length > 0

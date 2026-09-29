@@ -10,6 +10,7 @@ import {
 	getPaymentInforCourse,
 	handlePaymentLink,
 	startCourseFreeTrial,
+	getCourseShareLink,
 } from '@/apis/courseApis'
 import { useModal } from '@/context/ModalContext'
 import {
@@ -34,6 +35,7 @@ export default function useCourse(id?: string) {
 	const [paymentInforCourse, setPaymentInforCourse] =
 		useState<PaymentInforCourse | null>(null)
 	const [paymentLink, setPaymentLink] = useState<string>('')
+	const [courseShareLink, setCourseShareLink] = useState<string>('')
 	const [loading, setloading] = useState({
 		freeTrial: false,
 		listCourse: true,
@@ -244,6 +246,20 @@ export default function useCourse(id?: string) {
 		}
 	}
 
+	/** The learner's REF link for this course, as the app shares it. */
+	const handleGetCourseShareLink = async (course_id: string) => {
+		try {
+			const res: any = await getCourseShareLink(course_id)
+			const { code, results } = res || {}
+			if (code === 200) {
+				setCourseShareLink(results?.object?.share_link || '')
+			}
+		} catch (error) {
+			// The share menu falls back to the global link; nothing to show here.
+			console.log('Course share link failed', error)
+		}
+	}
+
 	useEffect(() => {
 		handleGetListCourse()
 		handleGetMyPurchasedCourse()
@@ -255,6 +271,7 @@ export default function useCourse(id?: string) {
 		if (!id) return
 		handleGetCourseDetail(id)
 		handleGetPaymentInforCourse(id)
+		handleGetCourseShareLink(id)
 	}, [id])
 
 	return {
@@ -268,6 +285,8 @@ export default function useCourse(id?: string) {
 		courseDetail,
 		paymentInforCourse,
 		paymentLink,
+		courseShareLink,
+		courseShareCode: getReferralCode(courseShareLink),
 		// Actions
 		handleReportCourse,
 		handleContributeIdea,

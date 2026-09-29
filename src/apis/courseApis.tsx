@@ -100,3 +100,26 @@ export const startCourseFreeTrial = async (
 		...(target_language ? { target_language } : {}),
 	})
 }
+
+/** The signed-in learner's REF link for one course. */
+export const getCourseShareLink = async (course_id: string) => {
+	return await axios.post(COURSE_ROUTES.shareCourse(course_id))
+}
+
+/** Records the sharer of a per-course REF link for this learner. */
+export const registerCourseReferral = async (
+	course_id: string,
+	invite_code: string,
+) => {
+	return await axios.post(COURSE_ROUTES.referralRegister, {
+		course_id,
+		invite_code,
+	})
+}
+
+/** Records the sharer of the global REF link for every course not bought yet. */
+export const registerGlobalCourseReferral = async (invite_code: string) => {
+	return await axios.post(COURSE_ROUTES.referralGlobalRegister, {
+		invite_code,
+	})
+}
