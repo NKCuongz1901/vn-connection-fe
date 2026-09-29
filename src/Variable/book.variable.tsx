@@ -26,7 +26,7 @@ export const BOOK_NAV = [
 	{ id: 'library', label: 'My Library', href: 'mini-apps/books-audio/library' },
 	{ id: 'vocab', label: 'Vocabulary', disabled: true },
 	{ id: 'profile', label: 'Reading profile', disabled: true },
-	{ id: 'contribute', label: 'Contributed book', disabled: true },
+	{ id: 'contribute', label: 'Contributed book', href: 'mini-apps/books-audio/contributed' },
 ] as const
 
 export const BOOK_CATEGORIES = [
