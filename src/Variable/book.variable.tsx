@@ -22,11 +22,12 @@ export const normalizeBookLevel = (value?: string | null): BookLevel => {
 
 export const BOOK_NAV = [
 	{ id: 'overview', label: 'All books', href: 'mini-apps/books-audio' },
-	{ id: 'shadowing', label: 'Shadowing', disabled: true },
+	// Studying: the books the reader is reading or listening to
+	{ id: 'studying', label: 'Studying', href: 'mini-apps/books-audio/continue' },
 	{ id: 'library', label: 'My Library', href: 'mini-apps/books-audio/library' },
 	{ id: 'vocab', label: 'Vocabulary', disabled: true },
-	{ id: 'profile', label: 'Reading profile', disabled: true },
-	{ id: 'contribute', label: 'Contributed book', disabled: true },
+	{ id: 'profile', label: 'Reading profile', href: 'mini-apps/books-audio/profile' },
+	{ id: 'contribute', label: 'Contributed book', href: 'mini-apps/books-audio/contributed' },
 ] as const
 
 export const BOOK_CATEGORIES = [
@@ -42,6 +43,7 @@ export const BOOK_CATEGORIES = [
 
 export const BOOK_ROOT = 'mini-apps/books-audio'
 export const BOOK_STREAK_PATH = `${BOOK_ROOT}/streak`
+export const BOOK_PROFILE_PATH = `${BOOK_ROOT}/profile`
 
 export const DEFAULT_LEARNING_LANG = 'en-gb'
 export const DEFAULT_NATIVE_LANG = 'vi-south'
