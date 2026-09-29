@@ -1,21 +1,31 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { IconArrowLeft } from '@tabler/icons-react'
 import { Skeleton } from 'antd'
 
 import ContributeIdeaModal from '@/Components/Course/ContributeIdeaModal'
-import CourseDetail from '@/Components/Course/CourseDetail/CourseDetail'
+import CourseDetail, {
+	CourseDetailAction,
+} from '@/Components/Course/CourseDetail/CourseDetail'
 import CourseDiscountModal from '@/Components/Course/CourseDiscountModal'
 import CourseLanguageModal from '@/Components/Course/CourseLanguageModal'
 import CourseReferralModal from '@/Components/Course/CourseReferralModal/CourseReferralModal'
 import ModalReport from '@/Components/Custom/ModalReport'
 import useCourse from '@/hooks/Course/useCourse'
+import useCourseReferralCapture from '@/hooks/Course/useCourseReferralCapture'
 import { mainRoutes } from '@/routes/MainRoutes'
+import {
+	canStartFreeTrial,
+	isCourseEnrolled,
+} from '@/ultis/courseEnrollment'
 import { useLocalePath } from '@/ultis/route'
 import { getCourseReportIssueTypes } from '@/Variable/common.variable'
 
 import classes from './DetailCourse.module.scss'
+
+/** Actions that need a learning language first, as in the app. */
+type PendingLanguageAction = 'buy' | 'trial' | null
 
 function DetailCourse({ id }: { id: string }) {
 	const { locale, onChangeRoute } = useLocalePath()
@@ -24,17 +34,22 @@ function DetailCourse({ id }: { id: string }) {
 		loading,
 		referralGlobalLink,
 		referralGlobalCode,
+		courseShareLink,
+		courseShareCode,
 		handleReportCourse,
 		handleContributeIdea,
 		paymentInforCourse,
 		handleGetPaymentLink,
+		handleStartFreeTrial,
 	} = useCourse(id)
+	useCourseReferralCapture(id)
 	const [referralModalOpen, setReferralModalOpen] = useState(false)
 	const [reportOpen, setReportOpen] = useState(false)
 	const [contributeOpen, setContributeOpen] = useState(false)
 	const [languageOpen, setLanguageOpen] = useState(false)
 	const [discountOpen, setDiscountOpen] = useState(false)
 	const [selectedLanguageCode, setSelectedLanguageCode] = useState('')
+	const pendingActionRef = useRef<PendingLanguageAction>(null)
 
 	useEffect(() => {
 		setSelectedLanguageCode(courseDetail?.userCourse?.target_language || '')
@@ -46,14 +61,70 @@ function DetailCourse({ id }: { id: string }) {
 	const reportHeaderTitle =
 		locale === 'vi' ? 'Cho chúng tôi biết vấn đề của bạn' : 'Tell us your issue'
 
+	const isEnrolled = isCourseEnrolled(courseDetail, paymentInforCourse)
+	const trialAvailable = !isEnrolled && canStartFreeTrial(courseDetail)
+	const isFirstPaymentDiscount =
+		paymentInforCourse?.is_first_payment_discount === true
+	const primaryAction: CourseDetailAction = isEnrolled
+		? 'classroom'
+		: trialAvailable
+			? 'trial'
+			: isFirstPaymentDiscount
+				? 'discount'
+				: 'buy'
+
+	// The app shares the per-course REF link on this page and the global one
+	// on the overview; the global link stands in until this one has loaded.
+	const shareLink = courseShareLink || referralGlobalLink
+	const shareCode = courseShareLink ? courseShareCode : referralGlobalCode
+
 	const handleBack = () => {
 		onChangeRoute(mainRoutes.courseOverview)
 	}
 
-	/** Starts OnePay checkout for the current course. */
-	const handleBuyNow = () => {
-		if (!id) return
-		handleGetPaymentLink(id)
+	/** Starts OnePay checkout; the server applies any first-course discount. */
+	const startPayment = (languageCode: string) => {
+		if (!id || !languageCode) return
+		setDiscountOpen(false)
+		handleGetPaymentLink(id, languageCode, locale as string)
+	}
+
+	const runAction = (action: 'buy' | 'trial', languageCode: string) => {
+		if (action === 'trial') {
+			handleStartFreeTrial(id, languageCode)
+			return
+		}
+		if (isFirstPaymentDiscount) {
+			setDiscountOpen(true)
+			return
+		}
+		startPayment(languageCode)
+	}
+
+	/** Asks for the learning language first when none is chosen yet. */
+	const requireLanguage = (action: 'buy' | 'trial') => {
+		if (selectedLanguageCode) {
+			runAction(action, selectedLanguageCode)
+			return
+		}
+		pendingActionRef.current = action
+		setLanguageOpen(true)
+	}
+
+	/**
+	 * The classroom exists only in the app for now, so the web sends the
+	 * learner to the page that opens or installs it.
+	 */
+	const handleGoToClassroom = () => {
+		onChangeRoute(`open-app?type=course&id=${encodeURIComponent(id)}`)
+	}
+
+	const handlePrimaryAction = () => {
+		if (primaryAction === 'classroom') {
+			handleGoToClassroom()
+			return
+		}
+		requireLanguage(primaryAction === 'trial' ? 'trial' : 'buy')
 	}
 
 	return (
@@ -76,13 +147,16 @@ function DetailCourse({ id }: { id: string }) {
 						course={courseDetail}
 						paymentInforCourse={paymentInforCourse || null}
 						selectedLanguageCode={selectedLanguageCode}
+						primaryAction={primaryAction}
 						onShare={() => setReferralModalOpen(true)}
 						onReport={() => setReportOpen(true)}
 						onContribute={() => setContributeOpen(true)}
-						onSelectLanguage={() => setLanguageOpen(true)}
-						onGetDiscount={() => setDiscountOpen(true)}
-						onBuyNow={handleBuyNow}
-						isPaying={loading.paymentLink}
+						onSelectLanguage={() => {
+							pendingActionRef.current = null
+							setLanguageOpen(true)
+						}}
+						onPrimaryAction={handlePrimaryAction}
+						isBusy={loading.paymentLink || loading.freeTrial}
 					/>
 				) : null}
 			</div>
@@ -90,8 +164,8 @@ function DetailCourse({ id }: { id: string }) {
 			<CourseReferralModal
 				open={referralModalOpen}
 				onClose={() => setReferralModalOpen(false)}
-				referralCode={referralGlobalCode}
-				shareLink={referralGlobalLink}
+				referralCode={shareCode}
+				shareLink={shareLink}
 			/>
 			<ModalReport
 				open={reportOpen}
@@ -111,18 +185,26 @@ function DetailCourse({ id }: { id: string }) {
 			/>
 			<CourseLanguageModal
 				open={languageOpen}
-				onClose={() => setLanguageOpen(false)}
+				onClose={() => {
+					pendingActionRef.current = null
+					setLanguageOpen(false)
+				}}
 				supportedLanguage={courseDetail?.supported_language || []}
 				initialSelectedCode={selectedLanguageCode}
 				onConfirm={(code) => {
 					setSelectedLanguageCode(code)
 					setLanguageOpen(false)
+					const action = pendingActionRef.current
+					pendingActionRef.current = null
+					if (action && code) runAction(action, code)
 				}}
 			/>
 			<CourseDiscountModal
 				open={discountOpen}
 				onClose={() => setDiscountOpen(false)}
 				paymentInfor={paymentInforCourse}
+				onPayNow={() => startPayment(selectedLanguageCode)}
+				isPaying={loading.paymentLink}
 			/>
 		</div>
 	)

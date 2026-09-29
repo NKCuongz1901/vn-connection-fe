@@ -35,7 +35,12 @@ export interface CourseOwner {
 
 export type UserCourseStatus = 'inactive' | 'complete' | 'active'
 
-export type UserCoursePaymentStatus = 'purchased' | 'pending' | 'refunded'
+export type UserCoursePaymentStatus =
+	| 'purchased'
+	| 'pending'
+	| 'refunded'
+	| 'trial'
+	| 'unpaid'
 
 export interface UserCourse {
 	id: string

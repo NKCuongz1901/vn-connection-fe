@@ -18,6 +18,7 @@ import {
 	CourseSlotPrototype,
 	PaymentInforCourse,
 } from '@/interface/Course/Course.interface'
+import { formatUtcHmRange } from '@/ultis/courseSlotTime'
 import { formatNumberString } from '@/ultis/string'
 import { OVERVIEW_GUEST_CHAT_ROOMS } from '@/Variable/overviewGuestChatRooms.variable'
 
@@ -37,17 +38,27 @@ const ABOUT_WARNING_TEXT =
 
 const SHARE_TICKER_TEXT = 'Share & earn 10% per sale'
 
+/** What the main button does, chosen the same way as the app's bottom bar. */
+export type CourseDetailAction = 'classroom' | 'trial' | 'discount' | 'buy'
+
+const ACTION_LABEL: Record<CourseDetailAction, string> = {
+	classroom: 'Go to classroom',
+	trial: 'Get 3 days free',
+	discount: 'Get discount',
+	buy: 'Buy now',
+}
+
 type CourseDetailProps = {
 	course: Course
-	paymentInforCourse: PaymentInforCourse
+	paymentInforCourse?: PaymentInforCourse | null
 	selectedLanguageCode?: string
 	onShare?: () => void
 	onReport?: () => void
 	onContribute?: () => void
 	onSelectLanguage?: () => void
-	onGetDiscount?: () => void
-	onBuyNow?: () => void
-	isPaying?: boolean
+	primaryAction: CourseDetailAction
+	onPrimaryAction?: () => void
+	isBusy?: boolean
 }
 
 const formatCoursePrice = (price: string) => {
@@ -56,19 +67,14 @@ const formatCoursePrice = (price: string) => {
 	return `${formatted} đ`
 }
 
-const formatSlotTime = (time: string) => {
-	if (!time) return ''
-	if (time === '24:00') return '00:00'
-	const [hour, minute] = time.split(':')
-	return `${hour.padStart(2, '0')}:${(minute || '00').padStart(2, '0')}`
-}
-
-/** Builds a display range from UTC start/end, e.g. "01:00 - 01:30". */
+/**
+ * The slot's UTC start and end shown in the viewer's local time, as the app
+ * does (course_slot_time.dart): 01:00 - 01:30 UTC reads 08:00 - 08:30 in
+ * Vietnam.
+ */
 const formatSlotRange = (slot: CourseSlotPrototype) => {
-	const start = formatSlotTime(slot.start_time_utc)
-	const end = formatSlotTime(slot.end_time_utc)
-	if (!start || !end) return ''
-	return `${start} - ${end}`
+	if (!slot.start_time_utc || !slot.end_time_utc) return ''
+	return formatUtcHmRange(slot.start_time_utc, slot.end_time_utc)
 }
 
 const splitSlotColumns = (slots: CourseSlotPrototype[]) => {
@@ -78,15 +84,14 @@ const splitSlotColumns = (slots: CourseSlotPrototype[]) => {
 
 function CourseDetail({
 	course,
-	paymentInforCourse,
 	selectedLanguageCode,
 	onShare,
 	onReport,
 	onContribute,
 	onSelectLanguage,
-	onGetDiscount,
-	onBuyNow,
-	isPaying,
+	primaryAction,
+	onPrimaryAction,
+	isBusy,
 }: CourseDetailProps) {
 	const { custom_data, slot_prototype, owner } = course
 	const learningTypes = custom_data?.learning_type || []
@@ -237,22 +242,15 @@ function CourseDetail({
 						</div>
 						<button
 							type="button"
-							className={`${classes.buyBtn} ${
-								selectedLanguageCode ? classes.buyBtnActive : ''
-							}`}
-							disabled={!selectedLanguageCode || isPaying}
+							className={`${classes.buyBtn} ${classes.buyBtnActive}`}
+							disabled={isBusy}
+							aria-busy={isBusy || undefined}
 							onClick={() => {
-								if (!selectedLanguageCode || isPaying) return
-								if (paymentInforCourse?.is_first_payment_discount === true) {
-									onGetDiscount?.()
-									return
-								}
-								onBuyNow?.()
+								if (isBusy) return
+								onPrimaryAction?.()
 							}}
 						>
-							{paymentInforCourse?.is_first_payment_discount === true
-								? 'Get discount'
-								: 'Buy now'}
+							{ACTION_LABEL[primaryAction]}
 						</button>
 					</div>
 				</div>

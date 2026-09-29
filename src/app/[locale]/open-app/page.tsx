@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import CourseReferralCapture from '@/Components/Course/CourseReferralCapture/CourseReferralCapture'
 import OpenApp from '@/Container/Open-app'
 
 export const metadata: Metadata = {
@@ -14,5 +15,10 @@ export const metadata: Metadata = {
 }
 
 export default function OpenAppPage() {
-	return <OpenApp />
+	return (
+		<>
+			<CourseReferralCapture />
+			<OpenApp />
+		</>
+	)
 }
