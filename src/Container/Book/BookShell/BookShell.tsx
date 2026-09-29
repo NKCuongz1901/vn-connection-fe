@@ -29,6 +29,12 @@ function BookShell({ children }: BookShellProps) {
 	const activeCategory = pathname.startsWith(categoryPrefix)
 		? decodeURIComponent(pathname.slice(categoryPrefix.length))
 		: ''
+	// Section pages (e.g. My Library) own their paths; everything else under
+	// the Books root belongs to All books
+	const sectionHrefs = BOOK_NAV.flatMap((item) =>
+		'href' in item && item.href && item.id !== 'overview' ? [item.href] : [],
+	)
+	const inSection = sectionHrefs.some((href) => pathname.startsWith(href))
 
 	return (
 		<div className={classes.shell}>
@@ -40,9 +46,9 @@ function BookShell({ children }: BookShellProps) {
 							const active =
 								'href' in item &&
 								item.href &&
-								(pathname === item.href ||
-									(item.id === 'overview' &&
-										pathname.startsWith(BOOK_ROOT)))
+								(item.id === 'overview'
+									? pathname.startsWith(BOOK_ROOT) && !inSection
+									: pathname.startsWith(item.href))
 							const button = (
 								<button
 									key={item.id}

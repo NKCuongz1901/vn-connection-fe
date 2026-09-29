@@ -24,13 +24,29 @@ const languageName = (code: string) => {
 	}
 }
 
+// A second part that is itself a language ("en-vi": English with Vietnamese)
+// counts as another language; a region or variant ("en-gb", "vi-north") does not
+const isLanguageCode = (code: string) => {
+	if (!/^[a-z]{2,3}$/.test(code)) return false
+	try {
+		const name = new Intl.DisplayNames(['en'], { type: 'language' }).of(code)
+		return Boolean(name) && name?.toLowerCase() !== code
+	} catch {
+		return false
+	}
+}
+
 // One language reads "Vietnamese only"; more than one reads "Multi-language"
 export const languageLabelFromCodes = (codes?: string[]) => {
 	if (!codes?.length) return undefined
-	const unique = Array.from(
-		new Set(codes.map((code) => code.split('-')[0].toLowerCase())),
-	)
-	return unique.length > 1 ? 'Multi-language' : `${languageName(unique[0])} only`
+	const unique = new Set<string>()
+	codes.forEach((code) => {
+		const [main, second] = code.toLowerCase().split('-')
+		if (main) unique.add(main)
+		if (second && isLanguageCode(second)) unique.add(second)
+	})
+	const list = Array.from(unique)
+	return list.length > 1 ? 'Multi-language' : `${languageName(list[0])} only`
 }
 
 export const parseApiList = <T,>(res: unknown): T[] => {
@@ -124,6 +140,9 @@ export const mapContinueReadingCard = (
 			: undefined,
 		durationLabel: duration ? formatListeningTime(duration) : undefined,
 		languageLabel: languageLabelFromCodes(book?.language),
+		level: book?.level,
+		isFavourited: book?.is_favourited,
+		shareLink: book?.share_link,
 		chapterId: resume?.chapter_id || resume?.chapter?.id,
 		page: resumePages.length ? Math.max(...resumePages) : 1,
 	}
@@ -178,6 +197,32 @@ export const parseListTotal = (res: unknown, fallback = 0) => {
 		data?.pagination?.total ??
 		fallback
 	)
+}
+
+export type MyLibrarySort = 'newest' | 'oldest' | 'a-z' | 'z-a'
+
+/**
+ * My Library: favorite=false lists the reader's books (in progress),
+ * favorite=true the favourites; book_ids narrows to given books (downloaded).
+ * Rows have the Continue reading shape ({ book_id, book, chapters }).
+ */
+export const getMyLibrary = async (params: {
+	favorite: boolean
+	sortBy?: MyLibrarySort
+	bookIds?: string[]
+	limit?: number
+	offset?: number
+}) => {
+	const { favorite, sortBy = 'newest', bookIds, limit = 20, offset = 0 } = params
+	return axios.get(BOOK_ROUTES.myLib, {
+		params: {
+			favorite,
+			sortBy,
+			limit,
+			offset,
+			...(bookIds ? { book_ids: bookIds.join(',') } : {}),
+		},
+	})
 }
 
 export const getBookDetail = async (id: string) => {

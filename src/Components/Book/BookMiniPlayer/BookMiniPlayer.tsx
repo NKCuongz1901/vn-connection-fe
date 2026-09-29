@@ -23,7 +23,7 @@ import { toast } from 'react-toastify'
 
 import CImage from '@/Components/Custom/CImage/CImage'
 import { useBookPlayer } from '@/context/BookPlayerContext'
-import { downloadAudio } from '@/ultis/bookDownload'
+import { downloadAudio, markBookDownloaded } from '@/ultis/bookDownload'
 import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
 import { useLocalePath } from '@/ultis/route'
 import {
@@ -84,6 +84,7 @@ function BookMiniPlayer() {
 		setDownloading(true)
 		const name = [book.title, chapter?.title].filter(Boolean).join(' - ')
 		await downloadAudio(url, name)
+		if (book.id) markBookDownloaded(book.id)
 		setDownloading(false)
 	}
 
