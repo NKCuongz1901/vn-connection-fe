@@ -134,8 +134,7 @@ export const parseAccountSuspendedPayload = (
 	if (!raw) return {}
 
 	try {
-		const parsed =
-			typeof raw === 'string' ? JSON.parse(raw) : raw
+		const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
 
 		if (!parsed || typeof parsed !== 'object') return {}
 
@@ -173,7 +172,10 @@ export const getSuspensionType = (
 
 export const getSuspensionDurationText = (
 	payload:
-		| Pick<AccountSuspendedPayload, 'unblocked_at' | 'blocked_at' | 'type_block'>
+		| Pick<
+				AccountSuspendedPayload,
+				'unblocked_at' | 'blocked_at' | 'type_block'
+		  >
 		| string
 		| number
 		| undefined,
@@ -205,3 +207,8 @@ export const getSuspensionDurationText = (
 
 export const canShowAppealButton = (amountOfAppeal?: number) =>
 	amountOfAppeal === undefined || amountOfAppeal === 0
+
+export const getReferralCode = (shareLink: string) => {
+	const segments = shareLink.split('/').filter(Boolean)
+	return segments.at(-1) || ''
+}

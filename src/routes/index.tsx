@@ -9,7 +9,6 @@ import People from '@/svg/People'
 import ProfileIcon from '@/svg/ProfileIcon'
 import SquareIcon from '@/svg/SquareIcon'
 import TwoUser from '@/svg/TwoUser'
-
 import { mainRoutes } from './MainRoutes'
 import MiniApp from '@/svg/MiniApp'
 
@@ -222,6 +221,21 @@ export const TALKROOM_ROUTES = {
 	// Get token socket
 	getTokenSocket: 'auth/socket_token',
 }
+
+export const COURSE_ROUTES = {
+	baseUrl: 'course-ai',
+	trackingCourse: 'course-ai/overview',
+	referralGlobal: 'course-ai/referral/global/share',
+	courseDetail: (id: string) => `course-ai/${id}`,
+	reportCourse: 'course-ai-reports',
+	contributeIdea: 'course-ai/contribute-idea',
+	getPaymentInforCourse: (id: string) => `course-ai/payment/${id}`,
+	paymentLink: 'course-ai/payment-link',
+	freeTrial: (id: string) => `course-ai/${id}/free-trial`,
+	shareCourse: (id: string) => `course-ai/${id}/share`,
+	referralRegister: 'course-ai/referral/register',
+	referralGlobalRegister: 'course-ai/referral/global/register',
+}
 export const Menus = [
 	{
 		title: 'Overview',
@@ -297,4 +311,17 @@ export const Menus = [
 	// 	path: mainRoutes.dating,
 	// 	child: [],
 	// },
+]
+
+/**
+ * Course sidebar. Track progress, Leader board, Classroom and Chat support have
+ * no web page yet, so they stay out of the menu until they do (UNIWEB-696).
+ */
+export const CourseMenus = [
+	{
+		title: 'Overview',
+		Icon: OverviewIcon,
+		path: mainRoutes.courseOverview,
+		child: [],
+	},
 ]
