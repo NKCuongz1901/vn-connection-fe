@@ -9,8 +9,11 @@ import {
 	createBookReview,
 	parseBookReview,
 	getMyBookReview,
+	updateBookReview,
 } from '@/apis/book/bookApis'
 import { useModal } from '@/context/ModalContext'
+import { useLocalePath } from '@/ultis/route'
+import { BOOK_PROFILE_PATH } from '@/Variable/book.variable'
 
 import classes from './BookReviewModal.module.scss'
 
@@ -66,6 +69,8 @@ export function BookRatingStars({
 type BookReviewModalProps = {
 	open: boolean
 	bookId: string
+	/** Reading profile → Your reviews: the reader's existing review can be edited */
+	editable?: boolean
 	onClose: () => void
 	onSubmitted?: () => void
 }
@@ -78,10 +83,12 @@ function reviewErrorMessage(error: unknown) {
 function BookReviewModal({
 	open,
 	bookId,
+	editable = false,
 	onClose,
 	onSubmitted,
 }: BookReviewModalProps) {
 	const { openError, openSuccess } = useModal()
+	const { onChangeRoute } = useLocalePath()
 	const [reviewId, setReviewId] = useState<string | null>(null)
 	const [rating, setRating] = useState(0)
 	const [comment, setComment] = useState('')
@@ -89,7 +96,8 @@ function BookReviewModal({
 	const [ready, setReady] = useState(false)
 	// One review per account: once it exists the form is read-only here and is
 	// edited from Profile → Your review
-	const alreadyReviewed = Boolean(reviewId)
+	const alreadyReviewed = Boolean(reviewId) && !editable
+	const isEdit = Boolean(reviewId) && editable
 
 	useEffect(() => {
 		if (!open) return
@@ -134,12 +142,20 @@ function BookReviewModal({
 		if (!canSubmit) return
 		setSubmitting(true)
 		try {
-			await createBookReview({
-				book_id: bookId,
+			const payload = {
 				content_rating: rating,
 				comment: comment.trim() || undefined,
+			}
+			if (isEdit && reviewId) {
+				await updateBookReview(reviewId, payload)
+			} else {
+				await createBookReview({ book_id: bookId, ...payload })
+			}
+			openSuccess({
+				message: isEdit
+					? 'Review updated successfully!'
+					: 'Review submitted successfully!',
 			})
-			openSuccess({ message: 'Review submitted successfully!' })
 			onSubmitted?.()
 			onClose()
 		} catch (error) {
@@ -165,7 +181,9 @@ function BookReviewModal({
 		<CModal
 			open
 			centered
-			title={alreadyReviewed ? 'Your review' : 'Review'}
+			title={
+				isEdit ? 'Edit your review' : alreadyReviewed ? 'Your review' : 'Review'
+			}
 			footer={null}
 			onCancel={onClose}
 			styles={{
@@ -223,8 +241,19 @@ function BookReviewModal({
 				<div className={classes.footer}>
 					{alreadyReviewed ? (
 						<div className={classes.notice}>
-							You have already reviewed this book. To change your review,
-							go to Profile → Your review.
+							You have already reviewed this book. To change your review, go
+							to{' '}
+							<button
+								type="button"
+								className={classes.noticeLink}
+								onClick={() => {
+									onClose()
+									onChangeRoute(BOOK_PROFILE_PATH)
+								}}
+							>
+								Reading profile → Your reviews
+							</button>
+							.
 						</div>
 					) : (
 						<button
@@ -233,7 +262,7 @@ function BookReviewModal({
 							disabled={!canSubmit}
 							onClick={submit}
 						>
-							Submit review
+							{isEdit ? 'Save changes' : 'Submit review'}
 						</button>
 					)}
 				</div>

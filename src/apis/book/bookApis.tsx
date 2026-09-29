@@ -293,6 +293,20 @@ export const updateBookReview = async (
 	return axios.put(`${BOOK_ROUTES.review}/${reviewId}`, payload)
 }
 
+export type MyReviewSort = 'newest' | 'highest' | 'lowest'
+
+export const getMyBookReviews = async (
+	params: { sort?: MyReviewSort; limit?: number; offset?: number } = {},
+) => {
+	return axios.get(`${BOOK_ROUTES.book}/my/reviews`, {
+		params: { sort: 'newest', limit: 20, offset: 0, ...params },
+	})
+}
+
+export const deleteBookReview = async (reviewId: string) => {
+	return axios.delete(`${BOOK_ROUTES.review}/${reviewId}`)
+}
+
 export const parseBookReview = (res: unknown): BookReview | null => {
 	const parsed = parseApiObject<BookReview>(res)
 	if (parsed?.id) return parsed
