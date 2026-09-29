@@ -44,7 +44,13 @@ function MyCourseList() {
 							/>
 						))
 					: myPurchasedCourse.map((course) => (
-							<MyCourseCard key={course.id} course={course} />
+							<MyCourseCard
+								key={course.id}
+								course={course}
+								onClick={() =>
+									onChangeRoute(`${mainRoutes.course}/${course.id}`)
+								}
+							/>
 						))}
 			</div>
 		</div>

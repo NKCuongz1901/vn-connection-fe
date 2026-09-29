@@ -27,6 +27,13 @@ function CourseOverview() {
 	const isPurchasedReady = !loading.myPurchasedCourse
 	const hasPurchasedCourse = myPurchasedCourse.length > 0
 
+	// The web has no classroom yet, so a course card opens the course detail,
+	// which offers Go to classroom for a course the learner has.
+	const openCourse = (courseId?: string) => {
+		if (!courseId) return
+		onChangeRoute(`${mainRoutes.course}/${courseId}`)
+	}
+
 	const _renderTopSection = () => {
 		if (!isPurchasedReady) {
 			return (
@@ -49,12 +56,14 @@ function CourseOverview() {
 						<TrackingCourseList
 							items={trackingCourse}
 							loading={loading.trackingCourse}
+							onItemClick={(item) => openCourse(item.course?.id)}
 						/>
 					</div>
 					<div className={classes.myCourseList}>
 						<MyCourseList
 							courses={myPurchasedCourse}
 							loading={loading.myPurchasedCourse}
+							onCourseClick={(course) => openCourse(course.id)}
 							onSeeAll={() => onChangeRoute(mainRoutes.courseMyCourse)}
 						/>
 					</div>
@@ -71,9 +80,7 @@ function CourseOverview() {
 					loading={loading.listCourse}
 					onSeeAll={() => onChangeRoute(mainRoutes.courseList)}
 					onShare={() => setReferralModalOpen(true)}
-					onCourseClick={(course) =>
-						onChangeRoute(`${mainRoutes.course}/${course.id}`)
-					}
+					onCourseClick={(course) => openCourse(course.id)}
 				/>
 			</div>
 		)

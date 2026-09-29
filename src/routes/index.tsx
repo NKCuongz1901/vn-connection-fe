@@ -9,10 +9,6 @@ import People from '@/svg/People'
 import ProfileIcon from '@/svg/ProfileIcon'
 import SquareIcon from '@/svg/SquareIcon'
 import TwoUser from '@/svg/TwoUser'
-import LeaderBoardCourseIcon from '@/svg/Course/LeaderBoardCourseIcon'
-import ClassroomIcon from '@/svg/Course/ClassroomIcon'
-import ChatSupportIcon from '@/svg/Course/ChatSupportIcon'
-import FriendAcceptIcon from '@/svg/FriendAcceptIcon'
 import { mainRoutes } from './MainRoutes'
 import MiniApp from '@/svg/MiniApp'
 
@@ -309,35 +305,15 @@ export const Menus = [
 	// },
 ]
 
+/**
+ * Course sidebar. Track progress, Leader board, Classroom and Chat support have
+ * no web page yet, so they stay out of the menu until they do (UNIWEB-696).
+ */
 export const CourseMenus = [
 	{
 		title: 'Overview',
 		Icon: OverviewIcon,
 		path: mainRoutes.courseOverview,
-		child: [],
-	},
-	{
-		title: 'Track progress',
-		Icon: FriendAcceptIcon,
-		path: mainRoutes.courseTrackProgress,
-		child: [],
-	},
-	{
-		title: 'Leader board',
-		Icon: LeaderBoardCourseIcon,
-		path: mainRoutes.courseLeaderBoard,
-		child: [],
-	},
-	{
-		title: 'Classroom',
-		Icon: ClassroomIcon,
-		path: mainRoutes.courseClassroom,
-		child: [],
-	},
-	{
-		title: 'Chat support',
-		Icon: ChatSupportIcon,
-		path: mainRoutes.courseChatSupport,
 		child: [],
 	},
 ]
