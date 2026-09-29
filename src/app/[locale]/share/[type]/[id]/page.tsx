@@ -1,6 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+import { bookDetailPath } from '@/Variable/book.variable'
+
+import { ShareImage, ShareRedirect } from './ShareClient'
+
 type Props = {
 	params: Promise<{ locale: string; type: string; id: string }>
 	searchParams: Promise<{ token?: string | string[] }>
@@ -18,6 +22,12 @@ const defaultImage = `${siteUrl}/og-default.png`
 
 const getToken = (value?: string | string[]) =>
 	Array.isArray(value) ? value[0] : value
+
+// Shared content the web can open directly; other types keep the preview page
+const webPathForShare = (locale: string, type: string, id: string) => {
+	if (type === 'book') return `/${locale}/${bookDetailPath(id)}`
+	return null
+}
 
 const getSharePreview = async ({
 	type,
@@ -92,6 +102,7 @@ export default async function SharePage({ params, searchParams }: Props) {
 		id,
 		token: getToken(query.token),
 	})
+	const webPath = webPathForShare(locale, type, id)
 
 	return (
 		<main
@@ -102,15 +113,8 @@ export default async function SharePage({ params, searchParams }: Props) {
 				fontFamily: 'Arial, sans-serif',
 			}}
 		>
-			{preview?.image ? (
-				<img
-					src={preview.image}
-					alt=""
-					width={1200}
-					height={630}
-					style={{ width: '100%', height: 'auto', borderRadius: 12 }}
-				/>
-			) : null}
+			{webPath ? <ShareRedirect to={webPath} /> : null}
+			{preview?.image ? <ShareImage src={preview.image} /> : null}
 			<h1>{preview?.title || 'UniVini'}</h1>
 			<p>{preview?.description || 'Discover UniVini'}</p>
 			{preview?.open_app_link ? (
