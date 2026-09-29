@@ -11,7 +11,11 @@ import { IconMapPinFilled } from '@tabler/icons-react'
 import { Flex } from 'antd'
 import { memo, useEffect, useRef, useState } from 'react'
 
-import { getAddressByText, getFullAddressFromLatLng } from '@/apis/ggApis'
+import {
+	getFullAddressFromLatLng,
+	getPlaceAutocomplete,
+	getPlaceDetails,
+} from '@/apis/ggApis'
 
 import { getCurrentLocation } from '@/ultis/common'
 import { getUserInfo } from '@/ultis/storage'
@@ -26,6 +30,9 @@ import classes from './CGGMap.module.scss'
 const libraries: any = ['places']
 
 const containerStyle = { width: '100%', height: '400px' }
+
+const MIN_SEARCH_LENGTH = 2
+const LOCATION_BIAS_RADIUS = 50000
 
 interface CGGMapProps {
 	title?: string
@@ -50,6 +57,10 @@ const CGGMap = (_props: CGGMapProps) => {
 	})
 	const [searchValue, setSearchValue] = useState('')
 	const [options, setOptions] = useState([])
+	const [choosing, setChoosing] = useState(false)
+	// Autocomplete and details must share one token per search lifecycle.
+	const sessionTokenRef = useRef<string | null>(null)
+	const requestIdRef = useRef(0)
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const handlePlaceChanged = () => {
 		const place = autoCompleteRef.current?.getPlace()
@@ -105,35 +116,104 @@ const CGGMap = (_props: CGGMapProps) => {
 			console.log('error:', error)
 		}
 	}
+	/** Ends the current search session so the next search starts a new token. */
+	const handleResetSearchSession = () => {
+		sessionTokenRef.current = null
+		requestIdRef.current += 1
+		setOptions([])
+	}
+
+	/** Clears the search session before closing the picker. */
+	const handleClose = (e?: any) => {
+		handleResetSearchSession()
+		onClose(e)
+	}
+
+	/** Fetches autocomplete suggestions for the current keyword. */
 	const handleGetLocation = async () => {
-		try {
+		const keyword = searchValue.trim()
+		if (keyword.length < MIN_SEARCH_LENGTH) {
 			setOptions([])
+			return
+		}
+		if (!sessionTokenRef.current) {
+			sessionTokenRef.current = crypto.randomUUID()
+		}
 
-			const res: any = await getAddressByText({ text: searchValue })
-			const { results } = res?.results?.object
+		const requestId = ++requestIdRef.current
+		try {
+			const hasBias = !!(marker?.lat && marker?.lng)
+			const res: any = await getPlaceAutocomplete({
+				text: keyword,
+				session_token: sessionTokenRef.current,
+				language: 'en',
+				region: 'vn',
+				...(hasBias && {
+					location_bias: {
+						latitude: marker.lat,
+						longitude: marker.lng,
+						radius: LOCATION_BIAS_RADIUS,
+					},
+				}),
+			})
+			// Ignore responses that arrive after a newer keyword was sent.
+			if (requestId !== requestIdRef.current) return
 
+			const suggestions = res?.results?.object?.suggestions || []
 			setOptions(
-				(results || []).map((i) => ({
+				suggestions.map((i) => ({
 					...i,
-					label: i.formatted_address,
+					label: i.formatted_address || i.name,
 					value: i.place_id,
 				})),
 			)
-		} catch {}
+		} catch (error) {
+			console.error('Place autocomplete error:', error)
+		}
 	}
-	const handleChoose = (value: string, option: DefaultOptionType) => {
-		if (option) {
-			const { formatted_address, geometry, types } = option || {}
-			const { location } = geometry || {}
-			const {} = option
-			setTimeout(() => {
-				onSubmit({
-					display_name: formatted_address,
-					...location,
-					type: types,
-				})
-				onClose()
-			}, 0)
+
+	/** Submits a resolved place and closes the picker. */
+	const handleSubmitPlace = (
+		place: any,
+		location: { lat: number; lng: number },
+	) => {
+		onSubmit({
+			display_name: place.formatted_address || place.name || '',
+			lat: location.lat,
+			lng: location.lng,
+			type: place.types,
+		})
+		handleClose()
+	}
+
+	/** Resolves the chosen suggestion to coordinates via place details. */
+	const handleChoose = async (_value: string, option: DefaultOptionType) => {
+		if (!option || choosing) return
+
+		const localLocation = option.geometry?.location
+		if (option.source === 'local' && localLocation?.lat && localLocation?.lng) {
+			handleSubmitPlace(option, localLocation)
+			return
+		}
+
+		setChoosing(true)
+		try {
+			const res: any = await getPlaceDetails({
+				place_id: option.place_id,
+				session_token: sessionTokenRef.current || crypto.randomUUID(),
+				language: 'en',
+			})
+			const place = res?.results?.object?.result
+			const location = place?.geometry?.location
+			// Never submit 0/empty coordinates when details fail.
+			if (!location?.lat || !location?.lng) return
+
+			handleSubmitPlace(place, location)
+		} catch (error) {
+			console.error('Place details error:', error)
+		} finally {
+			sessionTokenRef.current = null
+			setChoosing(false)
 		}
 	}
 	useEffect(() => {
@@ -148,7 +228,10 @@ const CGGMap = (_props: CGGMapProps) => {
 		}
 	}, [marker])
 	useEffect(() => {
-		if (!searchValue) return
+		if (!searchValue.trim()) {
+			handleResetSearchSession()
+			return
+		}
 
 		const timer = setTimeout(() => {
 			handleGetLocation()
@@ -163,8 +246,8 @@ const CGGMap = (_props: CGGMapProps) => {
 	return (
 		<div className={classes.wrapper}>
 			<CModal
-				onClose={onClose}
-				onCancel={onClose}
+				onClose={handleClose}
+				onCancel={handleClose}
 				title={title || 'Location'}
 				styles={{
 					content: {
@@ -174,11 +257,11 @@ const CGGMap = (_props: CGGMapProps) => {
 				footer={[
 					<Flex key="back" justify="flex-end">
 						<CButton
-							disabled={loading}
+							disabled={loading || choosing}
 							onClick={(e) => {
 								e.stopPropagation()
 								onSubmit({ ...data, ...marker })
-								onClose()
+								handleClose()
 							}}
 							ctype="oranger"
 							style={{ width: 200 }}
@@ -192,6 +275,8 @@ const CGGMap = (_props: CGGMapProps) => {
 					<CAutoComplete
 						placeholder="What address do you need to find?"
 						options={options || []}
+						filterOption={false}
+						disabled={choosing}
 						onSelect={handleChoose}
 						onSearch={(text) => setSearchValue(text)}
 						prefix={<SearchOutlined className={classes.searchIcon} />}

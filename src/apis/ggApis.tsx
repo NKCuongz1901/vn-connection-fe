@@ -45,3 +45,23 @@ export const getAddressByText = async (payload: any) => {
 	const url = MAP_ROUTES.name
 	return await axios.post(url, payload)
 }
+
+/** Gets place suggestions (no geometry) for one search session. */
+export const getPlaceAutocomplete = async (payload: {
+	text: string
+	session_token: string
+	language?: string
+	region?: string
+	location_bias?: { latitude: number; longitude: number; radius: number }
+}) => {
+	return await axios.post(MAP_ROUTES.autocomplete, payload)
+}
+
+/** Resolves a selected suggestion to coordinates within the same session. */
+export const getPlaceDetails = async (payload: {
+	place_id: string
+	session_token: string
+	language?: string
+}) => {
+	return await axios.post(MAP_ROUTES.details, payload)
+}

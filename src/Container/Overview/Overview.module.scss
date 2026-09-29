@@ -50,6 +50,16 @@
 				opacity: 0.5;
 			}
 		}
+		.nearbyFallback {
+			margin: 0;
+			width: 100%;
+			color: var(--text-secondary, #48546b);
+			font-size: var(--body-base-size, 14px);
+			font-style: normal;
+			font-weight: 400;
+			line-height: var(--body-base-line-height, 20px);
+			text-align: center;
+		}
 		.hangout {
 			padding: 0 32px;
 			gap: 12px;
@@ -137,6 +147,38 @@
 			.title {
 				width: 100%;
 				cursor: pointer;
+			}
+			.upcomingHeading {
+				width: 100%;
+				gap: 4px;
+			}
+			.upcomingLocation {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				width: 100%;
+				padding: 0;
+				border: none;
+				background: transparent;
+				text-align: left;
+				cursor: pointer;
+			}
+			.upcomingLocationIcon {
+				display: flex;
+				flex-shrink: 0;
+				align-items: center;
+				justify-content: center;
+				width: 20px;
+				height: 20px;
+			}
+			.upcomingLocationText {
+				color: var(--text-secondary, #48546b);
+				font-size: var(--body-base-size, 14px);
+				font-style: normal;
+				font-weight: 400;
+				line-height: var(--body-base-line-height, 20px);
+				letter-spacing: var(--body-base-tracking, 0);
+				word-break: break-word;
 			}
 			.wrapperItemUp {
 				flex-wrap: wrap;

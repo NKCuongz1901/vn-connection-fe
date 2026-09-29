@@ -26,6 +26,17 @@ export const getSecurityAlertAnchor = (): number => {
 	}
 }
 
+/** Clears the sign-in anchor so the next session starts without stale backlog filters. */
+export const clearSecurityAlertAnchor = () => {
+	if (typeof window === 'undefined') return
+
+	try {
+		localStorage.removeItem(SECURITY_ALERT_ANCHOR_KEY)
+	} catch {
+		// Ignore storage failures in private mode.
+	}
+}
+
 /** Creates an anchor for sessions that signed in before this check existed. */
 export const ensureSecurityAlertAnchor = (): number => {
 	const anchor = getSecurityAlertAnchor()

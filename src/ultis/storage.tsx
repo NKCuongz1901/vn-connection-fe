@@ -1,4 +1,7 @@
 'use client'
+
+import { clearSecurityAlertAnchor } from '@/ultis/security'
+
 export const handleStorageCookie = ({
 	key,
 	data,
@@ -74,6 +77,8 @@ export const handleRemoveAllCookie = () => {
 			.replace(/^ +/, '')
 			.replace(/=.*/, '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/')
 	})
+
+	clearSecurityAlertAnchor()
 
 	// const keys = ['token', 'refresh_token', 'info', 'refresh_token_flag']
 	// keys.forEach((i) => {

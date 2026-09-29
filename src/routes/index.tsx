@@ -169,6 +169,8 @@ export const REFERRAL_ROUTES = {
 }
 export const MAP_ROUTES = {
 	name: 'map/google/place/textsearch/json',
+	autocomplete: 'map/google/place/autocomplete/json',
+	details: 'map/google/place/details/json',
 }
 export const CONFIG_BOOTSTRAP = {
 	configBootstrap: 'config/bootstrap',
