@@ -262,6 +262,15 @@ export const reportBook = async (payload: {
 	return axios.post('book-reports', { report_type: 'book', ...payload })
 }
 
+/**
+ * Rating summary computed on every call. Book detail is cached by the API
+ * (up to 30 minutes), so use this after a review changes.
+ */
+export const getBookReviewSummary = async (bookId: string) => {
+	const res = await axios.get(`${BOOK_ROUTES.book}/${bookId}/reviews/summary`)
+	return parseApiObject<BookReviewStatistics>(res)
+}
+
 export const getMyBookReview = async (bookId: string) => {
 	return axios.get(`${BOOK_ROUTES.book}/${bookId}/my-review`)
 }

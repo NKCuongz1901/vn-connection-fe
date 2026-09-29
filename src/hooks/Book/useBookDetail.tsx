@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import {
 	deleteReadingSearchVocabWord,
 	getBookDetail,
+	getBookReviewSummary,
 	getReadingSearchVocab,
 	parseApiList,
 	parseApiObject,
@@ -135,8 +136,25 @@ export default function useBookDetail(bookId: string) {
 
 	const refreshBook = useCallback(async () => {
 		try {
-			const bookRes = await getBookDetail(bookId)
-			setBook(parseApiObject<BookApiItem>(bookRes))
+			const [bookRes, summary] = await Promise.all([
+				getBookDetail(bookId),
+				// book detail may come from the API cache and still carry the old
+				// rating; the summary is computed live, so a new review shows at once
+				getBookReviewSummary(bookId).catch(() => null),
+			])
+			const next = parseApiObject<BookApiItem>(bookRes)
+			setBook(
+				next && summary
+					? {
+							...next,
+							review_summary: {
+								...next.review_summary,
+								overall_rating: summary.overall_rating,
+								total_reviews: summary.total_reviews,
+							},
+						}
+					: next,
+			)
 		} catch {
 			// keep current book
 		}
