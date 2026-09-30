@@ -9,6 +9,17 @@ import { VocabSort, VocabStrength, VocabStrengthCounts, VocabWord } from '@/apis
 import VocabWordRow from './VocabWordRow'
 import classes from './Vocabulary.module.scss'
 
+// an avatar can be an image URL or an emoji
+export const FolderAvatar = ({ avatar, fallback }: { avatar?: string | null; fallback: React.ReactNode }) =>
+	avatar && /^https?:\/\//.test(avatar) ? (
+		// eslint-disable-next-line @next/next/no-img-element
+		<img src={avatar} alt="" />
+	) : avatar ? (
+		<span className={classes.emoji}>{avatar}</span>
+	) : (
+		<>{fallback}</>
+	)
+
 export const SORT_OPTIONS: { key: VocabSort; label: string }[] = [
 	{ key: 'latest_add', label: 'Newest' },
 	{ key: 'oldest_add', label: 'Oldest' },
@@ -93,7 +104,7 @@ export function WordList({
 	total: number
 	loadingMore: boolean
 	onLoadMore: () => void
-	onRemove: (word: VocabWord) => void
+	onRemove?: (word: VocabWord) => void
 	emptyText: string
 }) {
 	if (loading && !words.length) return <div className={classes.empty}>Loading…</div>

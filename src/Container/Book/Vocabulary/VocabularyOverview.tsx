@@ -1,7 +1,7 @@
 'use client'
 
 import { memo, useEffect, useState } from 'react'
-import { IconBook, IconFolder, IconSparkles, IconUserSquare } from '@tabler/icons-react'
+import { IconBook, IconChevronRight, IconFolder, IconSparkles, IconUserSquare } from '@tabler/icons-react'
 
 import { parseApiList, parseListTotal } from '@/apis/book/bookApis'
 import { folderWordCount, getMyVocabSets, getUniviniVocabSets, VocabFolder } from '@/apis/book/vocabApis'
@@ -10,20 +10,9 @@ import useSearchedVocab from '@/hooks/Book/useSearchedVocab'
 import { useLocalePath } from '@/ultis/route'
 import { BOOK_VOCAB_PATH } from '@/Variable/book.variable'
 
-import { SortMenu, STRENGTHS, StrengthBox, WordList } from './VocabParts'
+import { FolderAvatar, SortMenu, STRENGTHS, StrengthBox, WordList } from './VocabParts'
 import LearnChoiceModal from './LearnChoiceModal'
 import classes from './Vocabulary.module.scss'
-
-// an avatar can be an image URL or an emoji
-const FolderAvatar = ({ avatar, fallback }: { avatar?: string | null; fallback: React.ReactNode }) =>
-	avatar && /^https?:\/\//.test(avatar) ? (
-		// eslint-disable-next-line @next/next/no-img-element
-		<img src={avatar} alt="" />
-	) : avatar ? (
-		<span className={classes.emoji}>{avatar}</span>
-	) : (
-		<>{fallback}</>
-	)
 
 /** Vocabulary home: UniVini sets, the reader's sets and the words searched while reading */
 function VocabularyOverview() {
@@ -65,16 +54,30 @@ function VocabularyOverview() {
 					<IconSparkles size={18} className={classes.sectionIcon} />
 					<span className={classes.sectionTitle}>UniVini vocab sets</span>
 					{univiniTotal ? <span className={classes.badge}>{univiniTotal}</span> : null}
+					<button
+						type="button"
+						className={classes.seeAll}
+						onClick={() => onChangeRoute(`${BOOK_VOCAB_PATH}/univini`)}
+						aria-label="See all UniVini vocab sets"
+					>
+						<IconChevronRight size={18} />
+					</button>
 				</div>
 				{univini.length ? (
 					<div className={classes.rail}>
 						{univini.map((folder) => (
-							<div key={folder.id} className={classes.setCard} title={folder.name}>
+							<button
+								key={folder.id}
+								type="button"
+								className={classes.setCard}
+								title={folder.name}
+								onClick={() => folder.id && onChangeRoute(`${BOOK_VOCAB_PATH}/univini/${folder.id}`)}
+							>
 								<span className={classes.setAvatar}>
 									<FolderAvatar avatar={folder.avatar} fallback={<IconFolder size={32} stroke={1.5} />} />
 								</span>
 								<span className={classes.setName}>{folder.name}</span>
-							</div>
+							</button>
 						))}
 					</div>
 				) : (

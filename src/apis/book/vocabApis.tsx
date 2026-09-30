@@ -140,3 +140,75 @@ export const submitLearningProgress = async (payload: {
 	learning_type: LearningType
 	answers: { source_vocab_id: string; correct_count: number; incorrect_count: number }[]
 }) => axios.post('vocabulary/learning/progress', payload)
+
+export type VocabLevelGroup = { items?: VocabWord[]; total?: number }
+
+/** A UniVini set's words grouped by level (A1, A2, …) */
+export const getUniviniSetLevels = async (params: {
+	folder_id: string
+	languages: string[]
+	sort_by?: VocabSort
+	limit?: number
+}) =>
+	axios.get('vocabulary/univini-folder-vocab-details', {
+		params: {
+			folder_id: params.folder_id,
+			languages: params.languages.join(','),
+			limit: String(params.limit ?? 100),
+			offset: '0',
+			...(params.sort_by ? { sort_by: params.sort_by } : {}),
+		},
+	})
+
+export const parseLevelGroups = (res: unknown) => {
+	const levels =
+		(res as { results?: { object?: { levels?: Record<string, VocabLevelGroup> } } })?.results?.object?.levels || {}
+	return Object.entries(levels)
+		.map(([level, group]) => ({ level, items: group.items || [], total: group.total || group.items?.length || 0 }))
+		.filter((group) => group.total > 0)
+}
+
+/** A UniVini set's words in one list, with weak / medium / strong counts */
+export const getUniviniSetWords = async (params: {
+	folder_id: string
+	languages: string[]
+	word_type?: VocabStrength
+	in_progress?: boolean
+	limit?: number
+	offset?: number
+}) =>
+	axios.get('vocabulary/univini-folder-vocab-details-merged', {
+		params: {
+			folder_id: params.folder_id,
+			languages: params.languages.join(','),
+			limit: String(params.limit ?? 20),
+			offset: String(params.offset ?? 0),
+			...(params.word_type ? { word_type: params.word_type } : {}),
+			...(params.in_progress !== undefined ? { in_progress: String(params.in_progress) } : {}),
+		},
+	})
+
+export type VocabLanguages = { learning_languages?: string[]; native_language?: string }
+
+/** Extra languages the reader shows for a set, and their native language */
+export const getSetLanguages = async (folderId: string) =>
+	axios.get('vocabulary/user-languages', { params: { folder_id: folderId } })
+
+export const updateSetLanguages = async (folderId: string, learning: string[], native: string) =>
+	axios.put('vocabulary/user-languages', {
+		folder_id: folderId,
+		learning_languages: learning,
+		target_language: native,
+	})
+
+/** Languages a vocab set can show (as the API supports) */
+export const VOCAB_LANGUAGES = ['en', 'vi', 'fr', 'de', 'es', 'zh', 'ja', 'ko', 'th', 'id', 'ru', 'pt', 'it', 'hi', 'ar']
+
+export const posterOf = (folder: VocabFolder | null | undefined, level: string) => {
+	const posters = (folder as { custom_data?: { level_poster?: Record<string, unknown> } } | null)?.custom_data
+		?.level_poster
+	const value = posters?.[level] ?? posters?.[level.toLowerCase()]
+	if (typeof value === 'string') return value
+	if (value && typeof value === 'object' && 'url' in value) return String((value as { url?: string }).url || '')
+	return ''
+}

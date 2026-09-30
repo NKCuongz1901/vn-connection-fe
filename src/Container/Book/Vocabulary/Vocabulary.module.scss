@@ -777,3 +777,194 @@ button.box {
 .weakText {
 	color: #dc2626;
 }
+
+.extraWord {
+	margin-left: 10px;
+	font-weight: 600;
+}
+
+.seeAll {
+	display: flex;
+	padding: 2px;
+	border: none;
+	background: none;
+	color: #64748b;
+	cursor: pointer;
+}
+
+button.setCard {
+	text-align: left;
+	cursor: pointer;
+}
+
+.setGrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+	gap: 12px;
+
+	.setCard {
+		width: auto;
+	}
+}
+
+// UniVini set detail
+.tabsBar {
+	display: flex;
+	gap: 4px;
+	padding: 4px;
+	border-radius: 99px;
+	background: #fff;
+	border: 1px solid #e8edf3;
+}
+
+.tabBtn {
+	flex: 1;
+	height: 32px;
+	border: none;
+	border-radius: 99px;
+	background: none;
+	color: #64748b;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.tabOn {
+	background: $green;
+	color: #fff;
+	font-weight: 600;
+}
+
+.langRow {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+.langChip {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	height: 28px;
+	padding: 0 10px;
+	border: 1px solid #e8edf3;
+	border-radius: 99px;
+	background: #fff;
+	color: #334155;
+	font-size: 12px;
+}
+
+.langNative {
+	border-color: #bfe3cf;
+	background: #e7f5ee;
+	color: $green;
+	font-weight: 600;
+}
+
+.langRemove {
+	display: flex;
+	padding: 0;
+	border: none;
+	background: none;
+	color: #94a3b8;
+	cursor: pointer;
+}
+
+.langAdd {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	height: 28px;
+	padding: 0 10px;
+	border: 1px dashed #cbd5e1;
+	border-radius: 99px;
+	background: none;
+	color: #64748b;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.langArrow {
+	color: #94a3b8;
+}
+
+.langList {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+
+	.primaryBtn {
+		margin-top: 8px;
+		height: 42px;
+	}
+}
+
+.langItem {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.levelGroup {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.levelTag {
+	color: #0f1729;
+	font-size: 14px;
+	font-weight: 700;
+}
+
+.posterLink {
+	padding: 0;
+	border: none;
+	background: none;
+	color: #f05a0e;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.showMore {
+	display: inline-flex;
+	align-items: center;
+	align-self: center;
+	gap: 4px;
+	padding: 4px 8px;
+	border: none;
+	background: none;
+	color: #334155;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.boxOn .boxJar {
+	box-shadow: 0 0 0 2px #0f1729;
+}
+
+.poster {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+
+	img {
+		width: 100%;
+		max-height: 60vh;
+		border-radius: 10px;
+		object-fit: contain;
+		background: #f4f8fc;
+	}
+
+	.primaryBtn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 42px;
+		text-decoration: none;
+	}
+}
