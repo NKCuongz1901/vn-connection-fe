@@ -4,6 +4,7 @@ import { memo, useRef, useState } from 'react'
 import {
 	IconChevronDown,
 	IconDots,
+	IconPlus,
 	IconTrash,
 	IconVolume,
 } from '@tabler/icons-react'
@@ -22,6 +23,8 @@ type VocabWordRowProps = {
 	extraLangs?: string[]
 	/** without it the word has no menu (UniVini sets) */
 	onRemove?: (word: VocabWord) => void
+	/** add the word to one of the reader's sets */
+	onAdd?: (word: VocabWord) => void
 }
 
 const EXTRA_COLORS = ['#f59e0b', '#c026d3', '#0ea5e9', '#16a34a']
@@ -59,6 +62,7 @@ function VocabWordRow({
 	nativeLang,
 	extraLangs = [],
 	onRemove,
+	onAdd,
 }: VocabWordRowProps) {
 	const [open, setOpen] = useState(false)
 	const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -113,20 +117,28 @@ function VocabWordRow({
 					))}
 				</div>
 				<StrengthBadge level={word.learning_stats?.level} />
-				{onRemove ? (
+				{onRemove || onAdd ? (
 					<Dropdown
 						trigger={['click']}
 						placement="bottomRight"
 						menu={{
 							items: [
-								{
-									key: 'remove',
-									label: 'Remove',
-									icon: <IconTrash size={16} />,
-									danger: true,
-								},
+								...(onAdd
+									? [{ key: 'add', label: 'Add', icon: <IconPlus size={16} /> }]
+									: []),
+								...(onRemove
+									? [
+											{
+												key: 'remove',
+												label: 'Remove',
+												icon: <IconTrash size={16} />,
+												danger: true,
+											},
+										]
+									: []),
 							],
-							onClick: () => onRemove(word),
+							onClick: ({ key }) =>
+								key === 'add' ? onAdd?.(word) : onRemove?.(word),
 						}}
 					>
 						<button type="button" className={classes.iconBtn} aria-label="More">

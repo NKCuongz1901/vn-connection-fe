@@ -3,13 +3,14 @@
 import { memo, useState } from 'react'
 import { IconChevronLeft } from '@tabler/icons-react'
 
-import { VocabStrength } from '@/apis/book/vocabApis'
+import { VocabStrength, VocabWord } from '@/apis/book/vocabApis'
 import { useBookLibrary } from '@/context/BookLibraryContext'
 import useSearchedVocab from '@/hooks/Book/useSearchedVocab'
 import { useLocalePath } from '@/ultis/route'
 import { BOOK_VOCAB_PATH } from '@/Variable/book.variable'
 
 import { SortMenu, STRENGTHS, StrengthBox, WordList } from './VocabParts'
+import AddToSetModal from './AddToSetModal'
 import LearnChoiceModal from './LearnChoiceModal'
 import classes from './Vocabulary.module.scss'
 
@@ -19,6 +20,7 @@ function SearchedVocabByStrength({ type }: { type: VocabStrength }) {
 	const { nativeLang } = useBookLibrary()
 	const searched = useSearchedVocab(nativeLang, type)
 	const [learnOpen, setLearnOpen] = useState(false)
+	const [adding, setAdding] = useState<VocabWord | null>(null)
 	const view = STRENGTHS.find((item) => item.key === type) || STRENGTHS[0]
 	const count = searched.counts[view.countKey] || 0
 	const total =
@@ -52,6 +54,7 @@ function SearchedVocabByStrength({ type }: { type: VocabStrength }) {
 				loadingMore={searched.loadingMore}
 				onLoadMore={searched.loadMore}
 				onRemove={searched.remove}
+					onAdd={setAdding}
 				emptyText={`No ${view.label.toLowerCase()} yet.`}
 			/>
 			{searched.total ? (
@@ -59,6 +62,7 @@ function SearchedVocabByStrength({ type }: { type: VocabStrength }) {
 					Learning these words
 				</button>
 			) : null}
+			<AddToSetModal word={adding} onClose={() => setAdding(null)} />
 			<LearnChoiceModal
 				open={learnOpen}
 				onClose={() => setLearnOpen(false)}

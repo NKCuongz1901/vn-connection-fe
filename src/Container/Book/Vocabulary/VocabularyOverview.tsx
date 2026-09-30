@@ -4,13 +4,14 @@ import { memo, useEffect, useState } from 'react'
 import { IconBook, IconChevronRight, IconFolder, IconSparkles, IconUserSquare } from '@tabler/icons-react'
 
 import { parseApiList, parseListTotal } from '@/apis/book/bookApis'
-import { folderWordCount, getMyVocabSets, getUniviniVocabSets, VocabFolder } from '@/apis/book/vocabApis'
+import { folderWordCount, getMyVocabSets, getUniviniVocabSets, VocabFolder, VocabWord } from '@/apis/book/vocabApis'
 import { useBookLibrary } from '@/context/BookLibraryContext'
 import useSearchedVocab from '@/hooks/Book/useSearchedVocab'
 import { useLocalePath } from '@/ultis/route'
 import { BOOK_VOCAB_PATH } from '@/Variable/book.variable'
 
 import { FolderAvatar, SortMenu, STRENGTHS, StrengthBox, WordList } from './VocabParts'
+import AddToSetModal from './AddToSetModal'
 import LearnChoiceModal from './LearnChoiceModal'
 import classes from './Vocabulary.module.scss'
 
@@ -20,6 +21,7 @@ function VocabularyOverview() {
 	const { nativeLang } = useBookLibrary()
 	const searched = useSearchedVocab(nativeLang)
 	const [learnOpen, setLearnOpen] = useState(false)
+	const [adding, setAdding] = useState<VocabWord | null>(null)
 	const [univini, setUnivini] = useState<VocabFolder[]>([])
 	const [univiniTotal, setUniviniTotal] = useState(0)
 	const [mine, setMine] = useState<VocabFolder[]>([])
@@ -90,11 +92,24 @@ function VocabularyOverview() {
 					<IconUserSquare size={18} className={classes.sectionIcon} />
 					<span className={classes.sectionTitle}>My vocab sets</span>
 					{mineTotal ? <span className={classes.badge}>{mineTotal}</span> : null}
+					<button
+						type="button"
+						className={classes.seeAll}
+						onClick={() => onChangeRoute(`${BOOK_VOCAB_PATH}/mine`)}
+						aria-label="See all my vocab sets"
+					>
+						<IconChevronRight size={18} />
+					</button>
 				</div>
 				{mine.length ? (
 					<div className={classes.rail}>
 						{mine.map((folder) => (
-							<div key={folder.id} className={classes.myCard}>
+							<button
+								key={folder.id}
+								type="button"
+								className={classes.myCard}
+								onClick={() => folder.id && onChangeRoute(`${BOOK_VOCAB_PATH}/mine/${folder.id}`)}
+							>
 								<span className={classes.myAvatar}>
 									<FolderAvatar avatar={folder.avatar} fallback={<IconFolder size={18} />} />
 								</span>
@@ -102,7 +117,7 @@ function VocabularyOverview() {
 									<b>{folder.name}</b>
 									<span>{folderWordCount(folder)} words</span>
 								</span>
-							</div>
+							</button>
 						))}
 					</div>
 				) : (
@@ -110,6 +125,13 @@ function VocabularyOverview() {
 						<IconFolder size={28} className={classes.sectionIcon} />
 						<b>Build your own vocabulary set.</b>
 						<span>Save the words you want to learn in your own sets.</span>
+						<button
+							type="button"
+							className={classes.primaryBtn}
+							onClick={() => onChangeRoute(`${BOOK_VOCAB_PATH}/mine?new=1`)}
+						>
+							Start now
+						</button>
 					</div>
 				)}
 			</section>
@@ -142,6 +164,7 @@ function VocabularyOverview() {
 					loadingMore={searched.loadingMore}
 					onLoadMore={searched.loadMore}
 					onRemove={searched.remove}
+					onAdd={setAdding}
 					emptyText="Words you look up while reading show up here."
 				/>
 			</section>
@@ -150,6 +173,7 @@ function VocabularyOverview() {
 					Learning these words
 				</button>
 			) : null}
+			<AddToSetModal word={adding} onClose={() => setAdding(null)} />
 			<LearnChoiceModal
 				open={learnOpen}
 				onClose={() => setLearnOpen(false)}
