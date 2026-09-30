@@ -12,6 +12,7 @@ import {
 	IconEyeOff,
 	IconPhoto,
 	IconPlus,
+	IconProgress,
 	IconTrash,
 } from '@tabler/icons-react'
 import { Checkbox, Dropdown } from 'antd'
@@ -25,31 +26,39 @@ import {
 	parseApiObject,
 } from '@/apis/book/bookApis'
 import {
+	ChapterProcessStatus,
 	ContributedBook,
 	ContributedChapter,
 	deleteChapter,
+	deleteMultilingualChapter,
+	getChapterProcessStatus,
 	getMyBookChapters,
 	publishChapters,
+	publishMultilingualChapters,
 	unpublishChapters,
+	unpublishMultilingualChapter,
 } from '@/apis/book/contributeApis'
 import CImage from '@/Components/Custom/CImage/CImage'
 import CModal from '@/Components/Custom/CModal/CModal'
 import { useModal } from '@/context/ModalContext'
 import { useLocalePath } from '@/ultis/route'
-import { BOOK_ROOT } from '@/Variable/book.variable'
+import { BOOK_ROOT, bookReadPath } from '@/Variable/book.variable'
 import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
 
 import ContributeBookModal from './ContributeBookModal'
 import CreateChapterModal from './CreateChapterModal'
 import classes from './BookContribute.module.scss'
 
-type ChapterState = 'published' | 'approved' | 'review' | 'rejected'
+/** `processing`: an approved multilingual chapter whose translations and audio are not done yet */
+type ChapterState = 'published' | 'approved' | 'processing' | 'review' | 'rejected'
 
-const chapterState = (chapter: ContributedChapter): ChapterState =>
+const chapterState = (chapter: ContributedChapter, process?: ChapterProcessStatus): ChapterState =>
 	chapter.approved_status === 'approved'
 		? chapter.published_status === 'published'
 			? 'published'
-			: 'approved'
+			: process && !process.ready_to_publish
+				? 'processing'
+				: 'approved'
 		: chapter.approved_status === 'rejected'
 			? 'rejected'
 			: 'review'
@@ -57,24 +66,53 @@ const chapterState = (chapter: ContributedChapter): ChapterState =>
 const STATE_VIEW: Record<ChapterState, { label: string; icon: typeof IconClockFilled; className: string }> = {
 	published: { label: 'Approved | Published', icon: IconCircleArrowUpFilled, className: classes.statusApproved },
 	approved: { label: 'Approved | Unpublished', icon: IconCircleArrowUpFilled, className: classes.statusApproved },
+	processing: { label: 'In progress', icon: IconProgress, className: classes.statusProgress },
 	review: { label: 'Under Review', icon: IconClockFilled, className: classes.statusReview },
 	rejected: { label: 'Rejected', icon: IconAlertOctagonFilled, className: classes.statusRejected },
 }
 
-// the book card shows the best state of its chapters
-const bookState = (chapters: ContributedChapter[]): ChapterState | undefined => {
-	const states = chapters.map(chapterState)
-	return (['published', 'approved', 'review', 'rejected'] as const).find((state) => states.includes(state))
+// the popup a chapter opens, as in the app
+const STATE_POPUP: Record<ChapterState, { title: string; message: string; action: string }> = {
+	published: {
+		title: 'Chapter Approved',
+		message: 'Great news! Your chapter has been approved and published.',
+		action: 'Preview',
+	},
+	approved: {
+		title: 'Chapter Approved',
+		message: 'Great news! Your chapter has been approved. Select it and tap Publish now to share it.',
+		action: 'Ok, got it',
+	},
+	processing: {
+		title: 'Chapter Incomplete',
+		message: 'This chapter is still being translated and voiced. You can publish it once it is ready.',
+		action: 'Continue',
+	},
+	review: {
+		title: 'Chapter Under Review',
+		message: 'Your chapter is being reviewed by the UniVini team.',
+		action: 'Ok, got it',
+	},
+	rejected: {
+		title: 'Chapter Rejected',
+		message: "Sorry, your chapter can't be published because the content isn't suitable for the community or doesn't meet our guidelines.",
+		action: 'Edit & resubmit',
+	},
 }
 
-function StatusLine({ state }: { state?: ChapterState }) {
+const BOOK_STATE_ORDER: ChapterState[] = ['published', 'approved', 'processing', 'review', 'rejected']
+
+function StatusLine({ state, percent }: { state?: ChapterState; percent?: number }) {
 	if (!state) return null
 	const view = STATE_VIEW[state]
 	const Icon = view.icon
 	return (
 		<div className={clsx(classes.status, view.className)}>
 			<Icon size={16} />
-			<span>{view.label}</span>
+			<span>
+				{view.label}
+				{state === 'processing' && percent !== undefined ? ` · ${percent}%` : ''}
+			</span>
 		</div>
 	)
 }
@@ -83,18 +121,24 @@ type MyBookDetailProps = {
 	bookId: string
 }
 
-/** The reader's own book: its chapters with review status, add, publish, unpublish and delete */
+/** The reader's own book: its chapters with review status, add, resubmit, publish, unpublish and delete */
 function MyBookDetail({ bookId }: MyBookDetailProps) {
 	const { onChangeRoute } = useLocalePath()
 	const { openConfirm, closeModal } = useModal()
 	const [book, setBook] = useState<ContributedBook | null>(null)
 	const [chapters, setChapters] = useState<ContributedChapter[]>([])
+	const [progress, setProgress] = useState<Record<string, ChapterProcessStatus>>({})
 	const [loading, setLoading] = useState(true)
 	const [selected, setSelected] = useState<string[]>([])
 	const [publishing, setPublishing] = useState(false)
-	const [createOpen, setCreateOpen] = useState(false)
+	// undefined: closed, null: new chapter, a chapter: edit and resubmit it
+	const [chapterForm, setChapterForm] = useState<ContributedChapter | null | undefined>(undefined)
 	const [thanksOpen, setThanksOpen] = useState(false)
 	const [editOpen, setEditOpen] = useState(false)
+	const [popup, setPopup] = useState<ContributedChapter | null>(null)
+
+	const languages = book?.language || []
+	const multilingual = book?.language_type === 'bilingual' || languages.length > 1
 
 	const loadBook = useCallback(() => {
 		return getBookDetail(bookId)
@@ -116,14 +160,43 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 		Promise.all([loadBook(), loadChapters()]).finally(() => setLoading(false))
 	}, [loadBook, loadChapters])
 
+	// multilingual chapters can be published only once every language has its audio
+	useEffect(() => {
+		if (!multilingual) return
+		const pending = chapters.filter(
+			(item) => item.id && item.approved_status === 'approved' && item.published_status !== 'published',
+		)
+		if (!pending.length) return
+		let cancelled = false
+		Promise.all(
+			pending.map((item) =>
+				getChapterProcessStatus(item.id as string)
+					.then((res) => [item.id as string, parseApiObject<ChapterProcessStatus>(res) || {}] as const)
+					.catch(() => [item.id as string, {}] as const),
+			),
+		).then((pairs) => {
+			if (!cancelled) setProgress(Object.fromEntries(pairs))
+		})
+		return () => {
+			cancelled = true
+		}
+	}, [chapters, multilingual])
+
+	const stateOf = useCallback(
+		(chapter: ContributedChapter) => chapterState(chapter, chapter.id ? progress[chapter.id] : undefined),
+		[progress],
+	)
+
 	const publishable = useMemo(
-		() => chapters.filter((item) => chapterState(item) === 'approved' && item.id).map((item) => item.id as string),
-		[chapters],
+		() => chapters.filter((item) => item.id && stateOf(item) === 'approved').map((item) => item.id as string),
+		[chapters, stateOf],
 	)
 	const allSelected = publishable.length > 0 && publishable.every((id) => selected.includes(id))
+	const bookState = useMemo(() => {
+		const states = chapters.map(stateOf)
+		return BOOK_STATE_ORDER.find((state) => states.includes(state))
+	}, [chapters, stateOf])
 
-	const languages = book?.language || []
-	const multilingual = book?.language_type === 'bilingual' || languages.length > 1
 	const languageLabel = languageLabelFromCodes(languages)?.replace(' only', '') || 'English'
 	const category = (book?.category || []).find((item) => !item.toLowerCase().includes('contribut'))
 	const meta = [book?.level ? book.level.toUpperCase() : undefined, category, languageLabel].filter(Boolean)
@@ -135,7 +208,7 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 		if (!selected.length || publishing) return
 		setPublishing(true)
 		try {
-			await publishChapters(selected)
+			await (multilingual ? publishMultilingualChapters(selected) : publishChapters(selected))
 			toast.success(selected.length === 1 ? 'Chapter published' : `${selected.length} chapters published`)
 			await loadChapters()
 		} catch {
@@ -155,7 +228,8 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 			onAccept: async () => {
 				closeModal()
 				try {
-					await unpublishChapters([chapter.id as string])
+					const id = chapter.id as string
+					await (multilingual ? unpublishMultilingualChapter(id) : unpublishChapters([id]))
 					toast.success('Chapter unpublished')
 					await loadChapters()
 				} catch {
@@ -175,7 +249,8 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 			onAccept: async () => {
 				closeModal()
 				try {
-					await deleteChapter(chapter.id as string)
+					const id = chapter.id as string
+					await (multilingual ? deleteMultilingualChapter(id) : deleteChapter(id))
 					toast.success('Chapter deleted')
 					await loadChapters()
 				} catch {
@@ -183,6 +258,19 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 				}
 			},
 		})
+	}
+
+	const popupState = popup ? stateOf(popup) : undefined
+	const popupView = popupState ? STATE_POPUP[popupState] : undefined
+	const onPopupAction = () => {
+		const chapter = popup
+		setPopup(null)
+		if (!chapter?.id) return
+		if (popupState === 'published') {
+			onChangeRoute(bookReadPath(bookId, { chapter: chapter.id, page: 1, mode: 'read' }))
+		} else if (popupState === 'rejected') {
+			setChapterForm(chapter)
+		}
 	}
 
 	const back = () => onChangeRoute(`${BOOK_ROOT}/contributed`)
@@ -218,7 +306,7 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 					<span className={classes.rowTitle}>{book.title}</span>
 					{book.author ? <span className={classes.rowAuthor}>{book.author}</span> : null}
 					{meta.length ? <span className={classes.rowMeta}>{meta.join(' | ')}</span> : null}
-					<StatusLine state={bookState(chapters)} />
+					<StatusLine state={bookState} />
 				</span>
 				<IconChevronRight size={20} className={classes.chevron} />
 			</button>
@@ -239,7 +327,7 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 			{chapters.length ? (
 				<div className={classes.list}>
 					{chapters.map((chapter) => {
-						const state = chapterState(chapter)
+						const state = stateOf(chapter)
 						const id = chapter.id as string
 						return (
 							<div key={id} className={classes.chapterRow}>
@@ -249,20 +337,24 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 									onChange={() => toggle(id)}
 									aria-label="Select to publish"
 								/>
-								<span className={classes.chapterThumb}>
-									{chapter.cover_image ? (
-										<CImage src={chapter.cover_image} sizeType={TYPE_SIZE_IMAGE.small} alt="" />
-									) : (
-										<IconPhoto size={20} stroke={1.5} />
-									)}
-								</span>
-								<div className={classes.rowCopy}>
-									<div className={classes.rowTitle}>
-										{chapter.title || `Chapter ${chapter.chapter_number || ''}`}
-									</div>
-									{chapter.description ? <div className={classes.rowAuthor}>{chapter.description}</div> : null}
-									<StatusLine state={state} />
-								</div>
+								<button type="button" className={classes.chapterOpen} onClick={() => setPopup(chapter)}>
+									<span className={classes.chapterThumb}>
+										{chapter.cover_image ? (
+											<CImage src={chapter.cover_image} sizeType={TYPE_SIZE_IMAGE.small} alt="" />
+										) : (
+											<IconPhoto size={20} stroke={1.5} />
+										)}
+									</span>
+									<span className={classes.rowCopy}>
+										<span className={classes.rowTitle}>
+											{chapter.title || `Chapter ${chapter.chapter_number || ''}`}
+										</span>
+										{chapter.description ? (
+											<span className={classes.rowAuthor}>{chapter.description}</span>
+										) : null}
+										<StatusLine state={state} percent={progress[id]?.percentage_complete} />
+									</span>
+								</button>
 								<Dropdown
 									trigger={['click']}
 									placement="bottomRight"
@@ -280,6 +372,14 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 										<IconDots size={20} />
 									</button>
 								</Dropdown>
+								<button
+									type="button"
+									className={classes.chapterChevron}
+									onClick={() => setPopup(chapter)}
+									aria-label="Chapter status"
+								>
+									<IconChevronRight size={18} />
+								</button>
 							</div>
 						)
 					})}
@@ -293,17 +393,13 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 				</div>
 			)}
 
-			{multilingual ? (
-				<div className={classes.emptyHint}>Adding chapters to multilingual books is coming soon on the web.</div>
-			) : (
-				<button
-					type="button"
-					className={chapters.length ? classes.addChapter : classes.emptyBtn}
-					onClick={() => setCreateOpen(true)}
-				>
-					<IconPlus size={16} /> Add chapter
-				</button>
-			)}
+			<button
+				type="button"
+				className={chapters.length ? classes.addChapter : classes.emptyBtn}
+				onClick={() => setChapterForm(null)}
+			>
+				<IconPlus size={16} /> Add chapter
+			</button>
 
 			{selected.length ? (
 				<button type="button" className={classes.publishNow} onClick={publish} disabled={publishing}>
@@ -312,12 +408,16 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 			) : null}
 
 			<CreateChapterModal
-				open={createOpen}
+				open={chapterForm !== undefined}
 				bookId={bookId}
 				languageLabel={languageLabel}
-				onClose={() => setCreateOpen(false)}
+				multilingual={multilingual}
+				chapter={chapterForm}
+				onClose={() => setChapterForm(undefined)}
 				onCreated={() => {
-					setThanksOpen(true)
+					// a multilingual chapter is approved straight away; the others go to review
+					if (multilingual && !chapterForm) toast.success('Chapter uploaded. Translations and audio are on the way.')
+					else setThanksOpen(true)
 					loadChapters()
 				}}
 			/>
@@ -330,6 +430,24 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 					else loadBook()
 				}}
 			/>
+			<CModal
+				open={Boolean(popupView)}
+				centered
+				footer={null}
+				onCancel={() => setPopup(null)}
+				styles={{ content: { width: 400, maxWidth: 'calc(100vw - 32px)' } }}
+			>
+				{popupView && popupState ? (
+					<div className={classes.thanks}>
+						<StatusIcon state={popupState} />
+						<div className={classes.thanksTitle}>{popupView.title}</div>
+						<div className={classes.emptyHint}>{popupView.message}</div>
+						<button type="button" className={classes.primary} onClick={onPopupAction}>
+							{popupView.action}
+						</button>
+					</div>
+				) : null}
+			</CModal>
 			<CModal
 				open={thanksOpen}
 				centered
@@ -351,6 +469,12 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 			</CModal>
 		</div>
 	)
+}
+
+function StatusIcon({ state }: { state: ChapterState }) {
+	const view = STATE_VIEW[state]
+	const Icon = view.icon
+	return <Icon size={56} className={view.className} />
 }
 
 export default memo(MyBookDetail)

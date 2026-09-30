@@ -122,6 +122,45 @@ export const unpublishChapters = async (ids: string[]) =>
 export const deleteChapter = async (id: string) =>
 	axios.delete(`${BOOK_ROUTES.chapter}/single-language/${id}`)
 
+export type UpdateChapterPayload = Partial<Omit<CreateChapterPayload, 'book_id'>>
+
+/** Edit a one-language chapter; a new docx sends it for review again */
+export const updateSingleLanguageChapter = async (id: string, payload: UpdateChapterPayload) =>
+	axios.put(`${BOOK_ROUTES.chapter}/update-single-language/${id}`, payload)
+
+// Multilingual books belong to UniVini accounts, which use the published-chapter
+// endpoints: the English docx is translated and voiced for every language.
+
+export type CreateMultilingualChapterPayload = {
+	book_id: string
+	english_doc_url: string
+	title?: string
+	summary?: string
+	thumbnail?: string
+}
+
+export const createMultilingualChapter = async (payload: CreateMultilingualChapterPayload) =>
+	axios.post(`${BOOK_ROUTES.chapter}/create-published`, payload)
+
+/** Translation and audio progress of a multilingual chapter */
+export type ChapterProcessStatus = {
+	percentage_complete?: number
+	ready_to_publish?: boolean
+	failed_audios?: number
+}
+
+export const getChapterProcessStatus = async (id: string) =>
+	axios.get(`${BOOK_ROUTES.chapter}/${id}/status`)
+
+export const publishMultilingualChapters = async (ids: string[]) =>
+	axios.post(`${BOOK_ROUTES.chapter}/publish/list`, { ids })
+
+export const unpublishMultilingualChapter = async (id: string) =>
+	axios.post(`${BOOK_ROUTES.chapter}/${id}/unpublish`)
+
+export const deleteMultilingualChapter = async (id: string) =>
+	axios.delete(`${BOOK_ROUTES.chapter}/${id}`)
+
 const axiosUpload = axiosBase.create()
 
 /** Upload a .docx through a pre-signed URL and return its public URL */
