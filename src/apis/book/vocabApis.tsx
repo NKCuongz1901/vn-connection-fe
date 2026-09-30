@@ -88,3 +88,55 @@ export const parseStrengthCounts = (res: unknown): VocabStrengthCounts => {
 export const folderWordCount = (folder: VocabFolder) =>
 	folder.total_words ??
 	(folder.weak_words_count || 0) + (folder.medium_words_count || 0) + (folder.strong_words_count || 0)
+
+export type LearningType = 'flashcard' | 'writing'
+
+/** One answer choice: a translation of a word; the right one has is_correct */
+export type FlashcardOption = {
+	id?: string
+	vocab?: string
+	meaning?: string
+	language?: string
+	is_correct?: boolean
+}
+
+export type FlashcardQuestion = {
+	source_vocab_id: string
+	vocab: string
+	ipa?: string | null
+	language?: string
+	level?: string
+	all_options?: FlashcardOption[]
+}
+
+/**
+ * Questions for a vocab set; without a folder the reader's searched words are
+ * used (source_language picks which of their reading folders)
+ */
+export const getFlashcardQuestions = async (params: {
+	native_language: string
+	folder_id?: string
+	source_language?: string
+	word_type?: VocabStrength
+	limit?: number
+	wrong_options_count?: number
+}) =>
+	axios.get('vocabulary/flashcard/questions', {
+		params: {
+			sort_by: 'random',
+			limit: String(params.limit ?? 200),
+			wrong_options_count: String(params.wrong_options_count ?? 1),
+			native_language: params.native_language,
+			...(params.folder_id ? { folder_id: params.folder_id } : {}),
+			...(params.source_language ? { source_language: params.source_language } : {}),
+			...(params.word_type ? { word_type: params.word_type } : {}),
+		},
+	})
+
+/** Saves how many times each word was right or wrong (moves it between weak / medium / strong) */
+export const submitLearningProgress = async (payload: {
+	folder_id: string
+	native_language: string
+	learning_type: LearningType
+	answers: { source_vocab_id: string; correct_count: number; incorrect_count: number }[]
+}) => axios.post('vocabulary/learning/progress', payload)
