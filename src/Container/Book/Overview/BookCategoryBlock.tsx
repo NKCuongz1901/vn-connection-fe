@@ -50,8 +50,8 @@ const toCard = (book: BookApiItem): BookCardItem | null => {
 
 /**
  * Overview Category block: every category with its book count; the selected
- * one lists its books with the reader's progress, books not finished first
- * (a finished book shows a full green bar).
+ * one lists its books with the reader's progress: books being read first, then
+ * books not started, then finished ones (a finished book shows a full green bar).
  */
 function BookCategoryBlock() {
 	const { onChangeRoute } = useLocalePath()
@@ -101,9 +101,10 @@ function BookCategoryBlock() {
 				const cards = parseApiList<BookApiItem>(res)
 					.map(toCard)
 					.filter((item): item is BookCardItem => Boolean(item))
-				const unfinished = (card: BookCardItem) =>
-					card.progressPercent !== undefined && card.progressPercent < 100 ? 0 : 1
-				setBooks([...cards].sort((a, b) => unfinished(a) - unfinished(b)))
+				// reading first, then not started, then finished
+				const rank = (card: BookCardItem) =>
+					card.progressPercent === undefined ? 1 : card.progressPercent < 100 ? 0 : 2
+				setBooks([...cards].sort((a, b) => rank(a) - rank(b)))
 				setTotal(parseListTotal(res, cards.length))
 			})
 			.catch(() => {
