@@ -7,7 +7,6 @@ import {
 	IconClockFilled,
 	IconDots,
 	IconPencil,
-	IconProgress,
 	IconTrash,
 } from '@tabler/icons-react'
 import { Dropdown } from 'antd'
@@ -31,7 +30,8 @@ type ContributedBookRowProps = {
 const STATUS = {
 	approved: { label: 'Approved', icon: IconCircleArrowUpFilled, className: classes.statusApproved },
 	under_review: { label: 'Under Review', icon: IconClockFilled, className: classes.statusReview },
-	inprogress: { label: 'In Progress', icon: IconProgress, className: classes.statusProgress },
+	// the Under Review tab lists these (approved_status=inprogress), so they share its name
+	inprogress: { label: 'Under Review', icon: IconClockFilled, className: classes.statusReview },
 	rejected: { label: 'Rejected', icon: IconAlertOctagonFilled, className: classes.statusRejected },
 } as const
 

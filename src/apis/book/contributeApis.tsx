@@ -142,11 +142,24 @@ export type CreateMultilingualChapterPayload = {
 export const createMultilingualChapter = async (payload: CreateMultilingualChapterPayload) =>
 	axios.post(`${BOOK_ROUTES.chapter}/create-published`, payload)
 
+/** One language (and accent) of a multilingual chapter: its translated text and audio */
+export type ChapterLanguageFile = {
+	id?: string
+	language?: string
+	language_variant?: string | null
+	status?: string
+	url?: string | null
+	doc_url?: string | null
+	error?: string | null
+	duration?: number | null
+}
+
 /** Translation and audio progress of a multilingual chapter */
 export type ChapterProcessStatus = {
 	percentage_complete?: number
 	ready_to_publish?: boolean
 	failed_audios?: number
+	audio_details?: ChapterLanguageFile[]
 }
 
 export const getChapterProcessStatus = async (id: string) =>
@@ -183,3 +196,18 @@ export const uploadChapterDocument = async (file: File) => {
 
 export const DOCX_MIME =
 	'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+
+export type EditPublishedAction =
+	| 'regenerate_text'
+	| 'regenerate_audio'
+	| 'force_update_text'
+	| 'force_update_audio'
+
+/**
+ * Redo or replace one language of a multilingual chapter. The API unpublishes a
+ * published chapter first; a replaced docx must keep the chapter's sentences.
+ */
+export const editPublishedChapter = async (
+	chapterId: string,
+	payload: { action: EditPublishedAction; book_audio_id: string; docx_url?: string; audio_url?: string },
+) => axios.put(`${BOOK_ROUTES.chapter}/${chapterId}/edit-published`, payload)

@@ -10,6 +10,8 @@ import {
 	IconClockFilled,
 	IconDots,
 	IconEyeOff,
+	IconFiles,
+	IconFileText,
 	IconPhoto,
 	IconPlus,
 	IconProgress,
@@ -45,6 +47,8 @@ import { useLocalePath } from '@/ultis/route'
 import { BOOK_ROOT, bookReadPath } from '@/Variable/book.variable'
 import { TYPE_SIZE_IMAGE } from '@/Variable/image.variable'
 
+import ChapterFilesModal from './ChapterFilesModal'
+import ChapterTextPreview from './ChapterTextPreview'
 import ContributeBookModal from './ContributeBookModal'
 import CreateChapterModal from './CreateChapterModal'
 import classes from './BookContribute.module.scss'
@@ -136,6 +140,8 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 	const [thanksOpen, setThanksOpen] = useState(false)
 	const [editOpen, setEditOpen] = useState(false)
 	const [popup, setPopup] = useState<ContributedChapter | null>(null)
+	const [filesOf, setFilesOf] = useState<ContributedChapter | null>(null)
+	const [previewOf, setPreviewOf] = useState<ContributedChapter | null>(null)
 
 	const languages = book?.language || []
 	const multilingual = book?.language_type === 'bilingual' || languages.length > 1
@@ -218,6 +224,17 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 		}
 	}
 
+	const publishOne = async (chapter: ContributedChapter) => {
+		if (!chapter.id) return
+		try {
+			await publishMultilingualChapters([chapter.id])
+			toast.success('Chapter published')
+			await loadChapters()
+		} catch {
+			toast.error('Could not publish. Please try again.')
+		}
+	}
+
 	const unpublish = (chapter: ContributedChapter) => {
 		if (!chapter.id) return
 		openConfirm({
@@ -227,6 +244,7 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 			cancelLabel: 'Cancel',
 			onAccept: async () => {
 				closeModal()
+				setFilesOf(null)
 				try {
 					const id = chapter.id as string
 					await (multilingual ? unpublishMultilingualChapter(id) : unpublishChapters([id]))
@@ -360,12 +378,20 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 									placement="bottomRight"
 									menu={{
 										items: [
+											...(multilingual && ['published', 'approved', 'processing'].includes(state)
+												? [{ key: 'files', label: 'All files', icon: <IconFiles size={16} /> }]
+												: [{ key: 'preview', label: 'Preview text', icon: <IconFileText size={16} /> }]),
 											...(state === 'published'
 												? [{ key: 'unpublish', label: 'Unpublish this chapter', icon: <IconEyeOff size={16} /> }]
 												: []),
 											{ key: 'delete', label: 'Delete this chapter', icon: <IconTrash size={16} />, danger: true },
 										],
-										onClick: ({ key }) => (key === 'unpublish' ? unpublish(chapter) : remove(chapter)),
+										onClick: ({ key }) => {
+											if (key === 'files') setFilesOf(chapter)
+											else if (key === 'preview') setPreviewOf(chapter)
+											else if (key === 'unpublish') unpublish(chapter)
+											else remove(chapter)
+										},
 									}}
 								>
 									<button type="button" className={classes.more} aria-label="More">
@@ -429,6 +455,22 @@ function MyBookDetail({ bookId }: MyBookDetailProps) {
 					if (saved) setBook((prev) => ({ ...prev, ...saved }))
 					else loadBook()
 				}}
+			/>
+			<ChapterFilesModal
+				open={Boolean(filesOf)}
+				chapter={filesOf}
+				published={filesOf?.published_status === 'published'}
+				onClose={() => setFilesOf(null)}
+				onChanged={loadChapters}
+				onPublish={publishOne}
+				onUnpublish={unpublish}
+			/>
+			<ChapterTextPreview
+				open={Boolean(previewOf)}
+				chapterId={previewOf?.id}
+				language={languages[0] || 'en'}
+				title={previewOf?.title}
+				onClose={() => setPreviewOf(null)}
 			/>
 			<CModal
 				open={Boolean(popupView)}
