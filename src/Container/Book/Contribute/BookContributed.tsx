@@ -15,7 +15,7 @@ import {
 } from '@/apis/book/contributeApis'
 import { useModal } from '@/context/ModalContext'
 import { useLocalePath } from '@/ultis/route'
-import { BOOK_ROOT, bookDetailPath } from '@/Variable/book.variable'
+import { BOOK_ROOT, contributedBookPath } from '@/Variable/book.variable'
 
 import ContributeBookModal from './ContributeBookModal'
 import ContributedBookRow from './ContributedBookRow'
@@ -181,7 +181,7 @@ function BookContributed() {
 						<ContributedBookRow
 							key={book.id}
 							book={book}
-							onView={() => book.id && onChangeRoute(bookDetailPath(book.id))}
+							onView={() => book.id && onChangeRoute(contributedBookPath(book.id))}
 							onEdit={() => setEditing(book)}
 							onDelete={() => confirmDelete(book)}
 						/>
