@@ -43,6 +43,7 @@ function BookShell({ children }: BookShellProps) {
 					<div className={classes.heading}>Audiobooks</div>
 					<nav className={classes.nav}>
 						{BOOK_NAV.map((item) => {
+							const disabled = Boolean((item as { disabled?: boolean }).disabled)
 							const active =
 								'href' in item &&
 								item.href &&
@@ -56,7 +57,7 @@ function BookShell({ children }: BookShellProps) {
 									className={clsx(classes.navItem, {
 										[classes.active]: active,
 									})}
-									disabled={'disabled' in item && item.disabled}
+									disabled={disabled}
 									onClick={() => {
 										if ('href' in item && item.href) {
 											onChangeRoute(item.href)
@@ -67,7 +68,7 @@ function BookShell({ children }: BookShellProps) {
 								</button>
 							)
 
-							if ('disabled' in item && item.disabled) {
+							if (disabled) {
 								return (
 									<Tooltip
 										key={item.id}

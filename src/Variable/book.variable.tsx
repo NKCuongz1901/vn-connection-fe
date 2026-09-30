@@ -25,7 +25,7 @@ export const BOOK_NAV = [
 	// Studying: the books the reader is reading or listening to
 	{ id: 'studying', label: 'Studying', href: 'mini-apps/books-audio/continue' },
 	{ id: 'library', label: 'My Library', href: 'mini-apps/books-audio/library' },
-	{ id: 'vocab', label: 'Vocabulary', disabled: true },
+	{ id: 'vocab', label: 'Vocabulary', href: 'mini-apps/books-audio/vocabulary' },
 	{ id: 'profile', label: 'Reading profile', href: 'mini-apps/books-audio/profile' },
 	{ id: 'contribute', label: 'Contributed book', href: 'mini-apps/books-audio/contributed' },
 ] as const
@@ -44,6 +44,7 @@ export const BOOK_CATEGORIES = [
 export const BOOK_ROOT = 'mini-apps/books-audio'
 export const BOOK_STREAK_PATH = `${BOOK_ROOT}/streak`
 export const BOOK_PROFILE_PATH = `${BOOK_ROOT}/profile`
+export const BOOK_VOCAB_PATH = `${BOOK_ROOT}/vocabulary`
 
 /** Temporary kill switch for Books & Audio on web (main). Flip to true to ship. */
 export const BOOK_WEB_ENABLED = true
