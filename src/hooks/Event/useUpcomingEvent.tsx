@@ -6,14 +6,60 @@ import { getListPost, getMyEventsJoined } from '@/apis/postApis'
 
 import { isArray, uniqueArray } from '@/ultis/array'
 import { cloneDeep, delay } from '@/ultis/common'
+import { useQuery } from '@/ultis/route'
+import { getUserInfo } from '@/ultis/storage'
 
 import { paginationCommon } from '@/Variable/common.variable'
 
 import { PaginationType } from '@/interface/common/common.interface'
 import { mainRoutes } from '@/routes/MainRoutes'
 
+/** Builds location params from upcoming-event query, then user profile. */
+const getLocationSearchParams = (query: Record<string, string> = {}) => {
+	const queryLat = Number(query.latitude)
+	const queryLng = Number(query.longitude)
+	const hasQueryLocation =
+		!!queryLat &&
+		!!queryLng &&
+		!Number.isNaN(queryLat) &&
+		!Number.isNaN(queryLng)
+
+	if (hasQueryLocation) {
+		const types = String(query.types || '')
+			.split(',')
+			.map((item) => item.trim())
+			.filter(Boolean)
+
+		return {
+			latitude: queryLat,
+			longitude: queryLng,
+			google_title: query.google_title || '',
+			...(isArray(types, 1) ? { types } : {}),
+		}
+	}
+
+	const info = getUserInfo() || {}
+	const latitude = Number(info.latitude)
+	const longitude = Number(info.longitude)
+	if (
+		!latitude ||
+		!longitude ||
+		Number.isNaN(latitude) ||
+		Number.isNaN(longitude)
+	) {
+		return {}
+	}
+
+	return {
+		latitude,
+		longitude,
+		google_title: info.address || '',
+	}
+}
+
 export default function useUpcomingEvent({ type, onCRUDSuccess }: any) {
 	const { openError } = useModal()
+	const { onGetQuerry } = useQuery()
 	const _paginationRefs = useRef<PaginationType>(cloneDeep(paginationCommon))
 	const _parentRef = useRef<HTMLDivElement | null>(null)
 	const _childRef = useRef<HTMLDivElement | null>(null)
@@ -21,6 +67,8 @@ export default function useUpcomingEvent({ type, onCRUDSuccess }: any) {
 	const [loadmore, setLoadMore] = useState(true)
 	const [total, setTotal] = useState(0)
 	const [loading, setLoading] = useState(false)
+
+	/** Fetches upcoming activities for the location from query or profile. */
 	const handleGetListPost = async (isNotLoading = false) => {
 		setLoading(true)
 		try {
@@ -35,6 +83,7 @@ export default function useUpcomingEvent({ type, onCRUDSuccess }: any) {
 				limit: !isNotLoading ? limit : 50,
 				type,
 				radius: 20,
+				...getLocationSearchParams(onGetQuerry()),
 			}
 
 			const res: any = await (true ? getListPost : getMyEventsJoined)(params)
