@@ -155,7 +155,11 @@ function VocabLearning({ type, wordType, folderId, setName }: VocabLearningProps
 		setTyped(question.vocab)
 	}
 
-	const close = () => onChangeRoute(BOOK_VOCAB_PATH)
+	// back to the set or list the learning was opened from
+	const close = () => {
+		if (typeof window !== 'undefined' && window.history.length > 1) window.history.back()
+		else onChangeRoute(BOOK_VOCAB_PATH)
+	}
 	const total = questions.length
 	const percent = total ? Math.round((Math.min(index, total) / total) * 100) : 0
 
