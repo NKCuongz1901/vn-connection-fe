@@ -90,6 +90,9 @@ export const bookCategoryPath = (id: string) =>
 
 export const bookDetailPath = (id: string) => `${BOOK_ROOT}/book/${id}`
 
+/** The reader's own book: details and chapters */
+export const contributedBookPath = (id: string) => `${BOOK_ROOT}/contributed/${id}`
+
 export const bookReadPath = (
 	id: string,
 	query?: { chapter?: string; page?: number; mode?: 'read' | 'listen' },
