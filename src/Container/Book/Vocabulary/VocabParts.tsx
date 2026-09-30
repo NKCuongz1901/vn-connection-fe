@@ -96,6 +96,7 @@ export function WordList({
 	loadingMore,
 	onLoadMore,
 	onRemove,
+	onAdd,
 	emptyText,
 }: {
 	words: VocabWord[]
@@ -105,6 +106,7 @@ export function WordList({
 	loadingMore: boolean
 	onLoadMore: () => void
 	onRemove?: (word: VocabWord) => void
+	onAdd?: (word: VocabWord) => void
 	emptyText: string
 }) {
 	if (loading && !words.length) return <div className={classes.empty}>Loading…</div>
@@ -112,7 +114,13 @@ export function WordList({
 	return (
 		<div className={classes.words}>
 			{words.map((word) => (
-				<VocabWordRow key={word.source_vocab_id} word={word} nativeLang={nativeLang} onRemove={onRemove} />
+				<VocabWordRow
+					key={word.source_vocab_id}
+					word={word}
+					nativeLang={nativeLang}
+					onRemove={onRemove}
+					onAdd={onAdd}
+				/>
 			))}
 			{words.length < total ? (
 				<button type="button" className={classes.loadMore} onClick={onLoadMore} disabled={loadingMore}>

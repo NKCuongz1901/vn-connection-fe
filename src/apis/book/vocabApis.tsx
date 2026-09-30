@@ -45,6 +45,8 @@ export type VocabStrengthCounts = {
 /** A vocab set (UniVini or the reader's own) with the reader's word counts */
 export type VocabFolder = VocabStrengthCounts & {
 	id?: string
+	/** the words' language of the reader's own sets */
+	source_language?: string
 	name?: string
 	avatar?: string | null
 	languages?: string[] | null
@@ -72,8 +74,10 @@ export const getReadingSearchedVocab = async (params: {
 export const getUniviniVocabSets = async (limit = 20) =>
 	axios.get('vocabulary/univini-folder-lists', { params: { limit, offset: 0 } })
 
-export const getMyVocabSets = async (limit = 20) =>
-	axios.get('vocabulary/user-folder/list', { params: { limit: String(limit), offset: '0' } })
+export const getMyVocabSets = async (limit = 20, sourceLanguage?: string) =>
+	axios.get('vocabulary/user-folder/list', {
+		params: { limit: String(limit), offset: '0', ...(sourceLanguage ? { source_language: sourceLanguage } : {}) },
+	})
 
 /** The list payload also carries the weak / medium / strong counts */
 export const parseStrengthCounts = (res: unknown): VocabStrengthCounts => {
@@ -212,3 +216,55 @@ export const posterOf = (folder: VocabFolder | null | undefined, level: string) 
 	if (value && typeof value === 'object' && 'url' in value) return String((value as { url?: string }).url || '')
 	return ''
 }
+
+// The reader's own vocab sets
+
+export const createMyVocabSet = async (name: string, sourceLanguage: string) =>
+	axios.post('vocabulary/user-folder', { name, source_language: sourceLanguage })
+
+export const renameMyVocabSet = async (folderId: string, name: string) =>
+	axios.put('vocabulary/user-folder', { folder_id: folderId, name })
+
+export const deleteMyVocabSet = async (folderId: string) =>
+	axios.delete('vocabulary/user-folder', { params: { folder_id: folderId } })
+
+export const getMyVocabSetWords = async (params: {
+	folder_id: string
+	languages: string[]
+	sort_by?: VocabSort
+	word_type?: VocabStrength
+	in_progress?: boolean
+	limit?: number
+	offset?: number
+}) =>
+	axios.get('vocabulary/user-folder/words', {
+		params: {
+			folder_id: params.folder_id,
+			languages: params.languages.join(','),
+			limit: String(params.limit ?? 50),
+			offset: String(params.offset ?? 0),
+			...(params.sort_by ? { sort_by: params.sort_by } : {}),
+			...(params.word_type ? { word_type: params.word_type } : {}),
+			...(params.in_progress !== undefined ? { in_progress: String(params.in_progress) } : {}),
+		},
+	})
+
+/** Replaces the set's whole word list; unknown words come back in not_found_words */
+export const setMyVocabSetWords = async (params: {
+	folder_id: string
+	words: string[]
+	source_language?: string
+	target_language?: string
+}) => axios.put('vocabulary/user-folder/vocab-set', params)
+
+export const addWordToMyVocabSet = async (folderId: string, word: string, sourceLanguage?: string) =>
+	axios.post('vocabulary/user-folder/word', {
+		folder_id: folderId,
+		word,
+		...(sourceLanguage ? { source_language: sourceLanguage } : {}),
+	})
+
+export const removeWordFromMyVocabSet = async (folderId: string, word: string) =>
+	axios.delete('vocabulary/user-folder/word', { params: { folder_id: folderId, word } })
+
+export const MAX_SET_WORDS = 50

@@ -968,3 +968,147 @@ button.setCard {
 		text-decoration: none;
 	}
 }
+
+// My vocab sets
+button.myCard {
+	text-align: left;
+	cursor: pointer;
+}
+
+.langSelect {
+	min-width: 140px;
+}
+
+.folderRow {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 14px;
+	border: 1px solid #e8edf3;
+	border-radius: 10px;
+	background: #fff;
+}
+
+.folderOpen {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	gap: 10px;
+	padding: 0;
+	border: none;
+	background: none;
+	color: #0f1729;
+	font-size: 14px;
+	text-align: left;
+	cursor: pointer;
+}
+
+.chevronMuted {
+	color: #94a3b8;
+}
+
+.roundAdd {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	margin-left: 8px;
+	border: none;
+	border-radius: 99px;
+	background: #f05a0e;
+	color: #fff;
+	cursor: pointer;
+}
+
+.translatedTo {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	color: #64748b;
+	font-size: 13px;
+}
+
+.formCol {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.fieldLabel {
+	margin-top: 6px;
+	color: #0f1729;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.greenText {
+	color: $green;
+}
+
+.textInput {
+	height: 42px;
+	padding: 0 12px;
+	border: 1px solid #e8edf3;
+	border-radius: 8px;
+	background: #f4f8fc;
+	color: #0f1729;
+	font-size: 14px;
+	outline: none;
+
+	&:focus {
+		border-color: $green;
+	}
+
+	&:disabled {
+		cursor: not-allowed;
+	}
+}
+
+.fieldCount {
+	align-self: flex-end;
+	color: #94a3b8;
+	font-size: 12px;
+}
+
+.fullSelect {
+	width: 100%;
+}
+
+.tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.tag {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 2px 8px;
+	border-radius: 6px;
+	background: #e7f5ee;
+	color: $green;
+	font-size: 12px;
+
+	button {
+		display: flex;
+		padding: 0;
+		border: none;
+		background: none;
+		color: $green;
+		cursor: pointer;
+	}
+}
+
+.modalActions {
+	display: flex;
+	gap: 10px;
+	margin-top: 14px;
+
+	button {
+		flex: 1;
+		height: 42px;
+	}
+}
