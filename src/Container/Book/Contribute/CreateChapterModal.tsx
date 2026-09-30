@@ -116,10 +116,14 @@ function CreateChapterModal({
 				docFile ? uploadChapterDocument(docFile) : Promise.resolve(''),
 				thumbFile ? handleUploadImage(thumbFile) : Promise.resolve(''),
 			])
-			const details = {
+			const details: { title?: string; summary?: string; thumbnail?: string } = {
 				...(title.trim() ? { title: title.trim() } : {}),
 				...(summary.trim() ? { summary: summary.trim() } : {}),
 				...(thumbnail ? { thumbnail } : {}),
+			}
+			// the API falls back to the book cover when no thumbnail is sent, so keep the chapter's own
+			if (isEdit && !thumbnail && thumbPreview && chapter?.cover_image) {
+				details.thumbnail = chapter.cover_image
 			}
 			if (isEdit) {
 				await updateSingleLanguageChapter(chapter?.id as string, {
