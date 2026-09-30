@@ -6,8 +6,11 @@ import clsx from 'clsx'
 import { toast } from 'react-toastify'
 
 import {
+	ContributedChapter,
+	createMultilingualChapter,
 	createSingleLanguageChapter,
 	DOCX_MIME,
+	updateSingleLanguageChapter,
 	uploadChapterDocument,
 } from '@/apis/book/contributeApis'
 import { handleUploadImage } from '@/apis/uploadApis'
@@ -23,6 +26,10 @@ type CreateChapterModalProps = {
 	bookId: string
 	/** the book's language, shown above the docx picker */
 	languageLabel: string
+	/** multilingual books upload the English docx; the rest is translated */
+	multilingual?: boolean
+	/** a rejected chapter to edit and resubmit */
+	chapter?: ContributedChapter | null
 	onClose: () => void
 	onCreated: () => void
 }
@@ -30,8 +37,20 @@ type CreateChapterModalProps = {
 const isDocx = (file: File) =>
 	file.type === DOCX_MIME || file.name.toLowerCase().endsWith('.docx')
 
-/** Create a one-language chapter: optional thumbnail, title and summary, and the chapter docx */
-function CreateChapterModal({ open, bookId, languageLabel, onClose, onCreated }: CreateChapterModalProps) {
+/**
+ * Create a chapter (optional thumbnail, title and summary, and the chapter docx),
+ * or edit a rejected one and resubmit it
+ */
+function CreateChapterModal({
+	open,
+	bookId,
+	languageLabel,
+	multilingual,
+	chapter,
+	onClose,
+	onCreated,
+}: CreateChapterModalProps) {
+	const isEdit = Boolean(chapter?.id)
 	const imageRef = useRef<HTMLInputElement>(null)
 	const docRef = useRef<HTMLInputElement>(null)
 	const [thumbFile, setThumbFile] = useState<File | null>(null)
@@ -45,20 +64,20 @@ function CreateChapterModal({ open, bookId, languageLabel, onClose, onCreated }:
 	useEffect(() => {
 		if (!open) return
 		setThumbFile(null)
-		setTitle('')
-		setSummary('')
+		setTitle(chapter?.title || '')
+		setSummary(chapter?.description || '')
 		setDocFile(null)
-	}, [open])
+	}, [chapter, open])
 
 	useEffect(() => {
 		if (!thumbFile) {
-			setThumbPreview('')
+			setThumbPreview(open ? chapter?.cover_image || '' : '')
 			return
 		}
 		const url = URL.createObjectURL(thumbFile)
 		setThumbPreview(url)
 		return () => URL.revokeObjectURL(url)
-	}, [thumbFile])
+	}, [chapter?.cover_image, open, thumbFile])
 
 	if (!open) return null
 
@@ -86,21 +105,32 @@ function CreateChapterModal({ open, bookId, languageLabel, onClose, onCreated }:
 		setDocFile(file)
 	}
 
+	// a new chapter needs its docx; a resubmitted one keeps the old file unless replaced
+	const canSubmit = isEdit || Boolean(docFile)
+
 	const submit = async () => {
-		if (!docFile || saving) return
+		if (!canSubmit || saving) return
 		setSaving(true)
 		try {
 			const [docUrl, thumbnail] = await Promise.all([
-				uploadChapterDocument(docFile),
+				docFile ? uploadChapterDocument(docFile) : Promise.resolve(''),
 				thumbFile ? handleUploadImage(thumbFile) : Promise.resolve(''),
 			])
-			await createSingleLanguageChapter({
-				book_id: bookId,
-				doc_url: docUrl,
+			const details = {
 				...(title.trim() ? { title: title.trim() } : {}),
 				...(summary.trim() ? { summary: summary.trim() } : {}),
 				...(thumbnail ? { thumbnail } : {}),
-			})
+			}
+			if (isEdit) {
+				await updateSingleLanguageChapter(chapter?.id as string, {
+					...details,
+					...(docUrl ? { doc_url: docUrl } : {}),
+				})
+			} else if (multilingual) {
+				await createMultilingualChapter({ book_id: bookId, english_doc_url: docUrl, ...details })
+			} else {
+				await createSingleLanguageChapter({ book_id: bookId, doc_url: docUrl, ...details })
+			}
 			onCreated()
 			onClose()
 		} catch (error) {
@@ -121,7 +151,7 @@ function CreateChapterModal({ open, bookId, languageLabel, onClose, onCreated }:
 			<CModal
 				open
 				centered
-				title="Create chapter"
+				title={isEdit ? 'Edit chapter' : 'Create chapter'}
 				footer={null}
 				onCancel={saving ? undefined : onClose}
 				styles={{
@@ -130,7 +160,11 @@ function CreateChapterModal({ open, bookId, languageLabel, onClose, onCreated }:
 				}}
 			>
 				<div className={classes.form}>
-					<div className={classes.hint}>If your book has no chapters, just upload a DOCX file.</div>
+					<div className={classes.hint}>
+						{isEdit
+							? 'Fix the chapter and send it again. Upload a new DOCX file only if the text changes.'
+							: 'If your book has no chapters, just upload a DOCX file.'}
+					</div>
 					<div className={classes.sectionLabel}>
 						CHAPTER THUMBNAIL <span className={classes.optional}>(optional)</span>
 					</div>
@@ -142,7 +176,10 @@ function CreateChapterModal({ open, bookId, languageLabel, onClose, onCreated }:
 								<button
 									type="button"
 									className={classes.coverRemove}
-									onClick={() => setThumbFile(null)}
+									onClick={() => {
+										setThumbFile(null)
+										setThumbPreview('')
+									}}
 									aria-label="Remove thumbnail"
 								>
 									<IconX size={12} />
@@ -185,13 +222,21 @@ function CreateChapterModal({ open, bookId, languageLabel, onClose, onCreated }:
 					<div className={classes.field}>
 						<div className={classes.docHead}>
 							<div className={classes.label}>
-								Docx file <span className={classes.required}>*</span>
+								{multilingual ? 'Upload Files' : 'Docx file'}{' '}
+								{isEdit ? null : <span className={classes.required}>*</span>}
 							</div>
 							<button type="button" className={classes.tutorial} onClick={() => setTutorialOpen(true)}>
 								<IconBook2 size={14} /> Tutorial
 							</button>
 						</div>
-						<div className={classes.sectionLabel}>{languageLabel.toUpperCase()}</div>
+						<div className={classes.sectionLabel}>
+							{multilingual ? 'ENGLISH' : languageLabel.toUpperCase()}
+						</div>
+						{multilingual ? (
+							<div className={classes.hint}>
+								Upload the chapter in English; it is translated and voiced for every language of the book.
+							</div>
+						) : null}
 						{docFile ? (
 							<div className={classes.docFile}>
 								<IconFileTypeDocx size={20} stroke={1.5} />
@@ -209,7 +254,7 @@ function CreateChapterModal({ open, bookId, languageLabel, onClose, onCreated }:
 						) : (
 							<button type="button" className={classes.docPick} onClick={() => docRef.current?.click()}>
 								<IconFileTypeDocx size={20} stroke={1.5} />
-								<span>Choose a .docx file</span>
+								<span>{isEdit ? 'Replace the .docx file (optional)' : 'Choose a .docx file'}</span>
 							</button>
 						)}
 						<input
@@ -228,9 +273,9 @@ function CreateChapterModal({ open, bookId, languageLabel, onClose, onCreated }:
 						type="button"
 						className={classes.primary}
 						onClick={submit}
-						disabled={!docFile || saving}
+						disabled={!canSubmit || saving}
 					>
-						{saving ? 'Uploading…' : 'Next'}
+						{saving ? 'Uploading…' : isEdit ? 'Resubmit' : multilingual ? 'Upload' : 'Next'}
 					</button>
 				</div>
 			</CModal>
@@ -247,11 +292,18 @@ function CreateChapterModal({ open, bookId, languageLabel, onClose, onCreated }:
 					<div className={classes.tutorialText}>
 						<p>To make sure the chapter is read correctly and approved quickly:</p>
 						<ul>
-							<li>Upload a .docx file (Word) with the whole chapter in {languageLabel}.</li>
+							<li>
+								Upload a .docx file (Word) with the whole chapter in{' '}
+								{multilingual ? 'English' : languageLabel}.
+							</li>
 							<li>Write the text as normal paragraphs, one after another.</li>
 							<li>Leave out images, tables and headers or footers; only the text is used.</li>
 						</ul>
-						<p>The audio is made from the text, and the UniVini team reviews every chapter.</p>
+						<p>
+							{multilingual
+								? 'The chapter is translated into every language of the book and the audio is made for each; this can take a while.'
+								: 'The audio is made from the text, and the UniVini team reviews every chapter.'}
+						</p>
 					</div>
 					<button type="button" className={classes.primary} onClick={() => setTutorialOpen(false)}>
 						Got it
