@@ -11,6 +11,7 @@ import { useLocalePath } from '@/ultis/route'
 import { BOOK_VOCAB_PATH } from '@/Variable/book.variable'
 
 import { SortMenu, STRENGTHS, StrengthBox, WordList } from './VocabParts'
+import LearnChoiceModal from './LearnChoiceModal'
 import classes from './Vocabulary.module.scss'
 
 // an avatar can be an image URL or an emoji
@@ -29,6 +30,7 @@ function VocabularyOverview() {
 	const { onChangeRoute } = useLocalePath()
 	const { nativeLang } = useBookLibrary()
 	const searched = useSearchedVocab(nativeLang)
+	const [learnOpen, setLearnOpen] = useState(false)
 	const [univini, setUnivini] = useState<VocabFolder[]>([])
 	const [univiniTotal, setUniviniTotal] = useState(0)
 	const [mine, setMine] = useState<VocabFolder[]>([])
@@ -140,6 +142,16 @@ function VocabularyOverview() {
 					emptyText="Words you look up while reading show up here."
 				/>
 			</section>
+			{searched.total ? (
+				<button type="button" className={classes.learnBtn} onClick={() => setLearnOpen(true)}>
+					Learning these words
+				</button>
+			) : null}
+			<LearnChoiceModal
+				open={learnOpen}
+				onClose={() => setLearnOpen(false)}
+				onPick={(learnType) => onChangeRoute(`${BOOK_VOCAB_PATH}/learn?type=${learnType}`)}
+			/>
 		</div>
 	)
 }
