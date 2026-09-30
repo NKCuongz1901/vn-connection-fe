@@ -168,6 +168,28 @@ const Overview = () => {
 		[handleCloseMap, onChangeLocation],
 	)
 
+	/** Opens upcoming-event and passes the current Overview location via query. */
+	const handleOpenUpcomingEvent = useCallback(() => {
+		const { latitude, longitude, google_title, types } = filters || {}
+		const params = new URLSearchParams()
+		const lat = Number(latitude)
+		const lng = Number(longitude)
+		if (lat && lng && !Number.isNaN(lat) && !Number.isNaN(lng)) {
+			params.set('latitude', String(lat))
+			params.set('longitude', String(lng))
+			if (google_title) params.set('google_title', google_title)
+			if (Array.isArray(types) && types.length) {
+				params.set('types', types.join(','))
+			}
+		}
+		const query = params.toString()
+		onChangeRoute(
+			query
+				? `${mainRoutes.upcomingEvent}?${query}`
+				: mainRoutes.upcomingEvent,
+		)
+	}, [filters, onChangeRoute])
+
 	const handleChatRoomTabClick = (next: 'language' | 'location') => {
 		if (chatRoomTab === next) {
 			onChangeRoute(`${mainRoutes.chatRoom}?type=${next}`)
@@ -916,7 +938,7 @@ const Overview = () => {
 					<Flex className={classes.upcomingHeading} vertical>
 						<Flex
 							className={classes.title}
-							onClick={() => onChangeRoute(mainRoutes.upcomingEvent)}
+							onClick={handleOpenUpcomingEvent}
 						>
 							<EventTitle
 								hiddenAdd
