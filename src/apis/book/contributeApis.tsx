@@ -1,4 +1,5 @@
 import axios from '../../axios'
+import axiosBase from 'axios'
 import { BOOK_ROUTES } from '@/routes'
 import { BookApiItem } from '@/interface/Book/book.interface'
 
@@ -82,3 +83,64 @@ export const getContributeLanguages = async () => {
 		parseApiObject<{ languages?: BookLanguageOption[] }>(res)?.languages || []
 	).filter((item) => item.code)
 }
+
+/** A chapter of the reader's own book (GET chapter/my-book/:book_id) */
+export type ContributedChapter = {
+	id?: string
+	book_id?: string
+	title?: string
+	description?: string | null
+	cover_image?: string | null
+	chapter_number?: number
+	total_pages?: number
+	approved_status?: 'approved' | 'inprogress' | 'rejected' | null
+	published_status?: 'published' | 'unpublished' | null
+}
+
+export const getMyBookChapters = async (bookId: string) =>
+	axios.get(`${BOOK_ROUTES.chapter}/my-book/${bookId}`, { params: { limit: 100, offset: 0 } })
+
+export type CreateChapterPayload = {
+	book_id: string
+	doc_url: string
+	title?: string
+	summary?: string
+	thumbnail?: string
+}
+
+/** One-language chapter: the API reads the text from the docx and sends it for review */
+export const createSingleLanguageChapter = async (payload: CreateChapterPayload) =>
+	axios.post(`${BOOK_ROUTES.chapter}/create-single-language`, payload)
+
+/** Only approved chapters can be published */
+export const publishChapters = async (ids: string[]) =>
+	axios.post(`${BOOK_ROUTES.chapter}/publish-single-language`, { ids })
+
+export const unpublishChapters = async (ids: string[]) =>
+	axios.post(`${BOOK_ROUTES.chapter}/unpublish-single-language`, { ids })
+
+export const deleteChapter = async (id: string) =>
+	axios.delete(`${BOOK_ROUTES.chapter}/single-language/${id}`)
+
+const axiosUpload = axiosBase.create()
+
+/** Upload a .docx through a pre-signed URL and return its public URL */
+export const uploadChapterDocument = async (file: File) => {
+	const res = (await axios.post('files/pre-signed-url', {
+		fileType: 'document',
+		fileSize: file.size,
+		fileName: file.name,
+	})) as { results?: { object?: { result_url?: string; upload_url?: string } } }
+	const { result_url, upload_url } = res?.results?.object || {}
+	if (!upload_url || !result_url) throw new Error('no upload url')
+	await axiosUpload.put(upload_url, file, {
+		headers: {
+			'Content-Type': file.type || DOCX_MIME,
+			'Cache-Control': 'public, max-age=31536000, immutable',
+		},
+	})
+	return result_url
+}
+
+export const DOCX_MIME =
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
