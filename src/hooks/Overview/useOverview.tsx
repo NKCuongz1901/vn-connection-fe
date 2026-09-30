@@ -95,7 +95,7 @@ export default function useOverview() {
 	const initialLocation = getInitialLocationFilter()
 	const _childRef = useRef<HTMLDivElement | null>(null)
 	const _filterRef = useRef<filterProps>({
-		radius: 50,
+		radius: '',
 		date: null,
 		categories: null,
 		title: '',
@@ -150,7 +150,7 @@ export default function useOverview() {
 
 	const [loadmore, setLoadMore] = useState(true)
 	const [filters, setFilters] = useState<filterProps>({
-		radius: 50,
+		radius: '',
 		date: null,
 		categories: null,
 		title: '',

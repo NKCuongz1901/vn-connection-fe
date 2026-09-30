@@ -23,7 +23,7 @@ type filterProps = {
 export default function usePublicOverview() {
 	const { openError } = useModal()
 	const _filterRef = useRef<filterProps>({
-		radius: 50,
+		radius: '',
 		date: null,
 		categories: null,
 		title: '',
@@ -41,7 +41,7 @@ export default function usePublicOverview() {
 	const [totalTalkroom, setTotalTalkroom] = useState(0)
 	const [statsTalkroom, setStatsTalkroom] = useState<any>({})
 	const [filters, setFilters] = useState<filterProps>({
-		radius: 50,
+		radius: '',
 		date: null,
 		categories: null,
 		title: '',
